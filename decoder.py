@@ -35,14 +35,13 @@ import cProfile
 import datetime
 import struct
 import sys
-import socket
-import pygame
+import numpy
+import cv
 
 try:
     import psyco
 except ImportError:
     print "Please install psyco for better video decoding performance."
-
 
 # from zig-zag back to normal
 ZIG_ZAG_POSITIONS = array.array('B',
@@ -414,54 +413,13 @@ def get_pheader(bitreader):
     return width, height
 
 
-def get_mb(bitreader, picture, width, offset):
-    """Get macro block.
-
-    This method does not return data but modifies the picture parameter in
-    place.
-    """
-    mbc = bitreader.read(1)
-    if mbc == 0:
-        mbdesc = bitreader.read(8)
-        assert(mbdesc >> 7 & 1)
-        
-        if mbdesc >> 6 & 1:
-            mbdiff = bitreader.read(2)
-        y = get_block(bitreader, mbdesc & 1)
-        y.extend(get_block(bitreader, mbdesc >> 1 & 1))
-        y.extend(get_block(bitreader, mbdesc >> 2 & 1))
-        y.extend(get_block(bitreader, mbdesc >> 3 & 1))
-        cb = get_block(bitreader, mbdesc >> 4 & 1)
-        cr = get_block(bitreader, mbdesc >> 5 & 1)
-        # ycbcr to rgb
-        for i in range(256):
-            j = SCALE_TAB[i]
-            Y = y[i] - 16
-            B = cb[j] - 128
-            R = cr[j] - 128
-            r = (298 * Y           + 409 * R + 128) >> 8
-            g = (298 * Y - 100 * B - 208 * R + 128) >> 8
-            b = (298 * Y + 516 * B           + 128) >> 8
-            r = 0 if r < 0 else r
-            r = 255 if r > 255 else r
-            g = 0 if g < 0 else g
-            g = 255 if g > 255 else g
-            b = 0 if b < 0 else b
-            b = 255 if b > 255 else b
-            # re-order the pixels
-            row = MB_ROW_MAP[i]
-            col = MB_COL_MAP[i]
-            picture[offset + row*width + col] = ''.join((chr(r), chr(g), chr(b), chr(255)))
-    else:
-        print "mbc was not zero"
-
-
 def get_block(bitreader, has_coeff):
     """Read a 8x8 block from the data stream.
 
     This method takes care of the huffman-, RLE, zig-zag and idct and returns a
     list of 64 ints.
     """
+
     # read the first 10 bits in a 16 bit datum
     out_list = ZEROS[0:64]
     out_list[0] = int(bitreader.read(10)) * IQUANT_TAB[0]
@@ -494,6 +452,56 @@ def get_block(bitreader, has_coeff):
     return inverse_dct(out_list)
 
 
+def get_mb(bitreader, picture, width, offset):
+    """Get macro block.
+
+    This method does not return data but modifies the picture parameter in
+    place.
+    """
+
+    mbc = bitreader.read(1)
+    if mbc == 0:
+        mbdesc = bitreader.read(8)
+        assert(mbdesc >> 7 & 1)
+        
+        if mbdesc >> 6 & 1:
+            mbdiff = bitreader.read(2)
+        y = get_block(bitreader, mbdesc & 1)
+        y.extend(get_block(bitreader, mbdesc >> 1 & 1))
+        y.extend(get_block(bitreader, mbdesc >> 2 & 1))
+        y.extend(get_block(bitreader, mbdesc >> 3 & 1))
+        cb = get_block(bitreader, mbdesc >> 4 & 1)
+        cr = get_block(bitreader, mbdesc >> 5 & 1)
+        
+        # ycbcr to rgb
+        for i in range(256):
+            j = SCALE_TAB[i]
+            Y = y[i] - 16
+            B = cb[j] - 128
+            R = cr[j] - 128
+            r = (298 * Y           + 409 * R + 128) >> 8
+            g = (298 * Y - 100 * B - 208 * R + 128) >> 8
+            b = (298 * Y + 516 * B           + 128) >> 8
+            r = 0 if r < 0 else r
+            r = 255 if r > 255 else r
+            g = 0 if g < 0 else g
+            g = 255 if g > 255 else g
+            b = 0 if b < 0 else b
+            b = 255 if b > 255 else b
+            # re-order the pixels
+            row = MB_ROW_MAP[i]
+            col = MB_COL_MAP[i]
+            rowoff = offset[0]
+            coloff = offset[1]
+            
+            #index =  offset + row*(width*3) + (col*3)
+            picture[ rowoff+row, coloff+col] =  (b, g, r)
+                        
+    else:
+        print "mbc was not zero"
+
+
+
 def get_gob(bitreader, picture, slicenr, width):
     """Read a group of blocks.
     
@@ -501,6 +509,7 @@ def get_gob(bitreader, picture, slicenr, width):
     instead.
     """
     # the first gob has a special header
+
     if slicenr > 0:
         bitreader.align()
         gobsc = bitreader.read(22)
@@ -514,28 +523,55 @@ def get_gob(bitreader, picture, slicenr, width):
         _ = bitreader.read(5)
     offset = slicenr*16*width
     for i in range(width / 16):
-        get_mb(bitreader, picture, width, offset+16*i)
+        get_mb(bitreader, picture, width, (slicenr*16, i*16))#(offset+16*i))
 
+
+def cv2array(im): 
+  depth2dtype = { 
+        cv.IPL_DEPTH_8U: 'uint8', 
+        cv.IPL_DEPTH_8S: 'int8', 
+        cv.IPL_DEPTH_16U: 'uint16', 
+        cv.IPL_DEPTH_16S: 'int16', 
+        cv.IPL_DEPTH_32S: 'int32', 
+        cv.IPL_DEPTH_32F: 'float32', 
+        cv.IPL_DEPTH_64F: 'float64', 
+    } 
+
+  arrdtype=im.depth 
+  a = numpy.fromstring( 
+         im.tostring(), 
+         dtype=depth2dtype[im.depth], 
+         count=im.width*im.height*im.nChannels) 
+  a.shape = (im.height,im.width,im.nChannels) 
+  return a 
 
 def read_picture(data):
     """Convert an AR.Drone image packet to rgb-string.
-
     Returns: width, height, image and time to decode the image
     """
+    retimg = cv.CreateImage((320, 240), 8, 3)
+    
     bitreader = BitReader(data)
     t = datetime.datetime.now()
     width, height = get_pheader(bitreader)
     slices = height / 16
     blocks = width / 16
-    image = [0 for i in range(width*height)]
+       
+    #image = ['0' for i in range(width*height*3)]
+
     for i in range(0, slices):
-        get_gob(bitreader, image, i, width)
+        get_gob(bitreader, retimg, i, width)
+        
     bitreader.align()
     eos = bitreader.read(22)
     assert(eos == 0b0000000000000000111111)
-    t2 = datetime.datetime.now()
-    return width, height, ''.join(image), (t2 - t).microseconds / 1000000.
 
+    #numpy.set_printoptions(threshold='100')
+    #ar = cv2array(retimg)
+    #print ar
+
+    t2 = datetime.datetime.now()
+    return width, height, retimg, (t2 - t).microseconds / 1000000.
 
 try:
     psyco.bind(BitReader)
@@ -546,11 +582,6 @@ try:
     psyco.bind(read_picture)
 except NameError:
     print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
-
-# def getData():
-        
-#     return data
-
 
 def main():
     print 'Nothing to see here...'

@@ -53,7 +53,7 @@ class Controller(threading.Thread):
                 
                 elif e.type == pygame.JOYBUTTONDOWN: # 10
                     
-                    for b in range(self.js.get_numbuttons()):
+                    for b in xrange(self.js.get_numbuttons()):
                                                 
                         if self.js.get_button(b) > 0:
                             #print 'number of button pushed: ' + str(b)
@@ -155,7 +155,7 @@ def main():
         print 'No joystick available, exiting... should default to keyboard mode'
         return False
     Utils.dprint(DEBUG, '1')
-    drone = Drone.Drone()
+    drone = Drone.Drone(False)
     controller = Controller(drone, js)
     controller.start()
     

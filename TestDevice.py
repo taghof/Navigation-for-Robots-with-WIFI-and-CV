@@ -12,8 +12,9 @@ DEBUG = False
 
 class TestDevice(threading.Thread):
     
-    def __init__(self):
+    def __init__(self, runalone):
         threading.Thread.__init__(self)
+        self.run_alone = runalone
         self.packets = []
         self.stopping = False
         self.timeout = 500
@@ -29,12 +30,14 @@ class TestDevice(threading.Thread):
         self.send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         
     def run(self):
-        print 'TestDevice waiting for incoming connection.'
-        self.initpck, self.addr = self.init_sock.recvfrom(65535)
-        self.init_sock.setblocking(0)
-        print 'TestDevice connected, beginning transmission.'
-        Utils.dprint(DEBUG, 'received: ' + str(self.initpck))
+        if not self.run_alone:
+            print 'TestDevice waiting for incoming connection.'
+            self.initpck, self.addr = self.init_sock.recvfrom(65535)
+            
+            print 'TestDevice connected, beginning transmission.'
+            Utils.dprint(DEBUG, 'received: ' + str(self.initpck))
         
+        self.init_sock.setblocking(0)
         i = 0
         while self.timeout and not self.stopping:
             data = 0
@@ -61,5 +64,5 @@ class TestDevice(threading.Thread):
         self.stopping = True
        
 if __name__ == '__main__':
-    dev = TestDevice()
+    dev = TestDevice(True)
     dev.start()

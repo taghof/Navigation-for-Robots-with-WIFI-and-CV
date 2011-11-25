@@ -38,6 +38,7 @@ import sys
 import numpy
 import cv
 
+
 try:
     import psyco
 except ImportError:
@@ -161,7 +162,7 @@ MB_COL_MAP = array.array('B', [i % 16 for i in MB_TO_GOB_MAP])
 
 # An array of zeros. It is much faster to take the zeros from here than to
 # generate a new list when needed.
-ZEROS = array.array('i', [0 for i in range(256)])
+ZEROS = array.array('i', [0 for i in xrange(256)])
 
 # Constants needed for the inverse discrete cosine transform.
 FIX_0_298631336 = 2446
@@ -235,8 +236,8 @@ def _second_half(data):
 
 
 # Precompute all 12 and 15 bit values for the entropy decoding process
-FH = [_first_half(i) for i in range(2**12)]
-SH = [_second_half(i) for i in range(2**15)]
+FH = [_first_half(i) for i in xrange(2**12)]
+SH = [_second_half(i) for i in xrange(2**15)]
 
 
 class BitReader(object):
@@ -283,13 +284,13 @@ def inverse_dct(block):
     """
     workspace = ZEROS[0:64]
     data = ZEROS[0:64]
-    for pointer in range(8):
+    for pointer in xrange(8):
         if (block[pointer + 8] == 0 and block[pointer + 16] == 0 and
             block[pointer + 24] == 0 and block[pointer + 32] == 0 and
             block[pointer + 40] == 0 and block[pointer + 48] == 0 and
             block[pointer + 56] == 0):
             dcval = block[pointer] << PASS1_BITS
-            for i in range(8):
+            for i in xrange(8):
                 workspace[pointer + i*8] = dcval
             continue
 
@@ -338,7 +339,7 @@ def inverse_dct(block):
         workspace[pointer + 24] = ((tmp13 + tmp0 + (1 << F1)) >> F2)
         workspace[pointer + 32] = ((tmp13 - tmp0 + (1 << F1)) >> F2)
 
-    for pointer in range(0, 64, 8):
+    for pointer in xrange(0, 64, 8):
         z2 = workspace[pointer + 2]
         z3 = workspace[pointer + 6]
         z1 = (z2 + z3) * FIX_0_541196100
@@ -430,7 +431,7 @@ def get_block(bitreader, has_coeff):
         _ = bitreader.read(32*TRIES, False)
         streamlen = 0
         #######################################################################
-        for j in range(TRIES):
+        for j in xrange(TRIES):
             data = (_ << streamlen) & MASK
             data >>= SHIFT
 
@@ -474,7 +475,7 @@ def get_mb(bitreader, picture, width, offset):
         cr = get_block(bitreader, mbdesc >> 5 & 1)
         
         # ycbcr to rgb
-        for i in range(256):
+        for i in xrange(256):
             j = SCALE_TAB[i]
             Y = y[i] - 16
             B = cb[j] - 128
@@ -522,7 +523,7 @@ def get_gob(bitreader, picture, slicenr, width):
             return False
         _ = bitreader.read(5)
     offset = slicenr*16*width
-    for i in range(width / 16):
+    for i in xrange(width / 16):
         get_mb(bitreader, picture, width, (slicenr*16, i*16))#(offset+16*i))
 
 
@@ -549,6 +550,7 @@ def read_picture(data):
     """Convert an AR.Drone image packet to rgb-string.
     Returns: width, height, image and time to decode the image
     """
+
     retimg = cv.CreateImage((320, 240), 8, 3)
     
     bitreader = BitReader(data)
@@ -556,21 +558,16 @@ def read_picture(data):
     width, height = get_pheader(bitreader)
     slices = height / 16
     blocks = width / 16
-       
-    #image = ['0' for i in range(width*height*3)]
-
-    for i in range(0, slices):
+    
+    for i in xrange(0, slices):
         get_gob(bitreader, retimg, i, width)
         
     bitreader.align()
     eos = bitreader.read(22)
     assert(eos == 0b0000000000000000111111)
 
-    #numpy.set_printoptions(threshold='100')
-    #ar = cv2array(retimg)
-    #print ar
-
     t2 = datetime.datetime.now()
+
     return width, height, retimg, (t2 - t).microseconds / 1000000.
 
 try:
@@ -584,10 +581,13 @@ except NameError:
     print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
 
 def main():
-    print 'Nothing to see here...'
-
+    data = open('testdata/100.dat').read()
+    cProfile.runctx('read_picture(data)', globals(), locals())
+    
 if __name__ == '__main__':
     if 'profile' in sys.argv:
         cProfile.run('main()')
     else:
         main()
+        
+    

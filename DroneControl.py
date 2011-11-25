@@ -1,12 +1,10 @@
 #!/usr/bin/env python2.7
 
-import struct
+#import struct
 import sys
-#import socket
 import pygame
-import os
+#import os
 import threading
-#import Video
 import Utils
 import Drone
 

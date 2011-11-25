@@ -3,7 +3,6 @@
 import struct
 import sys
 import socket
-#import pygame
 import os
 import threading
 import Video
@@ -22,8 +21,9 @@ DEBUG = False
         
 
 class Drone(object):
-    def __init__(self):
+    def __init__(self, test):
         self.landed = True
+        self.test = test
         self.lock = threading.Lock()
         self.seq_num = 1
         self.timer_t = 0.1
@@ -33,8 +33,15 @@ class Drone(object):
         self.at(at_config, "general:navdata_demo", "TRUE")
     
     def startVideo(self):
-        self.videothread = Video.VideoThread(False, False, False)
-        self.videothread.start()
+        if not self.videothread:
+            self.videothread = Video.VideoThread(self.test, False, False)
+            self.videothread.start()
+        elif self.videothread and self.videothread.state == Video.STOPPING:
+            self.Videothread = None
+            self.videothread = Video.VideoThread(self.test, False, False)
+            self.videothread.start()
+        else:
+            self.videothread.stop()
 
 
     def stop(self):

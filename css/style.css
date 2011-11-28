@@ -1,0 +1,59 @@
+header				{ border-bottom: 3px double #000080; }
+header  .inside	{ padding-top: 48px; }
+aside					{ background: #ddd; height: 100%; }
+footer				{ border-top: 3px double #000080; }
+
+h2				{ font-size: 2.2em; line-height: 1em; }
+h3				{ margin: 12px 0 4px; }
+
+aside			{ background: -webkit-gradient(linear, left top, left bottom, from(#ccc), to(#eee)); background: -moz-linear-gradient(top, #ccc, #eee); }
+
+a,
+a:hover,
+a:visited	{ color: #000080; }
+
+p				{ margin: 4px 0 12px; }
+
+/* HEADER */
+
+header					{ position: relative; }
+header .description	{ margin: 8px 0 12px; font-size: 1.2em; }
+header .left			{ width: 600px; }
+header .right			{ position: absolute; bottom: 12px; right: 0; }
+
+nav a						{ font-size: 1.6em; text-decoration: none; margin-left: 12px; }
+
+
+
+/* RELATED POSTS */
+
+.related-post			{ margin: 12px 0; }
+.related-post h4		{ font-size: 1.8em; line-height: 1.2em; margin: 12px 0 4px; }
+.related-post .meta	{ font-size: 1.2em; line-height: 1.2em; }
+
+/* TAG CLOUDS */
+
+.text			{ font-size: 1.4em; }
+.tag-cloud	{ margin: 18px 0 0; line-height: 1.5em;}
+
+
+/* TEASERS */
+
+.teaser				{ width: 100%; }
+.teaser img			{ width: 200px; height: auto; float: left; margin-right: 12px; }
+.teaser h2			{ margin-top: 12px; }
+.teaser .meta		{ font-size: 1.2em; line-height: 2em; }
+.teaser .description	{ font-size: 1.4em; line-height: 1.2em; margin: 4px 0; }
+.teaser .read-more	{ font-size: 1.4em; line-height: 1.5em; }
+
+
+/* POSTS */
+
+.post-image img		{ width: 600px; height: auto; margin: 12px 0; }
+#disqus_thread			{ font-size: 1.4em; margin: 12px 0; padding: 12px 0; border-top: 1px solid #666; }
+
+
+/* MISC */
+
+h1 a		{ text-decoration: none; color: #000; }
+aside h3		{ background: #fff; padding: 8px; -moz-border-radius: 0em 1em 1em 0em; border-radius: 0em 1em 1em 0em; }

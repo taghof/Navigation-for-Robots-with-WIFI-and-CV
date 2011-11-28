@@ -1,0 +1,31 @@
+safe:        false
+auto:        false
+server:      false
+server_port: 4000
+
+source:      .
+destination: ./_site
+plugins:     ./_plugins
+
+future:      true
+lsi:         true
+pygments:    false
+markdown:    engine
+permalink:   /:categories/:title
+paginate:    20
+#limit_posts: 20
+
+title:         Your Site's Title Here
+description:   You Site's Description Here
+base:          http://www.domain.com
+author:        Your Name Here
+email:         me@domain.com
+
+disqus_id:     disqus
+google_analytics:  UA-XXXXXX-1
+redirects:   true
+
+exclude:    
+- ./tasks
+- README.textile
+

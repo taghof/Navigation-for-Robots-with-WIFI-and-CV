@@ -1,5 +1,0 @@
-git commit --all
-git push origin master
-
-jekyll
-# rsync -avz _site/ dest:/var/www/vhosts/httpdocs

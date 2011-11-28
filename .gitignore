@@ -1,0 +1,5 @@
+./testdata
+./media
+*.pyc
+*.py~
+#*#

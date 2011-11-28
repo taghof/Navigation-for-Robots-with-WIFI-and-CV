@@ -1,0 +1,84 @@
+/* Getting the new tags to behave */
+article, aside, audio, canvas, command, datalist, details, embed, figcaption, figure, footer, header, hgroup, keygen, meter, nav, output, progress, section, source, video{ display: block; }
+mark, rp, rt, ruby, summary, time{ display: inline }
+
+/* Site-wide properties ======================================================== */
+body{
+    font: normal normal 10px/10px Tahoma, Arial, Helvetica, Verdana, sans-serif; }
+    
+    /* Fibonacci based heading scale ratio */
+    h1{ font-size: 3.2em; font-weight: bold; }
+    h2{ font-size: 2.8em; font-weight: bold; }
+    h3{ font-size: 1.6em; font-weight: bold; }
+    h4{ font-size: 1.2em; font-weight: bold; }
+
+/* Reusable classes ============================================================ */
+
+/* Left & Right alignment */
+.left{ float: left; }
+.right{ float: right; }
+
+/* The inside class provides consistent padding. To be used often! */
+.inside{ padding: 20px; }
+
+/* The fraction classes are useful for column lists */
+.half, .third, .quarter, .fifth, .sixth{ width: 100%; }
+.half li, .third li, .quarter li, .fifth li, .sixth li{ float: left; }
+.half li{ padding-right: 5%; width: 45% }
+.third li{  padding-right: 5%; width: 28.3% }
+.quarter li{  padding-right: 5%; width: 20% }
+.fifth li{  padding-right: 5%; width: 15% }
+
+/* For when a <br /> just ain't enough */
+.separator{
+    clear: both;
+    float: left;
+    height: 1px;
+    width: 100%; }
+
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+ 
+.clearfix {
+	display: inline-block;
+}
+ 
+html[xmlns] .clearfix {
+	display: block;
+}
+ 
+* html .clearfix {
+	height: 1%;
+}
+
+/* Basic Structure ============================================================= */
+#page{
+    margin: 0 auto;
+    position: relative;
+    width: 960px; }
+
+    /* Header */
+    header{
+        float: left;
+        width: 100%; }
+    
+    /* Content */
+    article{
+        float: left;
+        width: 660px; }
+    
+    /* Sidebar */
+    aside{
+        float: left;
+        width: 300px; }
+        
+    /* Footer */
+    footer{
+        float: left;
+        width: 100%; }

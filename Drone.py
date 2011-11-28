@@ -1,4 +1,4 @@
-v#!/usr/bin/env python2.7
+#!/usr/bin/env python2.7
 
 import struct
 import sys
@@ -32,7 +32,8 @@ class Drone(object):
         self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
         self.speed = 0.2
         self.at(at_config, "general:navdata_demo", "TRUE")
-    
+        self.chan = 0
+
     def startVideo(self):
         if not self.videothread:
             self.videothread = Video.VideoThread(self.test, False, False)
@@ -44,6 +45,12 @@ class Drone(object):
         else:
             self.videothread.stop()
 
+    def zap(self):
+        print 'zapping: ' + str(self.chan)
+        self.at(at_config, "video:video_channel", str(self.chan))
+        self.at(at_zap, self.chan)
+        self.chan += 2
+        self.chan = self.chan % 8
 
     def stop(self):
         self.land()

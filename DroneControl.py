@@ -54,7 +54,7 @@ class Controller(threading.Thread):
                     for b in xrange(self.js.get_numbuttons()):
                                                 
                         if self.js.get_button(b) > 0:
-                            #print 'number of button pushed: ' + str(b)
+                            print 'number of button pushed: ' + str(b)
                             if b==0:
                                 self.drone.stop()
                                 self.stop()
@@ -67,8 +67,8 @@ class Controller(threading.Thread):
                                 self.drone.ledShow(6)
                             # elif b==4:
                             #     pass
-                            # elif b==5:
-                            #     pass
+                            elif b==5:
+                                 self.drone.zap()
                             # elif b==6:
                             #     pass
                             # elif b==7:

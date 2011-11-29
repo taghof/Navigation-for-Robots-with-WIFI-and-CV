@@ -1,4 +1,3 @@
 pygments: true
 markdown: redcarpet
-permalink: /Navigation-for-Robots-with-WIFI-and-CV/:year/:month/:day/:title
-exclude: sass/, config.rb
+permalink: /blog/:year/:month/:day/:title

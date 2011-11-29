@@ -4,3 +4,7 @@
 *.py~
 #*#
 
+/_site/index.html
+/_site/README
+/_site/Navigation-for-Robots-with-WIFI-and-CV/2009/07/30/introducting-the-yubr-programming-language/index.html
+/_config.yml~

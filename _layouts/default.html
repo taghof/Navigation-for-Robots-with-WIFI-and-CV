@@ -2,31 +2,22 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<title>Ben Ubois | {{ page.title }}</title>
-	<link rel="alternate" type="application/atom+xml" title="Ben Ubois - Atom" href="http://feeds.feedburner.com/benubois" />
+	<title>Navigation for Robots with WIFI and CV | {{ page.title }}</title>
 	<link rel="stylesheet" href="{{site.baseurl}}/css/master.css" />
 	<script src="{{site.baseurl}}/js/master.js"></script>
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-172060-6']);
-		_gaq.push(['_trackPageview']);
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
-		})();
-	</script>
 </head>
 
 <body>
 
 	<header>
 		<div class="container">
-			<p id="logo"><a href="{{site.baseurl}}">Ben Ubois</a></p>
+			<p id="logo"><a href="{{site.baseurl}}">Navigation for Robots with WIFI and CV</a></p>
 			<nav>
 				<ul class="clearfix">
-					<li{% if page.title == 'About' %} class="selected"{% endif %}><a href="/about.html">About</a></li>
-					<li{% if page.title == 'Archive' %} class="selected"{% endif %}><a href="/archive.html">Archive</a></li>
+				  
+				  <li{% if page.title == 'Project' %} class="selected"{% endif %}><a href="/project.html">Archive</a></li>
+				  <li{% if page.title == 'Code' %} class="selected"{% endif %}><a href="https://github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV">Code</a></li>
+				  <li{% if page.title == 'Archive' %} class="selected"{% endif %}><a href="/archive.html">Archive</a></li>
 				</ul>
 			</nav>
 		</div>
@@ -41,7 +32,8 @@
 	</section>
 
 	<footer class="container">
-		<p>Copyright &copy; 2009&ndash;{{ site.time | date: "%Y" }} <a href="mailto:ben@benubois.com">Ben Ubois</a></p>
+		<p>2011&ndash;{{ site.time | date: "%Y" }} Master
+		thesis project - <a href="mailto:taghof@gmail.com">Navigation for Robots with WIFI and CV</a></p>
 	</div>
 </body>
 </html>

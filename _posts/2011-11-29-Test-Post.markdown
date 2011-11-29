@@ -26,13 +26,13 @@ Mauris vitae tellus risus, eu sodales ante. In in metus vitae sem aliquam rutrum
 
 ## Lister ##
 
-1. derp
-2. herp
-3. derpette
+1 derp
+2 herp
+3 derpette
 
-+ derpo
-+ derpa
-+ derpow
+* derpo
+* derpa
+* derpow
 
 ## Code ##
 

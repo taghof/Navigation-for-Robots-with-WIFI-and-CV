@@ -1,3 +1,4 @@
 pygments: true
 markdown: redcarpet
 permalink: /blog/:year/:month/:day/:title
+baseurl: http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/

@@ -30,24 +30,17 @@ Mauris vitae tellus risus, eu sodales ante. In in metus vitae sem aliquam rutrum
 2.  herp
 3.  derpette
 
-` `
-
-*	derpo
-* 	derpa
-* 	derpow
-
-
 ## Code ##
 
 inline:
 `<pre><code> derpow </code></pre>`
 
-` `
+
 
 block:
+	`<pre><code> derpow </code></pre>
 	<pre><code> derpow </code></pre>
-	<pre><code> derpow </code></pre>
-	<pre><code> derpow </code></pre>
+	<pre><code> derpow </code></pre>`
 
 ## Links ##
 

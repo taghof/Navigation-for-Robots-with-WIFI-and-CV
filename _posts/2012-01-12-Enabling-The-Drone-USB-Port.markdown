@@ -25,12 +25,12 @@ steps assume you are using a linux build environment.
        	[here](https://projects.ardrone.org/documents/show/19 "Kernel
        	Source"). Also available is the kernel config file, and so we
        	are able to build modules for the kernel running on the drone.
-       	<ul><li> Download and unpack the kernel source and
-       	kernel.config. Rename kernel.config to .config and place it in
-       	the kernel source root.</li> <li>Setup a cross compilation
-       	environment by following the instructions
-       	[here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling
-       	"cross compilation setup").</li></ul></li>
+       	+	Download and unpack the kernel source and
+       		kernel.config. Rename kernel.config to .config and place it in
+       		the kernel source root.
+	+	Setup a cross compilation environment by following the instructions
+       		[here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling
+       		"cross compilation setup").
 
 2.	Edit the file "drivers/parrot/usb/dwc_otg/dwc\_\_otg\_driver.c",
 	instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html).
@@ -44,19 +44,15 @@ steps assume you are using a linux build environment.
 3.	Select the kernel modules you want to compile(including the one you edited) by going to the kernel tree root and running:
 
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig
-	   
-	.   
-	Remember to select as modules(M, not *). To enable the usb port select "System Type -> Parrot Drivers -> PARROT6 USB driver (Synopsys)". 
+
+	<br />Remember to select as modules(M, not *). To enable the usb port select "System Type -> Parrot Drivers -> PARROT6 USB driver (Synopsys)". 
 	To enable the FAT32 file system select "File systems -> DOS/FAT/NT Filesystems -> VFAT (Windows-95) fs support", "File systems -> Native language support", "File systems -> 		Native language support -> Codepage 437 (United States, Canada)", "File systems -> Native language support -> NLS ISO 8859-1  (Latin 1; Western European Languages), "File 		systems -> Native language support -> NLS UTF-8. 
 	Furthermore, for a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting "Device Drivers -> SCSI device support -> SCSI disk support.
 	Now the selected modules can be compiled by running:
    
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
-    
-    
-     
-   
-	This should, among other things, generate the following modules:
+
+	<br />This should, among other things, generate the following modules:
 
 		drivers/block/nbd.ko
 		drivers/parrot/usb/dwc_otg/dwc_otg.ko
@@ -71,12 +67,12 @@ steps assume you are using a linux build environment.
    
 
 4.	Transfer these modules to the drone via FTP and before inserting the modules, login to the drone via telnet and run the following commands to activate the USB port in the 		drone hardware:
-
+   
 		# gpio 127 -d ho 1
 		# gpio 127 -d i
    
 
-	Then insert the modules with `insmod <module file>`. Consider a shell script for automating the on-drone proces.
+	<br />Then insert the modules with `insmod <module file>`. Consider a shell script for automating the on-drone proces.
 
 Results
 =======

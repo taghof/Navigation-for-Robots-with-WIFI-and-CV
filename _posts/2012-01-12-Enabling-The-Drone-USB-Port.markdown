@@ -40,6 +40,7 @@ Now the selected modules can be compiled by running:
    make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
     
 this should, among other things, generate the following modules:
+    
     drivers/block/nbd.ko
     drivers/parrot/usb/dwc_otg/dwc_otg.ko
     drivers/scsi/scsi_wait_scan.ko
@@ -50,6 +51,7 @@ this should, among other things, generate the following modules:
     fs/nls/nls_iso8859-1.ko
     fs/nls/nls_utf8.ko
     fs/vfat/vfat.ko
+
 </li>
 <li>Transfer these modules to the drone via FTP and before inserting the modules run the following commands on the drone to activate the USB port in the drone hardware:
 

@@ -19,8 +19,8 @@ modules to the drone and inserting the modules in the kernel and
 lastly changing the state of an I/O pin with the drone gpio tool. The following
 steps assume you are using a linux build environment.
 <ol>
-<li>To begin editing the port driver one must first obtain the source code, luckily Parrot makes their custom kernel source(including drivers) freely available [here](https://projects.ardrone.org/documents/show/19 "Kernel Source"). Also available is the kernel config and so we are able to build modules for the kernel running on the drone.
-<ul><li>  So download and unpack the kernel source, rename kernel.config to .config and place it in the kernel source root.</li>
+<li>To begin editing the port driver one must first obtain the source code, luckily the custom Parrot kernel source(including drivers) is freely available [here](https://projects.ardrone.org/documents/show/19 "Kernel Source"). Also available is the kernel config file, and so we are able to build modules for the kernel running on the drone.
+<ul><li>  Download and unpack the kernel source and kernel.config. Rename kernel.config to .config and place it in the kernel source root.</li>
 <li>Setup a cross compilation environment by following the instructions [here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup").</li></ul></li>
 <li>Edit the file "drivers/parrot/usb/dwc_otg/dwc_otg_driver.c",
 instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html),

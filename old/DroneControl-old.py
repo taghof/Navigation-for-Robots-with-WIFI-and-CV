@@ -1,9 +1,7 @@
 #!/usr/bin/env python2.7
 
-#import struct
 import sys
 import pygame
-#import os
 import threading
 import Utils
 import Drone
@@ -20,6 +18,7 @@ INTERFACE_IP = '192.168.1.2'
 DEBUG = False
 
 class Controller(threading.Thread):    
+    
     def __init__(self, drone, js):
         threading.Thread.__init__(self)
         self.drone = drone
@@ -32,9 +31,7 @@ class Controller(threading.Thread):
             return nump/2
         else:
             return nump
-        
-
-
+    
     def run(self):
         while not self.stopping:
             for e in pygame.event.get(): # iterate over event stack

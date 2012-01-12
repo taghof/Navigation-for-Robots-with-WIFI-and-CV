@@ -20,8 +20,8 @@ class TestDevice(threading.Thread):
         self.timeout = 500
         self.i = 1
         
-        while os.path.isfile('./testdata/' + str(self.i) + '.dat'):
-            self.packets.append('./testdata/' + str(self.i) + '.dat')
+        while os.path.isfile('../testdata/' + str(self.i) + '.dat'):
+            self.packets.append('../testdata/' + str(self.i) + '.dat')
             self.i += 1
         
         self.init_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

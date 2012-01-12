@@ -1,4 +1,4 @@
-2#!/usr/bin/env python2.7
+#!/usr/bin/env python2.7
 
 import datetime
 import time
@@ -10,10 +10,11 @@ import numpy
 import multiprocessing
 import select
 import cv
-
+import math
 import TestDevice
 import Utils
 import decoder
+import Queue
 
 DEBUG = False
 
@@ -21,6 +22,9 @@ INIT = 0
 STARTED = 1
 PAUSED = 2
 STOPPING = 3
+
+NORMAL = 4
+PRINT = 5
 
 class VideoThread(multiprocessing.Process):
 
@@ -35,14 +39,16 @@ class VideoThread(multiprocessing.Process):
         
         self.window = "OpenCV window: " + str(datetime.datetime.now())
         
+        self.lock = multiprocessing.Lock()
         self.com_pipe, self.com_pipe_other = multiprocessing.Pipe() 
+        self.queue = multiprocessing.Queue(100000)
         self.state = INIT 
         self.wakeup = 2500
 
         self.MCAST = multicast       
         self.RECORD = record
         self.TEST = test
-
+      
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setblocking(0)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -81,11 +87,12 @@ class VideoThread(multiprocessing.Process):
         Utils.dprint(DEBUG, 'initing')
 
     def run(self):
-        
+        #self.queue.put('derpa')
         cv.NamedWindow(self.window)
         #cv.SetMouseCallback(self.window, self.callBack, None)
         runs = 0
         state = STARTED
+        mode = NORMAL
         time_start = datetime.datetime.now()
         
         self.initVideo()
@@ -106,17 +113,22 @@ class VideoThread(multiprocessing.Process):
             
                     if data:
                         runs += 1
-                        self.updateScreen(data, runs)
-                    else:
-                        Utils.dprint(DEBUG, 'not receiving video data, though select said so...')
-                
+                        img = self.updateScreen(data, runs)
+                        if mode == PRINT:
+                            vprint = self.extractPrint(img)
+                            #self.queue.get(False)
+                            self.queue.put(vprint)
+                            mode = NORMAL
+        
                 elif i == self.com_pipe:
-                    state = STOPPING
+                    if i.recv() == 'print':
+                        mode = PRINT
+                    else:
+                        state = STOPPING
 
         time_end = datetime.datetime.now()
         delta = (time_end - time_start)
         time_elapsed = (delta.microseconds + (delta.seconds*1000000.0))/1000000.0
-        
         cv.DestroyWindow(self.window)
         print
         print 'frames:\t', runs
@@ -138,27 +150,75 @@ class VideoThread(multiprocessing.Process):
         else:
             self.state = STARTED
            
+    def setCurrentTarget(self, p):
+        pass
+
+    def scanForCurrentTarget(self):
+        pass
+
+    def getVerticalPrint(self):
+        self.com_pipe_other.send('print')
+        img = self.queue.get()
+        print 'do stuff'
+
     def updateScreen(self, data, num):
         w, h, img, ti = decoder.read_picture(data)
-        
-        #self.findGoodFeatures(img)
-        #self.findFaces(img)
-        
-        rfactor = 3
-        resized = cv.CreateMat(img.height*rfactor, img.width*rfactor, cv.CV_8UC3)
-        cv.Resize(img, resized)
 
-        cv.ShowImage(self.window, resized);
+        #img = cv.LoadImage('./vert.png')
+        #rfactor = 3
+        #resized = cv.CreateMat(img.height*rfactor, img.width*rfactor, cv.CV_8UC3)
+        #cv.Resize(img, resized)
+        #img = resized
+
+        cv.ShowImage(self.window, img);
         cv.WaitKey(1)
-        
+
         if self.RECORD:
             f = open('./testdata/' + str(num) + '.dat', 'w')
             f.write(data)
             f.close()
             cv.WriteFrame(self.writer, img)
 
-        return ti
+        return img
 
+
+    def extractPrint(self, img):
+        gray  = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        canny = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        cv.CvtColor(img, gray,cv.CV_BGR2GRAY)
+        cv.Canny(gray, canny, 10, 15)
+        
+        li = cv.HoughLines2(canny,
+                            cv.CreateMemStorage(),
+                            cv.CV_HOUGH_STANDARD,
+                            1,
+                            math.pi/180,
+                            100,
+                            0,
+                            0)
+        
+        p = [0 for i in range(320)]
+
+        for (rho,theta) in li:
+            if theta < 0.04:
+                    #print theta
+                c = math.cos(theta)
+                s = math.sin(theta)
+                x0 = c*rho
+                y0 = s*rho
+                cv.Line(img,
+                        (int(x0 + 1000*(-s)), int(y0 + 1000*c)),
+                        (int(x0 + -1000*(-s)), int( y0 - 1000*c)),
+                        (0,255,0))
+                index = int(min([int(x0 + 1000*(-s)), int(x0 + -1000*(-s))]) + (abs((x0 + 1000*(-s)) - (x0 + -1000*(-s))) / 2))
+                p[index] = 1
+
+        for x in range(len(p)):
+            if p[x] == 1:
+                print x
+            
+        return p
+        
     def printButtons(self, img):
         font = cv.InitFont(cv.CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0)
         cv.Rectangle(img, (850, 660), (950, 710),  cv.RGB(17, 110, 255)) 
@@ -204,12 +264,31 @@ def main():
     
     vt = VideoThread(True, False, False)
     vt.start()
-    #while not vt.state == STARTED:
-        #pass
+    stopping = False
+    while not stopping:
+        print 'Push p to catch finger print, any other key to stop video...'
+        s = getChar()
+        print s
+        if s == 'p':
+            print 'got p'
+            vt.getVerticalPrint()
+        else:
+           stopping = True
 
-    s = raw_input('Push any key to stop video...')
     vt.stop()
     vt.join()
+
+def getChar():
+    import sys, tty, termios
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
     
 if __name__ == '__main__':
     main()

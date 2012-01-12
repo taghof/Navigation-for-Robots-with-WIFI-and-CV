@@ -5,3 +5,9 @@
 *.pyc
 testdata
 media
+/_site/README
+/_site/blog/2009/07/30/introducting-the-yubr-programming-language/index.html
+/_site/blog/2011/11/29/Test-Post/index.html
+/_site/css/master.css
+/_site/index.html
+/_site/js/master.js

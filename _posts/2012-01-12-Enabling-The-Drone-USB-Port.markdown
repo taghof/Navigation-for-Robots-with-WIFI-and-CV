@@ -52,6 +52,7 @@ steps assume you are using a linux build environment.
    
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
     
+   
 	This should, among other things, generate the following modules:
 
 		drivers/block/nbd.ko
@@ -64,11 +65,13 @@ steps assume you are using a linux build environment.
 		fs/nls/nls_iso8859-1.ko
 		fs/nls/nls_utf8.ko
 		fs/vfat/vfat.ko
+   
 
-4.	Transfer these modules to the drone via FTP and before inserting the modules, run the following commands on the drone to activate the USB port in the drone hardware:
+4.	Transfer these modules to the drone via FTP and before inserting the modules, login to the drone via telnet and run the following commands to activate the USB port in the 		drone hardware:
 
 		# gpio 127 -d ho 1
 		# gpio 127 -d i
+   
 
 	Then insert the modules with `insmod <module file>`. Consider a shell script for automating the on-drone proces.
 

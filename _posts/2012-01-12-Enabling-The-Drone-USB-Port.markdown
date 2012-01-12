@@ -55,7 +55,7 @@ Now the selected modules can be compiled by running:
     fs/vfat/vfat.ko
 
 </li>
-<li>Transfer these modules to the drone via FTP and before inserting the modules run the following commands on the drone to activate the USB port in the drone hardware:
+<li>Transfer these modules to the drone via FTP and before inserting the modules, run the following commands on the drone to activate the USB port in the drone hardware:
 
     # gpio 127 -d ho 1
     # gpio 127 -d i

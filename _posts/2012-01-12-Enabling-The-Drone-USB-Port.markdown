@@ -1,10 +1,8 @@
 ---
 layout: post
-title: Test Post
+title: Enabling the Drone USB Port
 ---
 
-Enabling the Drone USB Port
-===========================
 
 Purpose:
 --------

@@ -22,7 +22,7 @@ steps assume you are using a linux build environment.
 <li>To begin editing the port driver one must first obtain the source code, luckily the custom Parrot kernel source(including drivers) is freely available [here](https://projects.ardrone.org/documents/show/19 "Kernel Source"). Also available is the kernel config file, and so we are able to build modules for the kernel running on the drone.
 <ul><li>  Download and unpack the kernel source and kernel.config. Rename kernel.config to .config and place it in the kernel source root.</li>
 <li>Setup a cross compilation environment by following the instructions [here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup").</li></ul></li>
-<li>Edit the file "drivers/parrot/usb/dwc_otg/dwc____otg_driver.c",
+<li>Edit the file "drivers/parrot/usb/dwc_otg/dwc____otg_____driver.c",
 instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html),
 in short, around line 224 comment out: 
 

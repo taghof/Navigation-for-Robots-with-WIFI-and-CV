@@ -33,7 +33,7 @@ steps assume you are using a linux build environment.
        		[here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling
        		"cross compilation setup").
 
-2.	Edit the file "drivers/parrot/usb/dwc\_otg/dwc\_\_otg\_driver.c",
+2.	Edit the file "drivers/parrot/usb/dwc\_otg/dwc\_otg\_driver.c",
 	instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html).
 	In short, around line 224 comment out: 
 

@@ -26,18 +26,18 @@ steps assume you are using a linux build environment.
 instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html),
 in short, around line 224 comment out: 
 
-   params->ctrl_mode = info->ctrl_mode; 
-   params->vbus_detection = info->vbus_detection;
+    params->ctrl_mode = info->ctrl_mode; 
+    params->vbus_detection = info->vbus_detection;
 
 and around lin 135 set `.overcurrent_pin = -`.</li>
 <li>Select the kernel modules you want to compile(including the one you edited) by going to the kernel tree root and running:
 
-   make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig 	      
+    make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig 	      
 
 Remember to select as modules(M, not *). To enable the usb port go to "System Type -> Parrot Drivers" and select "PARROT6 USB driver (Synopsys)". To enable the FAT32 file system select "File systems -> DOS/FAT/NT Filesystems -> VFAT (Windows-95) fs support", "File systems -> Native language support", "File systems -> Native language support -> Codepage 437 (United States, Canada)", "File systems -> Native language support -> NLS ISO 8859-1  (Latin 1; Western European Languages), "File systems -> Native language support -> NLS UTF-8. Furthermore, for a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting "Device Drivers -> SCSI device support -> SCSI disk support.
 Now the selected modules can be compiled by running:
    
-   make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
+    make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
     
 this should, among other things, generate the following modules:
     

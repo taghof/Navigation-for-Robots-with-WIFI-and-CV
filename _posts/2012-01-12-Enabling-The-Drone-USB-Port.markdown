@@ -29,7 +29,8 @@ in short, around line 224 comment out:
     params->ctrl_mode = info->ctrl_mode; 
     params->vbus_detection = info->vbus_detection;
 
-and around lin 135 set `.overcurrent_pin = -`.</li>
+
+and around line 135 set `.overcurrent_pin = -1`.</li>
 <li>Select the kernel modules you want to compile(including the one you edited) by going to the kernel tree root and running:
 
     make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig 	      

@@ -4,14 +4,14 @@ title: Enabling the Drone USB Port
 ---
 
 
-Purpose:
---------
+Purpose
+=======
 To determine whether attaching extra sensors to the AR.Drone is
 possible and to make a proof of concept by attaching and mounting a
 USB memory stick.
 
-Procedure:
-----------
+Procedure
+=========
 To enable the On-The-Go USB port several steps must be taken: Editing the port
 driver to enable host mode, compiling the driver and other necessary
 kernel modules with a cross compiler toolchain, uploading the compiled

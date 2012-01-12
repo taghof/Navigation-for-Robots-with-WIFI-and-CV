@@ -27,9 +27,7 @@ steps assume you are using a linux build environment.
 +     So download and unpack the kernel source, rename kernel.config to
       .config and place it in the kernel source root.
 +     Setup a cross compilation environment by following the
-      instructions
-      [here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling
-      "cross compilation setup").
+      instructions [here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup").
 
 2.    Edit the file "drivers/parrot/usb/dwc_otg/dwc_otg_driver.c",
       instructions are

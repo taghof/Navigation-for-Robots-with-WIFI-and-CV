@@ -23,8 +23,8 @@ steps assume you are using a linux build environment.
 <ul><li>  Download and unpack the kernel source and kernel.config. Rename kernel.config to .config and place it in the kernel source root.</li>
 <li>Setup a cross compilation environment by following the instructions [here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup").</li></ul></li>
 <li>Edit the file "drivers/parrot/usb/dwc_otg/dwc\_\_otg\_driver.c",
-instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html),
-in short, around line 224 comment out: 
+instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html).
+In short, around line 224 comment out: 
 
     params->ctrl_mode = info->ctrl_mode; 
     params->vbus_detection = info->vbus_detection;

@@ -47,18 +47,18 @@ steps assume you are using a linux build environment.
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig
 
 	<br />Remember to select as modules(M, not *).   
-	To enable the usb port select:   
-	 "System Type -> Parrot Drivers -> PARROT6 USB driver (Synopsys)".   
+	+	To enable the usb port select:   
+		"System Type -> Parrot Drivers -> PARROT6 USB driver (Synopsys)".   
 
-	To enable the FAT32 file system select:   
-	"File systems -> DOS/FAT/NT Filesystems -> VFAT (Windows-95) fs support"   
-	"File systems -> Native language support"   
-	"File systems -> Native language support -> Codepage 437 (United States, Canada)"   
-	"File systems -> Native language support -> NLS ISO 8859-1  (Latin 1..."   
-	"File systems -> Native language support -> NLS UTF-8"   
+	+	To enable the FAT32 file system select:   
+		"File systems -> DOS/FAT/NT Filesystems -> VFAT (Windows-95) fs support"   
+		"File systems -> Native language support"   
+		"File systems -> Native language support -> Codepage 437 (United States, Canada)"   
+		"File systems -> Native language support -> NLS ISO 8859-1  (Latin 1..."   
+		"File systems -> Native language support -> NLS UTF-8"   
 
-	For a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting:   
-	"Device Drivers -> SCSI device support -> SCSI disk support"   
+	+	For a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting:   
+		"Device Drivers -> SCSI device support -> SCSI disk support"   
 
 	Now the selected modules can be compiled by running:
    

@@ -43,7 +43,7 @@ steps assume you are using a linux build environment.
 
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig
 
-	<br />Remember to select as modules(M, not *).   
+	<br />The command opens the graphical kernel configuration tool. Remember to select as modules(M, not *).   
 	+	To enable the usb port select:   
 		"System Type -> Parrot Drivers -> PARROT6 USB driver (Synopsys)".   
 

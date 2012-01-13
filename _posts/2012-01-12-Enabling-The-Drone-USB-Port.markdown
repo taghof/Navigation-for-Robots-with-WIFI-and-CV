@@ -21,20 +21,17 @@ steps assume you are using a linux build environment.
 								
 1.	To begin editing the port driver one must first obtain the
       	source code, luckily the custom Parrot kernel source(including
-       	drivers) is freely available
-       	[here](https://projects.ardrone.org/documents/show/19 "Kernel
-       	Source"). Also available is the kernel config file, and so we
-       	are able to build modules for the kernel running on the drone.
+       	drivers) is freely available from the [AR.Drone website][1]. Also available is the kernel config file, so we
+       	are able to build modules for the exact kernel running on the drone.
 	
 	+	Download and unpack the kernel source and 
 		kernel.config. Rename kernel.config to .config and place it in
 		the kernel source root.
 	+	Setup a cross compilation environment by following the instructions
-       		[here](http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling
-       		"cross compilation setup").
+       		from [www.nas-central.com][2], instructions include a setup script which automatically fetches the [codesourcery toolchain][3].
 
 2.	Edit the file "drivers/parrot/usb/dwc\_otg/dwc\_otg\_driver.c",
-	instructions are [here](http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html).
+	instructions are from [the E/S and I blog][4].
 	In short, around line 224 comment out: 
 
 		params->ctrl_mode = info->ctrl_mode;
@@ -60,7 +57,7 @@ steps assume you are using a linux build environment.
 	+	For a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting:   
 		"Device Drivers -> SCSI device support -> SCSI disk support"   
 
-	Now the selected modules can be compiled by running:
+	Alternatively you could use [our kernel config][5] and spare yourself the trouble, anyway the selected modules can now be compiled by running:
    
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
 
@@ -84,7 +81,29 @@ steps assume you are using a linux build environment.
 		# gpio 127 -d i
    
 
-	<br />Then insert the modules with `insmod <module file>`. Consider a shell script for automating the on-drone proces.
+	<br />Then insert the modules with `insmod <module file>`. Consider a shell script for automating the on-drone proces, we made a [script][6] that copies all transferred .ko 		files to a custom_modules directory, sets the I/O pin and inserts the needed modules. For further ease of use this script could be called from the drone startup script.
 
 Results
 =======
+
+After following the procedure above we were able to power the USB port, compile and insert the necessary kernel modules, recognize our USB stick 
+as a SCSI disk, mount the stick and copy files from the stick to the drone internal memory and back. Below are screen caps of the on-drone-process and the results.
+<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png" width="100" height="100">
+![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
+#![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
+#![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
+#![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
+
+
+
+
+# references
+[1]: https://projects.ardrone.org/documents/show/19 "Kernel Source"
+[2]: http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup"
+[3]: http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/ "Codesourcery(Mentor) lite edition"
+[4]: http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html "E/S and I, AR.Drone USB"
+
+# downloads
+
+[5]: https://raw.github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV/gh-pages/downloads/custom-kernel.config "Our kernel config"
+[6]: https://raw.github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV/gh-pages/downloads/load.sh "Our load script"

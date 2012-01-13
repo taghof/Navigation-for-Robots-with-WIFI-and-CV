@@ -39,11 +39,11 @@ steps assume you are using a linux build environment.
 
 	<br />and around line 135 set `.overcurrent_pin = -1`.</li>
 
-3.	Select the kernel modules you want to compile(including the one you edited) by going to the kernel tree root and running:
+3.	To open the graphical kernel configuration tool and select the kernel modules you want to compile(including the one you edited), go to the kernel tree root and run:
 
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig
 
-	<br />The command opens the graphical kernel configuration tool. Remember to select as modules(M, not *).   
+	<br />Remember to select as modules(M, not *).   
 	+	To enable the usb port select:   
 		"System Type -> Parrot Drivers -> PARROT6 USB driver (Synopsys)".   
 

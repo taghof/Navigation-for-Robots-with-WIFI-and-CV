@@ -89,9 +89,9 @@ Results
 After following the procedure above we were able to power the USB port, compile and insert the necessary kernel modules, recognize our USB stick 
 as a SCSI disk, mount the stick and copy files from the stick to the drone internal memory and back. Below are screen caps of the on-drone-process and the results.   
 
-<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/load.png" width="100" height="100">
-<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png" width="100" height="100">
-<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png" width="100" height="100">
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/images/load.png""><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/load.png" width="150" height="150"></a
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png""><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png" width="150" height="150"></a>
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png""><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png" width="150" height="150"></a>
 
 <!-- ![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
 ![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")

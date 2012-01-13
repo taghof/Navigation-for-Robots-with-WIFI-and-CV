@@ -54,13 +54,13 @@ steps assume you are using a linux build environment.
 	"File systems -> DOS/FAT/NT Filesystems -> VFAT (Windows-95) fs support"   
 	"File systems -> Native language support"   
 	"File systems -> Native language support -> Codepage 437 (United States, Canada)"   
-	"File systems -> Native language support -> NLS ISO 8859-1  (Latin 1; Western European Languages)"   
+	"File systems -> Native language support -> NLS ISO 8859-1  (Latin 1..."   
 	"File systems -> Native language support -> NLS UTF-8"   
 
 	Furthermore, for a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting:   
 	"Device Drivers -> SCSI device support -> SCSI disk support"   
 
-	<br />Now the selected modules can be compiled by running:
+	Now the selected modules can be compiled by running:
    
 		make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
 
@@ -76,7 +76,7 @@ steps assume you are using a linux build environment.
 		fs/nls/nls_iso8859-1.ko
 		fs/nls/nls_utf8.ko
 		fs/vfat/vfat.ko
-   
+	<br />   
 
 4.	Transfer these modules to the drone via FTP and before inserting the modules, login to the drone via telnet and run the following commands to activate the USB port in the 		drone hardware:
    

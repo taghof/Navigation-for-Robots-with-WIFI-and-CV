@@ -87,27 +87,31 @@ Results
 =======
 
 After following the procedure above we were able to power the USB port, compile and insert the necessary kernel modules, recognize our USB stick 
-as a SCSI disk, mount the stick and copy files from the stick to the drone internal memory and back. Below are screen caps of the on-drone-process and the results.   
+as a SCSI disk, mount the stick and copy files from the stick to the drone internal memory and back. Below are screen caps of the on-drone-process and results.   
 
 <a href="/Navigation-for-Robots-with-WIFI-and-CV/images/load.png"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/load.png" width="150" height="150"></a>
 <a href="/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png" width="150" height="150"></a>
 <a href="/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png" width="150" height="150"></a>
 
-<!-- ![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
-![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
-![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
-![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
--->
-
-
+References
+==========
+Much of the tweaking described above was developed by the users ["Scorpion2k"][http://embedded-software.blogspot.com]
+ and "MAPGPS" of [www.ardrone-flyers.com][http://www.ardrone-flyers.com]. Below is listed the actual threads, blogpost and wikis we used above.
+[NAS central, cross compilations setup][2]   
+[E/S and I, AR.Drone USB][4]   
+[AR.Drone Flyers, USB disc thread][7]   
+Code resources:
+[Kernel source and kernel config][1]
+[Our custom kernel config][5]
+[Our load script][6]
 
 <!-- references -->
-[1]: https://projects.ardrone.org/documents/show/19 "Kernel Source"
 [2]: http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup"
 [3]: http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/ "Codesourcery(Mentor) lite edition"
 [4]: http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html "E/S and I, AR.Drone USB"
+[7]: http://www.ardrone-flyers.com/forum/viewtopic.php?t=829 "AR.Drone Flyers, USB disc thread"
 
 <!-- downloads -->
-
+[1]: https://projects.ardrone.org/documents/show/19 "Kernel Source"
 [5]: https://raw.github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV/gh-pages/downloads/custom-kernel.config "Our kernel config"
 [6]: https://raw.github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV/gh-pages/downloads/load.sh "Our load script"

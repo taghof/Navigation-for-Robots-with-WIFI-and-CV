@@ -31,7 +31,7 @@ steps assume you are using a linux build environment.
        		from [www.nas-central.com][2], instructions include a setup script which automatically fetches the [codesourcery toolchain][3].
 
 2.	Edit the file "drivers/parrot/usb/dwc\_otg/dwc\_otg\_driver.c",
-	instructions are from [the E/S and I blog][4].
+	instructions are on [the E/S and I blog][4].
 	In short, around line 224 comment out: 
 
 		params->ctrl_mode = info->ctrl_mode;

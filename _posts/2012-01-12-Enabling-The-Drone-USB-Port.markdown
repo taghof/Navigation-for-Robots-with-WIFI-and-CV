@@ -95,12 +95,12 @@ as a SCSI disk, mount the stick and copy files from the stick to the drone inter
 
 References
 ==========
-Much of the tweaking described above was developed by the users ["Scorpion2k"][http://embedded-software.blogspot.com]
- and "MAPGPS" of [www.ardrone-flyers.com][http://www.ardrone-flyers.com]. Below is listed the actual threads, blogpost and wikis we used above.
+Much of the tweaking described above was developed by the users ["Scorpion2k"](http://embedded-software.blogspot.com)
+ and "MAPGPS" of [www.ardrone-flyers.com](http://www.ardrone-flyers.com). Below is listed the actual threads, blogpost and wikis we used above.
 [NAS central, cross compilations setup][2]   
 [E/S and I, AR.Drone USB][4]   
 [AR.Drone Flyers, USB disc thread][7]   
-Code resources:
+Code resources:   
 [Kernel source and kernel config][1]
 [Our custom kernel config][5]
 [Our load script][6]

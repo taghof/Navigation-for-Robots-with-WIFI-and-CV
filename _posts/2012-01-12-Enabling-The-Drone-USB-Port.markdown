@@ -113,5 +113,5 @@ Code resources:
 
 <!-- downloads -->
 [1]: https://projects.ardrone.org/documents/show/19 "Kernel Source"
-[5]: https://raw.github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV/gh-pages/downloads/custom-kernel.config "Our kernel config"
+[5]: /Navigation-for-Robots-with-WIFI-and-CV/downloads/custom-kernel.config "Our kernel config"
 [6]: /Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh "Our load script"

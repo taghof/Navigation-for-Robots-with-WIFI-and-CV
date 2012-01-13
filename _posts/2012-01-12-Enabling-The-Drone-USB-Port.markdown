@@ -101,9 +101,9 @@ Much of the tweaking described above was developed by the users ["Scorpion2k"](h
 [E/S and I, AR.Drone USB][4]   
 [AR.Drone Flyers, USB disc thread][7]   
 Code resources:   
-[Kernel source and kernel config][1]
-[Our custom kernel config][5]
-[Our load script][6]
+[Kernel source and kernel config][1]   
+[Our custom kernel config][5]   
+[Our load script][6]   
 
 <!-- references -->
 [2]: http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup"

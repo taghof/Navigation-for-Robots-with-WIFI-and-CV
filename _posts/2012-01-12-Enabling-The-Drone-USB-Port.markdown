@@ -57,7 +57,7 @@ steps assume you are using a linux build environment.
 	"File systems -> Native language support -> NLS ISO 8859-1  (Latin 1..."   
 	"File systems -> Native language support -> NLS UTF-8"   
 
-	Furthermore, for a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting:   
+	For a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting:   
 	"Device Drivers -> SCSI device support -> SCSI disk support"   
 
 	Now the selected modules can be compiled by running:

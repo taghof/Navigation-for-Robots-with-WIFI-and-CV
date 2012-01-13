@@ -87,23 +87,27 @@ Results
 =======
 
 After following the procedure above we were able to power the USB port, compile and insert the necessary kernel modules, recognize our USB stick 
-as a SCSI disk, mount the stick and copy files from the stick to the drone internal memory and back. Below are screen caps of the on-drone-process and the results.
-<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png" width="100" height="100">
+as a SCSI disk, mount the stick and copy files from the stick to the drone internal memory and back. Below are screen caps of the on-drone-process and the results.   
+
+<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/load.png" width="100" height="100">
+<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png" width="100" height="100">
+<img src="/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png" width="100" height="100">
+
+<!-- ![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
 ![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
-#![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
-#![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
-#![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
+![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
+![Lena](/Navigation-for-Robots-with-WIFI-and-CV/images/lena.png "Lena.png")
+-->
 
 
 
-
-# references
+<!-- references -->
 [1]: https://projects.ardrone.org/documents/show/19 "Kernel Source"
 [2]: http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling "cross compilation setup"
 [3]: http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/ "Codesourcery(Mentor) lite edition"
 [4]: http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html "E/S and I, AR.Drone USB"
 
-# downloads
+<!-- downloads -->
 
 [5]: https://raw.github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV/gh-pages/downloads/custom-kernel.config "Our kernel config"
 [6]: https://raw.github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV/gh-pages/downloads/load.sh "Our load script"

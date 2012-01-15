@@ -57,7 +57,7 @@ For the example we will use libpcap as the third party library and compile a sim
 
 3.	Now that the library has been built and installed all we need is to compile our sniffer program which uses the library.
 
-		$ arm-none-linux-gnueabi-gcc *.c -lpcap -static -o sniffer
+		$ arm-none-linux-gnueabi-gcc *.c -lpcap -static -o sniffer   
 	
 	The output, sniffer, can be transferred to and executed on the drone.
 

@@ -44,7 +44,7 @@ For the example we will use libpcap as the third party library and compile a sim
 
 1.	Fetch the libpcap source [here][02] and unpack it.
 
-2.	Start up the cross compile environment, build an ARM version of libpcap and install it with the following commands, remember the prefix part(to get the command right we 		used [the ARM cross-compiling howto][2] and [the www.secdev.org guide][3] for inspiration):
+2.	Start up the cross compile environment, build an ARM version of libpcap and install it with the following commands. Remember the prefix part, to get the command right we 		used [the ARM cross-compiling howto][2] and [the www.secdev.org guide][3] for inspiration.
 		
 		$ codesourcery-arm-2009q3.sh
 		$ CC=arm-none-linux-gnueabi-gcc ./configure --prefix=/usr/local/codesourcery/arm-2009q3/arm-none-linux-gnueabi/ --host=arm-none-linux-gnu \ 

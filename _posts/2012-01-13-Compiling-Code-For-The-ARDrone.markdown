@@ -68,13 +68,13 @@ We were able to cross compile both the simple program, the library and the more 
 References
 ==========
 Cross compilation guides:
-[Nas Central, cross compile setup][1]
-[The ARM cross-compiling howto][2]
-[The www.secdev.org guide][3]
+[Nas Central, cross compile setup][1]   
+[The ARM cross-compiling howto][2]   
+[The www.secdev.org guide][3]   
 
 Code resources:
-[Cross compilation setup script][01]
-[Libpcap source code][02]
+[Cross compilation setup script][01]   
+[Libpcap source code][02]   
 
 
 <!-- references -->

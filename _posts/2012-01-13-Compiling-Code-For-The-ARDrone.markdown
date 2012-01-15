@@ -36,6 +36,7 @@ The procedure for making and testing drone-executable code is rather simple: ins
 		$ ./hello_arm 
 		Hello World!
 
+<br />
 Procedure - advanced
 ====================
 The advanced procedure deals with cross compiling a third party library, installing it to be used with the cross compiling toolchain and compiling a program using the library.

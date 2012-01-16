@@ -22,7 +22,7 @@ title: Blog
 		</div>
 		<div class="post-content span-15 last">
 		  {{ post.content }}
-		  <a id="more" href="{{ post.url }}#disqus">Comments &raquo;</a>
+		  <a id="more" href="{{ post.url | remove-first:'/'}}#disqus">Comments &raquo;</a>
 		</div>
 	</article>
 

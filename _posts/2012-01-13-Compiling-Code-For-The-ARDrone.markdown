@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Compiling code for the AR.Drone
+public: true
 ---
 
 Purpose

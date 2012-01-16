@@ -10,14 +10,14 @@ layout: nil
     <atom:link href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/rss.xml" rel="self" type="application/rss+xml" />
     <description>Updates from "Navigation for Robots with WIFI and CV"</description>
     <language>en-us</language>
-    <pubDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
-    <lastBuildDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</lastBuildDate>
+    <pubDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %Z" }}</pubDate>
+    <lastBuildDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %Z" }}</lastBuildDate>
     {% for post in site.posts %}
     {% if post.public %}
     <item>
       <title>{{ post.title }}</title>
       <link>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.url }}</link>
-      <pubDate>{{ post.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
+      <pubDate>{{ post.date | date: "%a, %d %b %Y %H:%M:%S %Z" }}</pubDate>
       <author>Morten Daugaard, taghof@gmail.com and Thomas Thyregod</author>
       <guid>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.id }}</guid>
       <description>{{ post.content | xml_escape }}</description>

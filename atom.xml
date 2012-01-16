@@ -21,7 +21,7 @@ layout: nil
     <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.id }}</id>
     <link type="text/html" rel="alternate" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.url }}"/>
     <title>{{ post.title }}</title>
-    <updated>{{ post.date | date_to_xmlschema }}</updated>
+    <updated>{{ post.date | date: "%Y-%m-%dT%H:%M:%S+01:00" }}</updated>
     <author>
       <name>Morten Daugaard and Thomas Thyregod</name>
       <uri>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</uri>

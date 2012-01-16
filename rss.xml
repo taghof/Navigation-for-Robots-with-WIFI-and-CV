@@ -1,0 +1,28 @@
+---
+layout: nil
+---
+
+<?xml version="1.0"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Navigation for Robots with WIFI and CV</title>
+    <link>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</link>
+    <atom:link href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/rss.xml" rel="self" type="application/rss+xml" />
+    <description>Updates from "Navigation for Robots with WIFI and CV"</description>
+    <language>en-us</language>
+    <pubDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
+    <lastBuildDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</lastBuildDate>
+    {% for post in site.posts %}
+    {% if post.public %}
+    <item>
+      <title>{{ post.title }}</title>
+      <link>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.url }}</link>
+      <pubDate>{{ post.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
+      <author>Morten Daugaard, taghof@gmail.com and Thomas Thyregod</author>
+      <guid>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.id }}</guid>
+      <description>{{ post.content | xml_escape }}</description>
+    </item>
+    {% endif %}
+    {% endfor %}
+  </channel> 
+</rss>

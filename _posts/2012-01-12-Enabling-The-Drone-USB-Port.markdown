@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Enabling the Drone USB Port
+public: true
 ---
 
 

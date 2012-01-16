@@ -8,7 +8,7 @@ layout: nil
   <title>Navigation for Robots with WIFI and CV</title>
   <link href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/" />
   <link type="application/atom+xml" rel="self" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/atom.xml"/>
-  <updated>{{ site.time | date_to_xmlschema }}</updated>
+  <updated>{{ site.time | date: "%Y-%m-%dT%H:%M:%S+01:00" }}</updated>
   <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</id>
   <author>
     <name>Morten Daugaard and Thomas Thyregod</name>

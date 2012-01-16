@@ -1,4 +1,4 @@
 pygments: true
 markdown: redcarpet
 permalink: /blog/:year/:month/:day/:title
-baseurl: /Navigation-for-Robots-with-WIFI-and-CV/
+

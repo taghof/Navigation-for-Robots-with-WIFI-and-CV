@@ -13,7 +13,9 @@ title: Blog
 
 	<article class="{{ class }}">
 
-		<h2><a href="{{site.baseurl}}{{post.url}}">{{ post.title }}</a></h2>
+		<!-- <h2><a href="{{site.baseurl}}{{post.url}}">{{post.title}}</a></h2>-->
+		<h2><a href="{{post.url}}">{{post.title }}</a></h2>
+		
 		<div class="post-meta span-3">
 		  <a href="{{site.baseurl}}{{post.url}}" class="pill"><time datetime="{{ post.date | date: '%Y-%m-%d'}}">{{ post.date | date: "%B %d, %Y" }}</time>
 		  </a>
@@ -25,3 +27,6 @@ title: Blog
 	</article>
 
 {% endfor %}
+
+http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/13/Compiling-Code-For-The-ARDrone#disqus
+http://taghof.github.com/blog/2012/01/13/Compiling-Code-For-The-ARDrone#disqus

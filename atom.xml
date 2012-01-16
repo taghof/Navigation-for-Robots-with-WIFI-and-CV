@@ -19,7 +19,7 @@ layout: nil
   {% if post.public %}
   <entry>
     <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.id }}</id>
-    <link type="text/html" rel="alternate" href="http://coyled.com{{ post.url }}"/>
+    <link type="text/html" rel="alternate" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.url }}"/>
     <title>{{ post.title }}</title>
     <updated>{{ post.date | date_to_xmlschema }}</updated>
     <author>

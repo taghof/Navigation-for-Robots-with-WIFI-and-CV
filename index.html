@@ -20,8 +20,12 @@ title: Blog
 		  </a>
 		</div>
 		<div class="post-content span-15 last">
-		  {{ post.content }}
-		  <a id="more" href="{{site.baseurl}}{{ post.url}}#disqus">Comments &raquo;</a>
+		  {{ post.content | strip_html | trucatewords: 30}}
+		  <a href="{{site.baseurl}}{{ post.url }}">Continue reading</a>
+		  <a id="more" href="{{site.baseurl}}{{post.url}}#disqus">
+		    Comments &raquo;</a>
+		    
+		    
 		</div>
 	</article>
 

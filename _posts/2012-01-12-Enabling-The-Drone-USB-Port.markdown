@@ -74,7 +74,6 @@ steps assume you are using a linux build environment.
 		fs/nls/nls_utf8.ko
 		fs/vfat/vfat.ko
 	<br />   
-
 4.	Transfer these modules to the drone via FTP and before inserting the modules, login to the drone via telnet and run the following commands to activate the USB port in the 		drone hardware:
    
 		# gpio 127 -d ho 1

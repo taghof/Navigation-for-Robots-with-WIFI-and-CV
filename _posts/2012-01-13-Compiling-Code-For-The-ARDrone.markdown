@@ -63,7 +63,7 @@ For the example we will use libpcap as the third party library and compile a sim
 
 Results
 =======
-We were able to cross compile both the simple program, the library and the more advanced program utilizing the library. By doing a static compile of the advanced program, we don't have to transfer the library to the drone. 
+We were able to cross compile both the simple program, the library and the more advanced program utilizing the library. By doing a static compile of the advanced program, we don't have to transfer the library to the drone. We were also able to execute both programs on the drone.
 
 References
 ==========

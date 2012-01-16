@@ -1,0 +1,34 @@
+---
+layout: nil
+---
+
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+  <title>Navigation for Robots with WIFI and CV</title>
+  <link href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/" />
+  <link type="application/atom+xml" rel="self" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/atom.xml"/>
+  <updated>{{ site.time | date_to_xmlschema }}</updated>
+  <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</id>
+  <author>
+    <name>Morten Daugaard and Thomas Thyregod</name>
+    <email>taghof@gmail.com</email>
+  </author>
+
+  {% for post in site.posts %}
+  {% if post.public %}
+  <entry>
+    <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/{{ post.id }}</id>
+    <link type="text/html" rel="alternate" href="http://coyled.com{{ post.url }}"/>
+    <title>{{ post.title }}</title>
+    <updated>{{ post.date | date_to_xmlschema }}</updated>
+    <author>
+      <name>Morten Daugaard and Thomas Thyregod</name>
+      <uri>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</uri>
+    </author>
+    <content type="html">{{ post.content | xml_escape }}</content>
+  </entry>
+  {% endif %}}
+  {% endfor %}
+ 
+</feed>

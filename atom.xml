@@ -28,7 +28,7 @@ layout: nil
     </author>
     <content type="html">{{ post.content | xml_escape }}</content>
   </entry>
-  {% endif %}}
+  {% endif %}
   {% endfor %}
  
 </feed>

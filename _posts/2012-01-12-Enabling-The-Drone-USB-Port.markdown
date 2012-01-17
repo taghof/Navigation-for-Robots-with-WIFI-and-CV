@@ -83,6 +83,9 @@ steps assume you are using a linux build environment.
 
 	<br />Then insert the modules with `insmod <module file>`. Consider a shell script for automating the on-drone proces, we made a [script][6] that copies all transferred .ko 		files to a custom_modules directory, sets the I/O pin and inserts the needed modules. For further ease of use this script could be called from the drone startup script.
 
+5.	At this point we are able to plugin our [home made USB cable][8], with a USB stick atttached, and see with `$ dmesg` that the stick is correctly recognized.
+	The stick usually appears as `/dev/sda1` but you might need to run `$ devmem` for this to happen. Left is only mounting and manipulating(see images below). 
+
 Results
 =======
 
@@ -96,10 +99,13 @@ as a SCSI disk, mount the stick and copy files from the stick to the drone inter
 References
 ==========
 Much of the tweaking described above was developed by the users ["Scorpion2k"](http://embedded-software.blogspot.com)
- and "MAPGPS" of [www.ardrone-flyers.com](http://www.ardrone-flyers.com). Below are listed the actual threads, blogpost and wikis we used above.   
+ and "MAPGPS" of [www.ardrone-flyers.com](http://www.ardrone-flyers.com).   
+<br /> 
+Threads, blogpost and wikis used above:      
 [NAS central, cross compilation setup][2]   
 [E/S and I, AR.Drone USB][4]   
 [AR.Drone Flyers, USB disk thread][7]   
+<br />
 Code resources:   
 [Kernel source and kernel config][1]   
 [Our custom kernel config][5]   
@@ -110,7 +116,7 @@ Code resources:
 [3]: http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/ "Codesourcery(Mentor) lite edition"
 [4]: http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html "E/S and I, AR.Drone USB"
 [7]: http://www.ardrone-flyers.com/forum/viewtopic.php?t=829 "AR.Drone Flyers, USB disc thread"
-
+[8]: /Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/17/Cables-And-Physical-Setup-For-USB-Testing/ "Cables and physical setup for USB testing"
 <!-- downloads -->
 [1]: https://projects.ardrone.org/documents/show/19 "Kernel Source"
 [5]: /Navigation-for-Robots-with-WIFI-and-CV/downloads/custom-kernel.config "Our kernel config"

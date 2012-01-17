@@ -1,12 +1,11 @@
 ---
 layout: post
 title: Compiling code for the AR.Drone
-public: true
 ---
 
 Purpose
 =======
-To document the build process, when cross-compiling code to be executed on an AR.Drone. Results are considered satisfactory if we can
+To document the build process when cross-compiling code to executed on an AR.Drone. Results are considered satisfactory if we can
 compile a simple "hello world" program and execute the program on the drone, further we should be able to compile third-party libraries and likewise test them with simple programs on the drone.
 
 Procedure - simple
@@ -64,7 +63,7 @@ For the example we will use libpcap as the third party library and compile a sim
 
 Results
 =======
-We were able to cross compile both the simple program, the library and the more advanced program utilizing the library. By doing a static compile of the advanced program, we don't have to transfer the library to the drone. We were also able to execute both programs on the drone.
+We were able to cross compile both the simple program, the library and the more advanced program utilizing the library. By doing a static compile of the advanced program, we don't have to transfer the library to the drone. 
 
 References
 ==========

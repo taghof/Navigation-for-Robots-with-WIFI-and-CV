@@ -82,11 +82,14 @@ html {
 	overflow-y: scroll;
 }
 body {
-	font-family: Georgia, serif;
-	font-size: 15px;
-	line-height: 1.5;
-	color: #424254;
-	padding-bottom: 20px;
+    background-image:url('http://127.0.0.1:4000/Navigation-for-Robots-with-WIFI-and-CV/images/background-faded.png');
+    background-repeat:no-repeat;
+    background-attachment:fixed;    
+    font-family: Georgia, serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #424254;
+    padding-bottom: 20px;
 }
 a,a:visited {
 	color: #3061BE;
@@ -142,7 +145,7 @@ header p {
 	float: left;
 	font-family: Helvetica;
 	font-size: 18px;
-	font-weight: bold;
+	font-weight: normal;
 	letter-spacing: -1px;
 	width: 370px;
 }
@@ -168,7 +171,7 @@ nav li {
 nav li a {
 	display: block;
 	float: right;
-	font-weight: bold;
+	font-weight: normal;
 	text-decoration: none;
 	font-family: Helvetica, Arial;
 	font-size: 12px;

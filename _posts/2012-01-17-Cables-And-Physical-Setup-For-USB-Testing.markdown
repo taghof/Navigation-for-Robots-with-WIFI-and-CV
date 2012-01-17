@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Cables and physical setup for USB testing
-public: false
+public: true
 ---
 
 Purpose

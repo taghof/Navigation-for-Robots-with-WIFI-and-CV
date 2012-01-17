@@ -19,7 +19,7 @@ USB cable and attaching a female connector scavenged from an old motherboard.
 
 Results
 =======
-<a href=" https://projects.ardrone.org/attachments/download/170 "AR.Drone USB cable"><img src="https://projects.ardrone.org/attachments/download/170 "AR.Drone USB cable"" width="150" height="150"></a>
+<a href="https://projects.ardrone.org/attachments/download/170"><img src="https://projects.ardrone.org/attachments/download/170" width="150" height="150"></a>
 <a href="/Navigation-for-Robots-with-WIFI-and-CV/images/femaletofemale.JPG"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/femaletofemale.JPG" width="150" height="150"></a>
 <a href="/Navigation-for-Robots-with-WIFI-and-CV/images/droneconnector.JPG"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/droneconnector.JPG" width="150" height="150"></a>
 <a href="/Navigation-for-Robots-with-WIFI-and-CV/images/droneconnector-close.JPG"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/droneconnector-close.JPG" width="150" height="150"></a>

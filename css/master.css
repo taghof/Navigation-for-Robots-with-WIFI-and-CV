@@ -82,7 +82,7 @@ html {
 	overflow-y: scroll;
 }
 body {
-    background-image:url('http://127.0.0.1:4000/Navigation-for-Robots-with-WIFI-and-CV/images/background-faded.png');
+    background-image:url('/Navigation-for-Robots-with-WIFI-and-CV/images/background-faded.png');
     background-repeat:no-repeat;
     background-attachment:fixed;    
     font-family: Georgia, serif;

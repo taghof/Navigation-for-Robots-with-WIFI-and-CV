@@ -10,7 +10,7 @@ To document how we assembled the cables used in [Enabling the Drone USB Port][0]
 
 Procedure
 =========
-Initially we bought an AR.Drone USB cable from [morfars.dk][1], alternatively one could have obtained a 7-pin Molex connector and some USB chord and constructed a cable from this 
+Initially we bought an AR.Drone USB cable from [morfars.dk][1], alternatively one could have used a 7-pin Molex connector and some USB chord to construct a cable from this 
 [pinout][2]. After receiving the cable we realized that a female-to-female adapter would be needed if we were going to connect devices to the drone.   
 Instead of ordering an adapter, we decided to cut two regular usb-extension cables in halves and resolder the two female ends. After a few attempts(thank you [Peter][3]) we succeded in making two working cables,
 one female-female and one male-male. Cables were tested by measuring voltage levels after being plugged into the drone.   

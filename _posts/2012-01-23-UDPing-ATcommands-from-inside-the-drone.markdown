@@ -31,24 +31,24 @@ Some contemplating was conducted, before deciding on an adequate command to exec
 
 			sendto( sock_fd, line, BUFSIZE, 0,
 							(struct sockaddr*)&receiver_addr, sizeof(receiver_addr)
-						);
+						);   
 
 	The port number and ip addresse is assigned to a struct in order to send the message "AT*LED=5,6,1,2" to the drone.
 
-Cross compilation of the code and setup of the environment is managed as in the post by Morten on [Compiling code for the AR.Drone][7].
+Cross compilation of the code and setup of the environment is managed as in the post by taghof on [Compiling code for the AR.Drone][7].
 After installation, the environment is onvoked by calling:
 
-		$ codesourcery-arm-2009q3.sh
+		$ codesourcery-arm-2009q3.sh   
 
 After that compilation of eg. udping.c may be executed by calling
 
-		$ arm-none-linux-gnueabi-gcc udping.c -o hello_arm
+		$ arm-none-linux-gnueabi-gcc udping.c -o hello_arm   
 
 The program should then be transfered to the drone, eg. by ftp.
 
 		$ ftp 192.168.1.1
 		...
-		ftp> put hello_arm
+		ftp> put hello_arm   
 
 Upon which you telnet to the drone, change directory in to /data/video and execute the newly transfered program.
 
@@ -56,7 +56,7 @@ Upon which you telnet to the drone, change directory in to /data/video and execu
 
 		# cd data/video
 		# chmod +x hello_arm
-		# ./hello_arm
+		# ./hello_arm   
 
 
 2.	On the first testrun the idea was to have a udp [server][02] listening to the control port 5556, in order to ease the debugging, ie. to make sure that the correct signal was transfered complete.
@@ -76,10 +76,22 @@ Future experiments may contain more sequentially timed function calls eg. watchd
 
 References
 ==========
+on py-sockets and AT commands
 [Eexamples of ATcommands in use][2]
 [Venthurs pythonlib for Drone control][1]
 
+on SDK AT commands
+[AR.Drone SDK Developer Guide][6]
 
+on sockets in C
+[a man page for socket][5]
+[example from sub.nokia][3]
+[example from hi-ranking google sweed...][4]
+
+our own work:
+[taghofs blog entry on cross combilation for ar.drone][]
+[udp'ing.c][01]
+[udp server][02]
 
 <!-- references -->
 [1]: https://github.com/venthur/python-ardrone "python-ardrone"

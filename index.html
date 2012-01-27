@@ -2,15 +2,16 @@
 layout: default
 title: Blog
 ---
-
+{% assign li = 0 %}
 {% for post in site.posts %}
-
-	{% if forloop.index == 1 %}
+        {% if post.public %}
+	{% if li == 0 %}
 		{% assign class = 'container post' %}
+                {% assign li = 1 %}
 	{% else %}
 	   {% assign class = 'container post separator' %}
 	{% endif %}
-
+        
 	<article class="{{ class }}">
 
 		<h2><a href="{{site.baseurl}}{{post.url}}">{{post.title}}</a></h2>
@@ -29,5 +30,5 @@ title: Blog
 		    
 		</div>
 	</article>
-
+	{% endif %}
 {% endfor %}

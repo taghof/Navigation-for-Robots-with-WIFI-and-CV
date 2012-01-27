@@ -3,10 +3,36 @@ layout: default
 title: Archive
 ---
 
+ <h2>Published Posts</h2>
+{% assign l = 0 %}
 {% for post in site.posts %}
-
-	{% if forloop.index == 1 %}
+        {% if post.public %}
+	{% if l == 0 %}
 		{% assign class = 'container post' %}
+                {% assign l = 1 %} 
+	{% else %}
+	   {% assign class = 'container post separator' %}
+	{% endif %}
+       
+	<div class="{{ class }}">
+		<h2><a href="{{site.baseurl}}{{ post.url }}">{{ post.title }}</a></h2>
+		<div class="post-meta span-3">
+			<a href="{{site.baseurl}}{{ post.url }}" class="pill"><time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: "%B %d, %Y" }}</time></a>
+		</div>
+		<div class="post-content span-15 last">
+			{{ post.content | strip_html | truncatewords: 20 }} <a href="{{site.baseurl}}{{ post.url }}">Continue reading</a>
+		</div>
+	</div>
+        {% endif %}
+{% endfor %}
+
+ <h2>Drafts</h2>
+{% assign l = 0 %}
+{% for post in site.posts %}
+	{% unless post.public %}
+	{% if l == 0 %}
+		{% assign class = 'container post' %}
+	        {% assign l = 1 %} 
 	{% else %}
 	   {% assign class = 'container post separator' %}
 	{% endif %}
@@ -20,4 +46,5 @@ title: Archive
 			{{ post.content | strip_html | truncatewords: 20 }} <a href="{{site.baseurl}}{{ post.url }}">Continue reading</a>
 		</div>
 	</div>
+	{% endunless  %}
 {% endfor %}

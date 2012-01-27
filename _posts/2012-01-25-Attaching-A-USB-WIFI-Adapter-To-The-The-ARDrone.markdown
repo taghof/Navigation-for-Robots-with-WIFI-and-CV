@@ -22,7 +22,7 @@ After aquiring the device we must go through the following steps: examining the 
 
 2.	In hindsight finding the correct driver was the most troublesome step, this was mostly because we didn't search for the vendor:device id but instead for the more generic 		"RT2870". Thus after much searching, trying different drivers and modyfying before mentioned drivers(some of which actually loaded), we finally found the right driver, 	[RT3370][01], after reading this [thread on Ubuntu forums][4]. 
 
-3.	The instructions for compiling the driver can be found in the README\_STA\_usb. Basically we needed to edit the path to the linux source and modules and add a CROSS_COMPILE 		path in the Makefile, see below(of course these instructions only fit this specific driver):
+3.	The instructions for compiling the driver can be found in the README\_STA\_usb. Basically we needed to edit the path to the linux source and modules and add a CROSS_COMPILE 		path in the Makefile(of course these instructions will only fit this specific driver), see below:
 
 		ifeq ($(PLATFORM),PC)
 		# Linux 2.6
@@ -38,7 +38,11 @@ After aquiring the device we must go through the following steps: examining the 
 		$ sudo codesourcery-arm-2009q3.sh
 		$ make
 	<br />
-4.	The commands above produces RT3370STA.ko, FTP this to the drone, load the RT3370STA module and then load dwc_otg.ko.
+4.	The commands above produces rt3370sta.ko, FTP this to the drone, load the rt3370sta module and then load dwc_otg.ko.
+
+		$ insmod rt3370sta.ko
+		$ insmod dwc_otg.ko
+	<br />Next one would probably want to add the insmod commands to [the load script][02] mentioned in a previous [post][1].		
 
 5.	To test the driver we ran the commands listed below on the drone. The commands show us the new wireless interface ra0, brings it up and then gives us a list of in-range 		APs, lastly we see monitor mode working with the aid of tcpdump.
 		
@@ -70,7 +74,7 @@ Posts, guides and threads used in the above procedures:
 
 Code resources:   
 [RT3370STA driver][01]   
-
+[Our load script][02]   
 
 <!-- references -->
 [1]: http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/ "Enabling the drone USB port"
@@ -82,7 +86,8 @@ Code resources:
 [7]: http://owen-hsu.blogspot.com/2011/03/embedded-porting-tcpdump-to-arm-emedded.html "Cross compiling tcpdump"
 [8]: http://linux-wless.passys.nl/ "Tool for linking devices to chipsets and drivers"
 [9]: http://airodump.net/wifi-hardware-monitor-applications/ "List of usable WIFI adapters"
+
 <!-- downloads -->
 [01]: /Navigation-for-Robots-with-WIFI-and-CV/downloads/2010_0831_RT3070_Linux_STA_v2.4.0.1_DPO.bz2 "RT3370STA driver"
-
+[02]: /Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh "Our load script"
 

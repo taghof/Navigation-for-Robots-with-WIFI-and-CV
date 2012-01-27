@@ -78,7 +78,7 @@ Code resources:
 
 <!-- references -->
 [1]: /Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/ "Enabling the drone USB port"
-[2]: http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/ "Compiling code for the AR.Drone"
+[2]: /Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/ "Compiling code for the AR.Drone"
 [3]: http://www.dlink.dk/cs/Satellite?c=Product_C&childpagename=DLinkEurope-DK%2FDLProductCarouselMultiple&cid=1197319529299&p=1197357728135&packedargs=ParentPageID%3D1197337625277%26ProductParentID%3D1197318706946%26TopLevelPageProduct%3DBusiness%26category%3DQuickProductFinder%26locale%3D1195806935729%26term%3DDWL-G122&pagename=DLinkEurope-DK%2FDLWrapper "D-Link DWL-G122"
 [4]: http://ubuntuforums.org/showthread.php?t=1675764 "Ubuntu forums thread"
 [5]: http://www.ralinktech.com/en/04_support/support.php?sn=501 "Ra-Link driver download"

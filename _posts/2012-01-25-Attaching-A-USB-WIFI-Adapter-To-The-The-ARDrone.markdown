@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Attaching a USB WIFI adapter to the AR.Drone
-public: false
+public: true
 ---
 
 Purpose
@@ -15,14 +15,14 @@ Procedure
 =========
 Before getting to work we needed a device with the required features, for our purpose of gathering information about the WIFI access points in range,
 this meant a USB WIFI adapter capable of entering monitor mode and preferrably accompanied by a driver for linux kernel version 2.6.27. After some research on the web(mostly [here][8] and [here][9]), we found that a device based on a Ra-Link chipset would probably work and after a little more research we finally opted for a [D-Link DWL-G122][3].   
-After aquiring the device we must go through the following steps: examining the device to retrieve vendor and device ids, finding a suitable driver, cross compiling the driver, inserting the compiled driver module and testing monitor mode with tcpdump(cross compiled for the occasion).
+After acquiring the device we must go through the following steps: examining the device to retrieve vendor and device ids, finding a suitable driver, cross compiling the driver, inserting the compiled driver module and testing monitor mode with tcpdump(cross compiled for the occasion).
 
 1.	To examine the device we used `sudo lsusb -v`, lsusb is not available(so far)
  	on the drone so we used a Ubuntu 11.10 host. After finding the entry describing our device, we read our vendor:device id to be 0x07D1:0x3C0F. Next we attached the device to 		the drone and saw that it was picked up on insertion, but of course no driver was loaded.
 
 2.	In hindsight finding the correct driver was the most troublesome step, this was mostly because we didn't search for the vendor:device id but instead for the more generic 		"RT2870". Thus after much searching, trying different drivers and modyfying before mentioned drivers(some of which actually loaded), we finally found the right driver, 	[RT3370][01], after reading this [thread on Ubuntu forums][4]. 
 
-3.	The instructions for compiling the driver can be found in the README\_STA\_usb. Basically we needed to edit the path to the linux source and modules and add a CROSS_COMPILE 		path in the Makefile(of course these instructions will only fit this specific driver), see below:
+3.	The instructions for compiling the driver can be found in the README\_STA\_usb. Basically we needed to edit the path to the linux source and modules and add a CROSS_COMPILE 		path in the Makefile(of course these instructions will only fit this specific series of drivers), see below:
 
 		ifeq ($(PLATFORM),PC)
 		# Linux 2.6
@@ -51,7 +51,7 @@ After aquiring the device we must go through the following steps: examining the 
 		$ iwlist ra0 scan
 		$ iwconfig ra0 mode monitor
 		$ tcpdump -i ra0
-	<br />Like our advanced test program in [the cross compiling post][2] tcpdump depends on libpcap and it is compiled in a similar way, a guide that gets around the 		enevitable quirks can be found [here][7].
+	<br />Like our advanced test program in [the cross compiling post][2] tcpdump depends on libpcap and it is compiled in a similar way, a guide that gets around the 		inevitable quirks can be found [here][7].
 
 Results
 =======
@@ -62,15 +62,15 @@ References
 ==========
 
 Posts, guides and threads used in the above procedures:   
-["Enabling the drone USB port"][1]   
-["Compiling code for the AR.Drone"][2]   
-["D-Link DWL-G122"][3]   
-["Ubuntu forums thread"][4]   
-["Ra-Link driver download"][5]   
-["Compat wireless download"][6]   
-["Cross compiling tcpdump"][7]   
-["Tool for linking devices to chipsets and drivers"][8]   
-["List of usable WIFI adapters"][9]   
+[Enabling the drone USB port][1]   
+[Compiling code for the AR.Drone][2]   
+[D-Link DWL-G122][3]   
+[Ubuntu forums thread][4]   
+[Ra-Link driver download][5]   
+[Compat wireless download][6]   
+[Cross compiling tcpdump][7]   
+[Tool for linking devices to chipsets and drivers][8]   
+[List of usable WIFI adapters][9]   
 
 Code resources:   
 [RT3370STA driver][01]   

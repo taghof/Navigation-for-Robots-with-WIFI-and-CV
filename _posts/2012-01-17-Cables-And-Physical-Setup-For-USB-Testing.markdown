@@ -30,7 +30,7 @@ The cables above have been used to succesfully access a USB stick from the AR.Dr
 the cables will be further shortened/stripped to ensure drone maneuverability.
 
 <!-- references -->
-[0]: http://127.0.0.1:4000/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/ "Enabling the drone USB port"
+[0]: http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/ "Enabling the drone USB port"
 [1]: http://www.morfars.dk/rc/katalog-reservedele-c-52_308.html?preload=PF070021 "Morfars.dk, AR.Drone USB cable"
 [2]: https://projects.ardrone.org/attachments/167/ARDrone-USB-Cable.png "pinout"
 [3]: http://blog.ptx.dk/ "ptx's blog"

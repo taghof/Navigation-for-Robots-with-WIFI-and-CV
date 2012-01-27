@@ -30,6 +30,7 @@ The procedure for making and testing drone-executable code is rather simple: ins
 	<br />Compile it for the AR.Drones ARM9 processor with the following command:
 
 		$ arm-none-linux-gnueabi-gcc hello.c -o hello_arm
+	<br />
 
 3.	Connect to the drone FTP server(assuming that you are already connected to the drone wifi) and put hello_arm on the drone. The server will place the file in
 	/data/video/. Run the program like any other:
@@ -37,7 +38,8 @@ The procedure for making and testing drone-executable code is rather simple: ins
 		$ ./hello_arm 
 		Hello World!
 
-<br />
+	<br />
+
 Procedure - advanced
 ====================
 The advanced procedure deals with cross compiling a third party library, installing it to be used with the cross compiling toolchain and compiling a program using the library.
@@ -53,13 +55,13 @@ For the example we will use libpcap as the third party library and compile a sim
 		$ make
 		$ sudo codesourcery-arm-2009q3.sh
 		$ sudo make install
-
+	<br />
 	Note that(on our system at least) make install must be called with root privileges, therefore the codesourcery script must also be started again with sudo.
 
 3.	Now that the library has been built and installed all we need is to compile our sniffer program which uses the library.
 
 		$ arm-none-linux-gnueabi-gcc *.c -lpcap -static -o sniffer   
-	
+	<br />
 	The output, sniffer, can be transferred to and executed on the drone.
 
 Results

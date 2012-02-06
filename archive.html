@@ -26,11 +26,12 @@ title: Archive
         {% endif %}
 {% endfor %}
 
- <h2>Drafts</h2>
+ 
 {% assign l = 0 %}
 {% for post in site.posts %}
 	{% unless post.public %}
 	{% if l == 0 %}
+	<h2>Drafts</h2>
 		{% assign class = 'container post' %}
 	        {% assign l = 1 %} 
 	{% else %}

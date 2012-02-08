@@ -5,7 +5,7 @@ import sys
 import socket
 import os
 import threading
-import Video
+#import Video
 import ManualControl
 import AutoControl
 import Utils

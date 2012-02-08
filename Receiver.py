@@ -6,7 +6,7 @@ import os
 import sys
 import threading
 import socket
-import numpy
+#import numpy
 import multiprocessing
 import select
 import cv

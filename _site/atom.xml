@@ -1,0 +1,496 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+  <title>Navigation for Robots with WIFI and CV</title>
+  <link href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/" />
+  <link type="application/atom+xml" rel="self" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/atom.xml"/>
+  <updated>2012-01-27T15:10:46+01:00</updated>
+  <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</id>
+  <author>
+    <name>Morten Daugaard and Thomas Thyregod</name>
+    <email>taghof@gmail.com</email>
+  </author>
+
+  
+  
+  
+  
+  <entry>
+    <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/25/Attaching-A-USB-WIFI-Adapter-To-The-The-ARDrone</id>
+    <link type="text/html" rel="alternate" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/25/Attaching-A-USB-WIFI-Adapter-To-The-The-ARDrone"/>
+    <title>Attaching a USB WIFI adapter to the AR.Drone</title>
+    <updated>2012-01-25T00:00:00+01:00</updated>
+    <author>
+      <name>Morten Daugaard and Thomas Thyregod</name>
+      <uri>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</uri>
+    </author>
+    <content type="html">&lt;h1&gt;Purpose&lt;/h1&gt;
+
+&lt;p&gt;To allow a robot like the AR.Drone to be more autonomous we find that it is important to be able to attach extra sensors.
+The purpose of the work described in this post was to document how one attaches a USB WIFI adapter. The device was attached 
+via the drone OTG USB port which we &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/&quot; title=&quot;Enabling the drone USB port&quot;&gt;activated in a previous post&lt;/a&gt;. A secondary purpose was to gain more experience with linux drivers and
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/&quot; title=&quot;Compiling code for the AR.Drone&quot;&gt;the cross compiling process&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1&gt;Procedure&lt;/h1&gt;
+
+&lt;p&gt;Before getting to work we needed a device with the required features, for our purpose of gathering information about the WIFI access points in range,
+this meant a USB WIFI adapter capable of entering monitor mode and preferrably accompanied by a driver for linux kernel version 2.6.27. After some research on the web(mostly &lt;a href=&quot;http://linux-wless.passys.nl/&quot; title=&quot;Tool for linking devices to chipsets and drivers&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;http://airodump.net/wifi-hardware-monitor-applications/&quot; title=&quot;List of usable WIFI adapters&quot;&gt;here&lt;/a&gt;), we found that a device based on a Ra-Link chipset would probably work and after a little more research we finally opted for a &lt;a href=&quot;http://www.dlink.dk/cs/Satellite?c=Product_C&amp;childpagename=DLinkEurope-DK%2FDLProductCarouselMultiple&amp;cid=1197319529299&amp;p=1197357728135&amp;packedargs=ParentPageID%3D1197337625277%26ProductParentID%3D1197318706946%26TopLevelPageProduct%3DBusiness%26category%3DQuickProductFinder%26locale%3D1195806935729%26term%3DDWL-G122&amp;pagename=DLinkEurope-DK%2FDLWrapper&quot; title=&quot;D-Link DWL-G122&quot;&gt;D-Link DWL-G122&lt;/a&gt;.&lt;br&gt;
+After acquiring the device we must go through the following steps: examining the device to retrieve vendor and device ids, finding a suitable driver, cross compiling the driver, inserting the compiled driver module and testing monitor mode with tcpdump(cross compiled for the occasion).&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;To examine the device we used &lt;code&gt;sudo lsusb -v&lt;/code&gt;, lsusb is not available(so far)
+on the drone so we used a Ubuntu 11.10 host. After finding the entry describing our device, we read our vendor:device id to be 0x07D1:0x3C0F. Next we attached the device to        the drone and saw that it was picked up on insertion, but of course no driver was loaded.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;In hindsight finding the correct driver was the most troublesome step, this was mostly because we didn't search for the vendor:device id but instead for the more generic       &amp;quot;RT2870&amp;quot;. Thus after much searching, trying different drivers and modyfying before mentioned drivers(some of which actually loaded), we finally found the right driver,     &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/2010_0831_RT3070_Linux_STA_v2.4.0.1_DPO.bz2&quot; title=&quot;RT3370STA driver&quot;&gt;RT3370&lt;/a&gt;, after reading this &lt;a href=&quot;http://ubuntuforums.org/showthread.php?t=1675764&quot; title=&quot;Ubuntu forums thread&quot;&gt;thread on Ubuntu forums&lt;/a&gt;. &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The instructions for compiling the driver can be found in the README_STA_usb. Basically we needed to edit the path to the linux source and modules and add a CROSS_COMPILE        path in the Makefile(of course these instructions will only fit this specific series of drivers), see below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ifeq ($(PLATFORM),PC)
+# Linux 2.6
+LINUX_SRC = /home/taghof/speciale/embedded_linux/linux-2.6.27/
+# Linux 2.4 Change to your local setting
+#LINUX_SRC = /usr/src/linux-2.4
+LINUX_SRC_MODULE = /home/taghof/speciale/embedded_linux/linux-2.6.27/drivers/net/wireless/
+CROSS_COMPILE = arm-none-linux-gnueabi-
+endif
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;Next enter the cross compiling environment and run &lt;code&gt;make&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo codesourcery-arm-2009q3.sh
+$ make
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The commands above produces rt3370sta.ko, FTP this to the drone, load the rt3370sta module and then load dwc_otg.ko.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ insmod rt3370sta.ko
+$ insmod dwc_otg.ko
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;Next one would probably want to add the insmod commands to &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh&quot; title=&quot;Our load script&quot;&gt;the load script&lt;/a&gt; mentioned in a previous &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/&quot; title=&quot;Enabling the drone USB port&quot;&gt;post&lt;/a&gt;.       &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;To test the driver we ran the commands listed below on the drone. The commands show us the new wireless interface ra0, brings it up and then gives us a list of in-range        APs, lastly we see monitor mode working with the aid of tcpdump.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ifconfig -a
+$ ifconfig ra0 up
+$ iwlist ra0 scan
+$ iwconfig ra0 mode monitor
+$ tcpdump -i ra0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;Like our advanced test program in &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/&quot; title=&quot;Compiling code for the AR.Drone&quot;&gt;the cross compiling post&lt;/a&gt; tcpdump depends on libpcap and it is compiled in a similar way, a guide that gets around the      inevitable quirks can be found &lt;a href=&quot;http://owen-hsu.blogspot.com/2011/03/embedded-porting-tcpdump-to-arm-emedded.html&quot; title=&quot;Cross compiling tcpdump&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;Results&lt;/h1&gt;
+
+&lt;p&gt;After finding the correct driver, compiling and testing was straight forward. The driver works as expected and we have gained the ability to scan for wireless APs and to monitor all incoming wireless packets. We have also become painfully aware of the importance of finding the right driver version, specifically if the vendor:device id is not found in the drivers list of supported devices, it probably is not the correct driver... and further hacking and fiddling with the driver is likely futile. It would seem that other drivers might support our device, for instance the RT5370 USB which can be downloaded from the &lt;a href=&quot;http://www.ralinktech.com/en/04_support/support.php?sn=501&quot; title=&quot;Ra-Link driver download&quot;&gt;Ra-Link support site&lt;/a&gt;. Attempts to compile rt2800usb(available in the kernel tree from around 2.6.31) for 2.6.27 with &lt;a href=&quot;http://linuxwireless.org/en/users/Download/stable#Stable_compat-wireless_releases&quot; title=&quot;Compat wireless download&quot;&gt;compat wireless&lt;/a&gt; was unsuccesfull.&lt;/p&gt;
+
+&lt;h1&gt;References&lt;/h1&gt;
+
+&lt;p&gt;Posts, guides and threads used in the above procedures:&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/&quot; title=&quot;Enabling the drone USB port&quot;&gt;Enabling the drone USB port&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/&quot; title=&quot;Compiling code for the AR.Drone&quot;&gt;Compiling code for the AR.Drone&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.dlink.dk/cs/Satellite?c=Product_C&amp;childpagename=DLinkEurope-DK%2FDLProductCarouselMultiple&amp;cid=1197319529299&amp;p=1197357728135&amp;packedargs=ParentPageID%3D1197337625277%26ProductParentID%3D1197318706946%26TopLevelPageProduct%3DBusiness%26category%3DQuickProductFinder%26locale%3D1195806935729%26term%3DDWL-G122&amp;pagename=DLinkEurope-DK%2FDLWrapper&quot; title=&quot;D-Link DWL-G122&quot;&gt;D-Link DWL-G122&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://ubuntuforums.org/showthread.php?t=1675764&quot; title=&quot;Ubuntu forums thread&quot;&gt;Ubuntu forums thread&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.ralinktech.com/en/04_support/support.php?sn=501&quot; title=&quot;Ra-Link driver download&quot;&gt;Ra-Link driver download&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://linuxwireless.org/en/users/Download/stable#Stable_compat-wireless_releases&quot; title=&quot;Compat wireless download&quot;&gt;Compat wireless download&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://owen-hsu.blogspot.com/2011/03/embedded-porting-tcpdump-to-arm-emedded.html&quot; title=&quot;Cross compiling tcpdump&quot;&gt;Cross compiling tcpdump&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://linux-wless.passys.nl/&quot; title=&quot;Tool for linking devices to chipsets and drivers&quot;&gt;Tool for linking devices to chipsets and drivers&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://airodump.net/wifi-hardware-monitor-applications/&quot; title=&quot;List of usable WIFI adapters&quot;&gt;List of usable WIFI adapters&lt;/a&gt;   &lt;/p&gt;
+
+&lt;p&gt;Code resources:&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/2010_0831_RT3070_Linux_STA_v2.4.0.1_DPO.bz2&quot; title=&quot;RT3370STA driver&quot;&gt;RT3370STA driver&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh&quot; title=&quot;Our load script&quot;&gt;Our load script&lt;/a&gt;   &lt;/p&gt;
+
+&lt;!-- references --&gt;
+
+&lt;!-- downloads --&gt;
+</content>
+  </entry>
+  
+  
+  
+  <entry>
+    <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/23/UDPing-ATcommands-from-inside-the-drone</id>
+    <link type="text/html" rel="alternate" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/23/UDPing-ATcommands-from-inside-the-drone"/>
+    <title>UDPing ATcommands from inside the drone</title>
+    <updated>2012-01-23T00:00:00+01:00</updated>
+    <author>
+      <name>Morten Daugaard and Thomas Thyregod</name>
+      <uri>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</uri>
+    </author>
+    <content type="html">&lt;h1&gt;Purpose&lt;/h1&gt;
+
+&lt;p&gt;To have tysse do a blog post before the taghof:tysse blog post ratio is out of a 50:50 reach, and also to make initial investigations of the future possibility of constructing a controlprogram onboard the AR.Drone, - either instead-of or in-parallel with the current program.elf. A prerequisite of this is to be able of doing ATcommand requests onboard the drone.&lt;/p&gt;
+
+&lt;h1&gt;Procedure&lt;/h1&gt;
+
+&lt;p&gt;It is already possible to send ATcommands from an external source. This is what is used in the controller app on the iphone. Some of the AT-commands have been mapped for the use in the &lt;a href=&quot;http://abstract.cs.washington.edu/~shwetak/classes/ee472/notes/ARDrone_SDK_1_6_Developer_Guide.pdf&quot; title=&quot;AR.Drone SDK Developer Guide&quot;&gt;Drone SDK&lt;/a&gt;. The SDK system is mostly used from a PC platform etc. Some of the initial testings (of the initial testings) done in this projekt was done playing around with the py-code of &lt;a href=&quot;https://github.com/venthur/python-ardrone&quot; title=&quot;python-ardrone&quot;&gt;venthur&lt;/a&gt;, specifically the code for the &lt;a href=&quot;https://github.com/venthur/python-ardrone/blob/master/libardrone.py&quot; title=&quot;python code for sending commands to the AR.Drone&quot;&gt;Drone-implementation&lt;/a&gt;.   &lt;/p&gt;
+
+&lt;p&gt;Some contemplating was conducted, before deciding on an adequate command to execute. When not having access to all other controls, and not wanting to break or damage anything, - it seems best to refrain from doing any moving of any rotary part. - Other available commands are retrieving video or retrieving navigation data. When not wanting to do any retrieving, but just issue commands left and right without responsibility, one may restrict one-self to issuing commands to control the LED-animations on the motor-LED indicators.   &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;A &lt;a href=&quot;http://www.developer.nokia.com/Community/Wiki/Open_C_Sockets:_send,_sendto,_sendmsg_methods&quot; title=&quot;udp sendto.c&quot;&gt;C-program&lt;/a&gt; or &lt;a href=&quot;http://www.abc.se/~m6695/udp.html&quot; title=&quot;udp programII&quot;&gt;two&lt;/a&gt; was stolen and re-written (using &lt;a href=&quot;http://www.freebsd.org/cgi/man.cgi?query=socket&amp;apropos=0&amp;sektion=0&amp;manpath=FreeBSD+9.0-RELEASE&amp;arch=default&amp;format=html&quot;&gt;man&lt;/a&gt;) to send off UDP-packages to the Drones command port 5556.   &lt;/p&gt;
+
+&lt;p&gt;The client code is available at &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/udp_onboard/udping.c&quot; title=&quot;hello world of udp on ARDrone LED&quot;&gt;udping.c&lt;/a&gt;. udping.c is made to send one AT command and then terminate. Below is a small recap.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;sys/socket&amp;gt;
+ ...
+
+#define PORT 5556
+ ...
+
+    line = &amp;quot;AT*LED=5,6,1,2\r&amp;quot;;
+    inet_aton(&amp;quot;192.168.1.1&amp;quot;, &amp;amp;receiver_addr.sin_addr);
+    receiver_addr.sin_port = htons( PORT );
+
+    sendto( sock_fd, line, BUFSIZE, 0,
+                    (struct sockaddr*)&amp;amp;receiver_addr, sizeof(receiver_addr)
+                );   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The port number and ip addresse is assigned to a struct in order to send the message &amp;quot;AT*LED=5,6,1,2&amp;quot; to the drone.   &lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Cross compilation of the code and setup of the environment is managed as in the post by taghof on &lt;a href=&quot;http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/&quot; title=&quot;cross combilation&quot;&gt;Compiling code for the AR.Drone&lt;/a&gt;.
+After installation, the environment is onvoked by calling:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    $ codesourcery-arm-2009q3.sh   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After that compilation of eg. udping.c may be executed by calling&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    $ arm-none-linux-gnueabi-gcc udping.c -o hello_arm   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The program should then be transfered to the drone, eg. by ftp.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    $ ftp 192.168.1.1
+    ...
+    ftp&amp;gt; put hello_arm   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Upon which you telnet to the drone, change directory in to /data/video and execute the newly transfered program.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    $ telnet 198.168.1.1
+
+    # cd data/video
+    # chmod +x hello_arm
+    # ./hello_arm   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt; On the first testrun the idea was to have a udp &lt;a href=&quot;http://cs.au.dk/~tysse/speciale/ciaoserver.c&quot;&gt;server&lt;/a&gt; listening to the control port 5556, in order to ease the debugging, ie. to make sure that the correct signal was transfered complete.
+Though the Drones parrot control program had initially called first dibs on the 5556 port, so a 'killall program.elf' was initiated. With this the new listener program can use the socket interface alone.&lt;br&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The server or listener was sat to listen for one udp package, then print the message to stdout and then terminate. The program was good in determining the cause of a faulty udp client. The Client was editted to send a correctly formatted AT-command by help from the server/listener program.   &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt; program.elf was once again restarted, in order to see the effects of the command to initiate LED animation. 'hello_arm' was also started again. The effekt of issuing the LED animations command was seen ... it changed the ligt of one motor indicator LED from the color green to the color red ...&lt;br&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;Results&lt;/h1&gt;
+
+&lt;p&gt;The experiment showed that it is indeed possible to issue ATcomamnd with UDP packages sent from onboard the AR.Drone itself.   &lt;/p&gt;
+
+&lt;p&gt;Future experiments may contain more sequentially timed function calls eg. watchdog timely kicks, keep alive signals etc. and maybe a few experiments with autonomous flying without any human intervention, maybe.&lt;/p&gt;
+
+&lt;h1&gt;References&lt;/h1&gt;
+
+&lt;p&gt;on py-sockets and AT commands:&lt;br&gt;
+&lt;a href=&quot;https://github.com/venthur/python-ardrone/blob/master/libardrone.py&quot; title=&quot;python code for sending commands to the AR.Drone&quot;&gt;Examples of ATcommands in use&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;https://github.com/venthur/python-ardrone&quot; title=&quot;python-ardrone&quot;&gt;Venthurs pythonlib for Drone control&lt;/a&gt;   &lt;/p&gt;
+
+&lt;p&gt;on SDK AT commands:&lt;br&gt;
+&lt;a href=&quot;http://abstract.cs.washington.edu/~shwetak/classes/ee472/notes/ARDrone_SDK_1_6_Developer_Guide.pdf&quot; title=&quot;AR.Drone SDK Developer Guide&quot;&gt;AR.Drone SDK Developer Guide&lt;/a&gt;   &lt;/p&gt;
+
+&lt;p&gt;on sockets in C:&lt;br&gt;
+&lt;a href=&quot;http://www.freebsd.org/cgi/man.cgi?query=socket&amp;apropos=0&amp;sektion=0&amp;manpath=FreeBSD+9.0-RELEASE&amp;arch=default&amp;format=html&quot;&gt;a man page for socket&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.developer.nokia.com/Community/Wiki/Open_C_Sockets:_send,_sendto,_sendmsg_methods&quot; title=&quot;udp sendto.c&quot;&gt;example from sub.nokia&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.abc.se/~m6695/udp.html&quot; title=&quot;udp programII&quot;&gt;example from hi-ranking google sweed...&lt;/a&gt;   &lt;/p&gt;
+
+&lt;p&gt;our own work:&lt;br&gt;
+&lt;a href=&quot;http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/&quot; title=&quot;cross combilation&quot;&gt;taghofs blog entry on cross combilation for ar.drone&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/udp_onboard/udping.c&quot; title=&quot;hello world of udp on ARDrone LED&quot;&gt;udp'ing.c&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://cs.au.dk/~tysse/speciale/ciaoserver.c&quot;&gt;udp server&lt;/a&gt;   &lt;/p&gt;
+
+&lt;!-- references --&gt;
+
+&lt;!-- downloads --&gt;
+</content>
+  </entry>
+  
+  
+  
+  <entry>
+    <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/17/Cables-And-Physical-Setup-For-USB-Testing</id>
+    <link type="text/html" rel="alternate" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/17/Cables-And-Physical-Setup-For-USB-Testing"/>
+    <title>Cables and physical setup for USB testing</title>
+    <updated>2012-01-17T00:00:00+01:00</updated>
+    <author>
+      <name>Morten Daugaard and Thomas Thyregod</name>
+      <uri>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</uri>
+    </author>
+    <content type="html">&lt;h1&gt;Purpose&lt;/h1&gt;
+
+&lt;p&gt;To document how we assembled the cables used in &lt;a href=&quot;http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/&quot; title=&quot;Enabling the drone USB port&quot;&gt;Enabling the Drone USB Port&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1&gt;Procedure&lt;/h1&gt;
+
+&lt;p&gt;Initially we bought an AR.Drone USB cable from &lt;a href=&quot;http://www.morfars.dk/rc/katalog-reservedele-c-52_308.html?preload=PF070021&quot; title=&quot;Morfars.dk, AR.Drone USB cable&quot;&gt;morfars.dk&lt;/a&gt;, alternatively one could have used a 7-pin Molex connector and some USB chord to construct a cable from this 
+&lt;a href=&quot;https://projects.ardrone.org/attachments/167/ARDrone-USB-Cable.png&quot; title=&quot;pinout&quot;&gt;pinout&lt;/a&gt;. After receiving the cable we realized that a female-to-female adapter would be needed if we were going to connect devices to the drone.&lt;br&gt;
+Instead of ordering an adapter, we decided to cut two regular usb-extension cables in halves and resolder the two female ends. After a few attempts(thank you &lt;a href=&quot;http://blog.ptx.dk/&quot; title=&quot;ptx's blog&quot;&gt;Peter&lt;/a&gt;) we succeded in making two working cables,
+one female-female and one male-male. Cables were tested by measuring voltage levels after being plugged into the drone.&lt;br&gt;
+Though our newly created cables actually worked, we decided to simplify the setup a bit by cutting off the male connector of the AR.Drone
+USB cable and attaching a female connector scavenged from an old motherboard.&lt;/p&gt;
+
+&lt;h1&gt;Results&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://projects.ardrone.org/attachments/download/170&quot;&gt;&lt;img src=&quot;https://projects.ardrone.org/attachments/download/170&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/femaletofemale.JPG&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/femaletofemale.JPG&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/droneconnector.JPG&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/droneconnector.JPG&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/droneconnector-close.JPG&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/droneconnector-close.JPG&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/cabletest.JPG&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/cabletest.JPG&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/usbsetup.JPG&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/usbsetup.JPG&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;   &lt;/p&gt;
+
+&lt;p&gt;The cables above have been used to succesfully access a USB stick from the AR.Drone OTG USB port. For now the cables are suitable for testing, but when time comes for flying and reducing weight,
+the cables will be further shortened/stripped to ensure drone maneuverability.&lt;/p&gt;
+
+&lt;!-- references --&gt;
+</content>
+  </entry>
+  
+  
+  
+  <entry>
+    <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/13/Compiling-Code-For-The-ARDrone</id>
+    <link type="text/html" rel="alternate" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/13/Compiling-Code-For-The-ARDrone"/>
+    <title>Compiling code for the AR.Drone</title>
+    <updated>2012-01-13T00:00:00+01:00</updated>
+    <author>
+      <name>Morten Daugaard and Thomas Thyregod</name>
+      <uri>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</uri>
+    </author>
+    <content type="html">&lt;h1&gt;Purpose&lt;/h1&gt;
+
+&lt;p&gt;To document the build process, when cross-compiling code to be executed on an AR.Drone. Results are considered satisfactory if we can
+compile a simple &amp;quot;hello world&amp;quot; program and execute the program on the drone, further we should be able to compile third-party libraries and likewise test them with simple programs on the drone.&lt;/p&gt;
+
+&lt;h1&gt;Procedure - simple&lt;/h1&gt;
+
+&lt;p&gt;The procedure for making and testing drone-executable code is rather simple: install a cross-compilation toolchain, make a &amp;quot;hello world&amp;quot; c program and cross compile it, transfer the program to the drone and execute it like any other program. The following steps assume you are using a linux distro.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;To install the codesourcery toolchain follow the instruction on the &lt;a href=&quot;http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling&quot; title=&quot;Nas Central, cross compile setup&quot;&gt;Nas-central website&lt;/a&gt; or just download and run this &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/codesetup.sh&quot; title=&quot;Cross compilation setup script&quot;&gt;script&lt;/a&gt; (which originates from the Nat-center       site).&lt;br&gt;
+Run the following command to enter your cross compilation environment:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ codesourcery-arm-2009q3.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Construct a simple C program, for instance:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+
+int main ()
+{
+  printf (&amp;quot;Hello World!\n&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;Compile it for the AR.Drones ARM9 processor with the following command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ arm-none-linux-gnueabi-gcc hello.c -o hello_arm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Connect to the drone FTP server(assuming that you are already connected to the drone wifi) and put hello_arm on the drone. The server will place the file in
+/data/video/. Run the program like any other:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./hello_arm 
+Hello World!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;Procedure - advanced&lt;/h1&gt;
+
+&lt;p&gt;The advanced procedure deals with cross compiling a third party library, installing it to be used with the cross compiling toolchain and compiling a program using the library.
+For the example we will use libpcap as the third party library and compile a simple packet sniffer.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Fetch the libpcap source &lt;a href=&quot;http://www.tcpdump.org/release/libpcap-1.2.1.tar.gz&quot; title=&quot;Libpcap source&quot;&gt;here&lt;/a&gt; and unpack it.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Start up the cross compile environment, build an ARM version of libpcap and install it with the following commands (remember the prefix part). To get the command right we      used &lt;a href=&quot;http://www.ailis.de/~k/archives/19-ARM-cross-compiling-howto.html&quot; title=&quot;the ARM cross-compiling howto&quot;&gt;the ARM cross-compiling howto&lt;/a&gt; and &lt;a href=&quot;http://www.secdev.org/zaurus/crosscompile.html&quot; title=&quot;the www.secdev.org guide&quot;&gt;the www.secdev.org guide&lt;/a&gt; for inspiration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ codesourcery-arm-2009q3.sh
+$ CC=arm-none-linux-gnueabi-gcc ./configure --prefix=/usr/local/codesourcery/arm-2009q3/arm-none-linux-gnueabi/ --host=arm-none-linux-gnu \ 
+  --target=arm-none-linux-gnu --with-pcap=linux
+$ make
+$ sudo codesourcery-arm-2009q3.sh
+$ sudo make install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;
+Note that(on our system at least) make install must be called with root privileges, therefore the codesourcery script must also be started again with sudo.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Now that the library has been built and installed all we need is to compile our sniffer program which uses the library.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ arm-none-linux-gnueabi-gcc *.c -lpcap -static -o sniffer   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;
+The output, sniffer, can be transferred to and executed on the drone.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;Results&lt;/h1&gt;
+
+&lt;p&gt;We were able to cross compile both the simple program, the library and the more advanced program utilizing the library. By doing a static compile of the advanced program, we don't have to transfer the library to the drone. We were also able to execute both programs on the drone.&lt;/p&gt;
+
+&lt;h1&gt;References&lt;/h1&gt;
+
+&lt;p&gt;Cross compilation guides:&lt;br&gt;
+&lt;a href=&quot;http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling&quot; title=&quot;Nas Central, cross compile setup&quot;&gt;Nas Central, cross compile setup&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.ailis.de/~k/archives/19-ARM-cross-compiling-howto.html&quot; title=&quot;the ARM cross-compiling howto&quot;&gt;The ARM cross-compiling howto&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.secdev.org/zaurus/crosscompile.html&quot; title=&quot;the www.secdev.org guide&quot;&gt;The www.secdev.org guide&lt;/a&gt;   &lt;/p&gt;
+
+&lt;p&gt;Code resources:&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/codesetup.sh&quot; title=&quot;Cross compilation setup script&quot;&gt;Cross compilation setup script&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.tcpdump.org/release/libpcap-1.2.1.tar.gz&quot; title=&quot;Libpcap source&quot;&gt;Libpcap source code&lt;/a&gt;   &lt;/p&gt;
+
+&lt;!-- references --&gt;
+
+&lt;!-- downloads --&gt;
+</content>
+  </entry>
+  
+  
+  
+  <entry>
+    <id>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/12/Enabling-The-Drone-USB-Port</id>
+    <link type="text/html" rel="alternate" href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV//blog/2012/01/12/Enabling-The-Drone-USB-Port"/>
+    <title>Enabling the Drone USB Port</title>
+    <updated>2012-01-12T00:00:00+01:00</updated>
+    <author>
+      <name>Morten Daugaard and Thomas Thyregod</name>
+      <uri>http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/</uri>
+    </author>
+    <content type="html">&lt;h1&gt;Purpose&lt;/h1&gt;
+
+&lt;p&gt;To determine whether attaching extra sensors to the AR.Drone is
+possible and to make a proof of concept by attaching and mounting a
+USB memory stick.&lt;/p&gt;
+
+&lt;h1&gt;Procedure&lt;/h1&gt;
+
+&lt;p&gt;To enable the On-The-Go USB port several steps must be taken: Editing the port
+driver to enable host mode, compiling the driver and other necessary
+kernel modules with a cross compiler toolchain, uploading the compiled
+modules to the drone and inserting the modules in the kernel and
+lastly changing the state of an I/O pin with the drone gpio tool. The following
+steps assume you are using a linux build environment.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;To begin editing the port driver one must first obtain the
+    source code, luckily the custom Parrot kernel source(including
+    drivers) is freely available from the &lt;a href=&quot;https://projects.ardrone.org/documents/show/19&quot; title=&quot;Kernel Source&quot;&gt;AR.Drone website&lt;/a&gt;. Also available is the kernel config file, so we
+    are able to build modules for the exact kernel running on the drone.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;  Download and unpack the kernel source and 
+kernel.config. Rename kernel.config to .config and place it in
+the kernel source root.&lt;/li&gt;
+&lt;li&gt;  Setup a cross compilation environment by following the instructions
+    from &lt;a href=&quot;http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling&quot; title=&quot;cross compilation setup&quot;&gt;www.nas-central.com&lt;/a&gt;, instructions include a setup script which automatically fetches the &lt;a href=&quot;http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/&quot; title=&quot;Codesourcery(Mentor) lite edition&quot;&gt;codesourcery toolchain&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Edit the file &amp;quot;drivers/parrot/usb/dwc_otg/dwc_otg_driver.c&amp;quot;,
+instructions are on &lt;a href=&quot;http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html&quot; title=&quot;E/S and I, AR.Drone USB&quot;&gt;the E/S and I blog&lt;/a&gt;.
+In short, around line 224 comment out: &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;params-&amp;gt;ctrl_mode = info-&amp;gt;ctrl_mode;
+params-&amp;gt;vbus_detection = info-&amp;gt;vbus_detection;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;and around line 135 set &lt;code&gt;.overcurrent_pin = -1&lt;/code&gt;.&lt;/li&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;To open the graphical kernel configuration tool and select the kernel modules you want to compile(including the one you edited), go to the kernel tree root and run:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;Remember to select as modules(M, not *).   &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;  To enable the usb port select:&lt;br&gt;
+&amp;quot;System Type -&amp;gt; Parrot Drivers -&amp;gt; PARROT6 USB driver (Synopsys)&amp;quot;.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;  To enable the FAT32 file system select:&lt;br&gt;
+&amp;quot;File systems -&amp;gt; DOS/FAT/NT Filesystems -&amp;gt; VFAT (Windows-95) fs support&amp;quot;&lt;br&gt;
+&amp;quot;File systems -&amp;gt; Native language support&amp;quot;&lt;br&gt;
+&amp;quot;File systems -&amp;gt; Native language support -&amp;gt; Codepage 437 (United States, Canada)&amp;quot;&lt;br&gt;
+&amp;quot;File systems -&amp;gt; Native language support -&amp;gt; NLS ISO 8859-1  (Latin 1...&amp;quot;&lt;br&gt;
+&amp;quot;File systems -&amp;gt; Native language support -&amp;gt; NLS UTF-8&amp;quot;&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;  For a USB stick to be recognized as a SCSI disk, we must add SCSI support by selecting:&lt;br&gt;
+&amp;quot;Device Drivers -&amp;gt; SCSI device support -&amp;gt; SCSI disk support&amp;quot;&lt;br&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Alternatively you could use &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/custom-kernel.config&quot; title=&quot;Our kernel config&quot;&gt;our kernel config&lt;/a&gt; and spare yourself the trouble, anyway the selected modules can now be compiled by running:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- modules
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;This should, among other things, generate the following modules:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;drivers/block/nbd.ko
+drivers/parrot/usb/dwc_otg/dwc_otg.ko
+drivers/scsi/scsi_wait_scan.ko
+drivers/scsi/sd_mod.ko
+fs/fat/fat.ko
+fs/nls/nls_base.ko
+fs/nls/nls_cp437.ko
+fs/nls/nls_iso8859-1.ko
+fs/nls/nls_utf8.ko
+fs/vfat/vfat.ko
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;   &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Transfer these modules to the drone via FTP and before inserting the modules, login to the drone via telnet and run the following commands to activate the USB port in the      drone hardware:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# gpio 127 -d ho 1
+# gpio 127 -d i
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br /&gt;Then insert the modules with &lt;code&gt;insmod &amp;lt;module file&amp;gt;&lt;/code&gt;. Consider a shell script for automating the on-drone proces, we made a &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh&quot; title=&quot;Our load script&quot;&gt;script&lt;/a&gt; that copies all transferred .ko        files to a custom_modules directory, sets the I/O pin and inserts the needed modules. For further ease of use this script could be called from the drone startup script.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;At this point we are able to plugin our &lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/17/Cables-And-Physical-Setup-For-USB-Testing/&quot; title=&quot;Cables and physical setup for USB testing&quot;&gt;home made USB cable&lt;/a&gt;, with a USB stick atttached, and see with &lt;code&gt;$ dmesg&lt;/code&gt; that the stick is correctly recognized.
+The stick usually appears as &lt;code&gt;/dev/sda1&lt;/code&gt; but you might need to run &lt;code&gt;$ devmem&lt;/code&gt; for this to happen. Left is only mounting and manipulating(see images below). &lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;Results&lt;/h1&gt;
+
+&lt;p&gt;After following the procedure above we were able to power the USB port, compile and insert the necessary kernel modules, recognize our USB stick 
+as a SCSI disk, mount the stick and copy files from the stick to the drone internal memory and back. Below are screen caps of the on-drone-process and results.   &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/load.png&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/load.png&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/fdisk-df.png&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png&quot;&gt;&lt;img src=&quot;/Navigation-for-Robots-with-WIFI-and-CV/images/copying.png&quot; width=&quot;150&quot; height=&quot;150&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;References&lt;/h1&gt;
+
+&lt;p&gt;Much of the tweaking described above was developed by the users &lt;a href=&quot;http://embedded-software.blogspot.com&quot;&gt;&amp;quot;Scorpion2k&amp;quot;&lt;/a&gt;
+ and &amp;quot;MAPGPS&amp;quot; of &lt;a href=&quot;http://www.ardrone-flyers.com&quot;&gt;www.ardrone-flyers.com&lt;/a&gt;.&lt;br&gt;
+&lt;br /&gt; 
+Threads, blogpost and wikis used above:&lt;br&gt;
+&lt;a href=&quot;http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling&quot; title=&quot;cross compilation setup&quot;&gt;NAS central, cross compilation setup&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://embedded-software.blogspot.com/2010/12/ar-drone-usb.html&quot; title=&quot;E/S and I, AR.Drone USB&quot;&gt;E/S and I, AR.Drone USB&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;http://www.ardrone-flyers.com/forum/viewtopic.php?t=829&quot; title=&quot;AR.Drone Flyers, USB disc thread&quot;&gt;AR.Drone Flyers, USB disk thread&lt;/a&gt;&lt;br&gt;
+&lt;br /&gt;
+Code resources:&lt;br&gt;
+&lt;a href=&quot;https://projects.ardrone.org/documents/show/19&quot; title=&quot;Kernel Source&quot;&gt;Kernel source and kernel config&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/custom-kernel.config&quot; title=&quot;Our kernel config&quot;&gt;Our custom kernel config&lt;/a&gt;&lt;br&gt;
+&lt;a href=&quot;/Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh&quot; title=&quot;Our load script&quot;&gt;Our load script&lt;/a&gt;   &lt;/p&gt;
+
+&lt;!-- references --&gt;
+
+&lt;!-- downloads --&gt;
+</content>
+  </entry>
+  
+  
+ 
+</feed>

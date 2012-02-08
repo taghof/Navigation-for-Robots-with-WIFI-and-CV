@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Navigation for Robots with WIFI and CV | Attaching a USB WIFI adapter to the AR.Drone</title>
+	<!--<base href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/" target="_blank"/>-->
+	<link rel="stylesheet" href="/Navigation-for-Robots-with-WIFI-and-CV/css/master.css" />
+	<script src="/Navigation-for-Robots-with-WIFI-and-CV/js/master.js"></script>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <p id="logo"><a href="/Navigation-for-Robots-with-WIFI-and-CV">Navigation for Robots with WIFI and CV</a></p>
+      <nav>
+	<ul class="clearfix">
+	  <li><a href="/Navigation-for-Robots-with-WIFI-and-CV/archive.html">Archive</a></li>
+	  <li><a href="https://github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV">Code</a></li>
+	  <li><a href="/Navigation-for-Robots-with-WIFI-and-CV/project.html">The Project</a></li>
+	</ul>
+      </nav>
+    </div>
+  </header>
+
+  <section id="content-wrap">
+    <div class="container" style=”text-align: justify; text-justify: newspaper”>
+
+		<article class="post container">
+	<h2>Attaching a USB WIFI adapter to the AR.Drone</h2>
+	<div class="post-meta span-3">
+		<time class="pill" datetime="2012-01-25">January 25, 2012</time>
+	</div>
+	<div class="post-content span-15 last">
+	  <h1>Purpose</h1>
+
+<p>To allow a robot like the AR.Drone to be more autonomous we find that it is important to be able to attach extra sensors.
+The purpose of the work described in this post was to document how one attaches a USB WIFI adapter. The device was attached 
+via the drone OTG USB port which we <a href="/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/" title="Enabling the drone USB port">activated in a previous post</a>. A secondary purpose was to gain more experience with linux drivers and
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/" title="Compiling code for the AR.Drone">the cross compiling process</a>.</p>
+
+<h1>Procedure</h1>
+
+<p>Before getting to work we needed a device with the required features, for our purpose of gathering information about the WIFI access points in range,
+this meant a USB WIFI adapter capable of entering monitor mode and preferrably accompanied by a driver for linux kernel version 2.6.27. After some research on the web(mostly <a href="http://linux-wless.passys.nl/" title="Tool for linking devices to chipsets and drivers">here</a> and <a href="http://airodump.net/wifi-hardware-monitor-applications/" title="List of usable WIFI adapters">here</a>), we found that a device based on a Ra-Link chipset would probably work and after a little more research we finally opted for a <a href="http://www.dlink.dk/cs/Satellite?c=Product_C&childpagename=DLinkEurope-DK%2FDLProductCarouselMultiple&cid=1197319529299&p=1197357728135&packedargs=ParentPageID%3D1197337625277%26ProductParentID%3D1197318706946%26TopLevelPageProduct%3DBusiness%26category%3DQuickProductFinder%26locale%3D1195806935729%26term%3DDWL-G122&pagename=DLinkEurope-DK%2FDLWrapper" title="D-Link DWL-G122">D-Link DWL-G122</a>.<br>
+After acquiring the device we must go through the following steps: examining the device to retrieve vendor and device ids, finding a suitable driver, cross compiling the driver, inserting the compiled driver module and testing monitor mode with tcpdump(cross compiled for the occasion).</p>
+
+<ol>
+<li><p>To examine the device we used <code>sudo lsusb -v</code>, lsusb is not available(so far)
+on the drone so we used a Ubuntu 11.10 host. After finding the entry describing our device, we read our vendor:device id to be 0x07D1:0x3C0F. Next we attached the device to        the drone and saw that it was picked up on insertion, but of course no driver was loaded.</p></li>
+<li><p>In hindsight finding the correct driver was the most troublesome step, this was mostly because we didn't search for the vendor:device id but instead for the more generic       &quot;RT2870&quot;. Thus after much searching, trying different drivers and modyfying before mentioned drivers(some of which actually loaded), we finally found the right driver,     <a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/2010_0831_RT3070_Linux_STA_v2.4.0.1_DPO.bz2" title="RT3370STA driver">RT3370</a>, after reading this <a href="http://ubuntuforums.org/showthread.php?t=1675764" title="Ubuntu forums thread">thread on Ubuntu forums</a>. </p></li>
+<li><p>The instructions for compiling the driver can be found in the README_STA_usb. Basically we needed to edit the path to the linux source and modules and add a CROSS_COMPILE        path in the Makefile(of course these instructions will only fit this specific series of drivers), see below:</p>
+
+<pre><code>ifeq ($(PLATFORM),PC)
+# Linux 2.6
+LINUX_SRC = /home/taghof/speciale/embedded_linux/linux-2.6.27/
+# Linux 2.4 Change to your local setting
+#LINUX_SRC = /usr/src/linux-2.4
+LINUX_SRC_MODULE = /home/taghof/speciale/embedded_linux/linux-2.6.27/drivers/net/wireless/
+CROSS_COMPILE = arm-none-linux-gnueabi-
+endif
+</code></pre>
+
+<p><br />Next enter the cross compiling environment and run <code>make</code></p>
+
+<pre><code>$ sudo codesourcery-arm-2009q3.sh
+$ make
+</code></pre>
+
+<p><br /></p></li>
+<li><p>The commands above produces rt3370sta.ko, FTP this to the drone, load the rt3370sta module and then load dwc_otg.ko.</p>
+
+<pre><code>$ insmod rt3370sta.ko
+$ insmod dwc_otg.ko
+</code></pre>
+
+<p><br />Next one would probably want to add the insmod commands to <a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh" title="Our load script">the load script</a> mentioned in a previous <a href="/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/" title="Enabling the drone USB port">post</a>.       </p></li>
+<li><p>To test the driver we ran the commands listed below on the drone. The commands show us the new wireless interface ra0, brings it up and then gives us a list of in-range        APs, lastly we see monitor mode working with the aid of tcpdump.</p>
+
+<pre><code>$ ifconfig -a
+$ ifconfig ra0 up
+$ iwlist ra0 scan
+$ iwconfig ra0 mode monitor
+$ tcpdump -i ra0
+</code></pre>
+
+<p><br />Like our advanced test program in <a href="/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/" title="Compiling code for the AR.Drone">the cross compiling post</a> tcpdump depends on libpcap and it is compiled in a similar way, a guide that gets around the      inevitable quirks can be found <a href="http://owen-hsu.blogspot.com/2011/03/embedded-porting-tcpdump-to-arm-emedded.html" title="Cross compiling tcpdump">here</a>.</p></li>
+</ol>
+
+<h1>Results</h1>
+
+<p>After finding the correct driver, compiling and testing was straight forward. The driver works as expected and we have gained the ability to scan for wireless APs and to monitor all incoming wireless packets. We have also become painfully aware of the importance of finding the right driver version, specifically if the vendor:device id is not found in the drivers list of supported devices, it probably is not the correct driver... and further hacking and fiddling with the driver is likely futile. It would seem that other drivers might support our device, for instance the RT5370 USB which can be downloaded from the <a href="http://www.ralinktech.com/en/04_support/support.php?sn=501" title="Ra-Link driver download">Ra-Link support site</a>. Attempts to compile rt2800usb(available in the kernel tree from around 2.6.31) for 2.6.27 with <a href="http://linuxwireless.org/en/users/Download/stable#Stable_compat-wireless_releases" title="Compat wireless download">compat wireless</a> was unsuccesfull.</p>
+
+<h1>References</h1>
+
+<p>Posts, guides and threads used in the above procedures:<br>
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/" title="Enabling the drone USB port">Enabling the drone USB port</a><br>
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/" title="Compiling code for the AR.Drone">Compiling code for the AR.Drone</a><br>
+<a href="http://www.dlink.dk/cs/Satellite?c=Product_C&childpagename=DLinkEurope-DK%2FDLProductCarouselMultiple&cid=1197319529299&p=1197357728135&packedargs=ParentPageID%3D1197337625277%26ProductParentID%3D1197318706946%26TopLevelPageProduct%3DBusiness%26category%3DQuickProductFinder%26locale%3D1195806935729%26term%3DDWL-G122&pagename=DLinkEurope-DK%2FDLWrapper" title="D-Link DWL-G122">D-Link DWL-G122</a><br>
+<a href="http://ubuntuforums.org/showthread.php?t=1675764" title="Ubuntu forums thread">Ubuntu forums thread</a><br>
+<a href="http://www.ralinktech.com/en/04_support/support.php?sn=501" title="Ra-Link driver download">Ra-Link driver download</a><br>
+<a href="http://linuxwireless.org/en/users/Download/stable#Stable_compat-wireless_releases" title="Compat wireless download">Compat wireless download</a><br>
+<a href="http://owen-hsu.blogspot.com/2011/03/embedded-porting-tcpdump-to-arm-emedded.html" title="Cross compiling tcpdump">Cross compiling tcpdump</a><br>
+<a href="http://linux-wless.passys.nl/" title="Tool for linking devices to chipsets and drivers">Tool for linking devices to chipsets and drivers</a><br>
+<a href="http://airodump.net/wifi-hardware-monitor-applications/" title="List of usable WIFI adapters">List of usable WIFI adapters</a>   </p>
+
+<p>Code resources:<br>
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/2010_0831_RT3070_Linux_STA_v2.4.0.1_DPO.bz2" title="RT3370STA driver">RT3370STA driver</a><br>
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/load.sh" title="Our load script">Our load script</a>   </p>
+
+<!-- references -->
+
+<!-- downloads -->
+
+	  <hr />
+	  <div id="disqus">
+	    <div id="disqus_thread"></div>
+	    <script type="text/javascript"
+		    src="http://disqus.com/forums/navigationforrobotswithwifiandcv/embed.js"></script>
+	    <noscript>
+	      <a href="http://navigationforrobotswithwifiandcv.disqus.com/?url=ref">
+		View the discussion thread.
+	      </a>
+	    </noscript>
+	<!--    <a href="http://disqus.com" class="dsq-brlink">
+	    blog comments powered by <span class="logo-disqus">Disqus</span>
+	    </a>-->
+	  </div>
+	</div>
+
+</article>
+
+
+    </div>
+  </section>
+
+  <footer class="container">
+    <p>
+      <a href="/Navigation-for-Robots-with-WIFI-and-CV/rss.xml"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/feedlogos/28.png" width="14px" style="padding-bottom: 4px; vertical-align: middle;"></a>
+      <a href="/Navigation-for-Robots-with-WIFI-and-CV/atom.xml"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/feedlogos/31.png" width="14px" style="padding-bottom: 4px; vertical-align: middle;"></a>
+      &nbsp;&nbsp;&laquo;&nbsp;&nbsp; 2011-2012 Master thesis project &nbsp;&nbsp;&raquo;&nbsp;&nbsp; <a href="mailto:taghof@gmail.com">Navigation for Robots with WIFI and CV</a>
+    </p>
+  </footer>
+
+</body>
+</html>

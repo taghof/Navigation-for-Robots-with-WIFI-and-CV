@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Navigation for Robots with WIFI and CV | Compiling code for the AR.Drone</title>
+	<!--<base href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/" target="_blank"/>-->
+	<link rel="stylesheet" href="/Navigation-for-Robots-with-WIFI-and-CV/css/master.css" />
+	<script src="/Navigation-for-Robots-with-WIFI-and-CV/js/master.js"></script>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <p id="logo"><a href="/Navigation-for-Robots-with-WIFI-and-CV">Navigation for Robots with WIFI and CV</a></p>
+      <nav>
+	<ul class="clearfix">
+	  <li><a href="/Navigation-for-Robots-with-WIFI-and-CV/archive.html">Archive</a></li>
+	  <li><a href="https://github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV">Code</a></li>
+	  <li><a href="/Navigation-for-Robots-with-WIFI-and-CV/project.html">The Project</a></li>
+	</ul>
+      </nav>
+    </div>
+  </header>
+
+  <section id="content-wrap">
+    <div class="container" style=”text-align: justify; text-justify: newspaper”>
+
+		<article class="post container">
+	<h2>Compiling code for the AR.Drone</h2>
+	<div class="post-meta span-3">
+		<time class="pill" datetime="2012-01-13">January 13, 2012</time>
+	</div>
+	<div class="post-content span-15 last">
+	  <h1>Purpose</h1>
+
+<p>To document the build process, when cross-compiling code to be executed on an AR.Drone. Results are considered satisfactory if we can
+compile a simple &quot;hello world&quot; program and execute the program on the drone, further we should be able to compile third-party libraries and likewise test them with simple programs on the drone.</p>
+
+<h1>Procedure - simple</h1>
+
+<p>The procedure for making and testing drone-executable code is rather simple: install a cross-compilation toolchain, make a &quot;hello world&quot; c program and cross compile it, transfer the program to the drone and execute it like any other program. The following steps assume you are using a linux distro.</p>
+
+<ol>
+<li><p>To install the codesourcery toolchain follow the instruction on the <a href="http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling" title="Nas Central, cross compile setup">Nas-central website</a> or just download and run this <a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/codesetup.sh" title="Cross compilation setup script">script</a> (which originates from the Nat-center       site).<br>
+Run the following command to enter your cross compilation environment:</p>
+
+<pre><code>$ codesourcery-arm-2009q3.sh
+</code></pre>
+
+<p><br /></p></li>
+<li><p>Construct a simple C program, for instance:</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main ()
+{
+  printf (&quot;Hello World!\n&quot;);
+}
+</code></pre>
+
+<p><br />Compile it for the AR.Drones ARM9 processor with the following command:</p>
+
+<pre><code>$ arm-none-linux-gnueabi-gcc hello.c -o hello_arm
+</code></pre>
+
+<p><br /></p></li>
+<li><p>Connect to the drone FTP server(assuming that you are already connected to the drone wifi) and put hello_arm on the drone. The server will place the file in
+/data/video/. Run the program like any other:</p>
+
+<pre><code>$ ./hello_arm 
+Hello World!
+</code></pre>
+
+<p><br /></p></li>
+</ol>
+
+<h1>Procedure - advanced</h1>
+
+<p>The advanced procedure deals with cross compiling a third party library, installing it to be used with the cross compiling toolchain and compiling a program using the library.
+For the example we will use libpcap as the third party library and compile a simple packet sniffer.</p>
+
+<ol>
+<li><p>Fetch the libpcap source <a href="http://www.tcpdump.org/release/libpcap-1.2.1.tar.gz" title="Libpcap source">here</a> and unpack it.</p></li>
+<li><p>Start up the cross compile environment, build an ARM version of libpcap and install it with the following commands (remember the prefix part). To get the command right we      used <a href="http://www.ailis.de/~k/archives/19-ARM-cross-compiling-howto.html" title="the ARM cross-compiling howto">the ARM cross-compiling howto</a> and <a href="http://www.secdev.org/zaurus/crosscompile.html" title="the www.secdev.org guide">the www.secdev.org guide</a> for inspiration.</p>
+
+<pre><code>$ codesourcery-arm-2009q3.sh
+$ CC=arm-none-linux-gnueabi-gcc ./configure --prefix=/usr/local/codesourcery/arm-2009q3/arm-none-linux-gnueabi/ --host=arm-none-linux-gnu \ 
+  --target=arm-none-linux-gnu --with-pcap=linux
+$ make
+$ sudo codesourcery-arm-2009q3.sh
+$ sudo make install
+</code></pre>
+
+<p><br />
+Note that(on our system at least) make install must be called with root privileges, therefore the codesourcery script must also be started again with sudo.</p></li>
+<li><p>Now that the library has been built and installed all we need is to compile our sniffer program which uses the library.</p>
+
+<pre><code>$ arm-none-linux-gnueabi-gcc *.c -lpcap -static -o sniffer   
+</code></pre>
+
+<p><br />
+The output, sniffer, can be transferred to and executed on the drone.</p></li>
+</ol>
+
+<h1>Results</h1>
+
+<p>We were able to cross compile both the simple program, the library and the more advanced program utilizing the library. By doing a static compile of the advanced program, we don't have to transfer the library to the drone. We were also able to execute both programs on the drone.</p>
+
+<h1>References</h1>
+
+<p>Cross compilation guides:<br>
+<a href="http://www.nas-central.org/wiki/Setting_up_the_codesourcery_toolchain_for_X86_to_ARM9_cross_compiling" title="Nas Central, cross compile setup">Nas Central, cross compile setup</a><br>
+<a href="http://www.ailis.de/~k/archives/19-ARM-cross-compiling-howto.html" title="the ARM cross-compiling howto">The ARM cross-compiling howto</a><br>
+<a href="http://www.secdev.org/zaurus/crosscompile.html" title="the www.secdev.org guide">The www.secdev.org guide</a>   </p>
+
+<p>Code resources:<br>
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/codesetup.sh" title="Cross compilation setup script">Cross compilation setup script</a><br>
+<a href="http://www.tcpdump.org/release/libpcap-1.2.1.tar.gz" title="Libpcap source">Libpcap source code</a>   </p>
+
+<!-- references -->
+
+<!-- downloads -->
+
+	  <hr />
+	  <div id="disqus">
+	    <div id="disqus_thread"></div>
+	    <script type="text/javascript"
+		    src="http://disqus.com/forums/navigationforrobotswithwifiandcv/embed.js"></script>
+	    <noscript>
+	      <a href="http://navigationforrobotswithwifiandcv.disqus.com/?url=ref">
+		View the discussion thread.
+	      </a>
+	    </noscript>
+	<!--    <a href="http://disqus.com" class="dsq-brlink">
+	    blog comments powered by <span class="logo-disqus">Disqus</span>
+	    </a>-->
+	  </div>
+	</div>
+
+</article>
+
+
+    </div>
+  </section>
+
+  <footer class="container">
+    <p>
+      <a href="/Navigation-for-Robots-with-WIFI-and-CV/rss.xml"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/feedlogos/28.png" width="14px" style="padding-bottom: 4px; vertical-align: middle;"></a>
+      <a href="/Navigation-for-Robots-with-WIFI-and-CV/atom.xml"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/feedlogos/31.png" width="14px" style="padding-bottom: 4px; vertical-align: middle;"></a>
+      &nbsp;&nbsp;&laquo;&nbsp;&nbsp; 2011-2012 Master thesis project &nbsp;&nbsp;&raquo;&nbsp;&nbsp; <a href="mailto:taghof@gmail.com">Navigation for Robots with WIFI and CV</a>
+    </p>
+  </footer>
+
+</body>
+</html>

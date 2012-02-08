@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Navigation for Robots with WIFI and CV | UDPing ATcommands from inside the drone</title>
+	<!--<base href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/" target="_blank"/>-->
+	<link rel="stylesheet" href="/Navigation-for-Robots-with-WIFI-and-CV/css/master.css" />
+	<script src="/Navigation-for-Robots-with-WIFI-and-CV/js/master.js"></script>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <p id="logo"><a href="/Navigation-for-Robots-with-WIFI-and-CV">Navigation for Robots with WIFI and CV</a></p>
+      <nav>
+	<ul class="clearfix">
+	  <li><a href="/Navigation-for-Robots-with-WIFI-and-CV/archive.html">Archive</a></li>
+	  <li><a href="https://github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV">Code</a></li>
+	  <li><a href="/Navigation-for-Robots-with-WIFI-and-CV/project.html">The Project</a></li>
+	</ul>
+      </nav>
+    </div>
+  </header>
+
+  <section id="content-wrap">
+    <div class="container" style=”text-align: justify; text-justify: newspaper”>
+
+		<article class="post container">
+	<h2>UDPing ATcommands from inside the drone</h2>
+	<div class="post-meta span-3">
+		<time class="pill" datetime="2012-01-23">January 23, 2012</time>
+	</div>
+	<div class="post-content span-15 last">
+	  <h1>Purpose</h1>
+
+<p>To have tysse do a blog post before the taghof:tysse blog post ratio is out of a 50:50 reach, and also to make initial investigations of the future possibility of constructing a controlprogram onboard the AR.Drone, - either instead-of or in-parallel with the current program.elf. A prerequisite of this is to be able of doing ATcommand requests onboard the drone.</p>
+
+<h1>Procedure</h1>
+
+<p>It is already possible to send ATcommands from an external source. This is what is used in the controller app on the iphone. Some of the AT-commands have been mapped for the use in the <a href="http://abstract.cs.washington.edu/~shwetak/classes/ee472/notes/ARDrone_SDK_1_6_Developer_Guide.pdf" title="AR.Drone SDK Developer Guide">Drone SDK</a>. The SDK system is mostly used from a PC platform etc. Some of the initial testings (of the initial testings) done in this projekt was done playing around with the py-code of <a href="https://github.com/venthur/python-ardrone" title="python-ardrone">venthur</a>, specifically the code for the <a href="https://github.com/venthur/python-ardrone/blob/master/libardrone.py" title="python code for sending commands to the AR.Drone">Drone-implementation</a>.   </p>
+
+<p>Some contemplating was conducted, before deciding on an adequate command to execute. When not having access to all other controls, and not wanting to break or damage anything, - it seems best to refrain from doing any moving of any rotary part. - Other available commands are retrieving video or retrieving navigation data. When not wanting to do any retrieving, but just issue commands left and right without responsibility, one may restrict one-self to issuing commands to control the LED-animations on the motor-LED indicators.   </p>
+
+<ol>
+<li><p>A <a href="http://www.developer.nokia.com/Community/Wiki/Open_C_Sockets:_send,_sendto,_sendmsg_methods" title="udp sendto.c">C-program</a> or <a href="http://www.abc.se/~m6695/udp.html" title="udp programII">two</a> was stolen and re-written (using <a href="http://www.freebsd.org/cgi/man.cgi?query=socket&apropos=0&sektion=0&manpath=FreeBSD+9.0-RELEASE&arch=default&format=html">man</a>) to send off UDP-packages to the Drones command port 5556.   </p>
+
+<p>The client code is available at <a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/udp_onboard/udping.c" title="hello world of udp on ARDrone LED">udping.c</a>. udping.c is made to send one AT command and then terminate. Below is a small recap.</p>
+
+<pre><code>#include &lt;sys/socket&gt;
+ ...
+
+#define PORT 5556
+ ...
+
+    line = &quot;AT*LED=5,6,1,2\r&quot;;
+    inet_aton(&quot;192.168.1.1&quot;, &amp;receiver_addr.sin_addr);
+    receiver_addr.sin_port = htons( PORT );
+
+    sendto( sock_fd, line, BUFSIZE, 0,
+                    (struct sockaddr*)&amp;receiver_addr, sizeof(receiver_addr)
+                );   
+</code></pre>
+
+<p>The port number and ip addresse is assigned to a struct in order to send the message &quot;AT*LED=5,6,1,2&quot; to the drone.   </p></li>
+</ol>
+
+<p>Cross compilation of the code and setup of the environment is managed as in the post by taghof on <a href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/" title="cross combilation">Compiling code for the AR.Drone</a>.
+After installation, the environment is onvoked by calling:</p>
+
+<pre><code>    $ codesourcery-arm-2009q3.sh   
+</code></pre>
+
+<p>After that compilation of eg. udping.c may be executed by calling</p>
+
+<pre><code>    $ arm-none-linux-gnueabi-gcc udping.c -o hello_arm   
+</code></pre>
+
+<p>The program should then be transfered to the drone, eg. by ftp.</p>
+
+<pre><code>    $ ftp 192.168.1.1
+    ...
+    ftp&gt; put hello_arm   
+</code></pre>
+
+<p>Upon which you telnet to the drone, change directory in to /data/video and execute the newly transfered program.</p>
+
+<pre><code>    $ telnet 198.168.1.1
+
+    # cd data/video
+    # chmod +x hello_arm
+    # ./hello_arm   
+</code></pre>
+
+<ol>
+<li> On the first testrun the idea was to have a udp <a href="http://cs.au.dk/~tysse/speciale/ciaoserver.c">server</a> listening to the control port 5556, in order to ease the debugging, ie. to make sure that the correct signal was transfered complete.
+Though the Drones parrot control program had initially called first dibs on the 5556 port, so a 'killall program.elf' was initiated. With this the new listener program can use the socket interface alone.<br></li>
+</ol>
+
+<p>The server or listener was sat to listen for one udp package, then print the message to stdout and then terminate. The program was good in determining the cause of a faulty udp client. The Client was editted to send a correctly formatted AT-command by help from the server/listener program.   </p>
+
+<ol>
+<li> program.elf was once again restarted, in order to see the effects of the command to initiate LED animation. 'hello_arm' was also started again. The effekt of issuing the LED animations command was seen ... it changed the ligt of one motor indicator LED from the color green to the color red ...<br></li>
+</ol>
+
+<h1>Results</h1>
+
+<p>The experiment showed that it is indeed possible to issue ATcomamnd with UDP packages sent from onboard the AR.Drone itself.   </p>
+
+<p>Future experiments may contain more sequentially timed function calls eg. watchdog timely kicks, keep alive signals etc. and maybe a few experiments with autonomous flying without any human intervention, maybe.</p>
+
+<h1>References</h1>
+
+<p>on py-sockets and AT commands:<br>
+<a href="https://github.com/venthur/python-ardrone/blob/master/libardrone.py" title="python code for sending commands to the AR.Drone">Examples of ATcommands in use</a><br>
+<a href="https://github.com/venthur/python-ardrone" title="python-ardrone">Venthurs pythonlib for Drone control</a>   </p>
+
+<p>on SDK AT commands:<br>
+<a href="http://abstract.cs.washington.edu/~shwetak/classes/ee472/notes/ARDrone_SDK_1_6_Developer_Guide.pdf" title="AR.Drone SDK Developer Guide">AR.Drone SDK Developer Guide</a>   </p>
+
+<p>on sockets in C:<br>
+<a href="http://www.freebsd.org/cgi/man.cgi?query=socket&apropos=0&sektion=0&manpath=FreeBSD+9.0-RELEASE&arch=default&format=html">a man page for socket</a><br>
+<a href="http://www.developer.nokia.com/Community/Wiki/Open_C_Sockets:_send,_sendto,_sendmsg_methods" title="udp sendto.c">example from sub.nokia</a><br>
+<a href="http://www.abc.se/~m6695/udp.html" title="udp programII">example from hi-ranking google sweed...</a>   </p>
+
+<p>our own work:<br>
+<a href="http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/" title="cross combilation">taghofs blog entry on cross combilation for ar.drone</a><br>
+<a href="/Navigation-for-Robots-with-WIFI-and-CV/downloads/udp_onboard/udping.c" title="hello world of udp on ARDrone LED">udp'ing.c</a><br>
+<a href="http://cs.au.dk/~tysse/speciale/ciaoserver.c">udp server</a>   </p>
+
+<!-- references -->
+
+<!-- downloads -->
+
+	  <hr />
+	  <div id="disqus">
+	    <div id="disqus_thread"></div>
+	    <script type="text/javascript"
+		    src="http://disqus.com/forums/navigationforrobotswithwifiandcv/embed.js"></script>
+	    <noscript>
+	      <a href="http://navigationforrobotswithwifiandcv.disqus.com/?url=ref">
+		View the discussion thread.
+	      </a>
+	    </noscript>
+	<!--    <a href="http://disqus.com" class="dsq-brlink">
+	    blog comments powered by <span class="logo-disqus">Disqus</span>
+	    </a>-->
+	  </div>
+	</div>
+
+</article>
+
+
+    </div>
+  </section>
+
+  <footer class="container">
+    <p>
+      <a href="/Navigation-for-Robots-with-WIFI-and-CV/rss.xml"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/feedlogos/28.png" width="14px" style="padding-bottom: 4px; vertical-align: middle;"></a>
+      <a href="/Navigation-for-Robots-with-WIFI-and-CV/atom.xml"><img src="/Navigation-for-Robots-with-WIFI-and-CV/images/feedlogos/31.png" width="14px" style="padding-bottom: 4px; vertical-align: middle;"></a>
+      &nbsp;&nbsp;&laquo;&nbsp;&nbsp; 2011-2012 Master thesis project &nbsp;&nbsp;&raquo;&nbsp;&nbsp; <a href="mailto:taghof@gmail.com">Navigation for Robots with WIFI and CV</a>
+    </p>
+  </footer>
+
+</body>
+</html>

@@ -66,10 +66,10 @@ class Receiver(multiprocessing.Process):
         if self.TEST:
             self.DRONE_IP = '127.0.0.1'
             self.INIT_PORT = 5550
-            self.testdevice = TestDevice.TestDevice(False)
-            self.testdevice.start()
-            while not self.testdevice.isAlive():
-                pass # waiting for testdevice to start
+#            self.testdevice = TestDevice.TestDevice(False)
+#            self.testdevice.start()
+#            while not self.testdevice.isAlive():
+#                pass # waiting for testdevice to start
 
         # TODO: move the recording functionality to suited class
         # if self.RECORD:
@@ -97,9 +97,9 @@ class Receiver(multiprocessing.Process):
 
     def stop(self):
         self.state = STOPPING
-        if self.TEST:
-            self.testdevice.stop()
-            self.testdevice.join()
+        # if self.TEST:
+        #     self.testdevice.stop()
+        #     self.testdevice.join()
         self.comlist[3] = 0 
         time.sleep(1)
         print 'rstop'

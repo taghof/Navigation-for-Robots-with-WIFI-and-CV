@@ -8,7 +8,11 @@ import os
 #import Video
 import Controller
 import Receiver
+import WifiReceiver
 import Utils
+import TestDevice
+import Presenter
+import pygame
 
 NAV_PORT = 5554
 VIDEO_PORT = 5555
@@ -29,16 +33,41 @@ class Drone(object):
         pass
 
 def main():
+
+    #pygame.init()
+
+    if TEST:
+        testdevice = TestDevice.TestDevice(False)
+        testdevice.start()
+
     videosensor = Receiver.Receiver(TEST, MULTI)
     videosensor.start()
 
+    wifisensor = WifiReceiver.WifiReceiver()
+    wifisensor.start()
+
     controller = Controller.Controller(True, videosensor)
     controller.start()
+
+    presenter = Presenter.Presenter(controller, videosensor, wifisensor)
+    presenter.start()
+    presenter.showWifi()
+    presenter.showVideo()
+        
     print 'derp1'
     controller.join()
+    if TEST:
+        testdevice.stop()
+        print 'derp0.5'
+   
     print 'derp2'
     videosensor.stop()
     print 'derp3'
+    wifisensor.stop()
+    print 'derp4'
+    presenter.stop()
+    print 'derp5'
+        
 
 if __name__ == '__main__':
     main()

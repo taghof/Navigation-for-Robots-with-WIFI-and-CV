@@ -41,10 +41,10 @@ class Controller(threading.Thread):
 
     def run(self):
         self.manualcontrol.start()
-        self.autocontrol.start()
+        #self.autocontrol.start()
         self.manualcontrol.join()
-        self.autocontrol.join()
-        self.stop()
+        #self.autocontrol.join()
+        #self.stop()
 
     def zap(self):
         print 'zapping: ' + str(self.chan)
@@ -56,7 +56,10 @@ class Controller(threading.Thread):
     def stop(self):
         self.land()
         self.com_watchdog_timer.cancel()
-            
+        self.manualcontrol.stop()    
+        #self.autocontrol.stop()    
+        #self.manualcontrol.join()    
+        #self.autocontrol.join()    
     def commwdg(self):
         self.at(at_comwdg)
         if not self.landed:

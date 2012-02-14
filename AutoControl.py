@@ -8,7 +8,7 @@ import Drone
 import cv
 import time
 
-DEBUG = False
+DEBUG = True
 
 class AutoControl(threading.Thread):    
 
@@ -23,10 +23,11 @@ class AutoControl(threading.Thread):
         self.imagesretrieved = 0
 
     def run(self):
+        Utils.dprint(DEBUG, 'AutoControl Thread started')
         while not self.stopping:
             cv.WaitKey(1)
-            img = self.sensor.getImage()
-            self.imagesretrieved += 1
+            #img = self.sensor.getImage()
+            #self.imagesretrieved += 1
             self.lock.acquire()
             if self.video:
                 cv.ShowImage('test', self.sensor.getImage())

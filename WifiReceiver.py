@@ -17,6 +17,7 @@ import decoder
 import Queue
 import random
 from collections import OrderedDict
+from copy import deepcopy
 
 DEBUG = False
 
@@ -46,7 +47,8 @@ class WifiReceiver(multiprocessing.Process):
                             
         self.lock = multiprocessing.Lock()
         self.state = INIT 
-        
+        self.wifiprints = OrderedDict()
+    
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setblocking(0)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -62,6 +64,15 @@ class WifiReceiver(multiprocessing.Process):
     def getWifiSignals(self):
         index = self.comlist[2]
         return self.comlist[index]
+
+    def recordWifiPrint(self):
+        time = datetime.datetime.now()
+        wifiprint = deepclone(getWifiSignals())
+        self.wifiprints[time] = wifiprint
+        print 'WIFI print recorded at: ', time
+        
+    def getWifiPrints(self):
+        return self.wifiprints # should this be deepcloned?
 
     def getStatus(self):
         return self.comlist[3]
@@ -89,7 +100,12 @@ class WifiReceiver(multiprocessing.Process):
                     if data:
                         Utils.dprint(DEBUG, 'Got WIFI data')
                         keyval = data.split('#')
-                        wifimap[keyval[0]] = int(keyval[1])
+                        # filter reflected packages
+                        if wifimap.has_key(keyval[0]) and int(wifimap[keyval[0]]) - int(keyval[1]) > 15:
+                            pass
+                        else:
+                            wifimap[keyval[0]] = int(keyval[1])
+                        
                         l[currentbuffer] = wifimap
                         runs += 1
                                

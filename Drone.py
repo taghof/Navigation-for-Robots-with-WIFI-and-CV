@@ -24,50 +24,54 @@ TEST_DRONE_IP = '127.0.0.1'
 INTERFACE_IP = '192.168.1.2'
 
 DEBUG = False
-TEST = False        
+TEST = True        
 MULTI = False
 
 class Drone(object):
 
-    def __init__(self, test):
-        pass
+    def __init__(self, test, multi):
+        self.videosensor = Receiver.Receiver(test, multi)
+        self.wifisensor = WifiReceiver.WifiReceiver()
+        self.controller = Controller.Controller(test, self)
+        self.presenter = Presenter.Presenter(test, self)
+
+    def start(self):
+        self.videosensor.start()
+        self.wifisensor.start()
+        self.controller.start()
+        self.presenter.start()
+
+    def stop(self):
+        self.presenter.stop()
+        self.controller.stop()
+        self.wifisensor.stop()
+        self.videosensor.stop()
+
+    def getVideoSensor(self):
+        return self.videosensor
+        
+    def getWifiSensor(self):    
+        return self.wifisensor
+
+    def getPresenter(self):
+        return self.presenter
+
+    def getController(self):
+        return self.controller
 
 def main():
-
-    #pygame.init()
 
     if TEST:
         testdevice = TestDevice.TestDevice(False)
         testdevice.start()
 
-    videosensor = Receiver.Receiver(TEST, MULTI)
-    videosensor.start()
+    drone = Drone(TEST, MULTI)
+    drone.start()
 
-    wifisensor = WifiReceiver.WifiReceiver()
-    wifisensor.start()
 
-    controller = Controller.Controller(True, videosensor)
-    controller.start()
-
-    presenter = Presenter.Presenter(controller, videosensor, wifisensor)
-    presenter.start()
-    presenter.showWifi()
-    presenter.showVideo()
-        
-    print 'derp1'
-    controller.join()
     if TEST:
+        drone.getVideoSensor().join()
         testdevice.stop()
-        print 'derp0.5'
-   
-    print 'derp2'
-    videosensor.stop()
-    print 'derp3'
-    wifisensor.stop()
-    print 'derp4'
-    presenter.stop()
-    print 'derp5'
-        
 
 if __name__ == '__main__':
     main()

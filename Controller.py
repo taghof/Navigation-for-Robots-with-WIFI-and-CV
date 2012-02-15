@@ -23,9 +23,9 @@ DEBUG = False
         
 
 class Controller(threading.Thread):
-    def __init__(self, test, sensordata):
+    def __init__(self, test, drone):
         threading.Thread.__init__(self)
-        self.sensordata = sensordata
+        self.drone = drone
         self.landed = True
         self.test = test
         self.lock = threading.Lock()
@@ -37,7 +37,7 @@ class Controller(threading.Thread):
         self.chan = 0
         self.currentPrint = None
         self.manualcontrol = ManualControl.ManualControl(self)
-        self.autocontrol = AutoControl.AutoControl(self, self.sensordata)
+        #self.autocontrol = AutoControl.AutoControl(self, self.sensordata)
 
     def run(self):
         self.manualcontrol.start()
@@ -60,6 +60,7 @@ class Controller(threading.Thread):
         #self.autocontrol.stop()    
         #self.manualcontrol.join()    
         #self.autocontrol.join()    
+    
     def commwdg(self):
         self.at(at_comwdg)
         if not self.landed:

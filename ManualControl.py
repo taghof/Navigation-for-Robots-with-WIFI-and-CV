@@ -113,7 +113,7 @@ class ManualControl(threading.Thread):
                     print 'landing!'
                     
             elif s == '\x1b':
-                self.controller.stop()
+                self.controller.drone.stop()
                 #self.controller.autocontrol.stop()
                 #self.stop()
                     
@@ -152,11 +152,16 @@ class ManualControl(threading.Thread):
             elif s == 'r':
                 self.controller.reset()
             elif s == 'v':
-                if self.controller.autocontrol.video:
-                    self.controller.autocontrol.hideVideo()
+                if self.controller.drone.getPresenter().video:
+                    self.controller.drone.getPresenter().hideVideo()
                 else:
-                    self.controller.autocontrol.showVideo()
-                                        
+                    self.controller.drone.getPresenter().showVideo()
+            elif s == 'b':
+                if self.controller.drone.getPresenter().wifi:
+                    self.controller.drone.getPresenter().hideWifi()
+                else:
+                    self.controller.drone.getPresenter().showWifi()
+
     def stop(self):
         Utils.dprint(DEBUG, '4: Stopping ManualControl thread')
         self.stopping = True

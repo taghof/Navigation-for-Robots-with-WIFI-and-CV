@@ -2,7 +2,7 @@
 import math
 import sys
 import pygame
-
+import datetime
 import threading
 import Utils
 import Drone
@@ -11,49 +11,46 @@ import time
 import random
 import WifiReceiver
 from collections import OrderedDict
+from copy import deepcopy
 
 DEBUG = False
 
 class Presenter(threading.Thread):    
 
-    def __init__(self, controller, videosensor, wifisensor):
+    def __init__(self, test, drone):
         threading.Thread.__init__(self)
         self.lock = threading.Lock()
-        self.controller = controller
         self.stopping = False
+        self.test = test
+        self.drone = drone
 
         self.video = False
-        self.videosensor = videosensor
+        self.videosensor = drone.getVideoSensor()
         self.videoupdates = 0
 
         self.wifi = False
-        self.wifisensor = wifisensor
+        self.wifisensor = drone.getWifiSensor()
         self.wifiscreen = None
         self.wifiupdates = 0
         self.wifimap_old = None
         self.wifimap_current = None
-
-        #self.imagesretrieved = 0
+        self.wifimap_prints = OrderedDict()
 
     def run(self):
         Utils.dprint(DEBUG, 'Presenter thread started')
         while not self.stopping:
             cv.WaitKey(1)
-            #img = self.sensor.getImage()
-            #self.imagesretrieved += 1
             self.lock.acquire()
+
             if self.video:
                 cv.ShowImage('test', self.videosensor.getImage())
                 cv.WaitKey(1)
                 self.videoupdates += 1
-        
+                
             if self.wifi:
                 self.updateWifi(self.wifiscreen)
                 self.wifiupdates += 1
 
-            if not self.wifi and not self.video:
-                pass
-    
             self.lock.release()
             
     def stop(self):
@@ -78,7 +75,7 @@ class Presenter(threading.Thread):
 
     def hideWifi(self):
         self.lock.acquire()
-        self.wifi = false
+        self.wifi = False
         pygame.quit()
         self.lock.release()
 
@@ -108,11 +105,12 @@ class Presenter(threading.Thread):
 
             font = pygame.font.SysFont("Times New Roman",8)
             for k, v in self.wifimap_current.iteritems():
-                if self.wifimap_old and self.wifimap_old.has_key(k) and self.wifimap_old[k] - v > 15:
-                    v = self.wifimap_old[k]
-                    self.wifimap_current[k] = self.wifimap_old[k]
-                    #print 'old: ', self.wifimap_old[k], ' new: ', self.wifimap_current[k], 'v: ',v , '\r'
-                                     
+                # if self.wifimap_old and self.wifimap_old.has_key(k) and self.wifimap_old[k] - v > 15:
+                #     v = self.wifimap_old[k]
+                #     self.wifimap_current[k] = self.wifimap_old[k]
+                #     #print 'old: ', self.wifimap_old[k], ' new: ', self.wifimap_current[k], 'v: ',v , '\r'
+                 
+                    
                 figval = int((75+v)*(float(fig_height)/float(75)))
                 colors = (255-((75+v)*(float(255)/float(75))),(75+v)*(float(255)/float(75)), 0)
                 fig1 = pygame.draw.rect(screen, (255,255,255),(current_x, current_y, fig_width, fig_height), 1)
@@ -138,7 +136,14 @@ class Presenter(threading.Thread):
         self.wifi = True
         self.lock.release()
 
-    def recordFingerPrint():
+    def takeSnapshot():
+        self.snapshot = True
+
+    def copyWifiPrint(time, wifimap):
+        self.wifimap_prints[time] = wifimap
+        print 'wifi signals recorded at: ', time
+
+    def copyVideoPrint():
         # p = self.videothread.getVerticalPrint()
         # self.videothread.setCurrentTarget(p)
         # for x in range(len(p)):

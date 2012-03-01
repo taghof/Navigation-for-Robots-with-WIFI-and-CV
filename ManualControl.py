@@ -12,24 +12,28 @@ DEBUG = True
 JOY = 0
 KEY = 1
 
+FLIGHT = 1
+TEST = 2
+
 class ManualControl(threading.Thread):    
 
     def __init__(self, controller):
         threading.Thread.__init__(self)
         self.controller = controller
         self.stopping = False
-
-        pygame.init()
+        self.mode = TEST
+        #pygame.init()
         pygame.joystick.init()
 
         if pygame.joystick.get_count() > 0:
             self.js = pygame.joystick.Joystick(0)
             self.js.init()
-            print self.js.get_name()
-            self.mode = JOY
+            self.cstring = "(joystick: " + str(self.js.get_name()) + ")\r"
+            
+            self.control = JOY
         else:
-            print 'No joystick available, defaulting to keyboard mode'
-            self.mode = KEY
+            self.cstring = "(keyboard)\r"
+            self.control = KEY
         
     def convert(self, num):
         nump = num +1
@@ -39,8 +43,8 @@ class ManualControl(threading.Thread):
             return nump
 
     def run(self):
-        Utils.dprint(DEBUG, 'control loop started')
-        while not self.stopping and self.mode == JOY:
+        print "Starting manual controller\t\t" + self.cstring
+        while not self.stopping and self.control == JOY:
             for e in pygame.event.get(): # iterate over event stack
                 Utils.dprint(DEBUG, 'event : ' + str(e.type))
                 
@@ -99,69 +103,132 @@ class ManualControl(threading.Thread):
                               #     pass
                               # elif b==14:
                               #     pass
-                         
-        while not self.stopping and self.mode == KEY:
-        
-            s = Utils.getChar()
+        p = self.controller.drone.getPresenter()             
+        while not self.stopping and self.control == KEY:
+                     #p.toggleWifi()
+            #pygame.event.pump()
+            # for e in pygame.event.get(): # iterate over event stack
+                
+            #     Utils.dprint(True, 'event : ' + str(e.type))
+                
+            #     if e.type == pygame.KEYDOWN:
+            #         print "keydown"
+            
+            s = self.getCharWithBreak()
 
-            if s == '\x20':
-                if self.controller.getLanded():
-                    self.controller.takeoff()
-                    print 'takeoff!'
+            if s == '0':
+                if self.mode == TEST:
+                    print "Switching to FLIGHT mode"
+                    self.mode = FLIGHT
                 else:
-                    self.controller.land()
-                    print 'landing!'
-                    
+                    print "Switching to TEST mode"
+                    self.mode = TEST
+            
             elif s == '\x1b':
                 self.controller.drone.stop()
-                #self.controller.autocontrol.stop()
-                #self.stop()
-                    
-            elif s == 'd':
-                self.controller.move(1.0, 0.0, 0.0, 0.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 'a':
-                self.controller.move(-1.0, 0.0, 0.0, 0.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 's':
-                self.controller.move(0.0, 1.0, 0.0, 0.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 'w':
-                self.controller.move(0.0, -1.0, 0.0, 0.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 'o':
-                self.controller.move(0.0, 0.0, 1.0, 0.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 'p':
-                self.controller.move(0.0, 0.0, -1.0, 0.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 'q':
-                self.controller.move(0.0, 0.0, 0.0, 1.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 'e':
-                self.controller.move(0.0, 0.0, 0.0, -1.0)
-                time.sleep(0.1)
-                self.controller.move(0.0, 0.0, 0.0, 0.0)
-            elif s == 'r':
-                self.controller.reset()
-            elif s == 'v':
-                if self.controller.drone.getPresenter().video:
-                    self.controller.drone.getPresenter().hideVideo()
-                else:
-                    self.controller.drone.getPresenter().showVideo()
-            elif s == 'b':
-                if self.controller.drone.getPresenter().wifi:
-                    self.controller.drone.getPresenter().hideWifi()
-                else:
-                    self.controller.drone.getPresenter().showWifi()
+               
 
+            if self.mode == FLIGHT:
+
+                if s == '\x20':
+                    if self.controller.getLanded():
+                        self.controller.takeoff()
+                        print 'takeoff!'
+                    else:
+                        self.controller.land()
+                        print 'landing!'
+                                               
+                elif s == 'd':
+                    self.controller.move(1.0, 0.0, 0.0, 0.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 'a':
+                    self.controller.move(-1.0, 0.0, 0.0, 0.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 's':
+                    self.controller.move(0.0, 1.0, 0.0, 0.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 'w':
+                    self.controller.move(0.0, -1.0, 0.0, 0.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 'o':
+                    self.controller.move(0.0, 0.0, 1.0, 0.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 'p':
+                    self.controller.move(0.0, 0.0, -1.0, 0.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 'q':
+                    self.controller.move(0.0, 0.0, 0.0, 1.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 'e':
+                    self.controller.move(0.0, 0.0, 0.0, -1.0)
+                    time.sleep(0.1)
+                    self.controller.move(0.0, 0.0, 0.0, 0.0)
+                elif s == 'r':
+                    self.controller.reset()
+                              
+            elif self.mode == TEST:
+                p = self.controller.drone.getPresenter()
+                
+                if s == 'v':
+                    p.toggleVideo()
+                        
+                elif s == 'w':
+                    p.toggleWifi()
+            
+                elif s == 's':
+                    p.toggleSamples()
+
+                elif s == 'p':
+                    p.toggleTargets()
+                                                    
+                elif s == 'r':
+                    self.controller.drone.getWifiSensor().recordWifiSample()
+                    self.controller.drone.getVideoSensor().recordVideoSample()
+                elif s == 't':
+                    self.controller.drone.getWifiSensor().setTargetWifiSample()
+                    self.controller.drone.getVideoSensor().setTargetVideoSample()
+                    
+                elif s == 'm':
+                    self.controller.drone.getWifiSensor().matchCurrentWifiSample()
+
+                elif s == 'k':
+                    self.controller.drone.getWifiSensor().matchCurrentVideoSample()
+
+                elif s == '1':
+                    self.controller.drone.getWifiSensor().startPeriodicWifiRecording(1, 5)
+                elif s == '2':
+                    self.controller.drone.getWifiSensor().startPeriodicWifiRecording(2, 5)
+                elif s == '3':
+                    self.controller.drone.getWifiSensor().startPeriodicWifiRecording(3, 5)
+                elif s == '4':
+                    self.controller.drone.getWifiSensor().startPeriodicWifiRecording(4, 5)
+                elif s == '5':
+                    self.controller.drone.getWifiSensor().startPeriodicWifiRecording(5, 5)
+                    
+                
+                          
     def stop(self):
-        Utils.dprint(DEBUG, '4: Stopping ManualControl thread')
+        Utils.dprint(DEBUG, 'Shutting down manual controller\r')
         self.stopping = True
+
+    def getCharWithBreak(self):
+        import sys, tty, termios, select
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            while not self.stopping:
+                rlist, _, _ = select.select([sys.stdin], [], [], 1)
+                if rlist:
+                    s = sys.stdin.read(1)
+                    return s
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    

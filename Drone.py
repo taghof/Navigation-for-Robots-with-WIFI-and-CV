@@ -7,12 +7,16 @@ import os
 #import threading
 #import Video
 import Controller
-import Receiver
+import VideoReceiver
 import WifiReceiver
 import Utils
 import TestDevice
 import Presenter
-import pygame
+#import pygame
+import time
+
+DEBUG = False
+GTKVAL = True
 
 NAV_PORT = 5554
 VIDEO_PORT = 5555
@@ -24,29 +28,34 @@ TEST_DRONE_IP = '127.0.0.1'
 INTERFACE_IP = '192.168.1.2'
 
 DEBUG = False
-TEST = True        
+TEST = True#False        
 MULTI = False
 
 class Drone(object):
 
     def __init__(self, test, multi):
-        self.videosensor = Receiver.Receiver(test, multi)
-        self.wifisensor = WifiReceiver.WifiReceiver()
+        self.videosensor = VideoReceiver.VideoReceiver(test, multi)
         self.controller = Controller.Controller(test, self)
+        self.wifisensor = WifiReceiver.WifiReceiver()
         self.presenter = Presenter.Presenter(test, self)
+        self.gui = Presenter.PresenterGui(self)
 
     def start(self):
+        os.system('clear')
         self.videosensor.start()
-        self.wifisensor.start()
         self.controller.start()
+        self.wifisensor.start()
         self.presenter.start()
+        #time.sleep(2)
+        self.gui.start()
 
     def stop(self):
         self.presenter.stop()
         self.controller.stop()
         self.wifisensor.stop()
         self.videosensor.stop()
-
+        self.gui.stop()
+        
     def getVideoSensor(self):
         return self.videosensor
         
@@ -68,10 +77,9 @@ def main():
     drone = Drone(TEST, MULTI)
     drone.start()
 
-
     if TEST:
         drone.getVideoSensor().join()
         testdevice.stop()
-
+   
 if __name__ == '__main__':
     main()

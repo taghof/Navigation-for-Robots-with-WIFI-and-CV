@@ -35,10 +35,10 @@ class TestDevice(threading.Thread):
 
     def run(self):
         if not self.run_alone:
-            print 'TestDevice waiting for incoming connection.'
+            print 'Starting TestDevice (waiting for incoming connection)\r'
             self.initpck, self.addr = self.init_sock.recvfrom(65535)
             
-            print 'TestDevice connected, beginning transmission.'
+            print 'TestDevice connected, beginning transmission\r'
             Utils.dprint(DEBUG, 'received: ' + str(self.initpck))
         
         self.init_sock.setblocking(0)
@@ -59,19 +59,17 @@ class TestDevice(threading.Thread):
             f = open(self.packets[i % (self.i-1)], 'r')
             self.video_send_sock.sendto(f.read(), ('127.0.0.1', VIDEO_SEND_PORT))
             f.close()
-            
             # transmit WIFI data
-            wifidata = "00:10:20:30:40:" + str(random.randint(10,16)) +" # " + str(random.randint(-75, 0))          
+            wifidata = "00:10:20:30:40:" + str(random.randint(10,30)) +" # " + str(random.randint(-75, 0))          
             self.video_send_sock.sendto(wifidata, ('127.0.0.1', WIFI_SEND_PORT))
 
             i += 1
             self.timeout -= 1
             time.sleep(0.1)
 
-        print 'TestDevice stopping transmission'
+        print 'Shutting down TestDevice\r'
 
     def stop(self):
-        print 'TestDevice kindly asked to stop...'
         self.stopping = True
        
 if __name__ == '__main__':

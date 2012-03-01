@@ -6,7 +6,6 @@ import os
 import sys
 import threading
 import socket
-#import numpy
 import multiprocessing
 import select
 import cv
@@ -15,6 +14,8 @@ import TestDevice
 import Utils
 import decoder
 import Queue
+from collections import OrderedDict
+from copy import deepcopy
 
 DEBUG = False
 
@@ -45,9 +46,11 @@ class Receiver(multiprocessing.Process):
         multiprocessing.Process.__init__(self, target=self.runner, args=(self.comlist,))        
         
         self.MCAST = multicast       
-        # self.RECORD = record
         self.TEST = test
       
+        self.videosamples = OrderedDict()
+        self.targetVideoSample = None
+
         self.DRONE_IP = '192.168.1.1'
         self.INIT_PORT = 5555
         self.INITMSG = "\x01\x00\x00\x00"
@@ -66,21 +69,9 @@ class Receiver(multiprocessing.Process):
         if self.TEST:
             self.DRONE_IP = '127.0.0.1'
             self.INIT_PORT = 5550
-#            self.testdevice = TestDevice.TestDevice(False)
-#            self.testdevice.start()
-#            while not self.testdevice.isAlive():
-#                pass # waiting for testdevice to start
 
-        # TODO: move the recording functionality to suited class
-        # if self.RECORD:
-        #     Utils.ensure_dir('./testdata')
-        #     fps = 12
-        #     width, height = int(320), int(240)
-        #     fourcc = cv.CV_FOURCC('I','4','2','0')
-        #     self.writer = cv.CreateVideoWriter('out.avi', fourcc, fps, (width, height), 1)
-
+        # changing the socket setup to multicast
         if self.MCAST:
-            # changing the socket setup to multicast
             self.INITMSG = "\x02\x00\x00\x00"
             self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32) 
             self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
@@ -97,12 +88,8 @@ class Receiver(multiprocessing.Process):
 
     def stop(self):
         self.state = STOPPING
-        # if self.TEST:
-        #     self.testdevice.stop()
-        #     self.testdevice.join()
         self.comlist[3] = 0 
         time.sleep(1)
-        print 'rstop'
         self.sock.close()    
 
     def getImage(self):
@@ -110,10 +97,63 @@ class Receiver(multiprocessing.Process):
         w, h, img, ti = decoder.read_picture(self.comlist[index])
         return img
 
+    def recordVideoSample(self):
+        time = datetime.datetime.now()
+        print 'VIDEO sample recorded at: ', time, "\r"
+        ind = self.comlist[2]
+        w, h, img, ti = decoder.read_picture(self.comlist[ind])
+        gray  = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        canny = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        cv.CvtColor(img, gray,cv.CV_BGR2GRAY)
+        cv.Canny(gray, canny, 10, 15)
+        
+        li = cv.HoughLines2(canny,
+                            cv.CreateMemStorage(),
+                            cv.CV_HOUGH_STANDARD,
+                            1,
+                            math.pi/180,
+                            100,
+                            0,
+                            0)
+              
+        p = {}
+        coords =  []
+        for (rho,theta) in li:
+           
+            if theta < 0.04:
+                    #print theta
+                c = math.cos(theta)
+                s = math.sin(theta)
+                x0 = c*rho
+                y0 = s*rho
+                cv.Line(img,
+                        ( int(x0 + 1000*(-s)) , int(y0 + 1000*c) ),
+                        (int(x0 + -1000*(-s)), int( y0 - 1000*c)),
+                        (0,0,255))
+                index = int(min([int(x0 + 1000*(-s)), int(x0 + -1000*(-s))]) + (abs((x0 + 1000*(-s)) - (x0 + -1000*(-s))) / 2))
+                p[index] = 1
+                coords.append( ( (int(x0 + 1000*(-s)) , int(y0 + 1000*c)) , (int(x0 + -1000*(-s)), int( y0 - 1000*c)) ) )
+              
+        self.videosamples[time] = (p, coords) 
+        return (p, coords, img)
+
+    def getVideoSamples(self):
+        return self.videosamples
+
+
+    def setTargetVideoSample(self):
+        print "Setting target video print\r"
+        vs = self.recordVideoSample()
+        self.targetVideoSample = vs
+
+    def getTargetVideoSample(self):
+        return self.targetVideoSample
+
     def getStatus(self):
         return self.comlist[3]
 
     def runner(self, l):
+        Utils.dprint(True, 'Starting video receiver\r')
         currentbuffer = 0        
         runs = 0
         state = STARTED
@@ -122,7 +162,7 @@ class Receiver(multiprocessing.Process):
         
         self.initVideo()
         while l[3]:
-            Utils.dprint(DEBUG, 'Video started')
+
             inputready, outputready, exceptready = select.select([self.sock], [], [], 1)
             
             if len(inputready) == 0:
@@ -143,15 +183,20 @@ class Receiver(multiprocessing.Process):
                         runs += 1
                         currentbuffer = runs%2
         
+            if runs % 50 == 0:
+                self.initVideo()
         
         time_end = datetime.datetime.now()
         delta = (time_end - time_start)
         time_elapsed = (delta.microseconds + (delta.seconds*1000000.0))/1000000.0
-        
-        print
-        print 'frames:\t', runs
-        print 'avg time:\t', time_elapsed / runs, 'sec'
-        print 'avg fps:\t', runs / time_elapsed, 'fps'
+      
+        print "Shutting down video receiver\t\t (" + str(runs),"frames fetched in",time_elapsed,"secs)\r"
+        #print 'frames:\t', runs
+        #print 'avg time:\t', time_elapsed / runs, 'sec'
+        #print 'avg fps:\t', runs / time_elapsed, 'fps'
+
+
+
 
 def main():
     r = Receiver(True, False)
@@ -172,6 +217,7 @@ def showVideo(r):
         cv.ShowImage('test', r.getImage())
         cv.WaitKey(1)
     cv.DestroyWindow('test')
+
 
 if __name__ == '__main__':
     main()

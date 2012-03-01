@@ -1,3 +1,8 @@
+import sys
+import threading
+import time
+from select import select
+
 NAV_PORT = 5554
 VIDEO_PORT = 5555
 CMD_PORT = 5556
@@ -26,3 +31,34 @@ def getChar():
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
+
+def writeChar():
+    import sys, tty, termios
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
+
+
+def getRanNum(self):
+    return random.randint(-5, 5)
+
+class PeriodicTimer(threading.Thread):
+    
+    def __init__(self, duration, repetitions, function):
+        threading.Thread.__init__(self)
+        self.duration = duration
+        self.repetitions = repetitions
+        self.function = function
+
+    def run(self):
+        while self.repetitions > 0:
+            time.sleep(self.duration)
+            self.function()
+            self.repetitions -= 1
+

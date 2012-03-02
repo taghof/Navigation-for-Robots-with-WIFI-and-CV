@@ -35,26 +35,27 @@ class Drone(object):
 
     def __init__(self, test, multi):
         self.videosensor = VideoReceiver.VideoReceiver(test, multi)
-        self.controller = Controller.Controller(test, self)
         self.wifisensor = WifiReceiver.WifiReceiver()
-        self.presenter = Presenter.Presenter(test, self)
+        self.controller = Controller.Controller(test, self)
+        #self.presenter = Presenter.Presenter(test, self)
         self.gui = Presenter.PresenterGui(self)
 
     def start(self):
-        os.system('clear')
+        #os.system('clear')
         self.videosensor.start()
-        self.controller.start()
         self.wifisensor.start()
-        self.presenter.start()
-        #time.sleep(2)
+        self.controller.start()
+        #self.presenter.start()
+        time.sleep(2)
         self.gui.start()
 
     def stop(self):
-        self.presenter.stop()
+        time.sleep(1)
+        #self.gui.stop()
+        #self.presenter.stop()
         self.controller.stop()
         self.wifisensor.stop()
         self.videosensor.stop()
-        self.gui.stop()
         
     def getVideoSensor(self):
         return self.videosensor
@@ -63,7 +64,8 @@ class Drone(object):
         return self.wifisensor
 
     def getPresenter(self):
-        return self.presenter
+        pass
+        #return self.presenter
 
     def getController(self):
         return self.controller

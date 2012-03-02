@@ -216,8 +216,8 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
-                <property name="active">True</property>
                 <property name="draw_indicator">True</property>
+                <property name="group">radiobutton1</property>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -233,8 +233,8 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
-                <property name="active">True</property>
                 <property name="draw_indicator">True</property>
+                <property name="group">radiobutton1</property>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -254,14 +254,15 @@
           <widget class="GtkHBox" id="hbox2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
             <child>
-              <widget class="GtkButton" id="button1">
+              <widget class="GtkToggleButton" id="button1">
                 <property name="label" translatable="yes">Show Video</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="btn1OnClick" swapped="no"/>
+                <signal name="toggled" handler="btn1OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -270,17 +271,33 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkButton" id="button2">
-                <property name="label" translatable="yes">Show Match Target</property>
+              <widget class="GtkToggleButton" id="button2">
+                <property name="label" translatable="yes">Show Targets</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <signal name="toggled" handler="btn2OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkToggleButton" id="button3">
+                <property name="label" translatable="yes">Show Significance</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="toggled" handler="btn3OnClick" swapped="no"/>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </widget>
@@ -301,7 +318,57 @@
             <property name="position">3</property>
           </packing>
         </child>
+        <child>
+          <widget class="GtkHBox" id="hbox3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <widget class="GtkButton" id="button4">
+                <property name="label" translatable="yes">Take Sample</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="btn4OnClick" swapped="no"/>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="button5">
+                <property name="label" translatable="yes">Set Target</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="btn5OnClick" swapped="no"/>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
       </widget>
+    </child>
+  </widget>
+  <widget class="GtkWindow" id="videoWindow">
+    <property name="width_request">320</property>
+    <property name="height_request">240</property>
+    <property name="can_focus">False</property>
+    <child>
+      <placeholder/>
     </child>
   </widget>
 </glade-interface>

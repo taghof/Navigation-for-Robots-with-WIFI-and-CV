@@ -550,7 +550,8 @@ def read_picture(data):
     """Convert an AR.Drone image packet to rgb-string.
     Returns: width, height, image and time to decode the image
     """
-
+    if data == None:
+        print "no image data"
     retimg = cv.CreateImage((320, 240), 8, 3)
     
     bitreader = BitReader(data)

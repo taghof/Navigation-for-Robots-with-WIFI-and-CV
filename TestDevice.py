@@ -60,7 +60,7 @@ class TestDevice(threading.Thread):
             self.video_send_sock.sendto(f.read(), ('127.0.0.1', VIDEO_SEND_PORT))
             f.close()
             # transmit WIFI data
-            wifidata = "00:10:20:30:40:" + str(random.randint(10,30)) +" # " + str(random.randint(-75, 0))          
+            wifidata = "00:10:20:30:40:" + str(random.randint(10,30)) +" # " + str(random.randint(-75, 0))           
             self.video_send_sock.sendto(wifidata, ('127.0.0.1', WIFI_SEND_PORT))
 
             i += 1

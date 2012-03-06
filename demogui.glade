@@ -262,7 +262,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn1OnClick" swapped="no"/>
+                <signal name="toggled" handler="btn1OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -277,7 +277,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn2OnClick" swapped="no"/>
+                <signal name="toggled" handler="btn2OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -292,7 +292,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn3OnClick" swapped="no"/>
+                <signal name="toggled" handler="btn3OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -330,7 +330,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="btn4OnClick" swapped="no"/>
+                <signal name="clicked" handler="btn4OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -345,7 +345,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="btn5OnClick" swapped="no"/>
+                <signal name="clicked" handler="btn5OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>

@@ -5,7 +5,7 @@ import sys
 import socket
 import os
 import threading
-#import Video
+import pygame
 import ManualControl
 import AutoControl
 import Utils
@@ -22,12 +22,177 @@ INTERFACE_IP = '192.168.1.2'
 DEBUG = False
         
 
-class Controller(threading.Thread):
+class ControllerManager(object):
     def __init__(self, test, drone):
-        threading.Thread.__init__(self)
         self.drone = drone
-        self.landed = True
         self.test = test
+        self.interface = ControllerInterface()
+        self.controllers = (ManualControl(self.drone, self.interface), AutoControl(self.drone,self.interface))
+        
+    def getControllers(self):
+        return self.controllers
+
+    def addController(self, controller):
+        self.controllers.append(controller)
+
+    def removeController(self, controller):
+        self.controllers.remove(controller)
+
+    def stop(self):
+        self.stopControllers()
+
+    def stopControllers(self):
+        for con in self.controllers:
+            con.stop()
+
+class Controller(object):
+    
+    def __init__(self, drone, interface):
+        self.drone = drone
+        self.controlInterface = interface
+        self.controlButton = None
+        self.controlMethod = self.processEvents
+        self.stopping = False
+        
+    def processEvents(self):
+        return False
+    
+    def setControlButton(self, button):
+        self.controlButton = button
+
+    def getControlButton(self):
+        return self.controlButton
+
+    def setControlMethod(self, method):
+        self.controlMethod = method
+
+    def getControlMethod(self):
+        return self.controlMethod
+
+    def stop(self):
+        print "Shutting " + str(self)
+        self.stopping = True
+
+class AutoControl(Controller):    
+
+    def __init__(self, drone, interface):
+        Controller.__init__(self, drone, interface)
+
+    def processEvents(self):
+
+        if self.controlButton:
+            return self.controlButton.get_active()
+        else:
+            return True
+
+class ManualControl(Controller):    
+
+    def __init__(self, drone, interface):
+        Controller.__init__(self, drone, interface)
+        pygame.joystick.init()
+
+        if pygame.joystick.get_count() > 0:
+            pygame.display.init()
+            self.js = pygame.joystick.Joystick(0)
+            self.js.init()
+            self.cstring = "joystick: " + str(self.js.get_name()) + "\r"
+            self.controlMethod = self.processEvents
+            self.control = True
+            print self.cstring
+        else:
+            self.cstring = "keyboard"
+            self.controlMethod = None
+            self.control = False
+        
+    def getJoystickAttached(self):
+        if self.control:
+            return True
+        else: 
+            return False
+
+    def processEvents(self):
+        if self.control:
+            for e in pygame.event.get(): # iterate over event stack
+                Utils.dprint(DEBUG, 'event : ' + str(e.type))
+                
+                if e.type == pygame.JOYAXISMOTION: 
+                    roll = self.js.get_axis(0)
+                    pitch = self.js.get_axis(1)
+                    yaw = self.js.get_axis(3)
+                    power2 = self.convert( self.js.get_axis(2) )
+                    power1 = self.convert( self.js.get_axis(5) )
+                    power = power1 - power2
+                    self.controlInterface.move(roll, pitch, power, yaw)
+                    Utils.dprint( DEBUG, 'roll: ' + str(roll) + ' pitch: ' + str(pitch) + ' power: ' + str(power) + ' yaw: ' + str(yaw) )                   
+                    
+                elif e.type == pygame.JOYBUTTONDOWN: # 10
+                    for b in xrange(self.js.get_numbuttons()):
+                                                
+                        if self.js.get_button(b) > 0:
+                            print 'number of button pushed: ' + str(b)
+                            # if b==0:
+                            #     self.controllerInterface.autocontrol.stop()
+                            #     self.controllerInterface.stop()
+                            #     self.stop()
+                            #     break
+                            if b==1:
+                                self.controlInterface.reset() 
+                            elif b==2:
+                                self.drone.gui.toggleVideoWindow(None)
+                               
+                            elif b==3:
+                                self.controlInterface.ledShow(6)
+                            # elif b==4:
+                            #     pass
+                            elif b==5:
+                                self.controlInterface.zap()
+                            # elif b==6:
+                            #     pass
+                            # elif b==7:
+                            #     pass
+                            elif b==8:
+                                if self.controlInterface.getLanded():
+                                    self.controlInterface.takeoff()
+                                else:
+                                    self.controlInterface.land()
+                                # elif b==9:
+                                #     pass
+                                # elif b==10:
+                                #     pass
+                            elif b==11:
+                                self.controlInterface.rotate(-1)
+                            elif b==12:
+                                self.controlInterface.rotate(1)
+                              # elif b==13:
+                              #     pass
+                              # elif b==14:
+                              #     pass
+                          
+        if self.controlButton:
+            return self.controlButton.get_active()
+        else:
+            return True
+
+    def stop(self):
+        Controller.stop(self)
+        self.controlInterface.stop()
+        pygame.joystick.quit()
+        pygame.display.quit()
+
+# *************************** Utils ***************************************
+    
+    def convert(self, num):
+        nump = num +1
+        if nump > 0:
+            return nump/2
+        else:
+            return nump
+
+
+
+class ControllerInterface(object):
+    def __init__(self):
+        self.landed = True
         self.lock = threading.Lock()
         self.seq_num = 1
         self.timer_t = 0.1
@@ -35,17 +200,7 @@ class Controller(threading.Thread):
         self.speed = 0.2
         self.at(at_config, "general:navdata_demo", "TRUE")
         self.chan = 0
-        self.currentPrint = None
-        self.manualcontrol = ManualControl.ManualControl(self)
-        #self.autocontrol = AutoControl.AutoControl(self, self.sensordata)
-
-    def run(self):
-        self.manualcontrol.start()
-        #self.autocontrol.start()
-        self.manualcontrol.join()
-        #self.autocontrol.join()
-        #self.stop()
-
+   
     def zap(self):
         print 'zapping: ' + str(self.chan)
         self.at(at_config, "video:video_channel", str(self.chan))
@@ -56,10 +211,6 @@ class Controller(threading.Thread):
     def stop(self):
         self.land()
         self.com_watchdog_timer.cancel()
-        self.manualcontrol.stop()    
-        #self.autocontrol.stop()    
-        #self.manualcontrol.join()    
-        #self.autocontrol.join()    
     
     def commwdg(self):
         self.at(at_comwdg)
@@ -149,6 +300,12 @@ class Controller(threading.Thread):
         self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
         self.com_watchdog_timer.start()
         self.lock.release()
+
+
+
+
+
+
 
 #=====================================================================================
 # Low level functions

@@ -62,3 +62,17 @@ class PeriodicTimer(threading.Thread):
             self.function()
             self.repetitions -= 1
 
+
+    def getCharWithBreak(self):
+        import sys, tty, termios, select
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            while not self.stopping:
+                rlist, _, _ = select.select([sys.stdin], [], [], 1)
+                if rlist:
+                    s = sys.stdin.read(1)
+                    return s
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)

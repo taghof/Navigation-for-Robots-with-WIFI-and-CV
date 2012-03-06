@@ -21,44 +21,32 @@ class AutoControl(threading.Thread):
         self.sensor = sensor
         self.videoruns = 0
         self.imagesretrieved = 0
+        self.controlButton = None
+        self.controlMethod = self.processAutoControlEvents
+        return "auto control"
 
-    def run(self):
-        Utils.dprint(DEBUG, 'AutoControl Thread started')
-        while not self.stopping:
-            cv.WaitKey(1)
-            #img = self.sensor.getImage()
-            #self.imagesretrieved += 1
-            self.lock.acquire()
-            if self.video:
-                cv.ShowImage('test', self.sensor.getImage())
-                cv.WaitKey(1)
-                self.videoruns += 1
-            self.lock.release()
+
+    def processAutoControlEvents(self):
+        print "Processing autocontrol\r"
+        if self.controlButton:
+            return self.controlButton.get_active()
+        else:
+            return True
+
+    def setControlButton(self, button):
+        self.controlButton = button
+
+    def getControlButton(self):
+        return self.controlButton
+
+    def setControlMethod(self, method):
+        self.controlMethod = method
+
+    def getControlMethod(self):
+        return self.controlMethod
 
     def stop(self):
         Utils.dprint(DEBUG, '4: Stopping AutoControl thread')
-        if self.video:
-            self.hideVideo()
-        print 'frames showed: ' + str(self.videoruns)
-        print 'frames retrieved: ' + str(self.imagesretrieved)
         self.stopping = True
 
-    def hideVideo(self):
-        self.lock.acquire()
-        self.video = False
-        cv.DestroyAllWindows()
-        self.lock.release()
 
-    def showVideo(self):
-        self.lock.acquire()
-        cv.NamedWindow('test')
-        self.video = True
-        self.lock.release()
-
-    def recordFingerPrint():
-        # p = self.videothread.getVerticalPrint()
-        # self.videothread.setCurrentTarget(p)
-        # for x in range(len(p)):
-        #     if p[x] == 1:
-        #         print x
-        pass

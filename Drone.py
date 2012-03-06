@@ -8,6 +8,7 @@ import os
 #import Video
 import Controller
 import VideoReceiver
+import NavdataReceiver
 import WifiReceiver
 import Utils
 import TestDevice
@@ -28,7 +29,7 @@ TEST_DRONE_IP = '127.0.0.1'
 INTERFACE_IP = '192.168.1.2'
 
 DEBUG = False
-TEST = True#False        
+TEST = False        
 MULTI = False
 
 class Drone(object):
@@ -36,45 +37,43 @@ class Drone(object):
     def __init__(self, test, multi):
         self.videosensor = VideoReceiver.VideoReceiver(test, multi)
         self.wifisensor = WifiReceiver.WifiReceiver()
-        self.controller = Controller.Controller(test, self)
-        #self.presenter = Presenter.Presenter(test, self)
+        self.navdatasensor = NavdataReceiver.NavdataReceiver(test, multi)
+        self.controllerManager = Controller.ControllerManager(test, self)
         self.gui = Presenter.PresenterGui(self)
 
+
     def start(self):
-        #os.system('clear')
+        os.system('clear')
         self.videosensor.start()
         self.wifisensor.start()
-        self.controller.start()
-        #self.presenter.start()
+        self.navdatasensor.start()
         time.sleep(2)
         self.gui.start()
 
     def stop(self):
-        time.sleep(1)
-        #self.gui.stop()
-        #self.presenter.stop()
-        self.controller.stop()
         self.wifisensor.stop()
         self.videosensor.stop()
-        
+        self.navdatasensor.stop()
+        self.controllerManager.stop()
+
     def getVideoSensor(self):
         return self.videosensor
         
     def getWifiSensor(self):    
         return self.wifisensor
 
-    def getPresenter(self):
-        pass
-        #return self.presenter
+    def getNavdataSensor(self):
+        return self.navdatasensor
 
-    def getController(self):
-        return self.controller
+    def getControllerManager(self):
+        return self.controllerManager
 
 def main():
 
     if TEST:
         testdevice = TestDevice.TestDevice(False)
         testdevice.start()
+        time.sleep(1)
 
     drone = Drone(TEST, MULTI)
     drone.start()

@@ -228,7 +228,7 @@
             </child>
             <child>
               <widget class="GtkRadioButton" id="radiobutton3">
-                <property name="label" translatable="yes">Matching</property>
+                <property name="label" translatable="yes">Navdata</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -339,6 +339,21 @@
               </packing>
             </child>
             <child>
+              <widget class="GtkToggleButton" id="button6">
+                <property name="label" translatable="yes">Capture Video Packets</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="toggled" handler="btn6OnClick" />
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
               <widget class="GtkButton" id="button5">
                 <property name="label" translatable="yes">Set Target</property>
                 <property name="visible">True</property>
@@ -350,7 +365,7 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </widget>

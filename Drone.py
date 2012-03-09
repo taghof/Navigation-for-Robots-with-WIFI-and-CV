@@ -1,53 +1,60 @@
 #!/usr/bin/env python2.7
 
-#import struct
-import sys
-#import socket
+#    Copyright (c) 2012 Morten Daugaard
+#
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
+#
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
+
+#import sys
 import os
-#import threading
-#import Video
 import Controller
-import VideoReceiver
-import NavdataReceiver
-import WifiReceiver
+#import VideoReceiver
+#import NavdataReceiver
+#import WifiReceiver
+import Receiver
+import Presenter
 import Utils
 import TestDevice
-import Presenter
-#import pygame
-import time
-
-DEBUG = False
-GTKVAL = True
-
-NAV_PORT = 5554
-VIDEO_PORT = 5555
-CMD_PORT = 5556
-
-MULTICAST_IP = '224.1.1.1'
-DRONE_IP = '192.168.1.1'
-TEST_DRONE_IP = '127.0.0.1'
-INTERFACE_IP = '192.168.1.2'
-
-DEBUG = False
-TEST = False        
-MULTI = False
+import Settings
 
 class Drone(object):
 
-    def __init__(self, test, multi):
-        self.videosensor = VideoReceiver.VideoReceiver(test, multi)
-        self.wifisensor = WifiReceiver.WifiReceiver()
-        self.navdatasensor = NavdataReceiver.NavdataReceiver(test, multi)
-        self.controllerManager = Controller.ControllerManager(test, self)
+    def __init__(self):
+        self.videosensor = Receiver.VideoReceiver(Settings.VIDEO_PORT)
+        self.wifisensor = Receiver.WifiReceiver(Settings.WIFI_PORT)
+        self.navdatasensor = Receiver.NavdataReceiver(Settings.NAVDATA_PORT)
+        self.controllerManager = Controller.ControllerManager(self)
         self.gui = Presenter.PresenterGui(self)
 
-
     def start(self):
-        os.system('clear')
+       
         self.videosensor.start()
+        while not self.videosensor.getStatus() == Settings.RUNNING:
+            pass
+
         self.wifisensor.start()
+        while not self.wifisensor.getStatus() == Settings.RUNNING:
+            pass
+
         self.navdatasensor.start()
-        time.sleep(2)
+        while not self.navdatasensor.getStatus() == Settings.RUNNING:
+            pass
+       
         self.gui.start()
 
     def stop(self):
@@ -68,17 +75,19 @@ class Drone(object):
     def getControllerManager(self):
         return self.controllerManager
 
-def main():
+    def getGUI(self):
+        return self.gui
 
-    if TEST:
+def main():
+    os.system('clear')
+    if Settings.TEST:
         testdevice = TestDevice.TestDevice(False)
         testdevice.start()
-        time.sleep(1)
 
-    drone = Drone(TEST, MULTI)
+    drone = Drone()
     drone.start()
 
-    if TEST:
+    if Settings.TEST:
         drone.getVideoSensor().join()
         testdevice.stop()
    

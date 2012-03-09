@@ -1,4 +1,24 @@
 #!/usr/bin/env python2.7
+#
+#    Copyright (c) 2012 Morten Daugaard
+#
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
+#
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
 
 import socket
 import Utils
@@ -6,11 +26,13 @@ import time
 import threading
 import os
 import random
+import pickle
+import decoder
 
 INIT_PORT = 5550
 VIDEO_SEND_PORT = 5555
 WIFI_SEND_PORT = 5551
-
+NAV_SEND_PORT = 5554
 DEBUG = False
 
 class TestDevice(threading.Thread):
@@ -18,20 +40,60 @@ class TestDevice(threading.Thread):
     def __init__(self, runalone):
         threading.Thread.__init__(self)
         self.run_alone = runalone
-        self.packets = []
+        self.video_packets = []
+        self.wifi_packets = []
+        self.navdata_packets = []
         self.stopping = False
-        self.timeout = 100
-        self.i = 1
-        
-        while os.path.isfile('../testdata/' + str(self.i) + '.dat'):
-            self.packets.append('../testdata/' + str(self.i) + '.dat')
-            self.i += 1
-        
+        self.timeout = 10000
+        self.vi = 1
+        self.wi = 1
+        self.ni = 1
+        self.pickled_video = True
+        self.pickled_wifi = True
+        self.pickled_navdata = True
+
+        if not os.path.isfile('./pickled_video.data'):
+            self.pickled_video = False
+            while os.path.isfile('../testdata/' + str(self.vi) + '.dat'):
+                self.video_packets.append('../testdata/' + str(self.vi) + '.dat')
+                self.vi += 1
+        else:
+            print "Gone pickling...\r"
+            fileObj = open('./pickled_video.data')
+            self.video_packets = pickle.load(fileObj)
+            fileObj.close()
+            self.vi = len(self.video_packets)
+            print self.vi, " video frames"
+
+        if not os.path.isfile('./pickled_wifi.data'):
+            self.pickled_wifi = False
+        else:
+            print "Gone pickling...\r"
+            fileObj = open('./pickled_wifi.data')
+            self.wifi_packets = pickle.load(fileObj)
+            fileObj.close()
+            self.wi = len(self.wifi_packets)
+            print self.wi, " wifi frames"
+
+        if not os.path.isfile('./pickled_navdata.data'):
+            self.pickled_wifi = False
+        else:
+            print "Gone pickling...\r"
+            fileObj = open('./pickled_navdata.data')
+            self.navdata_packets = pickle.load(fileObj)
+            fileObj.close()
+            self.ni = len(self.navdata_packets)
+            # print self.ni, " navdata frames"
+            # for p in self.navdata_packets:
+            #     data = decoder.decode_navdata(p)
+            #     print data.get(0, dict()).get('num_frames', 0)
+
         self.init_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.init_sock.bind(('', INIT_PORT))
         
         self.video_send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.wifi_send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.navdata_send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def run(self):
         if not self.run_alone:
@@ -42,7 +104,11 @@ class TestDevice(threading.Thread):
             Utils.dprint(DEBUG, 'received: ' + str(self.initpck))
         
         self.init_sock.setblocking(0)
-        i = 0
+        
+        vi = 0
+        wi = 0
+        ni = 0
+        
         while self.timeout and not self.stopping:
             data = 0
             try:
@@ -56,16 +122,42 @@ class TestDevice(threading.Thread):
                 self.timeout = 500
             
             # transmit video data
-            f = open(self.packets[i % (self.i-1)], 'r')
-            self.video_send_sock.sendto(f.read(), ('127.0.0.1', VIDEO_SEND_PORT))
-            f.close()
+            if self.pickled_video:
+                data = self.video_packets[vi]
+            else:
+                f = open(self.video_packets[vi % (self.vi-1)], 'r')
+                data = f.read()
+                f.close()
+                
+            self.video_send_sock.sendto(data, ('127.0.0.1', VIDEO_SEND_PORT))
+            
             # transmit WIFI data
-            wifidata = "00:10:20:30:40:" + str(random.randint(10,30)) +" # " + str(random.randint(-75, 0))           
-            self.video_send_sock.sendto(wifidata, ('127.0.0.1', WIFI_SEND_PORT))
-
-            i += 1
+            if self.pickled_wifi:
+                wifidata = self.wifi_packets[wi]
+            else:
+                wifidata = "00:10:20:30:40:" + str(random.randint(10,30)) +" # " + str(random.randint(-75, 0))           
+            
+            self.wifi_send_sock.sendto(wifidata, ('127.0.0.1', WIFI_SEND_PORT))
+            
+            # TODO: transmit navdata
+            if self.pickled_wifi:
+                navdata = self.navdata_packets[ni]
+                self.navdata_send_sock.sendto(navdata, ('127.0.0.1', NAV_SEND_PORT))
+           
+            vi += 1
+            if vi == self.vi:
+                vi = 0
+            
+            wi += 1
+            if wi == self.wi:
+                wi = 0
+            
+            ni += 1
+            if ni == self.ni:
+                ni = 0
+#            print ni
             self.timeout -= 1
-            time.sleep(0.1)
+            time.sleep(0.05)
 
         print 'Shutting down TestDevice\r'
 

@@ -1,4 +1,24 @@
 #!/usr/bin/env python2.7
+#
+#    Copyright (c) 2012 Morten Daugaard
+#
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
+#
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
 
 import datetime
 import time
@@ -14,18 +34,18 @@ import TestDevice
 import Utils
 import decoder
 import Queue
+import pickle
+
 from collections import OrderedDict
 from copy import deepcopy
 
 DEBUG = False
 
-INIT = 0
-STARTED = 1
-PAUSED = 2
-STOPPING = 3
-
-NORMAL = 4
-PRINT = 5
+STOPPING = 0
+INIT = 1
+RUNNING = 2
+PAUSED = 3
+CAPTURE = 4
 
 class VideoReceiver(multiprocessing.Process):
 
@@ -42,15 +62,17 @@ class VideoReceiver(multiprocessing.Process):
         self.comlist[0] = None
         self.comlist[1] = None
         self.comlist[2] = 1
-        self.comlist[3] = 1
+        self.comlist[3] = INIT
         multiprocessing.Process.__init__(self, target=self.runner, args=(self.comlist,))        
-        
+        self.fetches = 0
         self.MCAST = multicast       
         self.TEST = test
-      
+        self.capture = False
+        self.capture_all = False
         self.videosamples = OrderedDict()
         self.targetVideoSample = None
-
+        self.imagelist = []
+        self.imagelist_all = []
         self.DRONE_IP = '192.168.1.1'
         self.INIT_PORT = 5555
         self.INITMSG = "\x01\x00\x00\x00"
@@ -58,7 +80,6 @@ class VideoReceiver(multiprocessing.Process):
         self.VIDEO_PORT = 5555
                             
         self.lock = multiprocessing.Lock()
-        self.state = INIT 
         self.wakeup = 2500
        
         # Standard socket setup for unicast
@@ -87,15 +108,13 @@ class VideoReceiver(multiprocessing.Process):
         Utils.dprint(DEBUG, 'initing')
 
     def stop(self):
-        self.state = STOPPING
-        self.comlist[3] = 0 
-        time.sleep(1)
+        self.comlist[3] = STOPPING 
+        self.join()
         self.sock.close()    
-
-    def getImage(self):
-        index = self.comlist[2]
-        w, h, img, ti = decoder.read_picture(self.comlist[index])
-        return img
+        if self.capture:
+            fileObj = open("./pickled.data", "a")
+            pickle.dump(self.imagelist, fileObj)
+            fileObj.close()
 
     def recordVideoSample(self):
         time = datetime.datetime.now()
@@ -137,9 +156,49 @@ class VideoReceiver(multiprocessing.Process):
         self.videosamples[time] = (p, coords) 
         return (p, coords, img)
 
+    def getImage(self):
+        #self.fetches += 1
+        #print "fetches: ", self.fetches
+        index = self.comlist[2]
+        image = self.comlist[index]
+        if self.capture and image:
+            self.captureImage(self.imagelist)
+       
+        if image:
+            w, h, img, ti = decoder.read_picture(self.comlist[index])
+            return img
+        else:
+            return None
+
+    def captureImage(self, ilist):
+        index = self.comlist[2]
+        image = self.comlist[index]
+        print "cap\r"
+        if image:
+            print "appending\r"
+            ilist.append(deepcopy(image))
+
+    def toggleCapture(self):
+        print "toggleCapture\r"
+        print len(self.imagelist), "\r"
+        if self.capture:
+            fileObj = open("./pickled.data", "a")
+            pickle.dump(self.imagelist, fileObj)
+            fileObj.close()
+
+        self.capture = not self.capture
+       
+    def toggleCaptureAll(self):
+        print "toggleCaptureAll\r"
+        if self.capture_all:
+            self.comlist[3] = RUNNING
+        else:
+            self.comlist[3] = CAPTURE
+        
+        self.capture_all = not self.capture_all
+
     def getVideoSamples(self):
         return self.videosamples
-
 
     def setTargetVideoSample(self):
         print "Setting target video print\r"
@@ -152,15 +211,18 @@ class VideoReceiver(multiprocessing.Process):
     def getStatus(self):
         return self.comlist[3]
 
+    def setStatus(self, arg):
+        self.comlist[3] = arg
+
+
     def runner(self, l):
         Utils.dprint(True, 'Starting video receiver\r')
         currentbuffer = 0        
         runs = 0
-        state = STARTED
-        mode = NORMAL
         time_start = datetime.datetime.now()
-        
+        imagelist_all = []
         self.initVideo()
+        self.setStatus(RUNNING)
         while l[3]:
 
             inputready, outputready, exceptready = select.select([self.sock], [], [], 1)
@@ -182,22 +244,23 @@ class VideoReceiver(multiprocessing.Process):
                         l[currentbuffer] = data
                         runs += 1
                         currentbuffer = runs%2
-        
+                        if l[3] == CAPTURE:
+                            imagelist_all.append(data)
+
             if runs % 50 == 0:
                 self.initVideo()
         
+        if len(imagelist_all):
+            fileObj = open("./pickled_video.data", "w")
+            pickle.dump(imagelist_all, fileObj)
+            fileObj.close()
+            print "pickling data\r"
+
         time_end = datetime.datetime.now()
         delta = (time_end - time_start)
         time_elapsed = (delta.microseconds + (delta.seconds*1000000.0))/1000000.0
-      
         print "Shutting down video receiver\t\t (" + str(runs),"frames fetched in",time_elapsed,"secs)\r"
-        #print 'frames:\t', runs
-        #print 'avg time:\t', time_elapsed / runs, 'sec'
-        #print 'avg fps:\t', runs / time_elapsed, 'fps'
-
-
-
-
+      
 def main():
     r = VideoReceiver(True, False)
     r.start()

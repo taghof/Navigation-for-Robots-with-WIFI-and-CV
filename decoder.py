@@ -1,25 +1,46 @@
 #!/usr/bin/env python2.7
-
-# Copyright (c) 2011 Bastian Venthur
+#    
+#    Copyright (c) 2012 Morten Daugaard
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
+#
+#    This file incorporates code covered by the following terms:
+#     
+#       Copyright (c) 2011 Bastian Venthur
+#
+#       Permission is hereby granted, free of charge, to any person obtaining a copy
+#       of this software and associated documentation files (the "Software"), to deal
+#       in the Software without restriction, including without limitation the rights
+#       to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#       copies of the Software, and to permit persons to whom the Software is
+#       furnished to do so, subject to the following conditions:
+#
+#       The above copyright notice and this permission notice shall be included in
+#       all copies or substantial portions of the Software.
+#
+#       THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#       IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#       FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#       AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#       LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#       OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#       THE SOFTWARE.
 
 """
 Video decoding for the AR.Drone.
@@ -28,8 +49,6 @@ This library uses psyco to speed-up the decoding process. It is however written
 in a way that it works also without psyco installed. On the author's
 development machine the speed up is from 2FPS w/o psyco to > 20 FPS w/ psyco.
 """
-
-
 import array
 import cProfile
 import datetime
@@ -37,7 +56,6 @@ import struct
 import sys
 import numpy
 import cv
-
 
 try:
     import psyco
@@ -547,11 +565,13 @@ def cv2array(im):
   return a 
 
 def read_picture(data):
-    """Convert an AR.Drone image packet to rgb-string.
-    Returns: width, height, image and time to decode the image
+    """Convert an AR.Drone image packet to an opencv image.
+    Returns: w'idth, height, image and time to decode the image
     """
     if data == None:
         print "no image data"
+        return None
+
     retimg = cv.CreateImage((320, 240), 8, 3)
     
     bitreader = BitReader(data)
@@ -573,6 +593,10 @@ def read_picture(data):
 
 def decode_navdata(packet):
     """Decode a navdata packet."""
+
+    if packet == None:
+        return None
+
     offset = 0
     _ =  struct.unpack_from("IIII", packet, offset)
     drone_state = dict()

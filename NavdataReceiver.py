@@ -1,4 +1,24 @@
 #!/usr/bin/env python2.7
+#
+#    Copyright (c) 2012 Morten Daugaard
+#
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
+#
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
 
 import datetime
 import time
@@ -14,18 +34,17 @@ import TestDevice
 import Utils
 import decoder
 import Queue
+import pickle
 from collections import OrderedDict
 from copy import deepcopy
 
 DEBUG = False
 
-INIT = 0
-STARTED = 1
-PAUSED = 2
-STOPPING = 3
-
-NORMAL = 4
-PRINT = 5
+STOPPING = 0
+INIT = 1
+RUNNING = 2
+PAUSED = 3
+CAPTURE = 4
 
 class NavdataReceiver(multiprocessing.Process):
 
@@ -42,12 +61,12 @@ class NavdataReceiver(multiprocessing.Process):
         self.comlist[0] = None
         self.comlist[1] = None
         self.comlist[2] = 1
-        self.comlist[3] = 1
+        self.comlist[3] = INIT
         multiprocessing.Process.__init__(self, target=self.runner, args=(self.comlist,))        
         
         self.MCAST = multicast       
         self.TEST = test
-      
+        self.capture_all = False
         self.navdatasamples = OrderedDict()
         self.targetNavdataSample = None
 
@@ -87,59 +106,39 @@ class NavdataReceiver(multiprocessing.Process):
         Utils.dprint(DEBUG, 'initing')
 
     def stop(self):
-        self.state = STOPPING
-        self.comlist[3] = 0 
-        time.sleep(1)
+        self.comlist[3] = STOPPING 
+        self.join()
         self.sock.close()    
 
     def getNavdata(self):
         index = self.comlist[2]
-        navdata = decoder.decode_navdata(self.comlist[index])
-        return navdata
+        navdata = self.comlist[index] if self.getStatus() else None
+        if navdata:
+            nd = decoder.decode_navdata(navdata)
+            return nd
+        else:
+            return None
+
+    
+    def toggleCaptureAll(self):
+        print "toggleCaptureAll\r"
+        if self.capture_all:
+            self.comlist[3] = RUNNING
+        else:
+            self.comlist[3] = CAPTURE
+        
+        self.capture_all = not self.capture_all
 
     def recordNavdataSample(self):
         time = datetime.datetime.now()
         print 'Navdata sample recorded at: ', time, "\r"
         ind = self.comlist[2]
         navdata = decoder.read_navdata(self.comlist[ind])
-        # gray  = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
-        # canny = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
-        # cv.CvtColor(img, gray,cv.CV_BGR2GRAY)
-        # cv.Canny(gray, canny, 10, 15)
-        
-        # li = cv.HoughLines2(canny,
-        #                     cv.CreateMemStorage(),
-        #                     cv.CV_HOUGH_STANDARD,
-        #                     1,
-        #                     math.pi/180,
-        #                     100,
-        #                     0,
-        #                     0)
-              
-        # p = {}
-        # coords =  []
-        # for (rho,theta) in li:
-           
-        #     if theta < 0.04:
-        #         #print theta
-        #         c = math.cos(theta)
-        #         s = math.sin(theta)
-        #         x0 = c*rho
-        #         y0 = s*rho
-        #         cv.Line(img,
-        #                 ( int(x0 + 1000*(-s)) , int(y0 + 1000*c) ),
-        #                 (int(x0 + -1000*(-s)), int( y0 - 1000*c)),
-        #                 (0,0,255))
-        #         index = int(min([int(x0 + 1000*(-s)), int(x0 + -1000*(-s))]) + (abs((x0 + 1000*(-s)) - (x0 + -1000*(-s))) / 2))
-        #         p[index] = 1
-        #         coords.append( ( (int(x0 + 1000*(-s)) , int(y0 + 1000*c)) , (int(x0 + -1000*(-s)), int( y0 - 1000*c)) ) )
-              
         self.navdatasamples[time] = navdata 
         return (time, navdata)
 
     def getNavdataSamples(self):
-        return self.videosamples
-
+        return self.navsamples
 
     def setTargetNavdataSample(self):
         print "Setting target navdata print\r"
@@ -147,27 +146,29 @@ class NavdataReceiver(multiprocessing.Process):
         self.targetNavdataSample = nds
 
     def getTargetNavdataSample(self):
-        return self.targetVideoSample
+        return self.targetNavdataSample
 
     def getStatus(self):
         return self.comlist[3]
 
+    def setStatus(self, arg):
+        self.comlist[3] = arg
+
     def runner(self, l):
+
         Utils.dprint(True, 'Starting navdata receiver\r')
         currentbuffer = 0        
         runs = 0
-        state = STARTED
-        mode = NORMAL
+        navdatalist_all = []
         time_start = datetime.datetime.now()
         
         self.initNavdata()
+        self.setStatus(RUNNING)
+        
         while l[3]:
 
             inputready, outputready, exceptready = select.select([self.sock], [], [], 1)
-            
-            if len(inputready) == 0:
-                self.initVideo()
-        
+           
             for i in inputready:
                 
                 if i == self.sock:
@@ -177,26 +178,26 @@ class NavdataReceiver(multiprocessing.Process):
                         Utils.dprint(DEBUG,  e)
             
                     if data:
-                        Utils.dprint(DEBUG, 'Got video data')
+                        Utils.dprint(DEBUG, 'Got navdata')
                         l[2] = (runs+1)%2
                         l[currentbuffer] = data
                         runs += 1
                         currentbuffer = runs%2
-        
+                        navdatalist_all.append(data)
             if runs % 50 == 0:
                 self.initNavdata()
-        
+
+        if len(navdatalist_all):
+            ofile = open("./pickled_navdata.data", "w")
+            pickle.dump(navdatalist_all, ofile)
+            ofile.close()
+
+
         time_end = datetime.datetime.now()
         delta = (time_end - time_start)
         time_elapsed = (delta.microseconds + (delta.seconds*1000000.0))/1000000.0
-      
+        
         print "Shutting down navdata receiver\t\t (" + str(runs),"frames fetched in",time_elapsed,"secs)\r"
-        #print 'frames:\t', runs
-        #print 'avg time:\t', time_elapsed / runs, 'sec'
-        #print 'avg fps:\t', runs / time_elapsed, 'fps'
-
-
-
 
 def main():
     r = VideoReceiver(True, False)

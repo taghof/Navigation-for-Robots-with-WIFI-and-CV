@@ -1,4 +1,24 @@
 #!/usr/bin/env python2.7
+#
+#    Copyright (c) 2012 Morten Daugaard
+#
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
+#
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
 
 import datetime
 import time
@@ -15,18 +35,17 @@ import Utils
 import decoder
 import Queue
 import random
+import pickle
 from collections import OrderedDict
 from copy import deepcopy
 
 DEBUG = False
 
-INIT = 0
-STARTED = 1
-PAUSED = 2
-STOPPING = 3
-
-NORMAL = 4
-PRINT = 5
+STOPPING = 0
+INIT = 1
+RUNNING = 2
+PAUSED = 3
+CAPTURE = 4
 
 class WifiReceiver(multiprocessing.Process):
     
@@ -37,15 +56,14 @@ class WifiReceiver(multiprocessing.Process):
         self.comlist[0] = None
         self.comlist[1] = None
         self.comlist[2] = 0
-        self.comlist[3] = 1
+        self.comlist[3] = INIT
 
         multiprocessing.Process.__init__(self, target=self.runner, args=(self.comlist,))        
         
         self.DRONE_IP = '192.168.1.1'
         self.WIFI_PORT = 5551
-                            
+        self.capture_all = False
         self.lock = multiprocessing.Lock()
-        self.state = INIT 
         self.wifisamples = OrderedDict()
         self.targetWifiSample = None
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -54,14 +72,23 @@ class WifiReceiver(multiprocessing.Process):
         self.sock.bind(('', self.WIFI_PORT))
             
     def stop(self):
-        self.state = STOPPING
-        self.comlist[3] = 0 
-        time.sleep(1)
+        self.comlist[3] = STOPPING 
+        self.join()
         self.sock.close()    
 
     def getWifiSignals(self):
         index = self.comlist[2]
         return self.comlist[index]
+
+    def toggleCaptureAll(self):
+        print "toggleCaptureAll\r"
+        if self.capture_all:
+            self.comlist[3] = RUNNING
+        else:
+            self.comlist[3] = CAPTURE
+        
+        self.capture_all = not self.capture_all
+
 
     def recordWifiSample(self):
         time = datetime.datetime.now()
@@ -129,16 +156,18 @@ class WifiReceiver(multiprocessing.Process):
     def getStatus(self):
         return self.comlist[3]
 
+    def setStatus(self, arg):
+        self.comlist[3] = arg
+
     def runner(self, l):
         Utils.dprint(True, 'Starting wifi receiver\r')
         wifimap = OrderedDict()
         currentbuffer = 0        
         l[currentbuffer] = wifimap
         runs = 0
-        state = STARTED
-        mode = NORMAL
+        wifilist_all = []
         time_start = datetime.datetime.now()
-                
+        self.setStatus(RUNNING)
         while l[3]:
 
             inputready, outputready, exceptready = select.select([self.sock], [], [], 1)
@@ -159,14 +188,20 @@ class WifiReceiver(multiprocessing.Process):
                             pass
                         else:
                             wifimap[keyval[0]] = (int(keyval[1]), datetime.datetime.now())
-                        
+                            if l[3] == CAPTURE:
+                                wifilist_all.append(data)
+
                         l[currentbuffer] = wifimap
                         runs += 1
-                               
+
+        if len(wifilist_all):
+            ofile = open("./pickled_wifi.data", "w")
+            pickle.dump(wifilist_all, ofile)
+            ofile.close()
+
         time_end = datetime.datetime.now()
         delta = (time_end - time_start)
         time_elapsed = (delta.microseconds + (delta.seconds*1000000.0))/1000000.0
-        
         print 'Shutting down wifireceiver\t\t (' + str(runs), 'packets fetched in', time_elapsed, 'secs)\r'
 
 

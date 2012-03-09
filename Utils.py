@@ -1,6 +1,8 @@
 import sys
 import threading
 import time
+import Settings
+
 from select import select
 
 NAV_PORT = 5554
@@ -13,7 +15,7 @@ TEST_DRONE_IP = '127.0.0.1'
 INTERFACE_IP = '192.168.1.2'
 
 def dprint(d, t):
-    if d:
+    if Settings.DEBUG:
         print t
 
 def ensure_dir(f):

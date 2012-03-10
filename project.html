@@ -34,17 +34,17 @@ consuming.
 We have written a couple of tools to aid us in our analysis work,
 both on-drone and off-drone. Our main off-drone tool is a python
 application which greatly extends the functionality found in the
-official AR.Drone iDevice app. Besides beeing able to show the drone
+official AR.Drone iDevice app. Besides being able to show the drone
 video feed, the tool is also able to display the nav data and wifi
 data stream and to record specific samples and even compare these
 samples to a target sample. We are able to record flights(video, nav and wifi
-packets) to disc and following replay the entire flight. 
+packets) to disc and following replay the entire flight.<br> 
 A key component of the tool is our integrated testdevice. After
 realising that we would not always be carrying the drone with us, we
 decided to build a simple server that on request could send out
 video,nav and wifi data in a way that is totally transparent to the
 rest of the program, thus making us able to test our code on realistic
-data everywhere. For manual control our program enables us to use a wireless
+data everywhere.<br>For manual control our program enables us to use a wireless
 X-box 360 controller, our controller architecture also makes it very easy
 to add automatic control of the drone, as this is nothing more than
 subclassing our base controller class and adding control code.
@@ -56,9 +56,9 @@ ourselves to ask questions on what features would be necessary for
 navigating such an environment. The features we identified for this
 environment basically fell into two categories, safety and
 navigation. How do we avoid crashing into people? can we detect
-silhouttes? can we detect them fast enough to avoid collision?. How
+silhouttes? can we detect them fast enough to avoid collision? How
 do we navigate in this environment? can we move along a corridor? can
-we recognize and go through a door? what if the door is closed?. We
+we recognize and go through a door? what if the door is closed? We
 doubt we will be able to build a fully autonoumus system which does all of these
 things at once, but we hope to be able to demonstrate the features
 individually and also to determine the level of information we need to

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Added Project Description
-public: false
+public: true
 ---
 
 Blog Update

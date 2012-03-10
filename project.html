@@ -17,6 +17,7 @@ as nothing more than an expensive toy, but with an onboard ARM
 processor and a range of sensors we find that the system is well
 suited to our needs as an aerial robotic development platform. 
 
+
 Out of the box the AR.Drone is equipped with two cameras(one front and
 one down facing), a three axis accellorometer and a ultrasonic sensor
 for measuring altitude. After enabling [USB support][1], we added a second
@@ -26,6 +27,7 @@ is linux compatible(driver wise) and doesn't weigh too much. Much work
 has gone into configuring the drone linux kernel, patching and adding
 kernel modules and finding correct wifi drivers beeing the most time
 consuming. 
+
 
 We have written a couple of tools to aid us in our analysis work,
 both on-drone and off-drone. Our main off-drone tool is a python
@@ -45,6 +47,7 @@ X-box 360 controller, our controller architecture also makes it very easy
 to add automatic control of the drone, as this is nothing more than
 subclassing our base controller class and adding control code.
 
+
 To decide which features to develop for our drone, we have considered
 situations from environments we consider to be only slightly
 dynamic. One of our main cases has been a museum, thus prompting
@@ -60,6 +63,7 @@ things at once, but we hope to be able to demonstrate the features
 individually and also to determine the level of information we need to
 feed the drone. The blog will reflect on our progress towards
 an implementation of these features.
+
 
 All code for this project is released from our [repository][2] under a
 permissive MIT license. 

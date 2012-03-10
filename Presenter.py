@@ -22,7 +22,7 @@
 
 import math
 import sys
-import pygame
+#import pygame
 import datetime
 import threading
 import Utils
@@ -30,7 +30,6 @@ import Drone
 import cv
 import time
 import random
-import WifiReceiver
 import pango
 from collections import OrderedDict
 from copy import deepcopy
@@ -75,7 +74,6 @@ class PresenterGui(object):
         self.drawing = self.wTree.get_widget("draw1")
 	self.drawing.connect("configure-event", self.configure_event)
 	self.drawing.connect("expose-event", self.expose_event)
-	
 
 	self.radiobutton1 = self.wTree.get_widget("radiobutton1")
 	self.radiobutton2 = self.wTree.get_widget("radiobutton2")
@@ -90,7 +88,7 @@ class PresenterGui(object):
 	self.radiobutton3.connect("toggled", self.handleRadioButtons)
 
 	# our frame
-	self.video_frame = VideoWindow(self.videosensor)   	
+	self.video_frame = VideoWindow(self.videosensor, self)   	
 	self.video_frame.hide_on_delete()
 
 	self.video_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -119,6 +117,7 @@ class PresenterGui(object):
 	    print "Starting GUI\r"
 	    self.window.show()
 	    self.gc = gtk.gdk.GC(self.drawing.window)
+	    self.white_gc = self.drawing.get_style().white_gc
 	    self.loadControllers(self.controllerManager.getControllers())
 	    self.video_frame.start_video()
 	    gobject.timeout_add(100, self.updateWifi, None, None)
@@ -204,7 +203,10 @@ class PresenterGui(object):
 		    self.setTarget(None)
 	    elif keyname == "r":
 		    self.takeSample(None)
-    
+    	    elif keyname == "5":
+		    self.drone.getWifiSensor().recordSamples(5, 5)
+ 
+   
     def updateSamples(self, widget, derp):
 	    
         wifisamples = self.drone.getWifiSensor().getSamples()
@@ -270,7 +272,14 @@ class PresenterGui(object):
 					current_int_x += (colwidth + colspace)
 				else:
 					current_int_x += (colwidth + colspace)
-				
+
+			target = self.drone.getWifiSensor().getTargetSample()
+			if self.show_targets and target and target.has_key(source):
+				self.gc.set_foreground(color1)
+				tv = target.get(source)
+				tval = int((75.0+tv[0])*(float(fig_height)/75.0))
+				pixmap.draw_line(self.gc, int(current_x), int(current_y+(fig_height-tval)), int(current_x+fig_width), int(current_y+(fig_height-tval)))
+
 			current_x += (margin+fig_width)
 			i += 1
 
@@ -282,8 +291,7 @@ class PresenterGui(object):
         self.wifimap_current = self.wifisensor.getData()       
 
 	x, y, width, height = self.drawing.get_allocation()
-	pixmap.draw_rectangle(self.drawing.get_style().white_gc,
-			      True, 0, 0, width, height)
+	pixmap.draw_rectangle(self.white_gc, True, 0, 0, width, height)
 
 	if self.wifimap_current and len(self.wifimap_current) > 0 and self.drawing.window:
 		
@@ -490,11 +498,11 @@ class PresenterGui(object):
 	
 class VideoWindow(gtk.Frame):
 
-        def __init__(self, videosensor):
+        def __init__(self, videosensor, gui):
 
                 gtk.Frame.__init__(self, "Video Source")
 		self.videosensor = videosensor
-
+		self.gui = gui
                 master_vbox = gtk.VBox(False, 5)
                 master_vbox.set_border_width( 5 )
                 self.add( master_vbox )
@@ -521,11 +529,7 @@ class VideoWindow(gtk.Frame):
                 #master_vbox.pack_start(self.inverted_video, False, False)
 
                 # -----------------------------------
-
-
                 self.capture = None
-
-
                 master_vbox.show_all()
 
         # -----------------------------------
@@ -568,22 +572,29 @@ class VideoWindow(gtk.Frame):
 			#gobject.idle_add(self.run )
 
 	def cb_capture_video(self, widget):
-		self.videosensor.toggleCapture()
+		self.videosensor.toggleDisplayCapture()
 
 
         # -------------------------------------------
 
         def run(self):
 		#print "showing\r"
-		webcam_frame = self.videosensor.getData()
+	        img = self.videosensor.getData()
+
+		if self.gui.show_targets:
+			target = self.videosensor.getTargetSample()
+			if target:
+				lines = target[1]
+				for line in lines:
+					cv.Line(img, line[0], line[1], (255,0,0))
 
 		incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
-                        webcam_frame.tostring(),
+                        img.tostring(),
                         gtk.gdk.COLORSPACE_RGB,
                         False,
                         8,
-                        webcam_frame.width,
-                        webcam_frame.height,
+                        img.width,
+                        img.height,
                         960)
 
 		self.video_image.set_from_pixbuf(incoming_pixbuf)

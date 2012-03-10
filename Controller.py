@@ -26,8 +26,8 @@ import socket
 import os
 import threading
 import pygame
-import ManualControl
-import AutoControl
+#import ManualControl
+#import AutoControl
 import Utils
 
 NAV_PORT = 5554

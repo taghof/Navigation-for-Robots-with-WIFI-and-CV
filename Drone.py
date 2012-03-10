@@ -20,16 +20,12 @@
 #    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #    THE SOFTWARE.
 
-#import sys
 import os
 import Controller
-#import VideoReceiver
-#import NavdataReceiver
-#import WifiReceiver
 import Receiver
 import Presenter
-import Utils
 import TestDevice
+import Utils
 import Settings
 
 class Drone(object):

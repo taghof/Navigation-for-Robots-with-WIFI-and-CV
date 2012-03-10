@@ -176,7 +176,7 @@ class VideoReceiver(Receiver):
     def __init__(self, port):
         Receiver.__init__(self, port)
         self.display_capture = False
-        self.dislay_dump = []
+        self.display_dump = []
         
     def stop(self):
         Receiver.stop(self)    
@@ -227,7 +227,7 @@ class VideoReceiver(Receiver):
 
     def toggleDisplayCapture(self):
         print "toggleDislayCapture\r"
-        if self.capture:
+        if self.display_capture:
             fileObj = open("./pickled.data", "a")
             pickle.dump(self.display_dump, fileObj)
             fileObj.close()

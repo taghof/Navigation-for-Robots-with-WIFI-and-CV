@@ -8,8 +8,17 @@ Purpose
 =======
 
 
-Process
-=======
+Description
+===========
+
+Data gathering
+--------------
+
+Data displaying
+---------------
+
+Drone control
+-------------
 
 
 Results

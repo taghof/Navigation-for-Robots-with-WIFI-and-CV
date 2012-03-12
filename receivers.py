@@ -1,21 +1,43 @@
 #!/usr/bin/env python2.7
+#    Copyright (c) 2012 Morten Daugaard
+#
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
+#
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
 
 import datetime
 import time
+import math
 import threading
 import socket
 import multiprocessing
 import select
-import cv
-import math
-import Utils
-import decoder
 import Queue
-import Settings
 import pickle
 from collections import OrderedDict
 
+import cv
+
+import utils
+import decoder
+import settings
+
 class Receiver(multiprocessing.Process):
+
 
     def __init__(self, port):
 
@@ -30,35 +52,33 @@ class Receiver(multiprocessing.Process):
         self.comlist[0] = None
         self.comlist[1] = None
         self.comlist[2] = 1
-        self.comlist[3] = Settings.INIT
-
-        multiprocessing.Process.__init__(self, target=self.runner, args=(self.comlist,))        
+        self.comlist[3] = settings.INIT
         
-        self.MCAST = Settings.MULTI
-        self.TEST = Settings.TEST
+        multiprocessing.Process.__init__(self, target=self.runner, args=(self.comlist,))        
+
         self.PORT = port 
         self.INIT_PORT = port
-      
-        self.DRONE_IP = Settings.DRONE_IP
-        self.INITMSG = Settings.INITMSG
-        self.MCAST_GRP = Settings.MCAST_GRP
-        self.DEBUG = Settings.DEBUG
+        
+        self.DRONE_IP = settings.DRONE_IP
+        self.INITMSG = settings.INITMSG
+        self.MCAST_GRP = settings.MCAST_GRP
+        self.DEBUG = settings.DEBUG
         
         self.samples = OrderedDict()
-        self.targetSample = None
-              
+        self.target_sample = None
+             
         # Standard socket setup for unicast
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setblocking(0)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
        
-        if self.TEST:
-            self.DRONE_IP = Settings.TEST_DRONE_IP
-            self.INIT_PORT = Settings.TEST_DRONE_INIT_PORT
+        if settings.TEST:
+            self.DRONE_IP = settings.TEST_DRONE_IP
+            self.INIT_PORT = settings.TEST_DRONE_INIT_PORT
 
         # changing the socket setup to multicast
-        if self.MCAST:
-            self.INITMSG = Settings.INITMSG_MCAST
+        if settings.MULTI:
+            self.INITMSG = settings.INITMSG_MCAST
             self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32) 
             self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
             self.sock.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton('192.168.1.2'))
@@ -70,7 +90,7 @@ class Receiver(multiprocessing.Process):
         self.sock.sendto(self.INITMSG, (self.DRONE_IP, self.INIT_PORT))
         self.sock.sendto(self.INITMSG, (self.DRONE_IP, self.INIT_PORT))
         self.sock.sendto(self.INITMSG, (self.DRONE_IP, self.INIT_PORT))
-        Utils.dprint("", 'initing')
+        utils.dprint("", 'initing')
 
     def runner(self, l):
         print 'Starting receiver ', self.PORT, '\r'
@@ -80,7 +100,7 @@ class Receiver(multiprocessing.Process):
         dumplist = []
         time_start = datetime.datetime.now()
         self.init()
-        self.setStatus(Settings.RUNNING)
+        self.set_status(settings.RUNNING)
         while l[3]:
             
             inputready, outputready, exceptready = select.select([self.sock], [], [], 1)
@@ -91,14 +111,14 @@ class Receiver(multiprocessing.Process):
                     try:
                         data, addr = self.sock.recvfrom(65535)
                     except socket.error, e:
-                        Utils.dprint("",  e)
+                        utils.dprint("",  e)
             
                     if data:
-                        Utils.dprint("", 'Got data')
-                        if l[3] == Settings.CAPTURE:
+                        utils.dprint("", 'Got data')
+                        if l[3] == settings.CAPTURE:
                             dumplist.append(data)
                         l[2] = (runs+1)%2
-                        l[currentbuffer] = self.onReceiveData(data, history)
+                        l[currentbuffer] = self.on_receive_data(data, history)
                         currentbuffer = runs%2
                         runs += 1
             
@@ -115,61 +135,57 @@ class Receiver(multiprocessing.Process):
         delta = (time_end - time_start)
         time_elapsed = (delta.microseconds + (delta.seconds*1000000.0))/1000000.0
         print 'Shutting down receiver ', self.PORT,'\t\t (' + str(runs), 'packets fetched in', time_elapsed, 'secs)\r'
- 
     
     def stop(self):
-        self.comlist[3] = Settings.STOPPING 
+        self.comlist[3] = settings.STOPPING 
         self.join()
         self.sock.close()    
 
-    def getData(self):
+    def get_data(self):
         index = self.comlist[2]
         data = self.comlist[index]
-        return self.onRequestData(data)
-
-
+        return self.on_request_data(data)
     
-    def recordSample(self):
+    def record_sample(self):
         time = datetime.datetime.now()
-        sample = self.getData()
+        sample = self.get_data()
         self.samples[time] = sample
         return sample
 
-    def recordSamples(self, duration, repetitions):
+    def record_samples(self, duration, repetitions):
         print "starting periodic wifi recording\r"
-        t = PeriodicTimer(duration, repetitions, self.recordSample)
+        t = PeriodicTimer(duration, repetitions, self.record_sample)
         t.start()
 
-    def getSamples(self):
+    def get_samples(self):
         return self.samples # should this be deepcloned?
 
-    def setTargetSample(self):
-        self.targetSample = self.recordSample()
+    def set_target_sample(self):
+        self.target_sample = self.record_sample()
 
-    def getTargetSample(self):
-        return self.targetSample
+    def get_target_sample(self):
+        return self.target_sample
    
-    
-    def toggleCapture(self):
+    def toggle_capture(self):
         print "toggleCapture\r"
-        if self.getStatus() == Settings.CAPTURE:
-            self.setStatus(Settings.RUNNING)
+        if self.get_status() == settings.CAPTURE:
+            self.set_status(settings.RUNNING)
         else:
-            self.setStatus(Settings.CAPTURE)
-        
+            self.set_status(settings.CAPTURE)
     
-    def getStatus(self):
+    def get_status(self):
         return self.comlist[3]
 
-    def setStatus(self, arg):
+    def set_status(self, arg):
         self.comlist[3] = arg
 
     
-    def onRequestData(self, data):
+    def on_request_data(self, data):
         return data
 
-    def onReceiveData(self, data, history):
+    def on_receive_data(self, data, history):
         return data
+
     
 class VideoReceiver(Receiver):
 
@@ -185,10 +201,10 @@ class VideoReceiver(Receiver):
             pickle.dump(self.display_dump, fileObj)
             fileObj.close()
 
-    def recordSample(self):
+    def record_sample(self):
         time = datetime.datetime.now()
         print 'VIDEO sample recorded at: ', time, "\r"
-        img = self.getData()
+        img = self.get_data()
         gray  = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
         canny = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
         cv.CvtColor(img, gray,cv.CV_BGR2GRAY)
@@ -216,7 +232,7 @@ class VideoReceiver(Receiver):
         self.samples[time] = (p, coords) 
         return (p, coords, img)
 
-    def onRequestData(self, data):
+    def on_request_data(self, data):
         if data:
             if self.display_capture:
                 self.display_dump.append(data)
@@ -225,7 +241,7 @@ class VideoReceiver(Receiver):
         else:
             return None
 
-    def toggleDisplayCapture(self):
+    def toggle_display_capture(self):
         print "toggleDislayCapture\r"
         if self.display_capture:
             fileObj = open("./pickled.data", "a")
@@ -240,19 +256,19 @@ class WifiReceiver(Receiver):
     def __init__(self, port):
         Receiver.__init__(self, port)
                     
-    def startPeriodicWifiMatching(self, duration, repetitions):
+    def start_periodic_wifi_matching(self, duration, repetitions):
         pass
 
-    def matchCurrentWifiSample(self):
-        if self.targetSample == None:
+    def match_current_wifi_sample(self):
+        if self.target_sample is None:
             print "Can't match, target sample not set\r"
             return 0
         else:
-            res = self.matchWifiSample(3, self.targetSample, self.getData())
+            res = self.matchWifiSample(3, self.target_sample, self.get_data())
             print "match score: ", res, "%\r"
             return res
 
-    def matchWifiSample(self, min_match_len, p1, p2):
+    def match_wifi_sample(self, min_match_len, p1, p2):
         match_set = OrderedDict()
         threshold = 20
         current_time = datetime.datetime.now()
@@ -281,7 +297,7 @@ class WifiReceiver(Receiver):
         
         return pval
 
-    def onReceiveData(self, data, history):
+    def on_receive_data(self, data, history):
         keyval = data.split('#')
         if not (history.has_key(keyval[0]) and int(history[keyval[0]][0]) - int(keyval[1]) > 40):
             history[keyval[0]] = (int(keyval[1]), datetime.datetime.now())
@@ -294,7 +310,7 @@ class NavdataReceiver(Receiver):
     def __init__(self, port):
         Receiver.__init__(self, port)
         
-    def onRequestData(self, data):
+    def on_request_data(self, data):
         if  data:
             nd = decoder.decode_navdata(data)
             return nd
@@ -314,3 +330,5 @@ class PeriodicTimer(threading.Thread):
             time.sleep(self.duration)
             self.function()
             self.repetitions -= 1
+
+

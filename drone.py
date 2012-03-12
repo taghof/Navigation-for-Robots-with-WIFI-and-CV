@@ -21,71 +21,73 @@
 #    THE SOFTWARE.
 
 import os
-import Controller
-import Receiver
-import Presenter
-import TestDevice
-import Utils
-import Settings
+
+import controllers
+import receivers
+import presenter
+import testdevice
+import utils
+import settings
 
 class Drone(object):
 
+
     def __init__(self):
-        self.videosensor = Receiver.VideoReceiver(Settings.VIDEO_PORT)
-        self.wifisensor = Receiver.WifiReceiver(Settings.WIFI_PORT)
-        self.navdatasensor = Receiver.NavdataReceiver(Settings.NAVDATA_PORT)
-        self.controllerManager = Controller.ControllerManager(self)
-        self.gui = Presenter.PresenterGui(self)
+        self.video_sensor = receivers.VideoReceiver(settings.VIDEO_PORT)
+        self.wifi_sensor = receivers.WifiReceiver(settings.WIFI_PORT)
+        self.navdata_sensor = receivers.NavdataReceiver(settings.NAVDATA_PORT)
+        self.controller_manager = controllers.ControllerManager(self)
+        self.gui = presenter.PresenterGui(self)
 
     def start(self):
        
-        self.videosensor.start()
-        while not self.videosensor.getStatus() == Settings.RUNNING:
+        self.video_sensor.start()
+        while not self.video_sensor.get_status() == settings.RUNNING:
             pass
 
-        self.wifisensor.start()
-        while not self.wifisensor.getStatus() == Settings.RUNNING:
+        self.wifi_sensor.start()
+        while not self.wifi_sensor.get_status() == settings.RUNNING:
             pass
 
-        self.navdatasensor.start()
-        while not self.navdatasensor.getStatus() == Settings.RUNNING:
+        self.navdata_sensor.start()
+        while not self.navdata_sensor.get_status() == settings.RUNNING:
             pass
        
         self.gui.start()
 
     def stop(self):
-        self.wifisensor.stop()
-        self.videosensor.stop()
-        self.navdatasensor.stop()
-        self.controllerManager.stop()
+        self.wifi_sensor.stop()
+        self.video_sensor.stop()
+        self.navdata_sensor.stop()
+        self.controller_manager.stop()
 
-    def getVideoSensor(self):
-        return self.videosensor
+    def get_video_sensor(self):
+        return self.video_sensor
         
-    def getWifiSensor(self):    
-        return self.wifisensor
+    def get_wifi_sensor(self):    
+        return self.wifi_sensor
 
-    def getNavdataSensor(self):
-        return self.navdatasensor
+    def get_navdata_sensor(self):
+        return self.navdata_sensor
 
-    def getControllerManager(self):
-        return self.controllerManager
+    def get_controller_manager(self):
+        return self.controller_manager
 
-    def getGUI(self):
+    def get_gui(self):
         return self.gui
 
 def main():
     os.system('clear')
-    if Settings.TEST:
-        testdevice = TestDevice.TestDevice(False)
-        testdevice.start()
+    if settings.TEST:
+        testdevice_ = testdevice.TestDevice(False)
+        testdevice_.start()
 
     drone = Drone()
     drone.start()
 
-    if Settings.TEST:
-        drone.getVideoSensor().join()
-        testdevice.stop()
+    if settings.TEST:
+        drone.get_video_sensor().join()
+        testdevice_.stop()
    
 if __name__ == '__main__':
     main()

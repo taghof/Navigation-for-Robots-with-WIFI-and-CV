@@ -568,7 +568,7 @@ def read_picture(data):
     """Convert an AR.Drone image packet to an opencv image.
     Returns: w'idth, height, image and time to decode the image
     """
-    if data == None:
+    if data is None:
         print "no image data"
         return None
 
@@ -594,7 +594,7 @@ def read_picture(data):
 def decode_navdata(packet):
     """Decode a navdata packet."""
 
-    if packet == None:
+    if packet is None:
         return None
 
     offset = 0

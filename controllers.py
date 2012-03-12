@@ -20,73 +20,64 @@
 #    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #    THE SOFTWARE.
 
-import struct
 import sys
-import socket
 import os
+import socket
+import struct
 import threading
 import pygame
-#import ManualControl
-#import AutoControl
-import Utils
 
-NAV_PORT = 5554
-VIDEO_PORT = 5555
-CMD_PORT = 5556
-
-MULTICAST_IP = '224.1.1.1'
-DRONE_IP = '192.168.1.1'
-TEST_DRONE_IP = '127.0.0.1'
-INTERFACE_IP = '192.168.1.2'
-
-DEBUG = False
-        
+import utils
+import settings
 
 class ControllerManager(object):
+
+
     def __init__(self, drone):
         self.drone = drone
         self.interface = ControllerInterface()
         self.controllers = (ManualControl(self.drone, self.interface), AutoControl(self.drone,self.interface))
         
-    def getControllers(self):
+    def get_controllers(self):
         return self.controllers
 
-    def addController(self, controller):
+    def add_controller(self, controller):
         self.controllers.append(controller)
 
-    def removeController(self, controller):
+    def remove_controller(self, controller):
         self.controllers.remove(controller)
 
     def stop(self):
-        self.stopControllers()
+        self.stop_controllers()
 
-    def stopControllers(self):
+    def stop_controllers(self):
         for con in self.controllers:
             con.stop()
 
 class Controller(object):
+
     
     def __init__(self, drone, interface):
         self.drone = drone
-        self.controlInterface = interface
-        self.controlButton = None
-        self.controlMethod = self.processEvents
+        self.control_interface = interface
+        self.control_button = None
+        self.control_method = self.process_events
         self.stopping = False
         
-    def processEvents(self):
+    def process_events(self):
         return False
     
-    def setControlButton(self, button):
-        self.controlButton = button
+    def set_control_button(self, button):
+        self.control_button = button
 
-    def getControlButton(self):
-        return self.controlButton
+    def get_control_button(self):
+        return self.control_button
 
-    def setControlMethod(self, method):
-        self.controlMethod = method
+    def set_control_method(self, method):
+        self.control_method = method
 
-    def getControlMethod(self):
-        return self.controlMethod
+    def get_control_method(self):
+        return self.control_method
 
     def stop(self):
         print "Shutting " + str(self)
@@ -94,17 +85,19 @@ class Controller(object):
 
 class AutoControl(Controller):    
 
+
     def __init__(self, drone, interface):
         Controller.__init__(self, drone, interface)
 
-    def processEvents(self):
+    def process_events(self):
 
-        if self.controlButton:
-            return self.controlButton.get_active()
+        if self.control_button is not None:
+            return self.control_button.get_active()
         else:
             return True
 
 class ManualControl(Controller):    
+
 
     def __init__(self, drone, interface):
         Controller.__init__(self, drone, interface)
@@ -115,24 +108,24 @@ class ManualControl(Controller):
             self.js = pygame.joystick.Joystick(0)
             self.js.init()
             self.cstring = "joystick: " + str(self.js.get_name()) + "\r"
-            self.controlMethod = self.processEvents
+            self.control_method = self.process_events
             self.control = True
             print self.cstring
         else:
             self.cstring = "keyboard"
-            self.controlMethod = None
+            self.control_method = None
             self.control = False
         
-    def getJoystickAttached(self):
+    def get_joystick_attached(self):
         if self.control:
             return True
         else: 
             return False
 
-    def processEvents(self):
+    def process_events(self):
         if self.control:
             for e in pygame.event.get(): # iterate over event stack
-                Utils.dprint(DEBUG, 'event : ' + str(e.type))
+                utils.dprint("", 'event : ' + str(e.type))
                 
                 if e.type == pygame.JOYAXISMOTION: 
                     roll = self.js.get_axis(0)
@@ -142,7 +135,7 @@ class ManualControl(Controller):
                     power1 = self.convert( self.js.get_axis(5) )
                     power = power1 - power2
                     self.controlInterface.move(roll, pitch, power, yaw)
-                    Utils.dprint( DEBUG, 'roll: ' + str(roll) + ' pitch: ' + str(pitch) + ' power: ' + str(power) + ' yaw: ' + str(yaw) )                   
+                    utils.dprint("", 'roll: ' + str(roll) + ' pitch: ' + str(pitch) + ' power: ' + str(power) + ' yaw: ' + str(yaw) )                   
                     
                 elif e.type == pygame.JOYBUTTONDOWN: # 10
                     for b in xrange(self.js.get_numbuttons()):
@@ -194,11 +187,11 @@ class ManualControl(Controller):
 
     def stop(self):
         Controller.stop(self)
-        self.controlInterface.stop()
+        self.control_interface.stop()
         pygame.joystick.quit()
         pygame.display.quit()
 
-# *************************** Utils ***************************************
+# *************************** utils ***************************************
     
     def convert(self, num):
         nump = num +1
@@ -206,7 +199,6 @@ class ManualControl(Controller):
             return nump/2
         else:
             return nump
-
 
 
 class ControllerInterface(object):
@@ -238,32 +230,32 @@ class ControllerInterface(object):
         else:
             self.at(at_ref, False)
 
-    def getLanded(self):
+    def get_landed(self):
         return self.landed
 
-    def setLanded(self, state):
+    def set_landed(self, state):
         self.landed = state
 
-    def takeoff(self):
-        Utils.dprint(DEBUG, 'Taking off!')
+    def take_off(self):
+        utils.dprint("", 'Taking off!')
         self.at(at_ftrim)
         self.at(at_config, "control:altitude_max", "40000")
         self.at(at_ref, True)
         # TODO: implement check for takeoff
-        self.setLanded(False)
+        self.set_landed(False)
            
     def land(self):
-        Utils.dprint(DEBUG, 'Landing')
+        utils.dprint("", 'Landing')
         self.at(at_ref, False)
         # TODO: implement check for landed
-        self.setLanded(True)
+        self.set_landed(True)
 
     def reset(self):
-        Utils.dprint(DEBUG, 'Resetting')
+        utils.dprint("", 'Resetting')
         self.at(at_ref, False, True)
         self.at(at_ref, False, False)
                
-    def ledShow(self, num):
+    def led_show(self, num):
         self.at(at_led, num, 1.0, 2)
 
     def move(self, roll, pitch, power, yaw):
@@ -295,13 +287,13 @@ class ControllerInterface(object):
         
     def rotate(self, dir):
         if dir > 0:
-            Utils.dprint(DEBUG, ' Rotating clockwise!')
+            utils.dprint("", ' Rotating clockwise!')
             self.at(at_pcmd, True, 0, 0, 0, -self.speed)
         elif dir < 0:
-            Utils.dprint(DEBUG, 'Rotating counterclockwise!')
+            utils.dprint("", 'Rotating counterclockwise!')
             self.at(at_pcmd, True, 0, 0, 0, self.speed)
         else:
-            Utils.dprint(DEBUG, 'Stopping rotation!')
+            utils.dprint("", 'Stopping rotation!')
             self.at(at_pcmd, True, 0, 0, 0, 0.0)
 
     
@@ -319,12 +311,6 @@ class ControllerInterface(object):
         self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
         self.com_watchdog_timer.start()
         self.lock.release()
-
-
-
-
-
-
 
 #=====================================================================================
 # Low level functions
@@ -427,10 +413,10 @@ def at(command, seq, params):
             
     msg = "AT*%s=%i%s\r" % (command, seq, param_str)
     if command != "COMWDG":
-        Utils.dprint(DEBUG, msg)
+        utils.dprint("", msg)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(msg, (DRONE_IP, CMD_PORT))
+    sock.sendto(msg, (settings.DRONE_IP, settings.CMD_PORT))
                 
 def f2i(f):
     #Interpret IEEE-754 floating-point value as signed integer.

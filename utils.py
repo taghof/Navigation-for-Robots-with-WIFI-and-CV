@@ -1,21 +1,12 @@
 import sys
-import threading
 import time
-import Settings
-
+import threading
 from select import select
 
-NAV_PORT = 5554
-VIDEO_PORT = 5555
-CMD_PORT = 5556
-
-MULTICAST_IP = '224.1.1.1'
-DRONE_IP = '192.168.1.1'
-TEST_DRONE_IP = '127.0.0.1'
-INTERFACE_IP = '192.168.1.2'
+import settings
 
 def dprint(d, t):
-    if Settings.DEBUG:
+    if settings.DEBUG:
         print t
 
 def ensure_dir(f):
@@ -23,7 +14,7 @@ def ensure_dir(f):
     if not os.path.exists(d):
         os.makedirs(d)
 
-def getChar():
+def get_char():
     import sys, tty, termios
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
@@ -34,20 +25,22 @@ def getChar():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
-def writeChar():
-    import sys, tty, termios
+def get_char_with_break(self):
+    import sys, tty, termios, select
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
         tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
+        while not self.stopping:
+            rlist, _, _ = select.select([sys.stdin], [], [], 1)
+            if rlist:
+                s = sys.stdin.read(1)
+                return s
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
 
 
-
-def getRanNum(self):
+def get_random_num(self):
     return random.randint(-5, 5)
 
 class PeriodicTimer(threading.Thread):
@@ -65,16 +58,3 @@ class PeriodicTimer(threading.Thread):
             self.repetitions -= 1
 
 
-    def getCharWithBreak(self):
-        import sys, tty, termios, select
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(sys.stdin.fileno())
-            while not self.stopping:
-                rlist, _, _ = select.select([sys.stdin], [], [], 1)
-                if rlist:
-                    s = sys.stdin.read(1)
-                    return s
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)

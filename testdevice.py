@@ -20,20 +20,16 @@
 #    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #    THE SOFTWARE.
 
+import os
 import socket
-import Utils
 import time
 import threading
-import os
 import random
 import pickle
-import decoder
 
-INIT_PORT = 5550
-VIDEO_SEND_PORT = 5555
-WIFI_SEND_PORT = 5551
-NAV_SEND_PORT = 5554
-DEBUG = False
+import utils
+import decoder
+import settings
 
 class TestDevice(threading.Thread):
     
@@ -83,13 +79,10 @@ class TestDevice(threading.Thread):
             self.navdata_packets = pickle.load(fileObj)
             fileObj.close()
             self.ni = len(self.navdata_packets)
-            # print self.ni, " navdata frames"
-            # for p in self.navdata_packets:
-            #     data = decoder.decode_navdata(p)
-            #     print data.get(0, dict()).get('num_frames', 0)
+            print self.ni, " navdata frames"
 
         self.init_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.init_sock.bind(('', INIT_PORT))
+        self.init_sock.bind(('', settings.TEST_DRONE_INIT_PORT))
         
         self.video_send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.wifi_send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -101,7 +94,7 @@ class TestDevice(threading.Thread):
             self.initpck, self.addr = self.init_sock.recvfrom(65535)
             
             print 'TestDevice connected, beginning transmission\r'
-            Utils.dprint(DEBUG, 'received: ' + str(self.initpck))
+            utils.dprint("", 'received: ' + str(self.initpck))
         
         self.init_sock.setblocking(0)
         
@@ -114,11 +107,11 @@ class TestDevice(threading.Thread):
             try:
                 data, addr = self.init_sock.recvfrom(65535)
             except socket.error, e:
-                Utils.dprint(DEBUG,  e)
+                utils.dprint("",  e)
             
             if data:
-                Utils.dprint(DEBUG, data)
-                Utils.dprint(DEBUG, 'TestDevice resetting shutdown timer')
+                utils.dprint("", data)
+                utils.dprint("", 'TestDevice resetting shutdown timer')
                 self.timeout = 500
             
             # transmit video data
@@ -129,7 +122,7 @@ class TestDevice(threading.Thread):
                 data = f.read()
                 f.close()
                 
-            self.video_send_sock.sendto(data, ('127.0.0.1', VIDEO_SEND_PORT))
+            self.video_send_sock.sendto(data, ('127.0.0.1', settings.VIDEO_PORT))
             
             # transmit WIFI data
             if self.pickled_wifi:
@@ -137,12 +130,12 @@ class TestDevice(threading.Thread):
             else:
                 wifidata = "00:10:20:30:40:" + str(random.randint(10,30)) +" # " + str(random.randint(-75, 0))           
             
-            self.wifi_send_sock.sendto(wifidata, ('127.0.0.1', WIFI_SEND_PORT))
+            self.wifi_send_sock.sendto(wifidata, ('127.0.0.1', settings.WIFI_PORT))
             
-            # TODO: transmit navdata
+            # transmit navdata
             if self.pickled_wifi:
                 navdata = self.navdata_packets[ni]
-                self.navdata_send_sock.sendto(navdata, ('127.0.0.1', NAV_SEND_PORT))
+                self.navdata_send_sock.sendto(navdata, ('127.0.0.1', settings.NAVDATA_PORT))
            
             vi += 1
             if vi == self.vi:
@@ -155,7 +148,7 @@ class TestDevice(threading.Thread):
             ni += 1
             if ni == self.ni:
                 ni = 0
-#            print ni
+
             self.timeout -= 1
             time.sleep(0.05)
 

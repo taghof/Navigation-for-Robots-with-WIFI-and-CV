@@ -34,7 +34,6 @@ the recording functions of the receiver classes.
 <img src="/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/controller.png" width="150" height="150">
 </a>
 
-
 The third part of the system deals with controlling the drone. The drone is controlled by sending AT 
 commands to the drone command port, we have isolated these commands in a controller interface and all commands 
 to drone is sent through this interface. Like in the receiver case we have implemented a base controller class and 

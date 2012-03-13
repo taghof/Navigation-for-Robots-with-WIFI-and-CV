@@ -28,7 +28,7 @@ We display the decoded data to the user via a pyGTK user interface. It basically
 to select the type of data to view and some togglebuttons to add special layers on top of the data. The data 
 itself is drawn to a standard pyGTK drawing area. Below the drawing area we have added buttons to control 
 the recording functions of the receiver classes.
-<a href="/Navigation-for-Robots-with-WIFI-and-CV/images/dronetool.png">
+<br><a href="/Navigation-for-Robots-with-WIFI-and-CV/images/dronetool.png">
 <img src="/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/dronetool.png" width="150" height="150">
 </a><a href="/Navigation-for-Robots-with-WIFI-and-CV/images/controller.png">
 <img src="/Navigation-for-Robots-with-WIFI-and-CV/images/thumbs/controller.png" width="150" height="150">

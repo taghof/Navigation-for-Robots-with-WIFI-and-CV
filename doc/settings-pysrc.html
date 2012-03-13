@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>settings</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Module&nbsp;settings
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="settings-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="settings-module.html">Module settings</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment">#    Copyright (c) 2012 Morten Daugaard</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-comment">#    Permission is hereby granted, free of charge, to any person obtaining a copy</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-comment">#    of this software and associated documentation files (the "Software"), to deal</tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-comment">#    in the Software without restriction, including without limitation the rights</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-comment">#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-comment">#    copies of the Software, and to permit persons to whom the Software is</tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-comment">#    furnished to do so, subject to the following conditions:</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-comment">#    The above copyright notice and this permission notice shall be included in</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt class="py-comment">#    all copies or substantial portions of the Software.</tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"><tt class="py-comment">#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"><tt class="py-comment">#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"><tt class="py-comment">#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-comment">#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"><tt class="py-comment">#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-comment">#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-comment">#    THE SOFTWARE.</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"> </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"><tt class="py-comment"># Run settings</tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line"> </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line"><tt id="link-0" class="py-name" targets="Variable settings.DEBUG=settings-module.html#DEBUG"><a title="settings.DEBUG" class="py-name" href="#" onclick="return doclink('link-0', 'DEBUG', 'link-0');">DEBUG</a></tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line"><tt id="link-1" class="py-name" targets="Variable settings.TEST=settings-module.html#TEST"><a title="settings.TEST" class="py-name" href="#" onclick="return doclink('link-1', 'TEST', 'link-1');">TEST</a></tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line"><tt id="link-2" class="py-name" targets="Variable settings.MULTI=settings-module.html#MULTI"><a title="settings.MULTI" class="py-name" href="#" onclick="return doclink('link-2', 'MULTI', 'link-2');">MULTI</a></tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line"> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line"><tt class="py-comment"># Constants</tt> </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line"> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"><tt id="link-3" class="py-name" targets="Variable settings.STOPPING=settings-module.html#STOPPING"><a title="settings.STOPPING" class="py-name" href="#" onclick="return doclink('link-3', 'STOPPING', 'link-3');">STOPPING</a></tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"><tt id="link-4" class="py-name" targets="Variable settings.INIT=settings-module.html#INIT"><a title="settings.INIT" class="py-name" href="#" onclick="return doclink('link-4', 'INIT', 'link-4');">INIT</a></tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
+<a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line"><tt id="link-5" class="py-name" targets="Variable settings.RUNNING=settings-module.html#RUNNING"><a title="settings.RUNNING" class="py-name" href="#" onclick="return doclink('link-5', 'RUNNING', 'link-5');">RUNNING</a></tt> <tt class="py-op">=</tt> <tt class="py-number">2</tt> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line"><tt id="link-6" class="py-name" targets="Variable settings.PAUSED=settings-module.html#PAUSED"><a title="settings.PAUSED" class="py-name" href="#" onclick="return doclink('link-6', 'PAUSED', 'link-6');">PAUSED</a></tt> <tt class="py-op">=</tt> <tt class="py-number">3</tt> </tt>
+<a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line"><tt id="link-7" class="py-name" targets="Variable settings.CAPTURE=settings-module.html#CAPTURE"><a title="settings.CAPTURE" class="py-name" href="#" onclick="return doclink('link-7', 'CAPTURE', 'link-7');">CAPTURE</a></tt> <tt class="py-op">=</tt> <tt class="py-number">4</tt> </tt>
+<a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line"> </tt>
+<a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line"><tt id="link-8" class="py-name" targets="Variable settings.DRONE_IP=settings-module.html#DRONE_IP"><a title="settings.DRONE_IP" class="py-name" href="#" onclick="return doclink('link-8', 'DRONE_IP', 'link-8');">DRONE_IP</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'192.168.1.1'</tt> </tt>
+<a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line"><tt id="link-9" class="py-name" targets="Variable settings.TEST_DRONE_IP=settings-module.html#TEST_DRONE_IP"><a title="settings.TEST_DRONE_IP" class="py-name" href="#" onclick="return doclink('link-9', 'TEST_DRONE_IP', 'link-9');">TEST_DRONE_IP</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'127.0.0.1'</tt> </tt>
+<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line"><tt id="link-10" class="py-name" targets="Variable settings.MCAST_GRP=settings-module.html#MCAST_GRP"><a title="settings.MCAST_GRP" class="py-name" href="#" onclick="return doclink('link-10', 'MCAST_GRP', 'link-10');">MCAST_GRP</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'224.1.1.1'</tt> </tt>
+<a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line"> </tt>
+<a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line"><tt id="link-11" class="py-name" targets="Variable settings.INITMSG=settings-module.html#INITMSG"><a title="settings.INITMSG" class="py-name" href="#" onclick="return doclink('link-11', 'INITMSG', 'link-11');">INITMSG</a></tt> <tt class="py-op">=</tt> <tt class="py-string">"\x01\x00\x00\x00"</tt> </tt>
+<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line"><tt id="link-12" class="py-name" targets="Variable settings.INITMSG_MCAST=settings-module.html#INITMSG_MCAST"><a title="settings.INITMSG_MCAST" class="py-name" href="#" onclick="return doclink('link-12', 'INITMSG_MCAST', 'link-12');">INITMSG_MCAST</a></tt> <tt class="py-op">=</tt> <tt class="py-string">"\x02\x00\x00\x00"</tt> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line"> </tt>
+<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line"><tt id="link-13" class="py-name" targets="Variable settings.TEST_DRONE_INIT_PORT=settings-module.html#TEST_DRONE_INIT_PORT"><a title="settings.TEST_DRONE_INIT_PORT" class="py-name" href="#" onclick="return doclink('link-13', 'TEST_DRONE_INIT_PORT', 'link-13');">TEST_DRONE_INIT_PORT</a></tt> <tt class="py-op">=</tt> <tt class="py-number">5550</tt>  </tt>
+<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line"><tt id="link-14" class="py-name" targets="Variable settings.WIFI_PORT=settings-module.html#WIFI_PORT"><a title="settings.WIFI_PORT" class="py-name" href="#" onclick="return doclink('link-14', 'WIFI_PORT', 'link-14');">WIFI_PORT</a></tt> <tt class="py-op">=</tt> <tt class="py-number">5551</tt> </tt>
+<a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line"><tt id="link-15" class="py-name" targets="Variable settings.NAVDATA_PORT=settings-module.html#NAVDATA_PORT"><a title="settings.NAVDATA_PORT" class="py-name" href="#" onclick="return doclink('link-15', 'NAVDATA_PORT', 'link-15');">NAVDATA_PORT</a></tt> <tt class="py-op">=</tt> <tt class="py-number">5554</tt> </tt>
+<a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line"><tt id="link-16" class="py-name" targets="Variable settings.VIDEO_PORT=settings-module.html#VIDEO_PORT"><a title="settings.VIDEO_PORT" class="py-name" href="#" onclick="return doclink('link-16', 'VIDEO_PORT', 'link-16');">VIDEO_PORT</a></tt> <tt class="py-op">=</tt> <tt class="py-number">5555</tt> </tt>
+<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line"><tt id="link-17" class="py-name" targets="Variable settings.CMD_PORT=settings-module.html#CMD_PORT"><a title="settings.CMD_PORT" class="py-name" href="#" onclick="return doclink('link-17', 'CMD_PORT', 'link-17');">CMD_PORT</a></tt> <tt class="py-op">=</tt> <tt class="py-number">5556</tt> </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Tue Mar 13 15:11:34 2012
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

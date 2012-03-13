@@ -316,21 +316,21 @@ class ControllerInterface(object):
 # Low level functions
 #=====================================================================================
 def at_ref(seq, takeoff, emergency=False):
-        """
-        Basic behaviour of the drone: take-off/landing, emergency stop/reset)
+    """
+    Basic behaviour of the drone: take-off/landing, emergency stop/reset)
+    
+    Parameters:
+    seq -- sequence number
+    takeoff -- True: Takeoff / False: Land
+    emergency -- True: Turn of the engines
+    """
+    p = 0b10001010101000000000000000000
+    if takeoff:
+        p += 0b1000000000
+    if emergency:
+        p += 0b0100000000
+    at("REF", seq, [p])
         
-        Parameters:
-        seq -- sequence number
-        takeoff -- True: Takeoff / False: Land
-        emergency -- True: Turn of the engines
-        """
-        p = 0b10001010101000000000000000000
-        if takeoff:
-            p += 0b1000000000
-        if emergency:
-            p += 0b0100000000
-        at("REF", seq, [p])
-
 def at_pcmd(seq, progressive, lr, fb, vv, va):
     """
     Makes the drone move (translate/rotate).
@@ -338,13 +338,13 @@ def at_pcmd(seq, progressive, lr, fb, vv, va):
     Parameters:
     seq -- sequence number
     progressive -- True: enable progressive commands, False: disable (i.e.
-        enable hovering mode)
+    enable hovering mode)
     lr -- left-right tilt: float [-1..1] negative: left, positive: right
     rb -- front-back tilt: float [-1..1] negative: forwards, positive:
-        backwards
+    backwards
     vv -- vertical speed: float [-1..1] negative: go down, positive: rise
     va -- angular speed: float [-1..1] negative: spin left, positive: spin 
-        right
+    right
 
     The above float values are a percentage of the maximum speed.
     """

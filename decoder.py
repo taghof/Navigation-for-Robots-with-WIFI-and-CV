@@ -50,7 +50,7 @@ in a way that it works also without psyco installed. On the author's
 development machine the speed up is from 2FPS w/o psyco to > 20 FPS w/ psyco.
 """
 import array
-import cProfile
+#import cProfile
 import datetime
 import struct
 import sys
@@ -62,119 +62,183 @@ try:
 except ImportError:
     print "Please install psyco for better video decoding performance."
 
+class BitReader(object):
+    """Bitreader. Given a stream of data, it allows to read it bitwise.
+    """
+
+    def __init__(self, packet):
+        self.packet = packet
+        self.offset = 0
+        self.bits_left = 0
+        self.chunk = 0
+        self.read_bits = 0
+
+    # def derp(self, nbits, consume=True):
+    #     """derp nbits and return the integervalue of the read bits.
+
+    #     If consume is False, it behaves like a 'peek' method (ie it reads the
+    #     bits but does not consume them.
+    #     """
+    #     # Read enough bits into chunk so we have at least nbits available
+    #     while nbits > self.bits_left:
+    #         try:
+    #             self.chunk = (self.chunk << 32) | struct.unpack_from('<I', self.packet, self.offset)[0]
+    #         except struct.error:
+    #             self.chunk <<= 32
+    #         self.offset += 4
+    #         self.bits_left += 32
+    #     # Get the first nbits bits from chunk (and remove them from chunk)
+    #     shift = self.bits_left - nbits
+    #     res = self.chunk >> shift
+    #     if consume:
+    #         self.chunk -= res << shift
+    #         self.bits_left -= nbits
+    #         self.read_bits += nbits
+    #     return res
+
+    def read(self, nbits, consume=True):
+        """Read nbits and return the integervalue of the read bits.
+
+        If consume is False, it behaves like a 'peek' method (ie it reads the
+        bits but does not consume them.
+        """
+        # Read enough bits into chunk so we have at least nbits available
+        while nbits > self.bits_left:
+            try:
+                self.chunk = (self.chunk << 32) | struct.unpack_from('<I', self.packet, self.offset)[0]
+            except struct.error:
+                self.chunk <<= 32
+            self.offset += 4
+            self.bits_left += 32
+        # Get the first nbits bits from chunk (and remove them from chunk)
+        shift = self.bits_left - nbits
+        res = self.chunk >> shift
+        if consume:
+            self.chunk -= res << shift
+            self.bits_left -= nbits
+            self.read_bits += nbits
+        return res
+
+    def align(self):
+        """Byte align the data stream."""
+        shift = (8 - self.read_bits) % 8
+        self.read(shift)
+
+
 # from zig-zag back to normal
 ZIG_ZAG_POSITIONS = array.array('B',
-    ( 0,  1,  8, 16,  9,  2, 3, 10,
-     17, 24, 32, 25, 18, 11, 4,  5,
-     12, 19, 26, 33, 40, 48, 41, 34,
-     27, 20, 13,  6,  7, 14, 21, 28,
-     35, 42, 49, 56, 57, 50, 43, 36,
-     29, 22, 15, 23, 30, 37, 44, 51,
-     58, 59, 52, 45, 38, 31, 39, 46,
-     53, 60, 61, 54, 47, 55, 62, 63))
+                                ( 0,  1,  8, 16,  9,  2, 3, 10,
+                                  17, 24, 32, 25, 18, 11, 4,  5,
+                                  12, 19, 26, 33, 40, 48, 41, 34,
+                                  27, 20, 13,  6,  7, 14, 21, 28,
+                                  35, 42, 49, 56, 57, 50, 43, 36,
+                                  29, 22, 15, 23, 30, 37, 44, 51,
+                                  58, 59, 52, 45, 38, 31, 39, 46,
+                                  53, 60, 61, 54, 47, 55, 62, 63))
 
 # Inverse quantization
 IQUANT_TAB = array.array('B',
-    ( 3,  5,  7,  9, 11, 13, 15, 17,
-      5,  7,  9, 11, 13, 15, 17, 19,
-      7,  9, 11, 13, 15, 17, 19, 21,
-      9, 11, 13, 15, 17, 19, 21, 23,
-     11, 13, 15, 17, 19, 21, 23, 25,
-     13, 15, 17, 19, 21, 23, 25, 27,
-     15, 17, 19, 21, 23, 25, 27, 29,
-     17, 19, 21, 23, 25, 27, 29, 31))
+                         ( 3,  5,  7,  9, 11, 13, 15, 17,
+                           5,  7,  9, 11, 13, 15, 17, 19,
+                           7,  9, 11, 13, 15, 17, 19, 21,
+                           9, 11, 13, 15, 17, 19, 21, 23,
+                           11, 13, 15, 17, 19, 21, 23, 25,
+                           13, 15, 17, 19, 21, 23, 25, 27,
+                           15, 17, 19, 21, 23, 25, 27, 29,
+                           17, 19, 21, 23, 25, 27, 29, 31))
 
 # Used for upscaling the 8x8 b- and r-blocks to 16x16
 SCALE_TAB = array.array('B', 
-    ( 0,  0,  1,  1,  2,  2,  3,  3,
-      0,  0,  1,  1,  2,  2,  3,  3,
-      8,  8,  9,  9, 10, 10, 11, 11,
-      8,  8,  9,  9, 10, 10, 11, 11,
-     16, 16, 17, 17, 18, 18, 19, 19,
-     16, 16, 17, 17, 18, 18, 19, 19,
-     24, 24, 25, 25, 26, 26, 27, 27,
-     24, 24, 25, 25, 26, 26, 27, 27,
+                        ( 0,  0,  1,  1,  2,  2,  3,  3,
+                          0,  0,  1,  1,  2,  2,  3,  3,
+                          8,  8,  9,  9, 10, 10, 11, 11,
+                          8,  8,  9,  9, 10, 10, 11, 11,
+                          16, 16, 17, 17, 18, 18, 19, 19,
+                          16, 16, 17, 17, 18, 18, 19, 19,
+                          24, 24, 25, 25, 26, 26, 27, 27,
+                          24, 24, 25, 25, 26, 26, 27, 27,
 
-      4,  4,  5,  5,  6,  6,  7,  7,
-      4,  4,  5,  5,  6,  6,  7,  7,
-     12, 12, 13, 13, 14, 14, 15, 15,
-     12, 12, 13, 13, 14, 14, 15, 15,
-     20, 20, 21, 21, 22, 22, 23, 23,
-     20, 20, 21, 21, 22, 22, 23, 23,
-     28, 28, 29, 29, 30, 30, 31, 31,
-     28, 28, 29, 29, 30, 30, 31, 31,
+                          4,  4,  5,  5,  6,  6,  7,  7,
+                          4,  4,  5,  5,  6,  6,  7,  7,
+                          12, 12, 13, 13, 14, 14, 15, 15,
+                          12, 12, 13, 13, 14, 14, 15, 15,
+                          20, 20, 21, 21, 22, 22, 23, 23,
+                          20, 20, 21, 21, 22, 22, 23, 23,
+                          28, 28, 29, 29, 30, 30, 31, 31,
+                          28, 28, 29, 29, 30, 30, 31, 31,
 
-     32, 32, 33, 33, 34, 34, 35, 35,
-     32, 32, 33, 33, 34, 34, 35, 35,
-     40, 40, 41, 41, 42, 42, 43, 43,
-     40, 40, 41, 41, 42, 42, 43, 43,
-     48, 48, 49, 49, 50, 50, 51, 51,
-     48, 48, 49, 49, 50, 50, 51, 51,
-     56, 56, 57, 57, 58, 58, 59, 59,
-     56, 56, 57, 57, 58, 58, 59, 59,
+                          32, 32, 33, 33, 34, 34, 35, 35,
+                          32, 32, 33, 33, 34, 34, 35, 35,
+                          40, 40, 41, 41, 42, 42, 43, 43,
+                          40, 40, 41, 41, 42, 42, 43, 43,
+                          48, 48, 49, 49, 50, 50, 51, 51,
+                          48, 48, 49, 49, 50, 50, 51, 51,
+                          56, 56, 57, 57, 58, 58, 59, 59,
+                          56, 56, 57, 57, 58, 58, 59, 59,
 
-     36, 36, 37, 37, 38, 38, 39, 39,
-     36, 36, 37, 37, 38, 38, 39, 39,
-     44, 44, 45, 45, 46, 46, 47, 47,
-     44, 44, 45, 45, 46, 46, 47, 47,
-     52, 52, 53, 53, 54, 54, 55, 55,
-     52, 52, 53, 53, 54, 54, 55, 55,
-     60, 60, 61, 61, 62, 62, 63, 63,
-     60, 60, 61, 61, 62, 62, 63, 63))
+                          36, 36, 37, 37, 38, 38, 39, 39,
+                          36, 36, 37, 37, 38, 38, 39, 39,
+                          44, 44, 45, 45, 46, 46, 47, 47,
+                          44, 44, 45, 45, 46, 46, 47, 47,
+                          52, 52, 53, 53, 54, 54, 55, 55,
+                          52, 52, 53, 53, 54, 54, 55, 55,
+                          60, 60, 61, 61, 62, 62, 63, 63,
+                          60, 60, 61, 61, 62, 62, 63, 63))
 
 # Count leading zeros look up table
 CLZLUT = array.array('B',
-    (8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
-     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+                     (8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
+                      3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+                      2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                      2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
 
 # Map pixels from four 8x8 blocks to one 16x16
 MB_TO_GOB_MAP = array.array('B',
-    [  0,   1,   2,   3,   4,   5,   6,   7,
-      16,  17,  18,  19,  20,  21,  22,  23,
-      32,  33,  34,  35,  36,  37,  38,  39,
-      48,  49,  50,  51,  52,  53,  54,  55,
-      64,  65,  66,  67,  68,  69,  70,  71,
-      80,  81,  82,  83,  84,  85,  86,  87,
-      96,  97,  98,  99, 100, 101, 102, 103,
-     112, 113, 114, 115, 116, 117, 118, 119,
-       8,   9,  10,  11,  12,  13,  14,  15,
-      24,  25,  26,  27,  28,  29,  30,  31,
-      40,  41,  42,  43,  44,  45,  46,  47,
-      56,  57,  58,  59,  60,  61,  62,  63,
-      72,  73,  74,  75,  76,  77,  78,  79,
-      88,  89,  90,  91,  92,  93,  94,  95,
-     104, 105, 106, 107, 108, 109, 110, 111,
-     120, 121, 122, 123, 124, 125, 126, 127,
-     128, 129, 130, 131, 132, 133, 134, 135,
-     144, 145, 146, 147, 148, 149, 150, 151,
-     160, 161, 162, 163, 164, 165, 166, 167,
-     176, 177, 178, 179, 180, 181, 182, 183,
-     192, 193, 194, 195, 196, 197, 198, 199,
-     208, 209, 210, 211, 212, 213, 214, 215,
-     224, 225, 226, 227, 228, 229, 230, 231,
-     240, 241, 242, 243, 244, 245, 246, 247,
-     136, 137, 138, 139, 140, 141, 142, 143,
-     152, 153, 154, 155, 156, 157, 158, 159,
-     168, 169, 170, 171, 172, 173, 174, 175,
-     184, 185, 186, 187, 188, 189, 190, 191,
-     200, 201, 202, 203, 204, 205, 206, 207,
-     216, 217, 218, 219, 220, 221, 222, 223,
-     232, 233, 234, 235, 236, 237, 238, 239,
-     248, 249, 250, 251, 252, 253, 254, 255])
+                            [  0,   1,   2,   3,   4,   5,   6,   7,
+                               16,  17,  18,  19,  20,  21,  22,  23,
+                               32,  33,  34,  35,  36,  37,  38,  39,
+                               48,  49,  50,  51,  52,  53,  54,  55,
+                               64,  65,  66,  67,  68,  69,  70,  71,
+                               80,  81,  82,  83,  84,  85,  86,  87,
+                               96,  97,  98,  99, 100, 101, 102, 103,
+                               112, 113, 114, 115, 116, 117, 118, 119,
+                               8,   9,  10,  11,  12,  13,  14,  15,
+                               24,  25,  26,  27,  28,  29,  30,  31,
+                               40,  41,  42,  43,  44,  45,  46,  47,
+                               56,  57,  58,  59,  60,  61,  62,  63,
+                               72,  73,  74,  75,  76,  77,  78,  79,
+                               88,  89,  90,  91,  92,  93,  94,  95,
+                               104, 105, 106, 107, 108, 109, 110, 111,
+                               120, 121, 122, 123, 124, 125, 126, 127,
+                               128, 129, 130, 131, 132, 133, 134, 135,
+                               144, 145, 146, 147, 148, 149, 150, 151,
+                               160, 161, 162, 163, 164, 165, 166, 167,
+                               176, 177, 178, 179, 180, 181, 182, 183,
+                               192, 193, 194, 195, 196, 197, 198, 199,
+                               208, 209, 210, 211, 212, 213, 214, 215,
+                               224, 225, 226, 227, 228, 229, 230, 231,
+                               240, 241, 242, 243, 244, 245, 246, 247,
+                               136, 137, 138, 139, 140, 141, 142, 143,
+                               152, 153, 154, 155, 156, 157, 158, 159,
+                               168, 169, 170, 171, 172, 173, 174, 175,
+                               184, 185, 186, 187, 188, 189, 190, 191,
+                               200, 201, 202, 203, 204, 205, 206, 207,
+                               216, 217, 218, 219, 220, 221, 222, 223,
+                               232, 233, 234, 235, 236, 237, 238, 239,
+                               248, 249, 250, 251, 252, 253, 254, 255])
+
 MB_ROW_MAP = array.array('B', [i / 16 for i in MB_TO_GOB_MAP])
 MB_COL_MAP = array.array('B', [i % 16 for i in MB_TO_GOB_MAP])
 
@@ -205,7 +269,6 @@ F3 = CONST_BITS + PASS1_BITS + 3
 TRIES = 16
 MASK = 2**(TRIES*32)-1
 SHIFT = 32*(TRIES-1)
-
 
 def _first_half(data):
     """Helper function used to precompute the zero values in a 12 bit datum.
@@ -256,45 +319,6 @@ def _second_half(data):
 # Precompute all 12 and 15 bit values for the entropy decoding process
 FH = [_first_half(i) for i in xrange(2**12)]
 SH = [_second_half(i) for i in xrange(2**15)]
-
-
-class BitReader(object):
-    """Bitreader. Given a stream of data, it allows to read it bitwise."""
-
-    def __init__(self, packet):
-        self.packet = packet
-        self.offset = 0
-        self.bits_left = 0
-        self.chunk = 0
-        self.read_bits = 0
-
-    def read(self, nbits, consume=True):
-        """Read nbits and return the integervalue of the read bits.
-
-        If consume is False, it behaves like a 'peek' method (ie it reads the
-        bits but does not consume them.
-        """
-        # Read enough bits into chunk so we have at least nbits available
-        while nbits > self.bits_left:
-            try:
-                self.chunk = (self.chunk << 32) | struct.unpack_from('<I', self.packet, self.offset)[0]
-            except struct.error:
-                self.chunk <<= 32
-            self.offset += 4
-            self.bits_left += 32
-        # Get the first nbits bits from chunk (and remove them from chunk)
-        shift = self.bits_left - nbits
-        res = self.chunk >> shift
-        if consume:
-            self.chunk -= res << shift
-            self.bits_left -= nbits
-            self.read_bits += nbits
-        return res
-
-    def align(self):
-        """Byte align the data stream."""
-        shift = (8 - self.read_bits) % 8
-        self.read(shift)
 
 
 def inverse_dct(block):
@@ -544,25 +568,24 @@ def get_gob(bitreader, picture, slicenr, width):
     for i in xrange(width / 16):
         get_mb(bitreader, picture, width, (slicenr*16, i*16))#(offset+16*i))
 
+# def cv2array(im): 
+#   depth2dtype = { 
+#         cv.IPL_DEPTH_8U: 'uint8', 
+#         cv.IPL_DEPTH_8S: 'int8', 
+#         cv.IPL_DEPTH_16U: 'uint16', 
+#         cv.IPL_DEPTH_16S: 'int16', 
+#         cv.IPL_DEPTH_32S: 'int32', 
+#         cv.IPL_DEPTH_32F: 'float32', 
+#         cv.IPL_DEPTH_64F: 'float64', 
+#     } 
 
-def cv2array(im): 
-  depth2dtype = { 
-        cv.IPL_DEPTH_8U: 'uint8', 
-        cv.IPL_DEPTH_8S: 'int8', 
-        cv.IPL_DEPTH_16U: 'uint16', 
-        cv.IPL_DEPTH_16S: 'int16', 
-        cv.IPL_DEPTH_32S: 'int32', 
-        cv.IPL_DEPTH_32F: 'float32', 
-        cv.IPL_DEPTH_64F: 'float64', 
-    } 
-
-  arrdtype=im.depth 
-  a = numpy.fromstring( 
-         im.tostring(), 
-         dtype=depth2dtype[im.depth], 
-         count=im.width*im.height*im.nChannels) 
-  a.shape = (im.height,im.width,im.nChannels) 
-  return a 
+#   arrdtype=im.depth 
+#   a = numpy.fromstring( 
+#          im.tostring(), 
+#          dtype=depth2dtype[im.depth], 
+#          count=im.width*im.height*im.nChannels) 
+#   a.shape = (im.height,im.width,im.nChannels) 
+#   return a 
 
 def read_picture(data):
     """Convert an AR.Drone image packet to an opencv image.
@@ -657,26 +680,24 @@ def decode_navdata(packet):
         data[id_nr] = values
     return data
 
+# try:
+#     psyco.bind(BitReader)
+#     psyco.bind(get_block)
+#     psyco.bind(get_gob)
+#     psyco.bind(get_mb)
+#     psyco.bind(inverse_dct)
+#     psyco.bind(read_picture)
+# except NameError:
+#     print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
 
-
-try:
-    psyco.bind(BitReader)
-    psyco.bind(get_block)
-    psyco.bind(get_gob)
-    psyco.bind(get_mb)
-    psyco.bind(inverse_dct)
-    psyco.bind(read_picture)
-except NameError:
-    print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
-
-def main():
-    data = open('testdata/100.dat').read()
-    cProfile.runctx('read_picture(data)', globals(), locals())
+# def main():
+#     data = open('testdata/100.dat').read()
+#     #cProfile.runctx('read_picture(data)', globals(), locals())
     
-if __name__ == '__main__':
-    if 'profile' in sys.argv:
-        cProfile.run('main()')
-    else:
-        main()
+# if __name__ == '__main__':
+#     # if 'profile' in sys.argv:
+#     #     cProfile.run('main()')
+#     # else:
+#     main()
         
     

@@ -8,7 +8,8 @@ Purpose
 =======
 To describe the python tool we have designed as the base of our further experimentation
 and to explain the archictecture of the program. The source code can be found in our repository 
-and easily cloned.
+and easily cloned. As this software has been developed to run on a linux pc, no attempts has been made to make
+it work on windows, this should not be too hard though.
 
 Description
 ===========

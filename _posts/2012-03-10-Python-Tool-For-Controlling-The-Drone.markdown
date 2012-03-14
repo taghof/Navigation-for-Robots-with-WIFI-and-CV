@@ -17,7 +17,9 @@ On a higher level of abstraction our tool consist of three distict parts: Data r
 data display and drone control. For performance reasons the data retrieval is split into
 separate processes. The entry point for the program is drone.py, here retrieval, display 
 and control is initialised and their processes and threads started. We are also able to
-start a testdevice if a real physical drone is not present.
+start a testdevice if a real physical drone is not present. The test device is a simple server which
+transmits data packets like a real drone, the packets transmitted are real packets which we have
+captured during a drone flight, so this feature actually makes it possible to review a previous flight.
 
 The data retrieval processes continously receives video, wifi and nav data from the drone or from
 the test device. We have implemented a base Receiver class and subclassed this base for each of the
@@ -42,6 +44,8 @@ from this base we subclass the actual controllers. At this point we have two con
 via an Xbox360 joypad and one for automatic control. The automatic control loop at this point is empty, but will 
 see development in the near future. Our controller arrangement is easily extendable if the need for 
 additional controllers arise.
+
+We provide <a href="/Navigation-for-Robots-with-WIFI-and-CV/doc/index.html">documentation</a>(though lacking in completeness) in the form of an Epydoc API with class diagrams and the like. 
 
 Results
 =======

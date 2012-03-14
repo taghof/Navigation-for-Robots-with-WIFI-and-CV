@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Python Tool for Controlling The Drone
-public: False
+public: True
 ---
 
 Purpose

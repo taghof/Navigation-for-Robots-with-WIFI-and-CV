@@ -7,7 +7,7 @@ public: False
 Purpose
 =======
 To describe the python tool we have designed as the base of our further experimentation
-and to explain the archictecture of the program. The source code can be found in our repository 
+and to explain the archictecture of the program. The [source code][1] can be found in our repository 
 and easily cloned. As this software has been developed to run on a linux pc, no attempts has been made to make
 it work on windows, this should not be too hard though.
 
@@ -45,10 +45,13 @@ via an Xbox360 joypad and one for automatic control. The automatic control loop 
 see development in the near future. Our controller arrangement is easily extendable if the need for 
 additional controllers arise.
 
-We provide <a href="/Navigation-for-Robots-with-WIFI-and-CV/doc/index.html">documentation</a>(though lacking in completeness) in the form of an Epydoc API with class diagrams and the like. 
+We provide [documentation][2] (though lacking in completeness) in the form of an Epydoc API with class diagrams and the like. 
 
 Results
 =======
 The program has reached a development stage where it can be used to control and monitor our
 drone experiments, it is not though a finished product, we expect the program to be developed further in the course 
 of the project.
+
+[1]: https://github.com/taghof/Navigation-for-Robots-with-WIFI-and-CV "Code repository"
+[2]: /Navigation-for-Robots-with-WIFI-and-CV/doc/index.html "Documentation API"

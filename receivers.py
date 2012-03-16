@@ -29,6 +29,7 @@ import select
 import Queue
 import pickle
 from collections import OrderedDict
+from collections import deque
 
 import cv
 
@@ -147,13 +148,13 @@ class Receiver(multiprocessing.Process):
         return self.on_request_data(data)
     
     def record_sample(self):
-        time = datetime.datetime.now()
         sample = self.get_data()
-        self.samples[time] = sample
-        return sample
+        processed_sample = self.on_record_sample(sample)
+        self.samples[datetime.datetime.now()] = processed_sample
+        return processed_sample
 
     def record_samples(self, duration, repetitions):
-        print "starting periodic wifi recording\r"
+        print "starting periodic sample recordings\r"
         t = PeriodicTimer(duration, repetitions, self.record_sample)
         t.start()
 
@@ -186,6 +187,9 @@ class Receiver(multiprocessing.Process):
     def on_receive_data(self, data, history):
         return data
 
+    def on_record_sample(self, sample):
+        return sample
+
     
 class VideoReceiver(Receiver):
 
@@ -201,10 +205,10 @@ class VideoReceiver(Receiver):
             pickle.dump(self.display_dump, fileObj)
             fileObj.close()
 
-    def record_sample(self):
-        time = datetime.datetime.now()
+    def on_record_sample(self, data):
         print 'VIDEO sample recorded at: ', time, "\r"
-        img = self.get_data()
+        img = data
+        cv.SaveImage("../images/target-image-"+ str(time.time()) + ".png", img)    
         gray  = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
         canny = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
         cv.CvtColor(img, gray,cv.CV_BGR2GRAY)
@@ -215,7 +219,6 @@ class VideoReceiver(Receiver):
         p = {}
         coords =  []
         for (rho,theta) in li:
-           
             if theta < 0.04:
                 c = math.cos(theta)
                 s = math.sin(theta)
@@ -228,8 +231,7 @@ class VideoReceiver(Receiver):
                 index = int(min([int(x0 + 1000*(-s)), int(x0 + -1000*(-s))]) + (abs((x0 + 1000*(-s)) - (x0 + -1000*(-s))) / 2))
                 p[index] = 1
                 coords.append( ( (int(x0 + 1000*(-s)) , int(y0 + 1000*c)) , (int(x0 + -1000*(-s)), int( y0 - 1000*c)) ) )
-              
-        self.samples[time] = (p, coords) 
+        
         return (p, coords, img)
 
     def on_request_data(self, data):
@@ -298,14 +300,31 @@ class WifiReceiver(Receiver):
         return pval
 
     def on_receive_data(self, data, history):
+        time = datetime.datetime.now()
         keyval = data.split('#')
-        if not (history.has_key(keyval[0]) and int(history[keyval[0]][0]) - int(keyval[1]) > 40):
-            history[keyval[0]] = (int(keyval[1]), datetime.datetime.now())
+        key = keyval[0]
+        val = int(keyval[1])
+
+        if history.has_key(keyval[0]):
+            if not ((history[key][0] - val) > 40):
+                old_avg = history[key][2]
+                num_avg = history[key][3]
+                last10 = history[key][4]
+                time_delta = (time - history[key][1]).total_seconds()
+                new_avg = ((old_avg*num_avg)+time_delta)/(num_avg+1)
+                last10.put(val)
+                history[key] = (val, datetime.datetime.now(), new_avg, num_avg+1, last10, last10.get_avg())
+                
+        else:
+            last10 = DiscardingQueue(10)
+            last10.put(val)
+            history[key] = (val, datetime.datetime.now(), 0, 0, last10)
+
         return history
 
-
-
 class NavdataReceiver(Receiver):
+
+
 
     def __init__(self, port):
         Receiver.__init__(self, port)
@@ -319,6 +338,8 @@ class NavdataReceiver(Receiver):
 
 class PeriodicTimer(threading.Thread):
     
+
+
     def __init__(self, duration, repetitions, function):
         threading.Thread.__init__(self)
         self.duration = duration
@@ -332,3 +353,41 @@ class PeriodicTimer(threading.Thread):
             self.repetitions -= 1
 
 
+
+class DiscardingQueue(object):
+
+
+    def __init__(self, max_size):
+        self.max_size = max_size
+        self.q = deque()
+
+    def put(self, item):
+        if len(self.q) >= self.max_size:
+            self.q.popleft()
+        self.q.append(item)
+        
+    def get_avg(self):
+        total = 0
+        for elem in self.q:
+            total += elem
+        if total:
+            return total/len(self.q)
+        else:
+            return None
+
+    def get_vals(self):
+        return self.q
+            
+
+    def get_var(self):
+        avg = self.get_avg()
+        total = 0
+        if len(self.q):
+            for elem in self.q:
+                total += (elem - avg) ** 2#(elem - avg)
+            return total/len(self.q)
+        else:
+            return None
+
+    def get_std_dev(self):
+        return self.get_var() ** (0.5)

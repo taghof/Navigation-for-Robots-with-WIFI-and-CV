@@ -122,7 +122,7 @@ class PresenterGui(object):
         self.black_gc = self.drawing.get_style().black_gc
         self.load_controllers(self.controller_manager.get_controllers())
         self.video_frame.init_video()
-        gobject.timeout_add(100, self.update_wifi, None)
+        gobject.timeout_add(200, self.update_wifi, None)
         gtk.main()
 	   
     def load_controllers(self, controllers):
@@ -184,11 +184,11 @@ class PresenterGui(object):
     def handle_radiobuttons_pressed(self, radio):
         if radio.get_active():
             if radio.get_name() == "radiobutton1":
-                gobject.timeout_add(100, self.update_wifi, radio)
+                gobject.timeout_add(200, self.update_wifi, radio)
             elif radio.get_name() == "radiobutton2":
-                gobject.timeout_add(100, self.update_samples, radio)
+                gobject.timeout_add(200, self.update_samples, radio)
             elif radio.get_name() == "radiobutton3":
-                gobject.timeout_add(100, self.update_navdata, radio)
+                gobject.timeout_add(200, self.update_navdata, radio)
                 
 
     def handle_key_pressed(self, widget, event):
@@ -328,9 +328,14 @@ class PresenterGui(object):
             for k, v in self.wifimap_current.iteritems():
                 		
                 figval = int((75+v[0])*(float(fig_height)/float(75)))
-			
-                r = int(65535.0-((75.0+float(v[0]))*(65535.0/75.0)))
-                g = int((75.0 + float(v[0]))*(65535.0/75.0))
+		
+                val = v[0]
+                last_updated = v[1]
+                avg_update_time = v[2]
+                update_num = v[3]
+                last10 = v[4]
+                r = int(65535.0-((75.0+float(val))*(65535.0/75.0)))
+                g = int((75.0 + float(val))*(65535.0/75.0))
                 b = 0
 			
                 color1 = colormap.alloc_color(gtk.gdk.Color(0, 0, 0))
@@ -339,8 +344,16 @@ class PresenterGui(object):
                 color4 = colormap.alloc_color(gtk.gdk.Color(0, 65535, 0))
 
                 self.gc.set_foreground(color1)
+                # draw surrounding rectangle
                 pixmap.draw_rectangle(self.gc, False, int(current_x), int(current_y), int(fig_width+1), int(fig_height+1))
-			
+                
+                # text matter
+                font_desc = pango.FontDescription('Serif 8')
+                layout = self.drawing.create_pango_layout(str(last10.get_avg()) + " (" + str(last10.get_std_dev()) + ")")
+                layout.set_font_description(font_desc)
+                # draw text below rectangle
+                pixmap.draw_layout(self.gc, current_x, current_y+fig_height+2, layout)
+           
                 if self.show_significance:
                     self.gc.set_foreground(color4)
                 else:
@@ -515,6 +528,7 @@ class VideoWindow(gtk.Frame):
         gtk.Frame.__init__(self, "Video Source")
         self.video_sensor = video_sensor
         self.gui = gui
+        self.crosshairs = False
         master_vbox = gtk.VBox(False, 5)
         master_vbox.set_border_width( 5 )
         self.add( master_vbox )
@@ -527,11 +541,17 @@ class VideoWindow(gtk.Frame):
 
         self.video_play_button = gtk.ToggleButton("Play Video")
         self.video_play_button.connect("clicked", self.toggle_video_play)
+
         self.video_capture_button = gtk.ToggleButton("Capture Video")
         self.video_capture_button.connect("clicked", self.toggle_video_capture)
+
+        self.crosshairs_button = gtk.ToggleButton("Toggle Crosshairs")
+        self.crosshairs_button.connect("clicked", self.toggle_crosshairs)
+
         
         master_vbox.pack_start(self.video_play_button, False, False)
         master_vbox.pack_start(self.video_capture_button, False, False)
+        master_vbox.pack_start(self.crosshairs_button, False, False)
         self.video_play_button.show()
 
         self.capture = None
@@ -559,13 +579,21 @@ class VideoWindow(gtk.Frame):
 
     def toggle_video_play(self, widget):
         if widget.get_active():
-            gobject.timeout_add(150, self.run )
-                #gobject.idle_add(self.run )
+            gobject.timeout_add(125, self.run )
+            #gobject.idle_add(self.run )
 
     def toggle_video_capture(self, widget):
         self.video_sensor.toggle_display_capture()
 
+    def toggle_crosshairs(self, widget):
+        self.crosshairs = not self.crosshairs
+
+
     def run(self):
+
+        width = 320
+        height= 240
+
         img = self.video_sensor.get_data()
 
         if self.gui.show_targets:
@@ -574,6 +602,9 @@ class VideoWindow(gtk.Frame):
                 lines = target[1]
                 for line in lines:
                     cv.Line(img, line[0], line[1], (255,0,0))
+        if self.crosshairs:
+            cv.Line(img, (160, 110), (160, 130), (255,0,0))
+            cv.Line(img, (150, 120), (170, 120), (255,0,0))
 
         incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
             img.tostring(),

@@ -57,13 +57,13 @@
 <center>  <map id="uml_class_diagram_for_presente" name="uml_class_diagram_for_presente">
 <area shape="rect" id="node11" href="presenter.PresenterGui-class.html#__init__" title="x.__init__(...) initializes x; see help(type(x)) for signature" alt="" coords="17,39,303,57"/>
 <area shape="rect" id="node11" href="presenter.PresenterGui-class.html#start" title="presenter.PresenterGui.start" alt="" coords="17,57,303,76"/>
-<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#load_controllers" title="presenter.PresenterGui.load_controllers" alt="" coords="17,76,303,95"/>
-<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#stop" title="presenter.PresenterGui.stop" alt="" coords="17,95,303,113"/>
+<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#stop" title="presenter.PresenterGui.stop" alt="" coords="17,76,303,95"/>
+<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#load_controllers" title="presenter.PresenterGui.load_controllers" alt="" coords="17,95,303,113"/>
 <area shape="rect" id="node11" href="presenter.PresenterGui-class.html#take_sample" title="presenter.PresenterGui.take_sample" alt="" coords="17,113,303,132"/>
 <area shape="rect" id="node11" href="presenter.PresenterGui-class.html#set_target" title="presenter.PresenterGui.set_target" alt="" coords="17,132,303,151"/>
-<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#toggle_video_window" title="presenter.PresenterGui.toggle_video_window" alt="" coords="17,151,303,169"/>
-<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#toggle_targets" title="presenter.PresenterGui.toggle_targets" alt="" coords="17,169,303,188"/>
-<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#toggle_capture" title="presenter.PresenterGui.toggle_capture" alt="" coords="17,188,303,207"/>
+<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#toggle_capture" title="presenter.PresenterGui.toggle_capture" alt="" coords="17,151,303,169"/>
+<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#toggle_video_window" title="presenter.PresenterGui.toggle_video_window" alt="" coords="17,169,303,188"/>
+<area shape="rect" id="node11" href="presenter.PresenterGui-class.html#toggle_targets" title="presenter.PresenterGui.toggle_targets" alt="" coords="17,188,303,207"/>
 <area shape="rect" id="node11" href="presenter.PresenterGui-class.html#toggle_significance" title="presenter.PresenterGui.toggle_significance" alt="" coords="17,207,303,225"/>
 <area shape="rect" id="node11" href="presenter.PresenterGui-class.html#handle_radiobuttons_pressed" title="presenter.PresenterGui.handle_radiobuttons_pressed" alt="" coords="17,225,303,244"/>
 <area shape="rect" id="node11" href="presenter.PresenterGui-class.html#handle_key_pressed" title="presenter.PresenterGui.handle_key_pressed" alt="" coords="17,244,303,263"/>
@@ -132,10 +132,11 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="load_controllers"></a><span class="summary-sig-name">load_controllers</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">controllers</span>)</span></td>
+          <td><span class="summary-sig"><a name="stop"></a><span class="summary-sig-name">stop</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">widget</span>,
+        <span class="summary-sig-arg">event</span>=<span class="summary-sig-default">None</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="presenter-pysrc.html#PresenterGui.load_controllers">source&nbsp;code</a></span>
+            <span class="codelink"><a href="presenter-pysrc.html#PresenterGui.stop">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -149,11 +150,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="stop"></a><span class="summary-sig-name">stop</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">widget</span>,
-        <span class="summary-sig-arg">event</span>=<span class="summary-sig-default">None</span>)</span></td>
+          <td><span class="summary-sig"><a name="load_controllers"></a><span class="summary-sig-name">load_controllers</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">controllers</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="presenter-pysrc.html#PresenterGui.stop">source&nbsp;code</a></span>
+            <span class="codelink"><a href="presenter-pysrc.html#PresenterGui.load_controllers">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -201,6 +201,23 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a name="toggle_capture"></a><span class="summary-sig-name">toggle_capture</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">widget</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="presenter-pysrc.html#PresenterGui.toggle_capture">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="toggle_video_window"></a><span class="summary-sig-name">toggle_video_window</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">widget</span>,
         <span class="summary-sig-arg">event</span>=<span class="summary-sig-default">None</span>)</span></td>
@@ -223,23 +240,6 @@
         <span class="summary-sig-arg">widget</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="presenter-pysrc.html#PresenterGui.toggle_targets">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a name="toggle_capture"></a><span class="summary-sig-name">toggle_capture</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">widget</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="presenter-pysrc.html#PresenterGui.toggle_capture">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -497,7 +497,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Tue Mar 13 15:11:33 2012
+    Generated by Epydoc 3.0.1 on Wed Mar 21 15:34:39 2012
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

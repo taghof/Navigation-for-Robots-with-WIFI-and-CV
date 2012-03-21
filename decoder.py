@@ -680,16 +680,16 @@ def decode_navdata(packet):
         data[id_nr] = values
     return data
 
-try:
-    psyco.bind(BitReader)
-    psyco.bind(get_block)
-    psyco.bind(get_gob)
-    psyco.bind(get_mb)
-    psyco.bind(inverse_dct)
-    psyco.bind(read_picture)
-except NameError:
-    print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
-
+# try:
+#     psyco.bind(BitReader)
+#     psyco.bind(get_block)
+#     psyco.bind(get_gob)
+#     psyco.bind(get_mb)
+#     psyco.bind(inverse_dct)
+#     psyco.bind(read_picture)
+# except NameError:
+#     print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
+ 
 # def main():
 #     data = open('testdata/100.dat').read()
 #     #cProfile.runctx('read_picture(data)', globals(), locals())

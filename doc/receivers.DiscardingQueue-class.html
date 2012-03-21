@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>testdevice.TestDevice</title>
+  <title>receivers.DiscardingQueue</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -34,8 +34,8 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        <a href="testdevice-module.html">Module&nbsp;testdevice</a> ::
-        Class&nbsp;TestDevice
+        <a href="receivers-module.html">Module&nbsp;receivers</a> ::
+        Class&nbsp;DiscardingQueue
       </span>
     </td>
     <td>
@@ -45,36 +45,25 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="testdevice.TestDevice-class.html"
+            >]&nbsp;|&nbsp;<a href="receivers.DiscardingQueue-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class TestDevice</h1><p class="nomargin-top"><span class="codelink"><a href="testdevice-pysrc.html#TestDevice">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class DiscardingQueue</h1><p class="nomargin-top"><span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_testdevi" name="uml_class_diagram_for_testdevi">
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.name" alt="" coords="17,95,185,113"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.ident" alt="" coords="17,113,185,132"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.daemon" alt="" coords="17,132,185,151"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="repr(x)" alt="" coords="17,153,185,172"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.start" alt="" coords="17,172,185,191"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.join" alt="" coords="17,191,185,209"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.isAlive" alt="" coords="17,209,185,228"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.is_alive" alt="" coords="17,228,185,247"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.isDaemon" alt="" coords="17,247,185,265"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.setDaemon" alt="" coords="17,265,185,284"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.getName" alt="" coords="17,284,185,303"/>
-<area shape="rect" id="node41" href="javascript:void(0);" title="threading.Thread.setName" alt="" coords="17,303,185,321"/>
-<area shape="rect" id="node1" href="javascript:void(0);" title="threading.Thread" alt="" coords="5,70,197,327"/>
-<area shape="rect" id="node40" href="testdevice.TestDevice-class.html#__init__" title="x.__init__(...) initializes x; see help(type(x)) for signature" alt="" coords="32,380,171,399"/>
-<area shape="rect" id="node40" href="testdevice.TestDevice-class.html#run" title="testdevice.TestDevice.run" alt="" coords="32,399,171,417"/>
-<area shape="rect" id="node40" href="testdevice.TestDevice-class.html#stop" title="testdevice.TestDevice.stop" alt="" coords="32,417,171,436"/>
-<area shape="rect" id="node3" href="testdevice.TestDevice-class.html" title="testdevice.TestDevice" alt="" coords="20,347,183,442"/>
-<area shape="rect" id="node2" href="javascript:void(0);" title="threading._Verbose" alt="" coords="32,6,171,50"/>
+<center>  <map id="uml_class_diagram_for_receiver" name="uml_class_diagram_for_receiver">
+<area shape="rect" id="node22" href="receivers.DiscardingQueue-class.html#__init__" title="x.__init__(...) initializes x; see help(type(x)) for signature" alt="" coords="17,39,163,57"/>
+<area shape="rect" id="node22" href="receivers.DiscardingQueue-class.html#put" title="receivers.DiscardingQueue.put" alt="" coords="17,57,163,76"/>
+<area shape="rect" id="node22" href="receivers.DiscardingQueue-class.html#get_avg" title="receivers.DiscardingQueue.get_avg" alt="" coords="17,76,163,95"/>
+<area shape="rect" id="node22" href="receivers.DiscardingQueue-class.html#get_vals" title="receivers.DiscardingQueue.get_vals" alt="" coords="17,95,163,113"/>
+<area shape="rect" id="node22" href="receivers.DiscardingQueue-class.html#get_var" title="receivers.DiscardingQueue.get_var" alt="" coords="17,113,163,132"/>
+<area shape="rect" id="node22" href="receivers.DiscardingQueue-class.html#get_std_dev" title="receivers.DiscardingQueue.get_std_dev" alt="" coords="17,132,163,151"/>
+<area shape="rect" id="node1" href="receivers.DiscardingQueue-class.html" title="receivers.DiscardingQueue" alt="" coords="5,6,173,157"/>
 </map>
-  <img src="uml_class_diagram_for_testdevi.gif" alt='' usemap="#uml_class_diagram_for_testdevi" ismap="ismap" class="graph-without-title" />
+  <img src="uml_class_diagram_for_receiver.gif" alt='' usemap="#uml_class_diagram_for_receiver" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
@@ -101,11 +90,11 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="testdevice.TestDevice-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">runalone</span>)</span><br />
+          <td><span class="summary-sig"><a href="receivers.DiscardingQueue-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">max_size</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="testdevice-pysrc.html#TestDevice.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -119,9 +108,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="testdevice.TestDevice-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a name="put"></a><span class="summary-sig-name">put</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">item</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="testdevice-pysrc.html#TestDevice.run">source&nbsp;code</a></span>
+            <span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue.put">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -135,9 +125,57 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="stop"></a><span class="summary-sig-name">stop</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td><span class="summary-sig"><a name="get_avg"></a><span class="summary-sig-name">get_avg</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="testdevice-pysrc.html#TestDevice.stop">source&nbsp;code</a></span>
+            <span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue.get_avg">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_vals"></a><span class="summary-sig-name">get_vals</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue.get_vals">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_var"></a><span class="summary-sig-name">get_var</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue.get_var">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="get_std_dev"></a><span class="summary-sig-name">get_std_dev</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue.get_std_dev">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -147,25 +185,6 @@
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b>:
-      <code>__repr__</code>,
-      <code>getName</code>,
-      <code>isAlive</code>,
-      <code>isDaemon</code>,
-      <code>is_alive</code>,
-      <code>join</code>,
-      <code>setDaemon</code>,
-      <code>setName</code>,
-      <code>start</code>
-      </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b> (private):
-      <code>_reset_internal_locks</code>,
-      <code>_set_daemon</code>,
-      <code>_set_ident</code>
-      </p></div>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading._Verbose</code></b> (private):
-      <code>_note</code>
-      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
@@ -174,6 +193,7 @@
       <code>__new__</code>,
       <code>__reduce__</code>,
       <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
       <code>__setattr__</code>,
       <code>__sizeof__</code>,
       <code>__str__</code>,
@@ -201,14 +221,6 @@
 </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b>:
-      <code>daemon</code>,
-      <code>ident</code>,
-      <code>name</code>
-      </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>threading.Thread</code></b> (private):
-      <code>_block</code>
-      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__class__</code>
       </p>
@@ -241,11 +253,11 @@
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">runalone</span>)</span>
+        <span class="sig-arg">max_size</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="testdevice-pysrc.html#TestDevice.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="receivers-pysrc.html#DiscardingQueue.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -254,28 +266,6 @@
     <dt>Overrides:
         object.__init__
         <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
-<a name="run"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="testdevice-pysrc.html#TestDevice.run">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  
-  <dl class="fields">
-    <dt>Overrides:
-        threading.Thread.run
     </dt>
   </dl>
 </td></tr></table>
@@ -304,7 +294,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Mar 21 15:34:40 2012
+    Generated by Epydoc 3.0.1 on Wed Mar 21 15:34:39 2012
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

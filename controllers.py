@@ -88,6 +88,9 @@ class AutoControl(Controller):
 
     def __init__(self, drone, interface):
         Controller.__init__(self, drone, interface)
+        self.navdata_sensor = drone.get_navdata_sensor()
+        self.wifi_sensor = drone.get_wifi_sensor()
+        self.video_sensor = drone.get_video_sensor()
 
     def process_events(self):
 
@@ -95,6 +98,11 @@ class AutoControl(Controller):
             return self.control_button.get_active()
         else:
             return True
+
+    def move_vertically(self, dist):
+        pass
+        #base = self.navdata_sensor.get_data()... get current height
+        
 
 class ManualControl(Controller):    
 
@@ -257,7 +265,7 @@ class ControllerInterface(object):
                
     def led_show(self, num):
         self.at(at_led, num, 1.0, 2)
-
+        
     def move(self, roll, pitch, power, yaw):
 
         if roll > 0.35 or roll < -0.35 :

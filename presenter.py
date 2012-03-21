@@ -27,7 +27,7 @@ import threading
 import time
 import random
 from collections import OrderedDict
-from copy import deepcopy
+#from copy import deepcopy
 try:
     import pygtk
     pygtk.require("2.0")
@@ -94,7 +94,7 @@ class PresenterGui(object):
 
 	self.video_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 	self.video_window.set_title("Video feed")
-	self.video_window.set_size_request(300, 360)
+	self.video_window.set_size_request(360, 500)
 	self.video_window.set_border_width(10)   
 	self.window.connect('key_press_event', self.handle_key_pressed) 
 
@@ -120,9 +120,9 @@ class PresenterGui(object):
         self.gc = gtk.gdk.GC(self.drawing.window)
         self.white_gc = self.drawing.get_style().white_gc
         self.black_gc = self.drawing.get_style().black_gc
-        self.load_controllers(self.controller_manager.get_controllers())
-        self.video_frame.init_video()
-        gobject.timeout_add(200, self.update_wifi, None)
+        #self.load_controllers(self.controller_manager.get_controllers())
+        
+#        gobject.timeout_add(200, self.update_wifi, None)
         gtk.main()
 	   
     def load_controllers(self, controllers):
@@ -158,7 +158,9 @@ class PresenterGui(object):
             self.video_window.hide()
             return True
         else:
+            self.video_frame.init_video()
             self.video_window.show_all()
+            self.video_frame.video_play_button.set_active(True)	
             return True
 
     def toggle_targets(self, widget): 
@@ -183,11 +185,11 @@ class PresenterGui(object):
 
     def handle_radiobuttons_pressed(self, radio):
         if radio.get_active():
-            if radio.get_name() == "radiobutton1":
+            if radio.get_name() == "radiobutton1" and self.wifisensor is not None:
                 gobject.timeout_add(200, self.update_wifi, radio)
-            elif radio.get_name() == "radiobutton2":
+            elif radio.get_name() == "radiobutton2" and self.wifisensor is not None:
                 gobject.timeout_add(200, self.update_samples, radio)
-            elif radio.get_name() == "radiobutton3":
+            elif radio.get_name() == "radiobutton3" and self.navdatasensor is not None:
                 gobject.timeout_add(200, self.update_navdata, radio)
                 
 
@@ -521,23 +523,28 @@ class PresenterGui(object):
         return False
 	
 
+
 class VideoWindow(gtk.Frame):
+
+
 
     def __init__(self, video_sensor, gui):
 
         gtk.Frame.__init__(self, "Video Source")
         self.video_sensor = video_sensor
         self.gui = gui
-        self.crosshairs = False
+       
         master_vbox = gtk.VBox(False, 5)
         master_vbox.set_border_width( 5 )
         self.add( master_vbox )
 
-        video_frame = gtk.Frame()
         self.video_image = gtk.Image()
-
-        master_vbox.pack_start(video_frame, False, False)
-        video_frame.add(self.video_image)
+        self.video_image.set_size_request(320, 240)
+        self.video_eventbox = gtk.EventBox()
+        self.video_eventbox.set_size_request(320, 240)
+        self.video_eventbox.connect("motion_notify_event", self.motion_notify_event)
+        self.video_eventbox.connect("button_press_event", self.button_press_event)
+        self.video_eventbox.add(self.video_image)
 
         self.video_play_button = gtk.ToggleButton("Play Video")
         self.video_play_button.connect("clicked", self.toggle_video_play)
@@ -548,74 +555,206 @@ class VideoWindow(gtk.Frame):
         self.crosshairs_button = gtk.ToggleButton("Toggle Crosshairs")
         self.crosshairs_button.connect("clicked", self.toggle_crosshairs)
 
+        self.get_features_button = gtk.ToggleButton("Find Features")
+        self.get_features_button.connect("clicked", self.find_features)
         
+        master_vbox.pack_start(self.video_eventbox, False, False)
         master_vbox.pack_start(self.video_play_button, False, False)
         master_vbox.pack_start(self.video_capture_button, False, False)
         master_vbox.pack_start(self.crosshairs_button, False, False)
+        master_vbox.pack_start(self.get_features_button, False, False)
         self.video_play_button.show()
 
-        self.capture = None
         master_vbox.show_all()
 
     def init_video(self):
-
-        webcam_frame = self.video_sensor.get_data()
-
-        if not webcam_frame:
-            print "Frame acquisition failed."
-            return False
-
-        self.webcam_pixbuf = gtk.gdk.pixbuf_new_from_data(
-            webcam_frame.tostring(), 
-            gtk.gdk.COLORSPACE_RGB,
-            False,
-            8,
-            webcam_frame.width,
-            webcam_frame.height,
-            960)
+        """
+        This will setup the variales needed for feature tracking and get the first image
+        from the video feed. The initial set of features is extracted to 'self.features'."""
         
-        self.video_image.set_from_pixbuf(self.webcam_pixbuf)
-        return True
+        # Frames and features list for feature tracking
+        self.frame0 = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        self.frame1 = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        self.features = []
 
-    def toggle_video_play(self, widget):
-        if widget.get_active():
-            gobject.timeout_add(125, self.run )
-            #gobject.idle_add(self.run )
+        # run flags for showing crosshairs and extracting new features
+        self.crosshairs = False
+        self.get_new_features = False        
 
-    def toggle_video_capture(self, widget):
-        self.video_sensor.toggle_display_capture()
+        # Make sure we are getting a feed from the video sensor before beginning
+        while self.video_sensor.get_data() is None:
+            print "Frame acquisition failed."
+            pass
 
-    def toggle_crosshairs(self, widget):
-        self.crosshairs = not self.crosshairs
-
-
-    def run(self):
-
-        width = 320
-        height= 240
-
+        # Get the first image from the video sensor
         img = self.video_sensor.get_data()
 
-        if self.gui.show_targets:
-            target = self.video_sensor.get_target_sample()
-            if target:
-                lines = target[1]
-                for line in lines:
-                    cv.Line(img, line[0], line[1], (255,0,0))
-        if self.crosshairs:
-            cv.Line(img, (160, 110), (160, 130), (255,0,0))
-            cv.Line(img, (150, 120), (170, 120), (255,0,0))
+        # Make a grayscale copy of the image
+        cv.CvtColor(img, self.frame0, cv.CV_RGB2GRAY);
 
-        incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
-            img.tostring(),
+        # Smoothen the grayscale image
+        cv.Smooth(self.frame0, self.frame0, param1=7, param2=7, param3=1.5)
+
+        # Extract initial features from the grayscale image
+        self.features = self.get_features(self.frame0)
+
+        # Add a circle around the extracted features in the original image
+        for (x, y) in self.features:
+            cv.Circle(img, (int(x),int(y)), 15, (255, 0, 0, 0), 1, 8, 0);
+
+        # Create a pixbuf from the original iplimage, img must be 3-channeled
+        self.webcam_pixbuf = gtk.gdk.pixbuf_new_from_data(
+            img.tostring(), 
             gtk.gdk.COLORSPACE_RGB,
             False,
             8,
             img.width,
             img.height,
             960)
+        
+        # Set the image widget data from the pixbuf
+        self.video_image.set_from_pixbuf(self.webcam_pixbuf)
+        return True
 
+    def run(self):
+        """
+        The run method is primarily responsible for updating the image widget with
+        new image data from the video receiver. As a part of development the method 
+        also carries out optical flow tracking of features in 'self.features'."""
+
+        # Get image from video sensor
+        img = self.video_sensor.get_data()
+
+        # Convert image to gray
+        cv.CvtColor(img, self.frame1, cv.CV_RGB2GRAY);
+
+        # Smoothen image to get rid of false features
+        cv.Smooth(self.frame1, self.frame1, param1=7, param2=7, param3=1.5)
+            
+        # If we want to display the grayscale image in gtk we use the merged
+        # frame1_gs
+        # frame1_gs = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 3)
+        # cv.Merge(self.frame1, self.frame1,self.frame1, None, frame1_gs)
+
+        # Run the optical flow tracking algorithm, features must be processed before
+        # they are used in next iteration
+        (features, status, error) = cv.CalcOpticalFlowPyrLK(
+            self.frame0, self.frame1, 
+            None, None, self.features, 
+            (15, 15), 5, 
+            (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 20, 0.03),
+            0) 
+                          
+        # Put the good features in a list to be returned and draw them in a
+        # circle on the original iplimage
+        processed_features = []
+        for i in range(len(features)):
+            if status[i]: 
+                processed_features.append(features[i])
+                xy = (int(features[i][0]), int(features[i][1]))
+                cv.Circle(img, xy, 15, (255, 0, 0, 0), 1, 8, 0);
+             
+        # Add the target lines if requested
+        if self.gui.show_targets:
+            target = self.video_sensor.get_target_sample()
+            if target:
+                lines = target[1]
+                for line in lines:
+                    cv.Line(img, line[0], line[1], (255,0,0))
+
+        # Add crosshairs if requested
+        if self.crosshairs:
+            cv.Line(img, (160, 110), (160, 130), (255,0,0))
+            cv.Line(img, (150, 120), (170, 120), (255,0,0))
+
+        # Create a pixbuf from the opencv iplimage, the image must be 3-channeled
+        incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
+            img.tostring(), 
+            gtk.gdk.COLORSPACE_RGB,
+            False,
+            8,
+            img.width,
+            img.height,
+            960)
+        
+        # Copy the pixbuf image data to the image widget and request a draw
         self.video_image.set_from_pixbuf(incoming_pixbuf)
         self.video_image.queue_draw()
 
+        # Set frames up for next round
+        cv.Copy(self.frame1, self.frame0) 
+        
+        # Set features up for next run, check if there has 
+        # been a request for new features
+        if self.get_new_features:
+            print "getting..."
+            self.get_new_features = False
+            self.features = self.get_features(self.frame1)
+        else:
+            print "not getting"
+            self.features = processed_features
+        
+        # return whether we should continue running
         return self.video_play_button.get_active()
+
+    def get_features(self, frame):
+        """
+        Extracts features from 'frame' with the opencv SURF algorithm, the extracted
+        features are returned as a list of (x,y) tuples."""
+        (keypoints, descriptors) = cv.ExtractSURF(frame, None, cv.CreateMemStorage(), (0, 500, 3, 1))
+        new_features = []
+        for ((x, y), laplacian, size, dir, hessian) in keypoints:
+            new_features.append((x, y))
+        return new_features
+
+    def button_press_event(self, widget, event):
+        """
+        Mouse callback method. On a left click the method adds the mouse coordinates to the 
+        tracked feature set"""
+        if event.button == 1:
+            x = int(event.x)
+            y = int(event.y)
+            self.features.append((x,y))
+            print "x: ", x, ", y: ", y, "\r"
+        return True
+   
+    def motion_notify_event(self, widget, event):
+        """
+        Mouse callback method. Method does nothing important at this point, will print
+        mouse coordinates if dragged"""
+        if event.is_hint:
+            x, y, state = event.window.get_pointer()
+        else:
+            x = event.x
+            y = event.y
+            state = event.state
+   
+        if state & gtk.gdk.BUTTON1_MASK:
+            print "x: ", x, ", y: ", y, "\r"
+           
+        return True
+
+    def toggle_video_play(self, widget):
+        """
+        Button callback method. Starts or stops updating of the image widget with data 
+        from the video feed"""
+        if widget.get_active():
+            #gobject.timeout_add(125, self.run )
+            gobject.idle_add(self.run )
+
+    def toggle_video_capture(self, widget):
+        """
+        Button callback method. Tells the video receiver to stop or start recording the requested frames
+        (only requested frames are recorded)"""
+        self.video_sensor.toggle_display_capture()
+
+    def toggle_crosshairs(self, widget):
+        """
+        Button callback method. Toggles whether the run method should draw crosshairs on the current image"""
+        self.crosshairs = not self.crosshairs
+
+    def find_features(self, widget):
+        """
+        Sets the get_new_features flag so that the run method will extract new 
+        features from the current image and discard the old."""
+        self.get_new_features = True

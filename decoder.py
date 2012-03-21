@@ -538,7 +538,7 @@ def get_mb(bitreader, picture, width, offset):
             coloff = offset[1]
             
             #index =  offset + row*(width*3) + (col*3)
-            picture[ rowoff+row, coloff+col] =  (b, g, r)
+            picture[ rowoff+row, coloff+col] =  (r, g, b)
                         
     else:
         print "mbc was not zero"
@@ -596,7 +596,7 @@ def read_picture(data):
         return None
 
     retimg = cv.CreateImage((320, 240), 8, 3)
-    
+    #retimg = cv.CreateMat (320, 240, cv.CV_8UC1)
     bitreader = BitReader(data)
     t = datetime.datetime.now()
     width, height = get_pheader(bitreader)

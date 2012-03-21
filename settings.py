@@ -21,7 +21,7 @@
 # Run settings
 
 DEBUG = False
-TEST = False#True
+TEST = True
 MULTI = False
 
 # Constants

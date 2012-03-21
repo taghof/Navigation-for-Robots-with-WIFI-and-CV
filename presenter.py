@@ -54,12 +54,12 @@ class PresenterGui(object):
         gobject.threads_init()
 
         self.drone = drone
+        self.sensors = drone.get_sensors()
 	self.wifi_sensor = drone.get_wifi_sensor()
 	self.video_sensor = drone.get_video_sensor()
 	self.navdata_sensor = drone.get_navdata_sensor()
         self.controller_manager = drone.get_controller_manager()
 
-	self.stopping = False
 	self.show_targets = False
 	self.show_significance = False
 
@@ -71,6 +71,7 @@ class PresenterGui(object):
 
         if self.window:
             self.window.connect("destroy", self.stop)#gtk.main_quit)
+            self.window.connect('key_press_event', self.handle_key_pressed) 
 
         self.drawing = self.wTree.get_widget("draw1")
 	self.drawing.connect("configure-event", self.configure_event)
@@ -88,20 +89,11 @@ class PresenterGui(object):
 	self.radiobutton2.connect("toggled", self.handle_radiobuttons_pressed)
 	self.radiobutton3.connect("toggled", self.handle_radiobuttons_pressed)
 
-	# our frame
-	self.video_frame = VideoWindow(self.video_sensor, self)   	
-	self.video_frame.hide_on_delete()
-
-	self.video_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-	self.video_window.set_title("Video feed")
-	self.video_window.set_size_request(360, 500)
-	self.video_window.set_border_width(10)   
-	self.window.connect('key_press_event', self.handle_key_pressed) 
-
+	# The video window
+	self.video_window = VideoWindow(self.video_sensor, self)   	
+	self.video_window.hide_on_delete()
 	self.video_window.connect('key_press_event', self.handle_key_pressed) 
 	self.video_window.connect("delete_event", self.toggle_video_window)
-
-	self.video_window.add(self.video_frame)
 
 	# Create our dictionary and connect it
         dic = {"btn1OnClick" : self.toggle_video_window,
@@ -120,30 +112,38 @@ class PresenterGui(object):
         self.gc = gtk.gdk.GC(self.drawing.window)
         self.white_gc = self.drawing.get_style().white_gc
         self.black_gc = self.drawing.get_style().black_gc
-        #self.load_controllers(self.controller_manager.get_controllers())
-        
-#        gobject.timeout_add(200, self.update_wifi, None)
+        self.load_controllers(self.controller_manager.get_controllers())
+        gobject.timeout_add(200, self.update_wifi, None)
         gtk.main()
 	   
+    def stop(self, widget, event=None):
+        print "Shutting down GUI"
+        gtk.main_quit()
+        return True
+
     def load_controllers(self, controllers):
         for con in controllers:
             if con.get_control_method() is not None:
                 meth = con.get_control_method()
                 gobject.idle_add(meth)
 
-    def stop(self, widget, event=None):
-        print "Shutting down GUI"
-        gtk.main_quit()
-        return True
+
 
     def take_sample(self, widget):
-        self.wifi_sensor.record_sample()
-        self.video_sensor.record_sample()
-
+        for sensor in self.sensors:
+            sensor.record_sample()
+        
     def set_target(self, widget):
-        self.wifi_sensor.set_target_sample()
-        self.video_sensor.set_target_sample()
+        for sensor in self.sensors:
+            sensor.set_target_sample()
 
+    def toggle_capture(self, widget):
+        if widget is None:
+            self.button6.set_active(not self.button2.get_active())
+            return True
+        for sensor in self.sensors:
+            sensor.toggle_capture()
+       
     def toggle_video_window(self, widget, event=None):
         if widget is None:
             self.button1.set_active(not self.button1.get_active())
@@ -154,28 +154,21 @@ class PresenterGui(object):
             return True
 
         if self.video_window.get_visible():
-            self.video_frame.video_play_button.set_active(False)	
+            self.video_window.video_play_button.set_active(False)	
             self.video_window.hide()
             return True
         else:
-            self.video_frame.init_video()
+            self.video_window.init_video()
             self.video_window.show_all()
-            self.video_frame.video_play_button.set_active(True)	
+            self.video_window.video_play_button.set_active(True)	
             return True
 
     def toggle_targets(self, widget): 
         if widget is None:
             self.button2.set_active(not self.button2.get_active())
             return True
+        self.video_window.toggle_targets(None)
         self.show_targets = not self.show_targets
-
-    def toggle_capture(self, widget):
-        if widget is None:
-            self.button6.set_active(not self.button2.get_active())
-            return True
-        self.video_sensor.toggle_capture()
-        self.wifi_sensor.toggle_capture()
-        self.navdata_sensor.toggle_capture()
 
     def toggle_significance(self, widget): 
         if widget is None:
@@ -185,13 +178,12 @@ class PresenterGui(object):
 
     def handle_radiobuttons_pressed(self, radio):
         if radio.get_active():
-            if radio.get_name() == "radiobutton1" and self.wifisensor is not None:
+            if radio.get_name() == "radiobutton1" and self.wifi_sensor is not None:
                 gobject.timeout_add(200, self.update_wifi, radio)
-            elif radio.get_name() == "radiobutton2" and self.wifisensor is not None:
+            elif radio.get_name() == "radiobutton2" and self.wifi_sensor is not None:
                 gobject.timeout_add(200, self.update_samples, radio)
-            elif radio.get_name() == "radiobutton3" and self.navdatasensor is not None:
+            elif radio.get_name() == "radiobutton3" and self.navdata_sensor is not None:
                 gobject.timeout_add(200, self.update_navdata, radio)
-                
 
     def handle_key_pressed(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
@@ -215,6 +207,10 @@ class PresenterGui(object):
  
    
     def update_samples(self, widget):
+        if self.wifi_sensor is None:
+            print "Wifi sensor not present"
+            return False
+       
         wifisamples = self.wifi_sensor.get_samples()
         wifisamples_num = len(wifisamples)
 	colormap = gtk.gdk.colormap_get_system()
@@ -301,6 +297,10 @@ class PresenterGui(object):
 
 
     def update_wifi(self, widget):
+        if self.wifi_sensor is None:
+            print "Wifi sensor not present"
+            return False
+       
         self.wifimap_current = self.wifi_sensor.get_data()       
 
 	x, y, width, height = self.drawing.get_allocation()
@@ -400,6 +400,10 @@ class PresenterGui(object):
         return self.radiobutton1.get_active()
 
     def update_navdata(self, widget):
+        if self.navdata_sensor is None:
+            print "Navdata sensor not present"
+            return False
+       
         navdata = self.navdata_sensor.get_data()       
 
 	x, y, width, height = self.drawing.get_allocation()
@@ -524,15 +528,21 @@ class PresenterGui(object):
 	
 
 
-class VideoWindow(gtk.Frame):
+class VideoWindow(gtk.Window):
 
+    """A specialized window class for displaying video from a videoreceiver, it takes a 
+    video receiver reference in the constructor. The widget holds an image widget for 
+    displaying video frames and a handfull of buttons for manipulation(graying, tracking and such)"""
 
+    def __init__(self, video_sensor):
+        """
+        Calls the Window super constructor, inits all the GTK gui elements and 
+        hooks up all the signal callbacks"""
 
-    def __init__(self, video_sensor, gui):
-
-        gtk.Frame.__init__(self, "Video Source")
-        self.video_sensor = video_sensor
-        self.gui = gui
+        gtk.Window.__init__(self)
+        self.set_title("Video Source")
+        self.set_position(gtk.WIN_POS_CENTER)
+        self.set_size_request(360, 500)
        
         master_vbox = gtk.VBox(False, 5)
         master_vbox.set_border_width( 5 )
@@ -558,14 +568,27 @@ class VideoWindow(gtk.Frame):
         self.get_features_button = gtk.ToggleButton("Find Features")
         self.get_features_button.connect("clicked", self.find_features)
         
+        self.grayscale_button = gtk.ToggleButton("Toggle Grayscale")
+        self.grayscale_button.connect("clicked", self.toggle_grayscale)
+
         master_vbox.pack_start(self.video_eventbox, False, False)
         master_vbox.pack_start(self.video_play_button, False, False)
         master_vbox.pack_start(self.video_capture_button, False, False)
         master_vbox.pack_start(self.crosshairs_button, False, False)
         master_vbox.pack_start(self.get_features_button, False, False)
+        master_vbox.pack_start(self.grayscale_button, False, False)
         self.video_play_button.show()
 
         master_vbox.show_all()
+
+        # run flags for showing crosshairs and extracting new features
+        self.show_crosshairs = False
+        self.show_targets = False
+        self.show_grayscale = True
+        self.get_new_features = False
+        
+        # our video sensor reference
+        self.video_sensor = video_sensor
 
     def init_video(self):
         """
@@ -576,21 +599,16 @@ class VideoWindow(gtk.Frame):
         self.frame0 = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
         self.frame1 = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
         self.features = []
-
-        # run flags for showing crosshairs and extracting new features
-        self.crosshairs = False
-        self.get_new_features = False        
-
+               
         # Make sure we are getting a feed from the video sensor before beginning
         while self.video_sensor.get_data() is None:
             print "Frame acquisition failed."
-            pass
 
         # Get the first image from the video sensor
-        img = self.video_sensor.get_data()
+        frame0_org = self.video_sensor.get_data()
 
         # Make a grayscale copy of the image
-        cv.CvtColor(img, self.frame0, cv.CV_RGB2GRAY);
+        cv.CvtColor(frame0_org, self.frame0, cv.CV_RGB2GRAY);
 
         # Smoothen the grayscale image
         cv.Smooth(self.frame0, self.frame0, param1=7, param2=7, param3=1.5)
@@ -600,16 +618,16 @@ class VideoWindow(gtk.Frame):
 
         # Add a circle around the extracted features in the original image
         for (x, y) in self.features:
-            cv.Circle(img, (int(x),int(y)), 15, (255, 0, 0, 0), 1, 8, 0);
+            cv.Circle(frame0_org, (int(x),int(y)), 15, (255, 0, 0, 0), 1, 8, 0);
 
         # Create a pixbuf from the original iplimage, img must be 3-channeled
         self.webcam_pixbuf = gtk.gdk.pixbuf_new_from_data(
-            img.tostring(), 
+            frame0_org.tostring(), 
             gtk.gdk.COLORSPACE_RGB,
             False,
             8,
-            img.width,
-            img.height,
+            frame0_org.width,
+            frame0_org.height,
             960)
         
         # Set the image widget data from the pixbuf
@@ -623,19 +641,18 @@ class VideoWindow(gtk.Frame):
         also carries out optical flow tracking of features in 'self.features'."""
 
         # Get image from video sensor
-        img = self.video_sensor.get_data()
+        frame1_org = self.video_sensor.get_data()
 
         # Convert image to gray
-        cv.CvtColor(img, self.frame1, cv.CV_RGB2GRAY);
+        cv.CvtColor(frame1_org, self.frame1, cv.CV_RGB2GRAY)
 
         # Smoothen image to get rid of false features
         cv.Smooth(self.frame1, self.frame1, param1=7, param2=7, param3=1.5)
             
-        # If we want to display the grayscale image in gtk we use the merged
-        # frame1_gs
-        # frame1_gs = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 3)
-        # cv.Merge(self.frame1, self.frame1,self.frame1, None, frame1_gs)
-
+        # If we want to display the grayscale image in gtk we must change back to 3-channels
+        if self.show_grayscale:
+            cv.CvtColor(self.frame1, frame1_org, cv.CV_GRAY2RGB)
+        
         # Run the optical flow tracking algorithm, features must be processed before
         # they are used in next iteration
         (features, status, error) = cv.CalcOpticalFlowPyrLK(
@@ -652,29 +669,29 @@ class VideoWindow(gtk.Frame):
             if status[i]: 
                 processed_features.append(features[i])
                 xy = (int(features[i][0]), int(features[i][1]))
-                cv.Circle(img, xy, 15, (255, 0, 0, 0), 1, 8, 0);
+                cv.Circle(frame1_org, xy, 15, (255, 0, 0, 0), 1, 8, 0);
              
         # Add the target lines if requested
-        if self.gui.show_targets:
+        if self.show_targets:
             target = self.video_sensor.get_target_sample()
             if target:
                 lines = target[1]
                 for line in lines:
-                    cv.Line(img, line[0], line[1], (255,0,0))
+                    cv.Line(frame1_org, line[0], line[1], (255,0,0))
 
         # Add crosshairs if requested
-        if self.crosshairs:
-            cv.Line(img, (160, 110), (160, 130), (255,0,0))
-            cv.Line(img, (150, 120), (170, 120), (255,0,0))
+        if self.show_crosshairs:
+            cv.Line(frame1_org, (160, 110), (160, 130), (255,0,0))
+            cv.Line(frame1_org, (150, 120), (170, 120), (255,0,0))
 
         # Create a pixbuf from the opencv iplimage, the image must be 3-channeled
         incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
-            img.tostring(), 
+            frame1_org.tostring(), 
             gtk.gdk.COLORSPACE_RGB,
             False,
             8,
-            img.width,
-            img.height,
+            frame1_org.width,
+            frame1_org.height,
             960)
         
         # Copy the pixbuf image data to the image widget and request a draw
@@ -687,11 +704,9 @@ class VideoWindow(gtk.Frame):
         # Set features up for next run, check if there has 
         # been a request for new features
         if self.get_new_features:
-            print "getting..."
             self.get_new_features = False
             self.features = self.get_features(self.frame1)
         else:
-            print "not getting"
             self.features = processed_features
         
         # return whether we should continue running
@@ -751,7 +766,17 @@ class VideoWindow(gtk.Frame):
     def toggle_crosshairs(self, widget):
         """
         Button callback method. Toggles whether the run method should draw crosshairs on the current image"""
-        self.crosshairs = not self.crosshairs
+        self.show_crosshairs = not self.show_crosshairs
+
+    def toggle_targets(self, widget):
+        """
+        Button callback method. Toggles whether the run method should draw target lines on the current image"""
+        self.show_targets = not self.show_targets
+
+    def toggle_grayscale(self, widget):
+        """
+        Button callback method. Toggles whether the run method should draw image as grayscale"""
+        self.show_grayscale = not self.show_grayscale
 
     def find_features(self, widget):
         """

@@ -22,7 +22,7 @@
 
 import os
 
-#import controllers
+import controllers
 import receivers
 import presenter
 import testdevice
@@ -33,17 +33,29 @@ class Drone(object):
 
 
     def __init__(self):
+        self.sensors = []
+        
         self.video_sensor = receivers.VideoReceiver(settings.VIDEO_PORT)
-        self.wifi_sensor = None#receivers.WifiReceiver(settings.WIFI_PORT)
-        self.navdata_sensor = None#receivers.NavdataReceiver(settings.NAVDATA_PORT)
-        self.controller_manager = None #controllers.ControllerManager(self)
+        self.sensors.append(self.video_sensor)
+        
+        self.wifi_sensor = receivers.WifiReceiver(settings.WIFI_PORT)
+        self.sensors.append(self.wifi_sensor)
+        
+        self.navdata_sensor = receivers.NavdataReceiver(settings.NAVDATA_PORT)
+        self.sensors.append(self.navdata_sensor)
+        
+        self.controller_manager = controllers.ControllerManager(self)
         self.gui = presenter.PresenterGui(self)
+
+    def get_sensors(self):
+        return self.sensors
 
     def start(self):
        
-        self.video_sensor.start()
-        while not self.video_sensor.get_status() == settings.RUNNING:
-            pass
+        for sensor in self.sensors:
+            sensor.start()
+            while not sensor.get_status() == settings.RUNNING:
+                pass
 
         # self.wifi_sensor.start()
         # while not self.wifi_sensor.get_status() == settings.RUNNING:
@@ -56,10 +68,9 @@ class Drone(object):
         self.gui.start()
 
     def stop(self):
-        # self.wifi_sensor.stop()
-        self.video_sensor.stop()
-        # self.navdata_sensor.stop()
-        #self.controller_manager.stop()
+        for sensor in self.sensors:
+            sensor.stop()
+        self.controller_manager.stop()
 
     def get_video_sensor(self):
         return self.video_sensor

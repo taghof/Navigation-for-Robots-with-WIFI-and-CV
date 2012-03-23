@@ -21,7 +21,7 @@
 # Run settings
 
 DEBUG = False
-TEST = True
+TEST = False#True
 MULTI = False
 
 # Constants
@@ -44,3 +44,7 @@ WIFI_PORT = 5551
 NAVDATA_PORT = 5554
 VIDEO_PORT = 5555
 CMD_PORT = 5556
+
+
+AUTOCONTROL = 0
+JOYCONTROL = 1

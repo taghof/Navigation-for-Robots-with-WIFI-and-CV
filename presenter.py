@@ -45,6 +45,7 @@ import cv
 import pango
 
 import utils
+import settings
 
 class PresenterGui(object):
 
@@ -81,16 +82,17 @@ class PresenterGui(object):
 	self.radiobutton2 = self.wTree.get_widget("radiobutton2")
 	self.radiobutton3 = self.wTree.get_widget("radiobutton3")
 
-	self.button1 = self.wTree.get_widget("button1")
-	self.button2 = self.wTree.get_widget("button2")
-	self.button3 = self.wTree.get_widget("button3")
+	# self.button1 = self.wTree.get_widget("button1")
+	# self.button2 = self.wTree.get_widget("button2")
+	# self.button3 = self.wTree.get_widget("button3")
+        # self.button4 = self.wTree.get_widget("button4")
 
 	self.radiobutton1.connect("toggled", self.handle_radiobuttons_pressed)
 	self.radiobutton2.connect("toggled", self.handle_radiobuttons_pressed)
 	self.radiobutton3.connect("toggled", self.handle_radiobuttons_pressed)
 
 	# The video window
-	self.video_window = VideoWindow(self.video_sensor, self)   	
+	self.video_window = VideoWindow(self.video_sensor)   	
 	self.video_window.hide_on_delete()
 	self.video_window.connect('key_press_event', self.handle_key_pressed) 
 	self.video_window.connect("delete_event", self.toggle_video_window)
@@ -101,7 +103,8 @@ class PresenterGui(object):
 	       "btn3OnClick" : self.toggle_significance,
 	       "btn4OnClick" : self.take_sample,
 	       "btn5OnClick" : self.set_target,
-	       "btn6OnClick" : self.toggle_capture}
+	       "btn6OnClick" : self.toggle_capture,
+               "btn7OnClick" : self.run_controllers}
 	
         self.wTree.signal_autoconnect(dic)
 	gtk.quit_add(0, self.drone.stop)
@@ -127,15 +130,21 @@ class PresenterGui(object):
                 meth = con.get_control_method()
                 gobject.idle_add(meth)
 
-
-
+    def run_controllers(self, widget):
+        print "derp"
+        controllers = self.controller_manager.get_controllers()
+        for con in controllers:
+            if con.id == settings.AUTOCONTROL:
+                print "derpa"
+                con.start_auto_session()
+               
     def take_sample(self, widget):
         for sensor in self.sensors:
             sensor.record_sample()
         
     def set_target(self, widget):
         for sensor in self.sensors:
-            sensor.set_target_sample()
+            sensor.record_target_sample()
 
     def toggle_capture(self, widget):
         if widget is None:
@@ -204,7 +213,8 @@ class PresenterGui(object):
             self.take_sample(None)
         elif keyname == "5":
             self.wifi_sensor.record_samples(5, 5)
- 
+        elif keyname == "m":
+            self.wifi_sensor.match_current_wifi_sample()
    
     def update_samples(self, widget):
         if self.wifi_sensor is None:
@@ -327,15 +337,10 @@ class PresenterGui(object):
             index = 0
             target = self.wifi_sensor.get_target_sample()
                 
-            for k, v in self.wifimap_current.iteritems():
-                		
-                figval = int((75+v[0])*(float(fig_height)/float(75)))
+            for k, (val, last_updated, avg_update_time, update_num, last10, avg_val) in self.wifimap_current.iteritems():
+              
+                figval = int((75+avg_val)*(float(fig_height)/float(75)))
 		
-                val = v[0]
-                last_updated = v[1]
-                avg_update_time = v[2]
-                update_num = v[3]
-                last10 = v[4]
                 r = int(65535.0-((75.0+float(val))*(65535.0/75.0)))
                 g = int((75.0 + float(val))*(65535.0/75.0))
                 b = 0
@@ -351,7 +356,7 @@ class PresenterGui(object):
                 
                 # text matter
                 font_desc = pango.FontDescription('Serif 8')
-                layout = self.drawing.create_pango_layout(str(last10.get_avg()) + " (" + str(last10.get_std_dev()) + ")")
+                layout = self.drawing.create_pango_layout(str(last10.get_avg()) + " (" + str(round(last10.get_std_dev(), 2)) + ")")
                 layout.set_font_description(font_desc)
                 # draw text below rectangle
                 pixmap.draw_layout(self.gc, current_x, current_y+fig_height+2, layout)
@@ -366,7 +371,7 @@ class PresenterGui(object):
                 # Calculate significance and set alpha value accordingly
                 threshold = 20
                 current_time = datetime.datetime.now()
-                signal_time = v[1]
+                signal_time = last_updated
                 delta_time = (current_time - signal_time).total_seconds()
            
                 if 0 < delta_time < threshold :
@@ -384,9 +389,11 @@ class PresenterGui(object):
 	                        
                 # print target bars if requested
                 if self.show_targets and target and target.has_key(k):
+                    if self.wifi_sensor.match_current_wifi_sample() > 85:
+                        print "Nice Match!"
                     self.gc.set_foreground(color1)
                     tv = target.get(k)
-                    tval = int((75.0+tv[0])*(float(fig_height)/75.0))
+                    tval = int((75.0+tv[5])*(float(fig_height)/75.0))
                     pixmap.draw_line(self.gc, int(current_x), int(current_y+(fig_height-tval)), int(current_x+fig_width), int(current_y+(fig_height-tval)))
 
                 index+=1

@@ -37,7 +37,8 @@ class ControllerManager(object):
         self.drone = drone
         self.interface = ControllerInterface()
         self.controllers = (ManualControl(self.drone, self.interface), AutoControl(self.drone,self.interface))
-        
+        self.id = None
+
     def get_controllers(self):
         return self.controllers
 
@@ -62,8 +63,10 @@ class Controller(object):
         self.control_interface = interface
         self.control_button = None
         self.control_method = self.process_events
+        self.id = settings.JOYCONTROL
         self.stopping = False
         
+
     def process_events(self):
         return False
     
@@ -91,18 +94,57 @@ class AutoControl(Controller):
         self.navdata_sensor = drone.get_navdata_sensor()
         self.wifi_sensor = drone.get_wifi_sensor()
         self.video_sensor = drone.get_video_sensor()
+        self.id = settings.AUTOCONTROL
+        self.run_session = False
+        self.tasks = []
 
     def process_events(self):
 
         if self.control_button is not None:
             return self.control_button.get_active()
         else:
+            for task in self.tasks:
+                if len(task) > 0:
+                    t = task[0]
+                    if not t.is_stable():
+                        print "updated:", t.error, t.set_point
+                        t.update()
+                    else:
+                        print "partly done"
+                        task.remove(t)
+                else:        
+                    self.tasks.remove(task)
+                    print "task done"
+        
             return True
+
+    def move_rotate(self, degrees):
+        pass
+
+    def get_altitude(self):
+        return self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0)
+
+    def get_psi(self):
+        return self.navdata_sensor.get_data().get(0, dict()).get('psi', 0)
+
+    def get_phi(self):
+        return self.navdata_sensor.get_data().get(0, dict()).get('phi', 0)
+
+    def get_theta(self):
+        return self.navdata_sensor.get_data().get(0, dict()).get('theta', 0)
+
+    def actual_move(self, power):
+        print power
 
     def move_vertically(self, dist):
         pass
-        #base = self.navdata_sensor.get_data()... get current height
         
+    def start_auto_session(self):
+        t = []
+        t.append(utils.PID(self.get_psi, self.actual_move, 10))
+        t.append(utils.PID(self.get_psi, self.actual_move, 15))
+
+        self.tasks.append(t)
 
 class ManualControl(Controller):    
 
@@ -293,13 +335,13 @@ class ControllerInterface(object):
         else:
             self.at(at_pcmd, True, r, pi, po, y)
         
-    def rotate(self, dir):
+    def rotate(self, dir, speed=0.2):
         if dir > 0:
             utils.dprint("", ' Rotating clockwise!')
-            self.at(at_pcmd, True, 0, 0, 0, -self.speed)
+            self.at(at_pcmd, True, 0, 0, 0, -speed)
         elif dir < 0:
             utils.dprint("", 'Rotating counterclockwise!')
-            self.at(at_pcmd, True, 0, 0, 0, self.speed)
+            self.at(at_pcmd, True, 0, 0, 0, speed)
         else:
             utils.dprint("", 'Stopping rotation!')
             self.at(at_pcmd, True, 0, 0, 0, 0.0)

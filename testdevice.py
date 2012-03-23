@@ -61,15 +61,15 @@ class TestDevice(threading.Thread):
             self.vi = len(self.video_packets)
             print self.vi, " video frames"
 
-        if not os.path.isfile('./pickled_wifi.data'):
-            self.pickled_wifi = False
-        else:
-            print "Gone pickling...\r"
-            fileObj = open('./pickled_wifi.data')
-            self.wifi_packets = pickle.load(fileObj)
-            fileObj.close()
-            self.wi = len(self.wifi_packets)
-            print self.wi, " wifi frames"
+#        if not os.path.isfile('./pickled_wifi.data'):
+        self.pickled_wifi = False
+        # else:
+        #     print "Gone pickling...\r"
+        #     fileObj = open('./pickled_wifi.data')
+        #     self.wifi_packets = pickle.load(fileObj)
+        #     fileObj.close()
+        #     self.wi = len(self.wifi_packets)
+        #     print self.wi, " wifi frames"
 
         if not os.path.isfile('./pickled_navdata.data'):
             self.pickled_wifi = False

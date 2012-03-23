@@ -148,11 +148,18 @@ class Receiver(multiprocessing.Process):
         return self.on_request_data(data)
     
     def record_sample(self):
+        print str(self.PORT), 'sample recorded at:', datetime.datetime.now(), "\r"
         sample = self.get_data()
         processed_sample = self.on_record_sample(sample)
         self.samples[datetime.datetime.now()] = processed_sample
         return processed_sample
 
+    def record_target_sample(self):
+        sample = self.record_sample()
+        processed_sample = self.on_record_target_sample(sample)
+        self.target_sample = processed_sample
+        return processed_sample
+    
     def record_samples(self, duration, repetitions):
         print "starting periodic sample recordings\r"
         t = PeriodicTimer(duration, repetitions, self.record_sample)
@@ -160,10 +167,7 @@ class Receiver(multiprocessing.Process):
 
     def get_samples(self):
         return self.samples # should this be deepcloned?
-
-    def set_target_sample(self):
-        self.target_sample = self.record_sample()
-
+   
     def get_target_sample(self):
         return self.target_sample
    
@@ -179,7 +183,6 @@ class Receiver(multiprocessing.Process):
 
     def set_status(self, arg):
         self.comlist[3] = arg
-
     
     def on_request_data(self, data):
         return data
@@ -190,7 +193,10 @@ class Receiver(multiprocessing.Process):
     def on_record_sample(self, sample):
         return sample
 
+    def on_record_target_sample(self, sample):
+        return sample
     
+
 class VideoReceiver(Receiver):
 
     def __init__(self, port):
@@ -206,7 +212,7 @@ class VideoReceiver(Receiver):
             fileObj.close()
 
     def on_record_sample(self, data):
-        print 'VIDEO sample recorded at: ', time, "\r"
+        
         img = data
         cv.SaveImage("../images/target-image-"+ str(time.time()) + ".png", img)    
         gray  = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
@@ -266,11 +272,14 @@ class WifiReceiver(Receiver):
             print "Can't match, target sample not set\r"
             return 0
         else:
-            res = self.matchWifiSample(3, self.target_sample, self.get_data())
-            print "match score: ", res, "%\r"
+            res = self.match_wifi_sample(1, self.target_sample, self.get_data())
+            #print "match score: ", res, "%\r"
             return res
 
     def match_wifi_sample(self, min_match_len, p1, p2):
+        if len(p1) < min_match_len:
+            print "Not enough entries in target sample to match"
+            return
         match_set = OrderedDict()
         threshold = 20
         current_time = datetime.datetime.now()
@@ -290,11 +299,12 @@ class WifiReceiver(Receiver):
         mval = 0
         maxmval = 0
         for k, v in match_set.iteritems():
-            dif = abs((v[0]+100)-(p1.get(k)[0]+100))
-            mval += (v[0]+100)*v[1] - dif
-            maxmval += (p1.get(k)[0]+100)
+            dif = abs((v[0]+100)-(p1.get(k)[5]+100))
+            #print dif
+            mval += (p1.get(k)[5]+100-dif)*v[1]
+            maxmval += (p1.get(k)[5]+100)
 
-        print "mval: ", mval, "maxmval: ", maxmval, "\r"
+        #print "mval: ", mval, "maxmval: ", maxmval, "\r"
         pval = (mval / maxmval) * 100
         
         return pval
@@ -316,14 +326,27 @@ class WifiReceiver(Receiver):
                 history[key] = (val, datetime.datetime.now(), new_avg, num_avg+1, last10, last10.get_avg())
                 
         else:
-            last10 = DiscardingQueue(10)
+            last10 = utils.DiscardingQueue(10)
             last10.put(val)
-            history[key] = (val, datetime.datetime.now(), 0, 0, last10)
+            history[key] = (val, datetime.datetime.now(), 0, 0, last10, last10.get_avg())
 
         return history
 
-class NavdataReceiver(Receiver):
+    def on_record_target_sample(self, sample):
+        temp_sample = []
+        processed_sample = OrderedDict()
+        for  key, (val, date_time, avg_time, num_avg, last10, avg_val) in sample.iteritems():
+            sig_val = avg_time + last10.get_std_dev()
+            if last10.get_std_dev() < 30 and avg_time < 10 and num_avg > 1:
+                temp_sample.append((key, sig_val, (val, date_time, avg_time, num_avg, last10, avg_val)))
 
+        temp_sample.sort(key=lambda entry: entry[1], reverse=False)
+        for entry in temp_sample[:5]:
+            processed_sample[entry[0]] = entry[2]
+
+        return processed_sample
+
+class NavdataReceiver(Receiver):
 
 
     def __init__(self, port):
@@ -351,43 +374,3 @@ class PeriodicTimer(threading.Thread):
             time.sleep(self.duration)
             self.function()
             self.repetitions -= 1
-
-
-
-class DiscardingQueue(object):
-
-
-    def __init__(self, max_size):
-        self.max_size = max_size
-        self.q = deque()
-
-    def put(self, item):
-        if len(self.q) >= self.max_size:
-            self.q.popleft()
-        self.q.append(item)
-        
-    def get_avg(self):
-        total = 0
-        for elem in self.q:
-            total += elem
-        if total:
-            return total/len(self.q)
-        else:
-            return None
-
-    def get_vals(self):
-        return self.q
-            
-
-    def get_var(self):
-        avg = self.get_avg()
-        total = 0
-        if len(self.q):
-            for elem in self.q:
-                total += (elem - avg) ** 2#(elem - avg)
-            return total/len(self.q)
-        else:
-            return None
-
-    def get_std_dev(self):
-        return self.get_var() ** (0.5)

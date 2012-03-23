@@ -262,7 +262,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn1OnClick" />
+                <signal name="toggled" handler="btn1OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -277,7 +277,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn2OnClick" />
+                <signal name="toggled" handler="btn2OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -292,7 +292,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn3OnClick" />
+                <signal name="toggled" handler="btn3OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -330,7 +330,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="btn4OnClick" />
+                <signal name="clicked" handler="btn4OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -345,7 +345,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn6OnClick" />
+                <signal name="toggled" handler="btn6OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -360,7 +360,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="btn5OnClick" />
+                <signal name="clicked" handler="btn5OnClick" swapped="no"/>
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -375,15 +375,22 @@
             <property name="position">4</property>
           </packing>
         </child>
+        <child>
+          <widget class="GtkButton" id="button7">
+            <property name="label" translatable="yes">Run Auto Session</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="use_action_appearance">False</property>
+            <signal name="clicked" handler="btn7OnClick" swapped="no"/>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">5</property>
+          </packing>
+        </child>
       </widget>
-    </child>
-  </widget>
-  <widget class="GtkWindow" id="videoWindow">
-    <property name="width_request">320</property>
-    <property name="height_request">240</property>
-    <property name="can_focus">False</property>
-    <child>
-      <placeholder/>
     </child>
   </widget>
 </glade-interface>

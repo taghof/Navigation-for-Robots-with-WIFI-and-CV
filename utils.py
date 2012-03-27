@@ -126,7 +126,7 @@ class PID(threading.Thread):
         
         PID = self.P_value + self.I_value + self.D_value
         
-        print PID
+        
 
         if self.max_pid == 0.0:
             self.max_pid = self.Kp*self.error + self.Ki*self.Integrator_max
@@ -134,6 +134,7 @@ class PID(threading.Thread):
             return 1.0
         else:
             self.error_vals.put(PID/self.max_pid)
+            print PID/self.max_pid
             time.sleep(0.1)
             return PID/self.max_pid
 

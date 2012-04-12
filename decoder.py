@@ -444,7 +444,7 @@ def get_pheader(bitreader):
     else:
         # VGA
         width, height = 160, 120
-        presolution = bitreader.read(3)
+    presolution = bitreader.read(3)
     assert(presolution != 0b000)
     # double resolution presolution-1 times
     width = width << presolution - 1
@@ -595,17 +595,60 @@ def read_picture(data):
         print "no image data"
         return None
 
-    retimg = cv.CreateImage((320, 240), 8, 3)
+
     #retimg = cv.CreateMat (320, 240, cv.CV_8UC1)
     bitreader = BitReader(data)
     t = datetime.datetime.now()
     width, height = get_pheader(bitreader)
     slices = height / 16
     blocks = width / 16
-    
+
+    retimg = cv.CreateImage((width, height), 8, 3)
     for i in xrange(0, slices):
         get_gob(bitreader, retimg, i, width)
-        
+
+    # total_red = 0
+    # total_green = 0
+    # total_blue = 0
+
+    # pixels = width*height
+
+    # for w in range(width):
+    #     for h in range(height):
+    #         (r, g, b) = retimg[ h, w]
+    #         total_red += r
+    #         total_green += g
+    #         total_blue += b
+
+    # avg_red = total_red / pixels
+    # avg_green = total_green / pixels    
+    # avg_blue = total_blue / pixels
+
+    # #print avg_red, avg_green, avg_blue
+
+    # var_red = 0
+    # var_green = 0
+    # var_blue = 0
+
+    # for w in range(width):
+    #     for h in range(height):
+    #         (r, g, b) = retimg[ h, w]
+    #         var_red += (r-avg_red)**2
+    #         var_green += (g-avg_green)**2
+    #         var_blue += (b-avg_blue)**2
+
+    # var_red = var_red/pixels
+    # var_green = var_green/pixels
+    # var_blue = var_blue/pixels
+    
+    # #print var_red, var_green, var_blue 
+
+    # dev_red = var_red**0.5
+    # dev_green = var_green**0.5
+    # dev_blue = var_blue**0.5
+
+    # print dev_red, dev_green, dev_blue 
+
     bitreader.align()
     eos = bitreader.read(22)
     assert(eos == 0b0000000000000000111111)
@@ -670,13 +713,16 @@ def decode_navdata(packet):
             offset += struct.calcsize("c")
         # navdata_tag_t in navdata-common.h
         if id_nr == 0:
-            values = struct.unpack_from("IIfffIfffI", "".join(values))
+            values = struct.unpack_from("IIfffffffI", "".join(values))
             values = dict(zip(['ctrl_state', 'battery', 'theta', 'phi', 'psi', 'altitude', 'vx', 'vy', 'vz', 'num_frames'], values))
             # convert the millidegrees into degrees and round to int, as they
             # are not so precise anyways
             for i in 'theta', 'phi', 'psi':
                 values[i] = int(values[i] / 1000)
                 #values[i] /= 1000
+            psi = values['psi']
+            values['psi'] = psi if psi > 0 else 360+psi 
+
         data[id_nr] = values
     return data
 

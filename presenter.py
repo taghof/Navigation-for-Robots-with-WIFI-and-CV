@@ -81,15 +81,17 @@ class PresenterGui(object):
 	self.radiobutton1 = self.wTree.get_widget("radiobutton1")
 	self.radiobutton2 = self.wTree.get_widget("radiobutton2")
 	self.radiobutton3 = self.wTree.get_widget("radiobutton3")
+	self.radiobutton4 = self.wTree.get_widget("radiobutton4")
 
-	# self.button1 = self.wTree.get_widget("button1")
-	# self.button2 = self.wTree.get_widget("button2")
-	# self.button3 = self.wTree.get_widget("button3")
-        # self.button4 = self.wTree.get_widget("button4")
+	self.button1 = self.wTree.get_widget("button1")
+	self.button2 = self.wTree.get_widget("button2")
+	self.button3 = self.wTree.get_widget("button3")
+        self.button4 = self.wTree.get_widget("button4")
 
 	self.radiobutton1.connect("toggled", self.handle_radiobuttons_pressed)
 	self.radiobutton2.connect("toggled", self.handle_radiobuttons_pressed)
 	self.radiobutton3.connect("toggled", self.handle_radiobuttons_pressed)
+	self.radiobutton4.connect("toggled", self.handle_radiobuttons_pressed)
 
 	# The video window
 	self.video_window = VideoWindow(self.video_sensor)   	
@@ -193,6 +195,8 @@ class PresenterGui(object):
                 gobject.timeout_add(200, self.update_samples, radio)
             elif radio.get_name() == "radiobutton3" and self.navdata_sensor is not None:
                 gobject.timeout_add(200, self.update_navdata, radio)
+            elif radio.get_name() == "radiobutton4" and self.navdata_sensor is not None and self.wifi_sensor is not None and self.video_sensor is not None:
+                gobject.timeout_add(200, self.update_matching, radio)
 
     def handle_key_pressed(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
@@ -216,6 +220,45 @@ class PresenterGui(object):
         elif keyname == "m":
             self.wifi_sensor.match_current_wifi_sample()
    
+
+    def update_matching(self, widget):
+        match_val_video = self.video_sensor.match_target_sample()
+        match_val_wifi = self.wifi_sensor.match_target_sample()
+        match_val_navdata = 1
+
+        x, y, width, height = self.drawing.get_allocation()
+	pixmap.draw_rectangle(self.drawing.get_style().white_gc,
+			      True, 0, 0, width, height)
+
+        match_string = ""
+        if match_val_video is not None:
+            match_string += "Video Match:\t\t" + str(match_val_video*100) + "\r\r"
+        if match_val_wifi is not None:
+            match_string += "Wifi Match:\t\t" + str(match_val_wifi) + "\r\r"
+        if match_val_navdata is not None:
+            match_string += "Navdata Match:\t" + str(match_val_navdata) + "\r\r"
+          
+        colormap = gtk.gdk.colormap_get_system()
+        color_black = colormap.alloc_color(gtk.gdk.Color(0, 0, 0))
+        color_white = colormap.alloc_color(gtk.gdk.Color(65535, 65535, 65535))
+        color_red = colormap.alloc_color(gtk.gdk.Color(65535, 0, 0))
+        color_green = colormap.alloc_color(gtk.gdk.Color(0, 65535, 0))
+        color_yellow = colormap.alloc_color(gtk.gdk.Color(65535, 65535, 0))
+        margin = 25
+        current_x = margin
+        current_y = margin
+
+        font_desc = pango.FontDescription('Serif 12')
+        layout = self.drawing.create_pango_layout(match_string)
+            
+        # layout = self.drawing.create_pango_layout("derpa")
+        layout.set_font_description(font_desc)
+        # draw text below rectangle
+        pixmap.draw_layout(self.gc, current_x, current_y, layout)
+
+	self.drawing.queue_draw()
+	return self.radiobutton4.get_active()
+
     def update_samples(self, widget):
         if self.wifi_sensor is None:
             print "Wifi sensor not present"
@@ -354,13 +397,7 @@ class PresenterGui(object):
                 # draw surrounding rectangle
                 pixmap.draw_rectangle(self.gc, False, int(current_x), int(current_y), int(fig_width+1), int(fig_height+1))
                 
-                # text matter
-                font_desc = pango.FontDescription('Serif 8')
-                layout = self.drawing.create_pango_layout(str(last10.get_avg()) + " (" + str(round(last10.get_std_dev(), 2)) + ")")
-                layout.set_font_description(font_desc)
-                # draw text below rectangle
-                pixmap.draw_layout(self.gc, current_x, current_y+fig_height+2, layout)
-           
+                          
                 if self.show_significance:
                     self.gc.set_foreground(color4)
                 else:
@@ -369,7 +406,7 @@ class PresenterGui(object):
                 pixmap.draw_rectangle(self.gc, True, int(current_x+1), int(current_y+(fig_height-figval)+1), int(fig_width), int(figval))
 			
                 # Calculate significance and set alpha value accordingly
-                threshold = 20
+                threshold = 5
                 current_time = datetime.datetime.now()
                 signal_time = last_updated
                 delta_time = (current_time - signal_time).total_seconds()
@@ -389,12 +426,23 @@ class PresenterGui(object):
 	                        
                 # print target bars if requested
                 if self.show_targets and target and target.has_key(k):
-                    if self.wifi_sensor.match_current_wifi_sample() > 85:
-                        print "Nice Match!"
                     self.gc.set_foreground(color1)
                     tv = target.get(k)
                     tval = int((75.0+tv[5])*(float(fig_height)/75.0))
                     pixmap.draw_line(self.gc, int(current_x), int(current_y+(fig_height-tval)), int(current_x+fig_width), int(current_y+(fig_height-tval)))
+                    
+                # text matter
+                self.gc.set_foreground(color1)
+                font_desc = pango.FontDescription('Serif 8')
+                layout = self.drawing.create_pango_layout("sig:\r" + str(last10.get_avg()))
+                layout.set_font_description(font_desc)
+                # draw text below rectangle
+                pixmap.draw_layout(self.gc, current_x+4, int(current_y+(fig_height/4)), layout)
+                layout.set_text("dev:\r" + str(round(last10.get_std_dev(), 2)))
+                pixmap.draw_layout(self.gc, current_x+4, int(current_y+(fig_height/4)+25), layout)
+                layout.set_text("avg up:\r" + str(round(avg_update_time, 2)))
+                pixmap.draw_layout(self.gc, current_x+4, int(current_y+(fig_height/4)+50), layout)
+
 
                 index+=1
                 current_x += (internal_margin + fig_width)
@@ -402,7 +450,13 @@ class PresenterGui(object):
                     current_x = x_margin
                     current_y += row_height
                     index = 0;
-		
+
+            if self.show_targets and target:
+                match_val = self.wifi_sensor.match_target_sample()
+                font_desc = pango.FontDescription('Serif 8')
+                layout = self.drawing.create_pango_layout("Current Match value: " + str(match_val))
+                pixmap.draw_layout(self.gc, x_margin, current_y+fig_height+10, layout)
+           	
         self.drawing.queue_draw()
         return self.radiobutton1.get_active()
 
@@ -602,17 +656,19 @@ class VideoWindow(gtk.Window):
         This will setup the variales needed for feature tracking and get the first image
         from the video feed. The initial set of features is extracted to 'self.features'."""
         
+        # Get the first image from the video sensor
+        frame0_org = self.video_sensor.get_data()
+        
         # Frames and features list for feature tracking
-        self.frame0 = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
-        self.frame1 = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        self.comparison = cv.CreateImage ((1, 1), cv.IPL_DEPTH_32F, 1)
+        self.frame0 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
+        self.frame1 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
         self.features = []
                
         # Make sure we are getting a feed from the video sensor before beginning
         while self.video_sensor.get_data() is None:
             print "Frame acquisition failed."
 
-        # Get the first image from the video sensor
-        frame0_org = self.video_sensor.get_data()
 
         # Make a grayscale copy of the image
         cv.CvtColor(frame0_org, self.frame0, cv.CV_RGB2GRAY);
@@ -621,7 +677,7 @@ class VideoWindow(gtk.Window):
         cv.Smooth(self.frame0, self.frame0, param1=7, param2=7, param3=1.5)
 
         # Extract initial features from the grayscale image
-        self.features = self.get_features(self.frame0)
+        #self.features = self.get_features(self.frame0)
 
         # Add a circle around the extracted features in the original image
         for (x, y) in self.features:
@@ -635,7 +691,7 @@ class VideoWindow(gtk.Window):
             8,
             frame0_org.width,
             frame0_org.height,
-            960)
+            frame0_org.width*3)
         
         # Set the image widget data from the pixbuf
         self.video_image.set_from_pixbuf(self.webcam_pixbuf)
@@ -651,6 +707,8 @@ class VideoWindow(gtk.Window):
         frame1_org = self.video_sensor.get_data()
 
         # Convert image to gray
+        
+        self.frame1 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
         cv.CvtColor(frame1_org, self.frame1, cv.CV_RGB2GRAY)
 
         # Smoothen image to get rid of false features
@@ -662,13 +720,16 @@ class VideoWindow(gtk.Window):
         
         # Run the optical flow tracking algorithm, features must be processed before
         # they are used in next iteration
-        (features, status, error) = cv.CalcOpticalFlowPyrLK(
-            self.frame0, self.frame1, 
-            None, None, self.features, 
-            (15, 15), 5, 
-            (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 20, 0.03),
-            0) 
-                          
+        if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
+            (features, status, error) = cv.CalcOpticalFlowPyrLK(
+                self.frame0, self.frame1, 
+                None, None, self.features, 
+                (15, 15), 5, 
+                (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 20, 0.03),
+                0) 
+
+        else:
+            features = []
         # Put the good features in a list to be returned and draw them in a
         # circle on the original iplimage
         processed_features = []
@@ -681,7 +742,14 @@ class VideoWindow(gtk.Window):
         # Add the target lines if requested
         if self.show_targets:
             target = self.video_sensor.get_target_sample()
+
             if target:
+                target_gray = cv.CreateImage ((target[2].width, target[2].height), cv.IPL_DEPTH_8U, 1)
+                # cv.CvtColor(target[2], target_gray, cv.CV_RGB2GRAY)
+
+                # cv.MatchTemplate(self.frame1, target_gray, self.comparison, cv.CV_TM_CCOEFF_NORMED)#CV_TM_CCORR_NORMED) 
+                print self.video_sensor.match_target_sample()
+
                 lines = target[1]
                 for line in lines:
                     cv.Line(frame1_org, line[0], line[1], (255,0,0))
@@ -699,15 +767,19 @@ class VideoWindow(gtk.Window):
             8,
             frame1_org.width,
             frame1_org.height,
-            960)
+            frame1_org.width*3)
         
         # Copy the pixbuf image data to the image widget and request a draw
         self.video_image.set_from_pixbuf(incoming_pixbuf)
         self.video_image.queue_draw()
 
         # Set frames up for next round
-        cv.Copy(self.frame1, self.frame0) 
-        
+        if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
+            cv.Copy(self.frame1, self.frame0) 
+        else:
+            self.frame0 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
+            cv.Copy(self.frame1, self.frame0) 
+
         # Set features up for next run, check if there has 
         # been a request for new features
         if self.get_new_features:
@@ -790,3 +862,24 @@ class VideoWindow(gtk.Window):
         Sets the get_new_features flag so that the run method will extract new 
         features from the current image and discard the old."""
         self.get_new_features = True
+
+
+class ControllerWindow(gtk.Window):
+
+    def __init__(self, controllers):
+        gtk.Window.__init__(self)
+        self.set_title("Controllers")
+        self.set_position(gtk.WIN_POS_CENTER)
+        self.set_size_request(360, 500)
+
+        self.controllers = controllers
+       
+        master_vbox = gtk.VBox(False, 5)
+        master_vbox.set_border_width( 5 )
+        self.add( master_vbox )
+
+        for controller in self.controllers:
+            button = gtk.ToggleButton(controller.name)
+            controller.set_control_button(button)
+        # self.video_play_button = 
+        # self.video_play_button.connect("clicked", self.toggle_video_play)

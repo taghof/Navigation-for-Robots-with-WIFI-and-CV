@@ -65,12 +65,13 @@ class PID(threading.Thread):
     Discrete PID control
     """
 
-    def __init__(self, source_method, move_method, degrees, P=2.0, I=0.0, D=1.0, Derivator=0, Integrator=0, Integrator_max=500, Integrator_min=-500, stable_point=0.02):
+    def __init__(self, source_method, move_method, degrees, P=1.0, I=0.0, D=0.0, Derivator=0, Integrator=0, Integrator_max=500, Integrator_min=-500, stable_point=0.5):
         threading.Thread.__init__(self)
         self.source_method = source_method
         self.move_method = move_method
         self.degrees = degrees
 
+        # variables used in calculating the PID output
         self.Kp=P
         self.Ki=I
         self.Kd=D
@@ -78,43 +79,59 @@ class PID(threading.Thread):
         self.Integrator=Integrator
         self.Integrator_max=Integrator_max
         self.Integrator_min=Integrator_min
-        
-        current = self.source_method()
       
+        # when do we consider the process stable enough to stop?
         self.stable_point = stable_point
-        self.set_point = 0.0# current + degrees
-        self.error=0.0
-        self.max_pid = 0.0
-        self.max_error = 0.0
-        self.error_vals = DiscardingQueue(10)
+
+        # we won't commit to a set point before we actually begin updating
+        self.set_point = 0.0
+
+        # please turn this many degrees
+        self.error = degrees
+        
+        # we can never be more than 180 degrees from our target
+        self.max_error = 180
+        
+        # PID values above this max_pid will be cut off before returning,
+        # This should happen only very rarely
+        self.max_PID = self.Kp*self.max_error + self.Ki*self.Integrator_max
+        self.error_vals = DiscardingQueue(11)
 
     def run(self):
         while not self.is_stable():
-            #current = self.source_method()
+            # Calculate PID output for this iteration
             power = self.update()
+            # Use the calculated PID output to actually move
             self.move_method(power)
 
-    def update(self):#,current_value):
+        # remember to put the vehicle in hover mode after moving
+        self.move_method(0)
+        
+
+    def update(self):
         """
-        Calculate PID output value for given reference input and feedback
+        Calculate PID output using the input method and the set point
         """
+
+        # Get the current reading
         current_value = self.source_method()
+
+        # If we have not yet assigned a set point do it now, must be a number
+        # between 0 and 360
         if self.set_point == 0.0:
-            self.set_point = current_value + self.degrees
+            normed_setpoint = 
+            self.set_point = (360+(current_value + self.degrees))%360
+            print "moving to: " + str(self.set_point) + "\r" 
 
-        self.error = self.set_point - current_value
-        if self.max_error == 0.0:
-            self.max_error = self.error
-        
-        if self.error > self.max_error:
-             self.error = self.max_error
-        elif self.error < -self.max_error:
-            self.error = -self.max_error
+        # calculate the current error, must be between -180 and 180
+        self.error = (360 + self.set_point - current_value)%360
+        if self.error > 180:
+            error = self.error - 360
 
+        # calculate the P term
         self.P_value = self.Kp * self.error
-        self.D_value = self.Kd * ( self.error - self.Derivator)
-        self.Derivator = self.error
         
+        # calculate the I term, considering integrator max and min 
         self.Integrator = self.Integrator + self.error
 
         if self.Integrator > self.Integrator_max:
@@ -123,27 +140,38 @@ class PID(threading.Thread):
             self.Integrator = self.Integrator_min
 
         self.I_value = self.Integrator * self.Ki
-        
+       
+        # calculate the D term
+        self.D_value = self.Kd * ( self.error - self.Derivator)
+        self.Derivator = self.error
+       
+        # Sum the term values into one PID value
         PID = self.P_value + self.I_value + self.D_value
-        
-        
 
-        if self.max_pid == 0.0:
-            self.max_pid = self.Kp*self.error + self.Ki*self.Integrator_max
-            self.error_vals.put(PID/self.max_pid)
-            return 1.0
-        else:
-            self.error_vals.put(PID/self.max_pid)
-            print PID/self.max_pid
-            time.sleep(0.1)
-            return PID/self.max_pid
+        # Record the current error value for figuring out when to stop
+        self.error_vals.put(self.error)
+        
+        # Calculate a return value between -1 and 1, PID values above max_pid or
+        # under -max_pid will be cut to 1 or -1
+        retval = (PID/self.max_PID) if (-1 <= (PID/self.max_PID) <= 1) else (PID/abs(PID))
+
+        # print stuff for debugging purposes
+        print "Current value: " + str(current_value) + ", Error: " + str(self.error) + "Engine response: " + str(retval)
+
+        # don't let thread suck all power, have a nap
+        time.sleep(0.1)
+        
+        return retval
 
     def is_stable(self):
         """
         Will return True if the average of the last 10 PID vals is below
         a certain threshold
         """
-        return self.error_vals.get_avg() < self.stable_point and self.max_pid > 0.0
+        #retval = self.error_vals.get_avg() < self.stable_point and self.error_vals.get_std_dev() < self.stable_point and self.max_pid > 0.0
+        retval = (-3 <= self.error <= 3)
+        #print retval
+        return retval
 
     def setPoint(self,set_point):
         """
@@ -186,19 +214,31 @@ class DiscardingQueue(object):
     def __init__(self, max_size):
         self.max_size = max_size
         self.q = deque()
+        self.lock = threading.Lock()
+
+    def get_len(self):
+        self.lock.acquire()
+        retval = len(self.q)
+        self.lock.release()
+        return retval
 
     def put(self, item):
+        self.lock.acquire()
         if len(self.q) >= self.max_size:
             self.q.popleft()
         self.q.append(item)
-        
+        self.lock.release()
+
     def get_avg(self):
+        self.lock.acquire()
         total = 0
         for elem in self.q:
             total += elem
         if total:
+            self.lock.release()
             return total/len(self.q)
         else:
+            self.lock.release()
             return None
 
     def get_vals(self):
@@ -207,13 +247,21 @@ class DiscardingQueue(object):
 
     def get_var(self):
         avg = self.get_avg()
+        self.lock.acquire()
         total = 0
         if len(self.q):
             for elem in self.q:
                 total += (elem - avg) ** 2#(elem - avg)
+            self.lock.release()
             return total/len(self.q)
         else:
+            self.lock.release()
             return None
+        
 
     def get_std_dev(self):
-        return self.get_var() ** (0.5)
+        var = self.get_var()
+        if var:
+            return var ** (0.5)
+        else:
+            return 0

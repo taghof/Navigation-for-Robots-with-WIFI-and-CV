@@ -48,34 +48,34 @@ class TestDevice(threading.Thread):
         self.pickled_wifi = True
         self.pickled_navdata = True
 
-        if not os.path.isfile('./pickled_video.data'):
+        if not os.path.isfile('./pickled_5555.data'):
             self.pickled_video = False
             while os.path.isfile('../testdata/' + str(self.vi) + '.dat'):
                 self.video_packets.append('../testdata/' + str(self.vi) + '.dat')
                 self.vi += 1
         else:
             print "Gone pickling...\r"
-            fileObj = open('./pickled_video.data')
+            fileObj = open('./pickled_5555.data')
             self.video_packets = pickle.load(fileObj)
             fileObj.close()
             self.vi = len(self.video_packets)
             print self.vi, " video frames"
 
-#        if not os.path.isfile('./pickled_wifi.data'):
-        self.pickled_wifi = False
-        # else:
-        #     print "Gone pickling...\r"
-        #     fileObj = open('./pickled_wifi.data')
-        #     self.wifi_packets = pickle.load(fileObj)
-        #     fileObj.close()
-        #     self.wi = len(self.wifi_packets)
-        #     print self.wi, " wifi frames"
-
-        if not os.path.isfile('./pickled_navdata.data'):
+        if not os.path.isfile('./pickled_5551.data'):
             self.pickled_wifi = False
         else:
             print "Gone pickling...\r"
-            fileObj = open('./pickled_navdata.data')
+            fileObj = open('./pickled_5551.data')
+            self.wifi_packets = pickle.load(fileObj)
+            fileObj.close()
+            self.wi = len(self.wifi_packets)
+            print self.wi, " wifi frames"
+
+        if not os.path.isfile('./pickled_5554.data'):
+            self.pickled_wifi = False
+        else:
+            print "Gone pickling...\r"
+            fileObj = open('./pickled_5554.data')
             self.navdata_packets = pickle.load(fileObj)
             fileObj.close()
             self.ni = len(self.navdata_packets)
@@ -116,7 +116,7 @@ class TestDevice(threading.Thread):
             
             # transmit video data
             if self.pickled_video:
-                data = self.video_packets[vi]
+                data = self.video_packets[vi][1]
             else:
                 f = open(self.video_packets[vi % (self.vi-1)], 'r')
                 data = f.read()
@@ -126,7 +126,7 @@ class TestDevice(threading.Thread):
             
             # transmit WIFI data
             if self.pickled_wifi:
-                wifidata = self.wifi_packets[wi]
+                wifidata = self.wifi_packets[wi][1]
             else:
                 wifidata = "00:10:20:30:40:" + str(random.randint(10,30)) +" # " + str(random.randint(-75, 0))           
             
@@ -134,7 +134,7 @@ class TestDevice(threading.Thread):
             
             # transmit navdata
             if self.pickled_wifi:
-                navdata = self.navdata_packets[ni]
+                navdata = self.navdata_packets[ni][1]
                 self.navdata_send_sock.sendto(navdata, ('127.0.0.1', settings.NAVDATA_PORT))
            
             vi += 1

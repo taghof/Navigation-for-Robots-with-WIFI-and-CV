@@ -37,7 +37,6 @@ class ControllerManager(object):
         self.drone = drone
         self.interface = ControllerInterface()
         self.controllers = (ManualControl(self.drone, self.interface), AutoControl(self.drone,self.interface))
-        self.id = None
 
     def get_controllers(self):
         return self.controllers
@@ -63,9 +62,8 @@ class Controller(object):
         self.control_interface = interface
         self.control_button = None
         self.control_method = self.process_events
-        self.id = settings.JOYCONTROL
+        self.id = None       
         self.stopping = False
-        
 
     def process_events(self):
         return False
@@ -95,21 +93,21 @@ class AutoControl(Controller):
         self.wifi_sensor = drone.get_wifi_sensor()
         self.video_sensor = drone.get_video_sensor()
         self.id = settings.AUTOCONTROL
-        self.run_session = False
+        self.name = "Auto Controller"
         self.tasks = []
 
     def process_events(self):
-
+       
         if self.control_button is not None:
             return self.control_button.get_active()
         else:
             for task in self.tasks:
+                
                 if len(task) > 0:
                     t = task[0]
-                    if not t.is_stable():
-                        print "updated:", t.error, t.set_point
-                        t.update()
-                    else:
+                    if not t.is_alive():
+                        t.start()
+                    if t.is_stable():
                         print "partly done"
                         task.remove(t)
                 else:        
@@ -134,15 +132,16 @@ class AutoControl(Controller):
         return self.navdata_sensor.get_data().get(0, dict()).get('theta', 0)
 
     def actual_move(self, power):
-        print power
+        self.control_interface.move(0, 0, 0, power, True)
+        #print power
 
     def move_vertically(self, dist):
         pass
         
     def start_auto_session(self):
         t = []
-        t.append(utils.PID(self.get_psi, self.actual_move, 10))
-        t.append(utils.PID(self.get_psi, self.actual_move, 15))
+        t.append(utils.PID(self.get_psi, self.actual_move, 180))
+        #t.append(utils.PID(self.get_psi, self.actual_move, -15))
 
         self.tasks.append(t)
 
@@ -152,7 +151,8 @@ class ManualControl(Controller):
     def __init__(self, drone, interface):
         Controller.__init__(self, drone, interface)
         pygame.joystick.init()
-
+        self.id = settings.JOYCONTROL
+        self.name = "Joystick Controller"
         if pygame.joystick.get_count() > 0:
             pygame.display.init()
             self.js = pygame.joystick.Joystick(0)
@@ -184,7 +184,7 @@ class ManualControl(Controller):
                     power2 = self.convert( self.js.get_axis(2) )
                     power1 = self.convert( self.js.get_axis(5) )
                     power = power1 - power2
-                    self.controlInterface.move(roll, pitch, power, yaw)
+                    self.control_interface.move(roll, pitch, power, yaw, False)
                     utils.dprint("", 'roll: ' + str(roll) + ' pitch: ' + str(pitch) + ' power: ' + str(power) + ' yaw: ' + str(yaw) )                   
                     
                 elif e.type == pygame.JOYBUTTONDOWN: # 10
@@ -198,40 +198,41 @@ class ManualControl(Controller):
                             #     self.stop()
                             #     break
                             if b==1:
-                                self.controlInterface.reset() 
+                                self.control_interface.reset() 
                             elif b==2:
-                                self.drone.gui.toggleVideoWindow(None)
+                                self.drone.gui.toggle_video_window(None)
                                
                             elif b==3:
-                                self.controlInterface.ledShow(6)
-                            # elif b==4:
-                            #     pass
+                                self.control_interface.led_show(5)
+                            elif b==4:
+                                self.drone.gui.set_target(None)
                             elif b==5:
-                                self.controlInterface.zap()
+                                self.drone.gui.take_sample(None)
+#self.control_interface.zap()
                             # elif b==6:
                             #     pass
                             # elif b==7:
                             #     pass
                             elif b==8:
-                                if self.controlInterface.getLanded():
-                                    self.controlInterface.takeoff()
+                                if self.control_interface.get_landed():
+                                    self.control_interface.take_off()
                                 else:
-                                    self.controlInterface.land()
+                                    self.control_interface.land()
                                 # elif b==9:
                                 #     pass
                                 # elif b==10:
                                 #     pass
                             elif b==11:
-                                self.controlInterface.rotate(-1)
+                                self.control_interface.rotate(-1)
                             elif b==12:
-                                self.controlInterface.rotate(1)
+                                self.control_interface.rotate(1)
                               # elif b==13:
                               #     pass
                               # elif b==14:
                               #     pass
                           
-        if self.controlButton:
-            return self.controlButton.get_active()
+        if self.control_button:
+            return self.control_button.get_active()
         else:
             return True
 
@@ -265,9 +266,9 @@ class ControllerInterface(object):
     def zap(self):
         print 'zapping: ' + str(self.chan)
         self.at(at_config, "video:video_channel", str(self.chan))
-        self.at(at_zap, self.chan)
-        self.chan += 2
-        self.chan = self.chan % 8
+
+        self.chan += 1
+        self.chan = self.chan % 4
 
     def stop(self):
         self.land()
@@ -308,24 +309,24 @@ class ControllerInterface(object):
     def led_show(self, num):
         self.at(at_led, num, 1.0, 2)
         
-    def move(self, roll, pitch, power, yaw):
+    def move(self, roll, pitch, power, yaw, auto=False):
 
-        if roll > 0.35 or roll < -0.35 :
+        if roll > 0.35 or roll < -0.35 or auto:
             r = roll
         else:
             r = 0.0
 
-        if pitch > 0.35 or pitch < -0.35 :
+        if pitch > 0.35 or pitch < -0.35 or auto:
             pi = pitch 
         else:
             pi = 0.0
 
-        if power > 0.35 or power < -0.35 :
+        if power > 0.35 or power < -0.35 or auto:
             po = power
         else:
             po = power
 
-        if yaw > 0.35 or yaw < -0.35 :
+        if yaw > 0.35 or yaw < -0.35 or auto:
             y = yaw
         else:
             y = 0.0

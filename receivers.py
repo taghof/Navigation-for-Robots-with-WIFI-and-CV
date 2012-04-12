@@ -97,6 +97,7 @@ class Receiver(multiprocessing.Process):
         print 'Starting receiver ', self.PORT, '\r'
         history = OrderedDict()
         currentbuffer = 1       
+        
         runs = 0
         dumplist = []
         time_start = datetime.datetime.now()
@@ -117,7 +118,7 @@ class Receiver(multiprocessing.Process):
                     if data:
                         utils.dprint("", 'Got data')
                         if l[3] == settings.CAPTURE:
-                            dumplist.append(data)
+                            dumplist.append((datetime.datetime.now(), data))
                         l[2] = (runs+1)%2
                         l[currentbuffer] = self.on_receive_data(data, history)
                         currentbuffer = runs%2
@@ -160,6 +161,8 @@ class Receiver(multiprocessing.Process):
         self.target_sample = processed_sample
         return processed_sample
     
+    def match_target_sample(self):
+        pass
     def record_samples(self, duration, repetitions):
         print "starting periodic sample recordings\r"
         t = PeriodicTimer(duration, repetitions, self.record_sample)
@@ -240,6 +243,18 @@ class VideoReceiver(Receiver):
         
         return (p, coords, img)
 
+    def match_target_sample(self):
+        if self.target_sample is None:
+            print "Can't match, target sample not set\r"
+            return None
+        else:
+            target = self.get_target_sample()[2]
+            current = self.get_data()
+            comparison = cv.CreateImage ((1, 1), cv.IPL_DEPTH_32F, 1)
+            cv.MatchTemplate(current, target, comparison, cv.CV_TM_CCOEFF_NORMED)#CV_TM_CCORR_NORMED) 
+            res = comparison[0,0]
+            return res
+
     def on_request_data(self, data):
         if data:
             if self.display_capture:
@@ -263,14 +278,14 @@ class WifiReceiver(Receiver):
     
     def __init__(self, port):
         Receiver.__init__(self, port)
-                    
+        self.last_matches = utils.DiscardingQueue(10)
     def start_periodic_wifi_matching(self, duration, repetitions):
         pass
 
-    def match_current_wifi_sample(self):
+    def match_target_sample(self):
         if self.target_sample is None:
             print "Can't match, target sample not set\r"
-            return 0
+            return None
         else:
             res = self.match_wifi_sample(1, self.target_sample, self.get_data())
             #print "match score: ", res, "%\r"
@@ -279,9 +294,9 @@ class WifiReceiver(Receiver):
     def match_wifi_sample(self, min_match_len, p1, p2):
         if len(p1) < min_match_len:
             print "Not enough entries in target sample to match"
-            return
+            return None
         match_set = OrderedDict()
-        threshold = 20
+        threshold = 5
         current_time = datetime.datetime.now()
         for key, val in p2.iteritems():
             signal_time_stamp = val[1]
@@ -292,22 +307,28 @@ class WifiReceiver(Receiver):
                     match_set[key] = (val[0], significance)
                 elif time_difference > threshold:
                     significance = 0
-                    match_set[key] = (val[0], significance)
+                    #match_set[key] = (val[0], significance)
                 else:
                     significance = 1
-                    match_set[key] = (val[0], significance)
+                    match_set[key] = (val[5], significance)
         mval = 0
         maxmval = 0
         for k, v in match_set.iteritems():
-            dif = abs((v[0]+100)-(p1.get(k)[5]+100))
+            target = p1.get(k)
+            dif = abs((v[0]+100)-(target[5]+100))
             #print dif
-            mval += (p1.get(k)[5]+100-dif)*v[1]
-            maxmval += (p1.get(k)[5]+100)
+
+            watt_val = (10**(target[5]/10))*10
+            mval += ((target[5]+100-dif)*watt_val*v[1])
+            maxmval += ((target[5]+100)*watt_val)
 
         #print "mval: ", mval, "maxmval: ", maxmval, "\r"
-        pval = (mval / maxmval) * 100
-        
-        return pval
+        if not maxmval:
+            return 0
+        else:
+            pval = (mval / maxmval) * 100
+            self.last_matches.put(pval)
+        return self.last_matches.get_avg()
 
     def on_receive_data(self, data, history):
         time = datetime.datetime.now()
@@ -332,12 +353,22 @@ class WifiReceiver(Receiver):
 
         return history
 
+    def on_request_data(self, data):
+        if data is None:
+            return OrderedDict()
+        else:
+            return data
+
     def on_record_target_sample(self, sample):
+        time = datetime.datetime.now()
         temp_sample = []
         processed_sample = OrderedDict()
+        if sample is None:
+            return processed_sample
+
         for  key, (val, date_time, avg_time, num_avg, last10, avg_val) in sample.iteritems():
             sig_val = avg_time + last10.get_std_dev()
-            if last10.get_std_dev() < 30 and avg_time < 10 and num_avg > 1:
+            if last10.get_std_dev() < 10 and avg_time < 40 and num_avg > 1:# and (date_time - time).total_seconds() < 10:
                 temp_sample.append((key, sig_val, (val, date_time, avg_time, num_avg, last10, avg_val)))
 
         temp_sample.sort(key=lambda entry: entry[1], reverse=False)

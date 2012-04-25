@@ -3,6 +3,8 @@
 \usepackage[danish]{babel}
 \usepackage[ansinew]{inputenc}
 \usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{listings}
 \usepackage{natbib}
 \usepackage{titleref}
 
@@ -40,10 +42,68 @@
 \subsection{}
 \subsection{}
 
-\subsection{Sektion 1.1}
+\pagebreak
+\section{AR.Drone}
+AR.Drone er en quadrocopter fremstillet og udviklet af det franske
+firma Parrot. En quadrocopter benytter fire faste rotorer til at
+generere opdrift, samt til at styre sin bevægelse i rummet. 
+\\AR.Drone blev introduceret i 2010 og har siden fundet stor anvendelse, ikke
+blot som et stykke avanceret legetøj, men også som en
+udviklingsplatform til forskere og studerende. En AR.Drone kommer med et
+sæt sensorer bestående af to kameraer(et vertikalt nedadrettet og et
+horisontalt fremadrettet), en højdemåler, gyroskop(til at måle
+hældning, krængning og drejning), samt et accelerometer. I 2012 ventes
+en opdateret udgave af AR.Drone, denne forventes at tilføje HD kamera,
+trykmåler og kompas til platformen.
+\\AR.Drone er opbygget som en letvægtskonstruktion af kulfiber, plast og
+skummateriale og kommer med to forskellige skumskjold til henholdsvis
+indendørs og udendørs flyvning.
 
-Detaljeret text\cite{Krumm09}.
+\begin{figure}[h]
+\centering
+  \subfloat[Indendørsskjold]{
+    \label{fig:indendørsskjold}
+    \includegraphics[width=0.45\textwidth]{parrot-ardrone.jpg}
+  }
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfloat[Udendørsskjold]{
+    \label{fig:udendørsskjold}
+    \includegraphics[width=0.45\textwidth]{parrot-ardrone-outdoor.jpg}
+  }
+  \caption{AR.Drone med indendørs- og udendørsskjold}
+  \label{fig:ardrone}
+\end{figure}
+ 
+\subsection{Hardware}
+Som de fleste robotter består AR.Drone af et antal sensorer, et antal
+aktuatorer og en styringsenhed. 
+\\AR.Drone er udstyret med to kameraer, det fremadrettede er en 93
+graders CMOS sensor som kan levere 640x480 billeder(selvom
+resourceknaphed gør at opløsningen der transmitteres fra dronen
+kun er 320x240(QVGA) ) med en framerate på 15/s. Det nedadvendte kamera er
+en 64 graders CMOS sensor, der tager billeder i 176x144(QCIF) med en
+framerate på 60/s.
+\\Til at bestemme dronens højde over jorden anvendes en ultrasonisk
+højdemåler, denne opererer ved at udsende en ultralydspuls og herefter
+måle tidsintervallet der går før ekkoet måles. Højdemåleren er angivet
+til at virke op til seks meters højde og er rent fysisk placeret på
+dronens navboard. Det er værd at bemærke, at højdemåleren ikke måler
+højden på et specifikt punkt, men derimod returnerer den mindste højde
+i et område som det på (fig).
 
+gyroskoper
+
+accelerometer
+
+embedded computer
+
+motorer
+  
+\subsection{Software}
+%\lstinputlisting[language=Python]{../drone.py}
+\subsection{Kommunikation}
+
+\subsection{Fysik}
 
 \pagebreak
 

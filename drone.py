@@ -103,7 +103,6 @@ def main():
 
     if settings.TEST:
         drone.get_video_sensor().join()
-        
         testdevice_.stop()
 
 

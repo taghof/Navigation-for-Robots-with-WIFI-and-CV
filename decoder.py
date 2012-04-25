@@ -55,7 +55,7 @@ import datetime
 import struct
 import sys
 import numpy
-import cv
+import cv2.cv as cv
 
 try:
     import psyco
@@ -713,12 +713,12 @@ def decode_navdata(packet):
             offset += struct.calcsize("c")
         # navdata_tag_t in navdata-common.h
         if id_nr == 0:
-            values = struct.unpack_from("IIfffffffI", "".join(values))
+            values = struct.unpack_from("IIfffIfffI", "".join(values))
             values = dict(zip(['ctrl_state', 'battery', 'theta', 'phi', 'psi', 'altitude', 'vx', 'vy', 'vz', 'num_frames'], values))
             # convert the millidegrees into degrees and round to int, as they
             # are not so precise anyways
             for i in 'theta', 'phi', 'psi':
-                values[i] = int(values[i] / 1000)
+                values[i] = values[i] / 1000
                 #values[i] /= 1000
             psi = values['psi']
             values['psi'] = psi if psi > 0 else 360+psi 

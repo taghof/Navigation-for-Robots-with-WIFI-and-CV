@@ -41,11 +41,13 @@ try:
 except:
     sys.exit(1)
 
-import cv
+import cv2.cv as cv
+import cv2
 import pango
-
+import numpy as np
 import utils
 import settings
+import matcher
 
 class PresenterGui(object):
 
@@ -94,7 +96,7 @@ class PresenterGui(object):
 	self.radiobutton4.connect("toggled", self.handle_radiobuttons_pressed)
 
 	# The video window
-	self.video_window = VideoWindow(self.video_sensor)   	
+	self.video_window = VideoWindow(self.video_sensor, self.controller_manager.get_controller(settings.AUTOCONTROL))   	
 	self.video_window.hide_on_delete()
 	self.video_window.connect('key_press_event', self.handle_key_pressed) 
 	self.video_window.connect("delete_event", self.toggle_video_window)
@@ -106,7 +108,7 @@ class PresenterGui(object):
 	       "btn4OnClick" : self.take_sample,
 	       "btn5OnClick" : self.set_target,
 	       "btn6OnClick" : self.toggle_capture,
-               "btn7OnClick" : self.run_controllers}
+               "btn7OnClick" : self.start_auto_track}
 	
         self.wTree.signal_autoconnect(dic)
 	gtk.quit_add(0, self.drone.stop)
@@ -118,7 +120,7 @@ class PresenterGui(object):
         self.white_gc = self.drawing.get_style().white_gc
         self.black_gc = self.drawing.get_style().black_gc
         self.load_controllers(self.controller_manager.get_controllers())
-        gobject.timeout_add(200, self.update_wifi, None)
+        gobject.timeout_add(200, self.update_navdata, None)
         gtk.main()
 	   
     def stop(self, widget, event=None):
@@ -131,14 +133,6 @@ class PresenterGui(object):
             if con.get_control_method() is not None:
                 meth = con.get_control_method()
                 gobject.idle_add(meth)
-
-    def run_controllers(self, widget):
-        print "derp"
-        controllers = self.controller_manager.get_controllers()
-        for con in controllers:
-            if con.id == settings.AUTOCONTROL:
-                print "derpa"
-                con.start_auto_session()
                
     def take_sample(self, widget):
         for sensor in self.sensors:
@@ -186,6 +180,13 @@ class PresenterGui(object):
             self.button3.set_active(not self.button3.get_active())
             return True
         self.show_significance = not self.show_significance
+
+    def start_auto_track(self, widget):
+        auto_con = self.controller_manager.get_controller(settings.AUTOCONTROL)
+        if not auto_con is None:
+            auto_con.toggle_mark_search()
+        else:
+            print 'Auto controller not present!'
 
     def handle_radiobuttons_pressed(self, radio):
         if radio.get_active():
@@ -595,10 +596,12 @@ class VideoWindow(gtk.Window):
     video receiver reference in the constructor. The widget holds an image widget for 
     displaying video frames and a handfull of buttons for manipulation(graying, tracking and such)"""
 
-    def __init__(self, video_sensor):
+    def __init__(self, video_sensor, autocontrol):
         """
         Calls the Window super constructor, inits all the GTK gui elements and 
         hooks up all the signal callbacks"""
+
+        self.autocontrol = autocontrol
 
         gtk.Window.__init__(self)
         self.set_title("Video Source")
@@ -608,9 +611,10 @@ class VideoWindow(gtk.Window):
         master_vbox = gtk.VBox(False, 5)
         master_vbox.set_border_width( 5 )
         self.add( master_vbox )
-
+        
         self.video_image = gtk.Image()
         self.video_image.set_size_request(320, 240)
+        self.video_image.set_alignment(0,0)
         self.video_eventbox = gtk.EventBox()
         self.video_eventbox.set_size_request(320, 240)
         self.video_eventbox.connect("motion_notify_event", self.motion_notify_event)
@@ -643,9 +647,9 @@ class VideoWindow(gtk.Window):
         master_vbox.show_all()
 
         # run flags for showing crosshairs and extracting new features
-        self.show_crosshairs = False
+        self.show_crosshairs = True
         self.show_targets = False
-        self.show_grayscale = True
+        self.show_grayscale = False
         self.get_new_features = False
         
         # our video sensor reference
@@ -659,12 +663,19 @@ class VideoWindow(gtk.Window):
         # Get the first image from the video sensor
         frame0_org = self.video_sensor.get_data()
         
+        #self.video_image.set_size_request(frame0_org.width, frame0_org.height)
+        #self.video_eventbox.set_size_request(frame0_org.width, frame0_org.height)
+
         # Frames and features list for feature tracking
         self.comparison = cv.CreateImage ((1, 1), cv.IPL_DEPTH_32F, 1)
         self.frame0 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
         self.frame1 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
         self.features = []
-               
+        self.mark1 = cv2.imread('./mark3e.png', 0)
+        self.mark2 = cv2.imread('./mark3f.png', 0)
+        self.mark3 = cv2.imread('./mark3g.png', 0)
+        self.mark4 = cv2.imread('./mark3h.png', 0)
+
         # Make sure we are getting a feed from the video sensor before beginning
         while self.video_sensor.get_data() is None:
             print "Frame acquisition failed."
@@ -704,12 +715,37 @@ class VideoWindow(gtk.Window):
         also carries out optical flow tracking of features in 'self.features'."""
 
         # Get image from video sensor
-        frame1_org = self.video_sensor.get_data()
-
-        # Convert image to gray
+        match_image = self.autocontrol.last_match_image
         
+        frame1_org = self.video_sensor.get_data()
+        middle_x = frame1_org.width / 2
+        middle_y = frame1_org.height / 2
         self.frame1 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
+        # Convert image to gray
         cv.CvtColor(frame1_org, self.frame1, cv.CV_RGB2GRAY)
+        # if self.autocontrol.current is None and not self.autocontrol.stopping:
+        #      match_frame = cv2array(self.frame1)
+        #      m1 = matcher.match(self.mark1, match_frame)
+        #      m2 = matcher.match(self.mark2, match_frame)
+        #      m3 = matcher.match(self.mark3, match_frame)
+        #      m4 = matcher.match(self.mark4, match_frame)
+             
+        #      m = m1
+        #      if m2[1] > m[1]:
+        #          m = m2
+        #      if m3[1] > m[1]:
+        #          m = m3
+        #      if m4[1] > m[1]:
+        #          m = m4
+
+        #      match_image = m[0]
+        #      match_num = m[1]
+        #      match_point = m[2]
+        #      if match_num >= 8 and self.autocontrol.current is None and not self.autocontrol.stopping:
+        #          print 'matched six or more...'
+        #          self.autocontrol.start_auto_session(match_point)
+        # else:
+        #match_image = None
 
         # Smoothen image to get rid of false features
         cv.Smooth(self.frame1, self.frame1, param1=7, param2=7, param3=1.5)
@@ -720,24 +756,24 @@ class VideoWindow(gtk.Window):
         
         # Run the optical flow tracking algorithm, features must be processed before
         # they are used in next iteration
-        if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
-            (features, status, error) = cv.CalcOpticalFlowPyrLK(
-                self.frame0, self.frame1, 
-                None, None, self.features, 
-                (15, 15), 5, 
-                (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 20, 0.03),
-                0) 
+        # if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
+        #     (features, status, error) = cv.CalcOpticalFlowPyrLK(
+        #         self.frame0, self.frame1, 
+        #         None, None, self.features, 
+        #         (15, 15), 5, 
+        #         (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 20, 0.03),
+        #         0) 
 
-        else:
-            features = []
+        # else:
+        #     features = []
         # Put the good features in a list to be returned and draw them in a
         # circle on the original iplimage
         processed_features = []
-        for i in range(len(features)):
-            if status[i]: 
-                processed_features.append(features[i])
-                xy = (int(features[i][0]), int(features[i][1]))
-                cv.Circle(frame1_org, xy, 15, (255, 0, 0, 0), 1, 8, 0);
+        # for i in range(len(features)):
+        #     if status[i]: 
+        #         processed_features.append(features[i])
+        #         xy = (int(features[i][0]), int(features[i][1]))
+        #         cv.Circle(frame1_org, xy, 15, (255, 0, 0, 0), 1, 8, 0);
              
         # Add the target lines if requested
         if self.show_targets:
@@ -756,19 +792,37 @@ class VideoWindow(gtk.Window):
 
         # Add crosshairs if requested
         if self.show_crosshairs:
-            cv.Line(frame1_org, (160, 110), (160, 130), (255,0,0))
-            cv.Line(frame1_org, (150, 120), (170, 120), (255,0,0))
+            cv.Line(frame1_org, (middle_x, middle_y-10), (middle_x, middle_y+10), (255,0,0))
+            cv.Line(frame1_org, (middle_x-10, middle_y), (middle_x+10, middle_y), (255,0,0))
 
         # Create a pixbuf from the opencv iplimage, the image must be 3-channeled
-        incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
-            frame1_org.tostring(), 
-            gtk.gdk.COLORSPACE_RGB,
-            False,
-            8,
-            frame1_org.width,
-            frame1_org.height,
-            frame1_org.width*3)
-        
+        # incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
+        #     frame1_org.tostring(), 
+        #     gtk.gdk.COLORSPACE_RGB,
+        #     False,
+        #     8,
+        #     frame1_org.width,
+        #     frame1_org.height,
+        #     frame1_org.width*3)
+        if match_image is not None:
+            incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
+                match_image.tostring(), 
+                gtk.gdk.COLORSPACE_RGB,
+                False,
+                8,
+                match_image.shape[1],
+                match_image.shape[0],
+                match_image.shape[1]*3)
+        else:
+            incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
+                frame1_org.tostring(), 
+                gtk.gdk.COLORSPACE_RGB,
+                False,
+                8,
+                frame1_org.width,
+                frame1_org.height,
+                frame1_org.width*3)
+     
         # Copy the pixbuf image data to the image widget and request a draw
         self.video_image.set_from_pixbuf(incoming_pixbuf)
         self.video_image.queue_draw()
@@ -777,6 +831,8 @@ class VideoWindow(gtk.Window):
         if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
             cv.Copy(self.frame1, self.frame0) 
         else:
+            self.video_image.set_size_request(frame1_org.width, frame1_org.height)
+            self.video_eventbox.set_size_request(frame1_org.width, frame1_org.height)
             self.frame0 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
             cv.Copy(self.frame1, self.frame0) 
 
@@ -784,7 +840,8 @@ class VideoWindow(gtk.Window):
         # been a request for new features
         if self.get_new_features:
             self.get_new_features = False
-            self.features = self.get_features(self.frame1)
+            self.features = [] #self.get_features(self.frame1)
+            self.features.append((middle_x, middle_y))
         else:
             self.features = processed_features
         
@@ -795,7 +852,8 @@ class VideoWindow(gtk.Window):
         """
         Extracts features from 'frame' with the opencv SURF algorithm, the extracted
         features are returned as a list of (x,y) tuples."""
-        (keypoints, descriptors) = cv.ExtractSURF(frame, None, cv.CreateMemStorage(), (0, 500, 3, 1))
+        print frame
+        (keypoints, descriptors) = cv.ExtractSURF(frame, None, cv.CreateMemStorage(), (0, 20, 3, 1))
         new_features = []
         for ((x, y), laplacian, size, dir, hessian) in keypoints:
             new_features.append((x, y))
@@ -810,8 +868,9 @@ class VideoWindow(gtk.Window):
             y = int(event.y)
             self.features.append((x,y))
             print "x: ", x, ", y: ", y, "\r"
+            self.autocontrol.start_auto_session((x,y))
         return True
-   
+
     def motion_notify_event(self, widget, event):
         """
         Mouse callback method. Method does nothing important at this point, will print
@@ -883,3 +942,22 @@ class ControllerWindow(gtk.Window):
             controller.set_control_button(button)
         # self.video_play_button = 
         # self.video_play_button.connect("clicked", self.toggle_video_play)
+
+def cv2array(im): 
+  depth2dtype = { 
+        cv.IPL_DEPTH_8U: 'uint8', 
+        cv.IPL_DEPTH_8S: 'int8', 
+        cv.IPL_DEPTH_16U: 'uint16', 
+        cv.IPL_DEPTH_16S: 'int16', 
+        cv.IPL_DEPTH_32S: 'int32', 
+        cv.IPL_DEPTH_32F: 'float32', 
+        cv.IPL_DEPTH_64F: 'float64', 
+    } 
+
+  arrdtype=im.depth 
+  a = np.fromstring( 
+         im.tostring(), 
+         dtype=depth2dtype[im.depth], 
+         count=im.width*im.height*im.nChannels) 
+  a.shape = (im.height,im.width,im.nChannels) 
+  return a 

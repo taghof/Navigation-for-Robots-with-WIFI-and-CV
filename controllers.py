@@ -26,9 +26,14 @@ import socket
 import struct
 import threading
 import pygame
+import time
+
+import cv2.cv as cv
+import cv2
 
 import utils
 import settings
+import matcher
 
 class ControllerManager(object):
 
@@ -36,10 +41,22 @@ class ControllerManager(object):
     def __init__(self, drone):
         self.drone = drone
         self.interface = ControllerInterface()
-        self.controllers = (ManualControl(self.drone, self.interface), AutoControl(self.drone,self.interface))
+        auto = AutoControl(self.drone,self.interface)
+        man = ManualControl(self.drone, self.interface, auto)
+        self.controllers = []
+        self.controllers.append(man)
+        self.controllers.append(auto)
 
     def get_controllers(self):
         return self.controllers
+
+    def get_controller(self, id):
+        controllers = self.get_controllers()
+        for con in controllers:
+            if con.id == id:
+                return con
+            
+        return None
 
     def add_controller(self, controller):
         self.controllers.append(controller)
@@ -82,6 +99,7 @@ class Controller(object):
 
     def stop(self):
         print "Shutting " + str(self)
+        self.control_interface.stop()
         self.stopping = True
 
 class AutoControl(Controller):    
@@ -94,27 +112,81 @@ class AutoControl(Controller):
         self.video_sensor = drone.get_video_sensor()
         self.id = settings.AUTOCONTROL
         self.name = "Auto Controller"
-        self.tasks = []
+        
+        self.unstarted_tasks = []
+        self.active_tasks = []
+        
+        self.lock = threading.Lock()
+        
+        self.mark = []
+        self.init_mark()
+        self.mark_acquired = False
+        self.mark_search = False
+        self.last_match_image = None
+
+    def init_mark(self, markpics=None):
+        if markpics is None:
+            self.mark.append(cv2.imread('./mark3e.png', 0))
+            self.mark.append(cv2.imread('./mark3f.png', 0))
+            self.mark.append(cv2.imread('./mark3g.png', 0))
+            self.mark.append(cv2.imread('./mark3h.png', 0))
+
+    def toggle_mark_search(self):
+        self.mark_search = not self.mark_search
+
+    def search_for_mark(self):
+        matching = None
+        frame_org = self.video_sensor.get_data()
+        frame = cv.CreateImage ((frame_org.width, frame_org.height), cv.IPL_DEPTH_8U, 1)
+        cv.CvtColor(frame_org, frame, cv.CV_RGB2GRAY)
+        match_frame = utils.cv2array(frame)
+        num = 0
+       
+        for m in self.mark:
+            matching = matcher.match(m, match_frame)
+            if matching is not None and matching[1] > num:
+                num = matching[1]
+                matching = matching
+        if num:
+            self.last_match_image = matching[0]
+
+        if matching is not None and matching[1] >= 5:
+            self.last_match_image = None
+            return matching
+        else:
+            return None
 
     def process_events(self):
-       
+        self.lock.acquire()
+        
+        
+        if not self.mark_acquired and self.mark_search:
+            print 'Searching...'
+            mark = self.search_for_mark()
+            if not mark is None:
+                self.unstarted_tasks.append(self.create_track_point_task(mark[2]))
+                self.mark_acquired = True
+        
+        for task in self.unstarted_tasks:
+            task.start()
+            self.unstarted_tasks.remove(task)
+            self.active_tasks.append(task)
+
+        self.lock.release()
+
         if self.control_button is not None:
             return self.control_button.get_active()
         else:
-            for task in self.tasks:
-                
-                if len(task) > 0:
-                    t = task[0]
-                    if not t.is_alive():
-                        t.start()
-                    if t.is_stable():
-                        print "partly done"
-                        task.remove(t)
-                else:        
-                    self.tasks.remove(task)
-                    print "task done"
-        
-            return True
+            return not self.stopping
+
+
+    def stop(self):
+        self.lock.acquire()
+        for task in self.active_tasks:
+            task.stop()
+            task.join()
+        self.lock.release()        
+        Controller.stop(self)
 
     def move_rotate(self, degrees):
         pass
@@ -131,26 +203,37 @@ class AutoControl(Controller):
     def get_theta(self):
         return self.navdata_sensor.get_data().get(0, dict()).get('theta', 0)
 
-    def actual_move(self, power):
-        self.control_interface.move(0, 0, 0, power, True)
-        #print power
+    def actual_move(self, x, y, power, yaw):
+        self.control_interface.move(x, y, power, yaw, True)
 
     def move_vertically(self, dist):
         pass
-        
-    def start_auto_session(self):
-        t = []
-        t.append(utils.PID(self.get_psi, self.actual_move, 180))
-        #t.append(utils.PID(self.get_psi, self.actual_move, -15))
+    
+    def lost_track(self, caller):
+        self.mark_acquired = False
+        self.task_done(caller)
 
-        self.tasks.append(t)
+    def task_done(self, caller):
+        self.active_tasks.remove(caller)
+
+    def create_track_point_task(self, point=(88,72)):
+        tracker = utils.PointTracker(self.video_sensor, self.navdata_sensor, point)
+        t = utils.PIDxy(tracker, self.actual_move, self.lost_track)
+        return t
+
+    def start_auto_session(self, point=(88,72)):
+        tracker = utils.PointTracker(self.video_sensor, self.navdata_sensor, point)
+        #t.append(utils.PID(self.get_psi, self.actual_move, 180))
+        t = utils.PIDxy(tracker, self.actual_move)
+        self.unstarted_tasks.append(t)
 
 class ManualControl(Controller):    
 
 
-    def __init__(self, drone, interface):
+    def __init__(self, drone, interface, auto_control):
         Controller.__init__(self, drone, interface)
         pygame.joystick.init()
+        self.auto_control = auto_control
         self.id = settings.JOYCONTROL
         self.name = "Joystick Controller"
         if pygame.joystick.get_count() > 0:
@@ -181,36 +264,41 @@ class ManualControl(Controller):
                     roll = self.js.get_axis(0)
                     pitch = self.js.get_axis(1)
                     yaw = self.js.get_axis(3)
+                    print self.js.get_axis(2)
+                    print self.js.get_axis(5)
                     power2 = self.convert( self.js.get_axis(2) )
                     power1 = self.convert( self.js.get_axis(5) )
                     power = power1 - power2
+                    #print "power:" + str(power)
                     self.control_interface.move(roll, pitch, power, yaw, False)
-                    utils.dprint("", 'roll: ' + str(roll) + ' pitch: ' + str(pitch) + ' power: ' + str(power) + ' yaw: ' + str(yaw) )                   
+                    # print 'roll: ' + str(roll) + ' pitch: ' + str(pitch) + ' power: ' + str(power) + ' yaw: ' + str(yaw)                    
                     
                 elif e.type == pygame.JOYBUTTONDOWN: # 10
                     for b in xrange(self.js.get_numbuttons()):
                                                 
                         if self.js.get_button(b) > 0:
                             print 'number of button pushed: ' + str(b)
-                            # if b==0:
-                            #     self.controllerInterface.autocontrol.stop()
-                            #     self.controllerInterface.stop()
-                            #     self.stop()
-                            #     break
-                            if b==1:
+                            if b==0:
+                                self.control_interface.zap()
+                            elif b==1:
                                 self.control_interface.reset() 
                             elif b==2:
                                 self.drone.gui.toggle_video_window(None)
-                               
                             elif b==3:
-                                self.control_interface.led_show(5)
+                                self.control_interface.flat_trim()
+                                #self.control_interface.led_show(5)
                             elif b==4:
                                 self.drone.gui.set_target(None)
                             elif b==5:
                                 self.drone.gui.take_sample(None)
-#self.control_interface.zap()
-                            # elif b==6:
-                            #     pass
+#
+                            elif b==6:
+                                c = self.auto_control.current
+                                if c is not None:
+                                    c.toggle_verbose()
+                                else:
+                                    print "No task"
+                          
                             # elif b==7:
                             #     pass
                             elif b==8:
@@ -223,13 +311,36 @@ class ManualControl(Controller):
                                 # elif b==10:
                                 #     pass
                             elif b==11:
-                                self.control_interface.rotate(-1)
+                                c = self.auto_control.current
+                                if c is not None:
+                                    p = c.getKp()
+                                    c.setKp(p - 0.05)
+                                else:
+                                    print "No task"
+                          
                             elif b==12:
-                                self.control_interface.rotate(1)
-                              # elif b==13:
-                              #     pass
-                              # elif b==14:
-                              #     pass
+                                c = self.auto_control.current
+                                if c is not None:
+                                    p = c.getKp()
+                                    c.setKp(p + 0.05)
+                                else:
+                                    print "No task"
+                          
+                            elif b==13:
+                                c = self.auto_control.current
+                                if c is not None:
+                                    d = c.getKd()
+                                    c.setKd(d + 0.05)
+                                else:
+                                    print "No task"
+                          
+                            elif b==14:
+                                c = self.auto_control.current
+                                if c is not None:
+                                    d = c.getKd()
+                                    c.setKd(d - 0.05)
+                                else:
+                                    print "No task"
                           
         if self.control_button:
             return self.control_button.get_active()
@@ -245,11 +356,12 @@ class ManualControl(Controller):
 # *************************** utils ***************************************
     
     def convert(self, num):
-        nump = num +1
+        print "converting: " + str(num)
+        nump = float(num) + 1.0
         if nump > 0:
-            return nump/2
+            return nump/2.0
         else:
-            return nump
+            return float(nump)
 
 
 class ControllerInterface(object):
@@ -261,7 +373,7 @@ class ControllerInterface(object):
         self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
         self.speed = 0.2
         self.at(at_config, "general:navdata_demo", "TRUE")
-        self.chan = 0
+        self.chan = 1
    
     def zap(self):
         print 'zapping: ' + str(self.chan)
@@ -301,6 +413,10 @@ class ControllerInterface(object):
         # TODO: implement check for landed
         self.set_landed(True)
 
+    def flat_trim(self):
+        self.at(at_ftrim)
+        self.at(at_config, "control:altitude_max", "40000")
+
     def reset(self):
         utils.dprint("", 'Resetting')
         self.at(at_ref, False, True)
@@ -310,32 +426,31 @@ class ControllerInterface(object):
         self.at(at_led, num, 1.0, 2)
         
     def move(self, roll, pitch, power, yaw, auto=False):
-
-        if roll > 0.35 or roll < -0.35 or auto:
+        if roll > 0.10 or roll < -0.10 or auto:
             r = roll
         else:
             r = 0.0
 
-        if pitch > 0.35 or pitch < -0.35 or auto:
+        if pitch > 0.10 or pitch < -0.10 or auto:
             pi = pitch 
         else:
             pi = 0.0
 
-        if power > 0.35 or power < -0.35 or auto:
+        if power > 0.10 or power < -0.10 or auto:
             po = power
         else:
             po = power
 
-        if yaw > 0.35 or yaw < -0.35 or auto:
+        if yaw > 0.10 or yaw < -0.10 or auto:
             y = yaw
         else:
             y = 0.0
-
+        
         if r == 0.0 and pi == 0.0 and po == 0.0 and y == 0.0:
             self.at(at_pcmd, False, r, pi, po, y)
         else:
             self.at(at_pcmd, True, r, pi, po, y)
-        
+            
     def rotate(self, dir, speed=0.2):
         if dir > 0:
             utils.dprint("", ' Rotating clockwise!')
@@ -362,7 +477,7 @@ class ControllerInterface(object):
         self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
         self.com_watchdog_timer.start()
         self.lock.release()
-
+        
 #=====================================================================================
 # Low level functions
 #=====================================================================================
@@ -399,8 +514,10 @@ def at_pcmd(seq, progressive, lr, fb, vv, va):
 
     The above float values are a percentage of the maximum speed.
     """
+    
     p = 1 if progressive else 0
     at("PCMD", seq, [p, float(lr), float(fb), float(vv), float(va)])
+    
 
 def at_led(seq, anim, f, d):
     """

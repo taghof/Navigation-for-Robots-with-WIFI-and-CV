@@ -28,6 +28,8 @@ import presenter
 import testdevice
 import utils
 import settings
+import time
+import threading
 
 class Drone(object):
 
@@ -68,9 +70,12 @@ class Drone(object):
         self.gui.start()
 
     def stop(self):
+        self.controller_manager.stop()
         for sensor in self.sensors:
             sensor.stop()
-        self.controller_manager.stop()
+            
+        time.sleep(1)
+        print threading.enumerate()
 
     def get_video_sensor(self):
         return self.video_sensor
@@ -98,7 +103,10 @@ def main():
 
     if settings.TEST:
         drone.get_video_sensor().join()
+        
         testdevice_.stop()
+
+
    
 if __name__ == '__main__':
     main()

@@ -31,7 +31,7 @@ import pickle
 from collections import OrderedDict
 from collections import deque
 
-import cv
+import cv2.cv as cv
 
 import utils
 import decoder
@@ -217,9 +217,13 @@ class VideoReceiver(Receiver):
     def on_record_sample(self, data):
         
         img = data
-        cv.SaveImage("../images/target-image-"+ str(time.time()) + ".png", img)    
-        gray  = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
-        canny = cv.CreateImage ((320, 240), cv.IPL_DEPTH_8U, 1)
+        s = (img.width, img.height)
+        saveimg  = cv.CreateImage (s, cv.IPL_DEPTH_8U, 3)
+        cv.CvtColor(img, saveimg,cv.CV_BGR2RGB)
+        cv.SaveImage("../images/target-image-"+ str(time.time()) + ".png", saveimg)    
+        
+        gray  = cv.CreateImage (s, cv.IPL_DEPTH_8U, 1)
+        canny = cv.CreateImage (s, cv.IPL_DEPTH_8U, 1)
         cv.CvtColor(img, gray,cv.CV_BGR2GRAY)
         cv.Canny(gray, canny, 10, 15)
         

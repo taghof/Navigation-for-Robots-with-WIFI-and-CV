@@ -50,9 +50,10 @@ class TestDevice(threading.Thread):
 
         if not os.path.isfile('./pickled_5555.data'):
             self.pickled_video = False
-            while os.path.isfile('../testdata/' + str(self.vi) + '.dat'):
-                self.video_packets.append('../testdata/' + str(self.vi) + '.dat')
+            while os.path.isfile('./testdata/' + str(self.vi) + '.dat'):
+                self.video_packets.append('./testdata/' + str(self.vi) + '.dat')
                 self.vi += 1
+            print "video frames:", self.vi
         else:
             print "Gone pickling...\r"
             fileObj = open('./pickled_5555.data')
@@ -150,7 +151,7 @@ class TestDevice(threading.Thread):
                 ni = 0
 
             self.timeout -= 1
-            time.sleep(0.05)
+            time.sleep(0.4)
 
         print 'Shutting down TestDevice\r'
 

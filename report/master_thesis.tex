@@ -89,17 +89,46 @@ måle tidsintervallet der går før ekkoet måles. Højdemåleren er angivet
 til at virke op til seks meters højde og er rent fysisk placeret på
 dronens navboard. Det er værd at bemærke, at højdemåleren ikke måler
 højden på et specifikt punkt, men derimod returnerer den mindste højde
-i et område som det på (fig).
+i et område som det på \ref{fig:sonicbeam}, samt at ultrasoniske
+detektorer generelt har problemer med bløde og skrånende overflader.
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.80\textwidth]{sonardzone.jpg}
+\caption{Udslagsområde for en ultrasonisk sensor}
+\label{fig:sonicbeam}
+\end{figure}
 
-gyroskoper
-
-accelerometer
-
-embedded computer
-
-motorer
+AR.drone er udstyret med to gyroskoper, et 2-akses gyroskop til at
+måle hældningsraten om x- og y-aksen samt et piezoelektrisk gyroskop
+til at måle rotationen om z-aksen. Gyroskoperne kombineres med et
+3-akses accelerometer i en samlet IMU-enhed, denne anvendes til
+løbende at give estimater af Euler-vinklerne(theta, phi og psi).  
+\\Dronens aktuatorer er de fire børsteløse 15W motorer. Motorerne
+arbejder i intervallet 10350 til 41400 RPM og når dronen står stille i
+luften arbejder motorerne med 28000 RPM. Dette svarer, grundet gearingen,
+til 3300 RPM for propellerne.
+\\Den centrale styringsenhed på dronen er en ARM9 468 mHz
+processor(Parrot 6 ARM926EJ) med 128 mb DDR ram og et integreret
+trådløst netværkskort(Atheros AR6102G-BM2D). Enheden giver også adgang
+til en On-The-Go USB port som primært anvendes ved opdateringer.
+\\Batterierne der driver alle enhederne er af lithium-polymer typen og
+giver ifølge dokumentationen ca. 12 minutters flyvetid.
   
 \subsection{Software}
+Dronens microcomputer kommer med en Linux 2.6.27 kerne
+installeret. Det bemærkes at 2.6.27 er den første kerne med indbygget
+support for UBIFS som er det filsystem der anvendes på dronens
+flashmemory.
+\\Udover Linux kernen leveres AR.Drone også med Busybox installeret,
+busybox er et meget populært valg blandt udviklere af embeddede
+systemer, da der er tale om en hel suite af alle de nødvendige userspace
+værktøjer pakket i en enkelt binær fil. Busybox kan
+konfigureres så kun den ønskede funktionalitet kommer med, hvilket
+betyder at størrelsen holdes på et minimum, hvilket i dette tilfælde
+er 483kb.   
+program.elf
+
+
 %\lstinputlisting[language=Python]{../drone.py}
 \subsection{Kommunikation}
 
@@ -113,7 +142,6 @@ motorer
 \bibliography{referencer}
 
 \section{Appendix header A}
-
 
 
 \end{document}

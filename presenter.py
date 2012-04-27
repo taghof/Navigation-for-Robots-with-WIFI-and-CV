@@ -723,29 +723,6 @@ class VideoWindow(gtk.Window):
         self.frame1 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
         # Convert image to gray
         cv.CvtColor(frame1_org, self.frame1, cv.CV_RGB2GRAY)
-        # if self.autocontrol.current is None and not self.autocontrol.stopping:
-        #      match_frame = cv2array(self.frame1)
-        #      m1 = matcher.match(self.mark1, match_frame)
-        #      m2 = matcher.match(self.mark2, match_frame)
-        #      m3 = matcher.match(self.mark3, match_frame)
-        #      m4 = matcher.match(self.mark4, match_frame)
-             
-        #      m = m1
-        #      if m2[1] > m[1]:
-        #          m = m2
-        #      if m3[1] > m[1]:
-        #          m = m3
-        #      if m4[1] > m[1]:
-        #          m = m4
-
-        #      match_image = m[0]
-        #      match_num = m[1]
-        #      match_point = m[2]
-        #      if match_num >= 8 and self.autocontrol.current is None and not self.autocontrol.stopping:
-        #          print 'matched six or more...'
-        #          self.autocontrol.start_auto_session(match_point)
-        # else:
-        #match_image = None
 
         # Smoothen image to get rid of false features
         cv.Smooth(self.frame1, self.frame1, param1=7, param2=7, param3=1.5)

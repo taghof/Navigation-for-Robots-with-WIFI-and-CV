@@ -11,7 +11,7 @@
 \begin{document} 
 
 %\newcommand{\oversaet}[1]{(\textit{#1})}
-
+\newcommand{\uri}[1]{#1}
 
 \title{Master Thesis}
 \author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
@@ -39,8 +39,8 @@
 
 \section{Introduktion}
 \subsection{området, teknologi}
-\subsection{}
-\subsection{}
+%\subsection{}
+%\subsection{}
 
 \pagebreak
 \section{AR.Drone}
@@ -62,12 +62,12 @@ indendørs og udendørs flyvning.
 \begin{figure}[h]
 \centering
   \subfloat[Indendørsskjold]{
-    \label{fig:indendørsskjold}
+    \label{fig:indendoersskjold}
     \includegraphics[width=0.45\textwidth]{parrot-ardrone.jpg}
   }
   ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
   \subfloat[Udendørsskjold]{
-    \label{fig:udendørsskjold}
+    \label{fig:udendoersskjold}
     \includegraphics[width=0.45\textwidth]{parrot-ardrone-outdoor.jpg}
   }
   \caption{AR.Drone med indendørs- og udendørsskjold}
@@ -78,41 +78,44 @@ indendørs og udendørs flyvning.
 \label{ssec:hardware}
 Som de fleste robotter består AR.Drone af et antal sensorer, et antal
 aktuatorer og en styringsenhed. 
-\\AR.Drone er udstyret med to kameraer, det fremadrettede er en 93
-graders CMOS sensor som kan levere 640x480 billeder(selvom
+\\AR.Drone er udstyret med to kameraer, det fremadrettede er en $93 ^{\circ}$
+CMOS sensor som kan levere $640 \times 480$ billeder (selvom
 resourceknaphed gør at opløsningen der transmitteres fra dronen
-kun er 320x240(QVGA)) med en framerate på 15/s. Det nedadvendte kamera er
-en 64 graders CMOS sensor, der tager billeder i 176x144(QCIF) med en
-framerate på 60/s.
+kun er $320 \times 240$ (QVGA)) med en framerate på $15 FPS$. Det nedadvendte kamera er
+en $64 ^{\circ}$ CMOS sensor, der tager billeder i $176 \times 144$ (QCIF) med en
+framerate på $60 FPS$.
 \\Til at bestemme dronens højde over jorden anvendes en ultrasonisk
 højdemåler, denne opererer ved at udsende en ultralydspuls og herefter
 måle tidsintervallet der går før ekkoet måles. Højdemåleren er angivet
-til at virke op til seks meters højde og er rent fysisk placeret på
+til at virke op til 6 meter og er rent fysisk placeret på
 dronens navboard. Det er værd at bemærke, at højdemåleren ikke måler
 højden på et specifikt punkt, men derimod returnerer den mindste højde
-i et område som det på \ref{fig:sonicbeam}, samt at ultrasoniske
+i et område som det på %\ref{fig:sonicbeam}, samt at ultrasoniske
 detektorer generelt har problemer med bløde og skrånende overflader.
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.80\textwidth]{sonardzone.jpg}
-\caption{Udslagsområde for en ultrasonisk sensor}
-\label{fig:sonicbeam}
-\end{figure}
+%\begin{figure}[h]
+%  \centering
+%  \includegraphics[width=0.80\textwidth]{sonardzone.jpg}
+%  \caption{Udslagsområde for en ultrasonisk sensor}
+%  \label{fig:sonicbeam}
+%\end{figure}
 
 AR.drone er udstyret med to gyroskoper, et 2-akses gyroskop til at
 måle hældningsraten om x- og y-aksen samt et piezoelektrisk gyroskop
 til at måle rotationen om z-aksen. Gyroskoperne kombineres med et
 3-akses accelerometer i en samlet IMU-enhed, denne anvendes til
-løbende at give estimater af Euler-vinklerne(theta, phi og psi).  
-\\Dronens aktuatorer er de fire børsteløse 15W motorer. Motorerne
-arbejder i intervallet 10350 til 41400 RPM og når dronen står stille i
-luften arbejder motorerne med 28000 RPM. Dette svarer, grundet gearingen,
-til 3300 RPM for propellerne.
-\\Den centrale styringsenhed på dronen er en ARM9 468 mHz
-processor(Parrot 6 ARM926EJ) med 128 mb DDR ram og et integreret
-trådløst netværkskort(Atheros AR6102G-BM2D). Enheden giver også adgang
-til en On-The-Go USB port som primært anvendes ved opdateringer.
-\\Batterierne der driver alle enhederne er af lithium-polymer typen og
+løbende at give estimater af Euler-vinklerne(theta, phi og psi).%\\
+
+Dronens aktuatorer er de fire børsteløse $15 W$ motorer. Motorerne
+arbejder i intervallet $10350$ til $41400 RPM$ og når dronen står stille i
+luften arbejder motorerne med $28000 RPM$. Dette svarer, grundet gearingen,
+til $3300 RPM$ for propellerne.%\\
+
+Den centrale styringsenhed på dronen er en ARM9 468 mHz
+processor (Parrot 6 ARM926EJ) med 128 mb DDR ram og et integreret
+trådløst netværkskort (Atheros AR6102G-BM2D). Enheden giver også adgang
+til en On-The-Go USB port som primært anvendes ved opdateringer.%\\
+
+Batterierne der driver alle enhederne er af lithium-polymer typen og
 giver ifølge dokumentationen ca. 12 minutters flyvetid.
   
 \subsection{Software}
@@ -130,7 +133,7 @@ dette betyder at størrelsen holdes på et minimum. Busybox på AR.Drone
 fylder 483 kb.
 \\Den firmware der står for selve styringen, transmitteringen af
 data og bearbejdning af sensordata i forbindelse med flyvning er
-implementeret i /bin/program.elf. Da der er tale om proprietært
+implementeret i \uri{/bin/program.elf}. Da der er tale om proprietært
 software kan vi ikke udtale os om hvordan programmet er implementeret,
 vi kan dog udlede forskellige elementer efter at have observeret
 dronen under flyvning. Program.elf indeholder blandt andet en PID
@@ -146,17 +149,21 @@ interfacet beskrives i afsnit~\ref{ssec:kommunikation}.
 \label{ssec:fysik}
 Dronen har 4 rotorvinger siddende i hver sit hjørne af et stativkryds
 på dronen.  2 motorer drejer 2 rotorer den ene vej (med uret), mens det
-andet par motorer og rotorer drejer den anden vej (imod uret). Dronen
-har 3 bevægelsesakser (x, y og z). Alle dronens bevægelser styres ved
+andet par motorer og rotorer drejer den anden vej (imod uret)
+\cite{ardroneDevGuide}. Dronens 
+flyvning og bevægelser i rummet kan beskrives med 3 bevægelsesakser (x, 
+y og z). Alle dronens bevægelser styres ved
 at kontrolere dronens vinkel i forhold til de 3 akser, eg. skal dronen
 flyve fremad roteres dronen så den hælder fremad, dvs.  forenden
 kommer lidt under bagenden ift afstanden til gulvet. Sagt i de
 korrekte termer så roteres dronen en smule om y-aksen (pitch).
-Ligesom med y- eller en pitch-akse, er der ved drejning af dronen
+Ligesom med y-akse, er der ved drejning af dronen
 omkring x-aksen(roll) og z-aksen(yaw) en resulterende bevægelse
-henholdsvis sidelæns og omkring dronens center.
-
-max flyvehastighed - krængning?
+henholdsvis sidelæns og omkring dronens center.\\
+Ifølge Wikipedia.org\footnote{Wikipedia.org/wiki/Parrot\_AR.Drone, set april 2012} skal dronen være i 
+stand til at flyve fremad med en hastighed på 5 m/sek svarende til 18 km/t
+%\cite{wikiDrone}
+ - krængning?
 
 plus figure
 

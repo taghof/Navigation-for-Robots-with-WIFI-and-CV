@@ -78,7 +78,9 @@ indendørs og udendørs flyvning.
 \label{ssec:hardware}
 Som de fleste robotter består AR.Drone af et antal sensorer, et antal
 aktuatorer og en styringsenhed. 
-\\AR.Drone er udstyret med to kameraer, det fremadrettede er en 93
+\subsubsection{Sensorer}
+\label{sssec:sensorer}
+AR.Drone er udstyret med to kameraer, det fremadrettede er en 93
 graders CMOS sensor som kan levere 640x480 billeder(selvom
 resourceknaphed gør at opløsningen der transmitteres fra dronen
 kun er 320x240(QVGA)) med en framerate på 15/s. Det nedadvendte kamera er
@@ -104,11 +106,15 @@ måle hældningsraten om x- og y-aksen samt et piezoelektrisk gyroskop
 til at måle rotationen om z-aksen. Gyroskoperne kombineres med et
 3-akses accelerometer i en samlet IMU-enhed, denne anvendes til
 løbende at give estimater af Euler-vinklerne(theta, phi og psi).  
-\\Dronens aktuatorer er de fire børsteløse 15W motorer. Motorerne
+\subsubsection{Aktuatorer}
+\label{sssec:aktuatorer}
+Dronens aktuatorer er de fire børsteløse 15W motorer. Motorerne
 arbejder i intervallet 10350 til 41400 RPM og når dronen står stille i
 luften arbejder motorerne med 28000 RPM. Dette svarer, grundet gearingen,
 til 3300 RPM for propellerne.
-\\Den centrale styringsenhed på dronen er en ARM9 468 mHz
+\subsubsection{Styring}
+\label{sssec:styring}
+Den centrale styringsenhed på dronen er en ARM9 468 mHz
 processor(Parrot 6 ARM926EJ) med 128 mb DDR ram og et integreret
 trådløst netværkskort(Atheros AR6102G-BM2D). Enheden giver også adgang
 til en On-The-Go USB port som primært anvendes ved opdateringer.
@@ -117,30 +123,88 @@ giver ifølge dokumentationen ca. 12 minutters flyvetid.
   
 \subsection{Software}
 \label{ssec:software}
+\subsubsection{Linux}
+\label{sssec:linux}
 Dronens microcomputer kommer med en Linux 2.6.27 kerne
 installeret. Det bemærkes at 2.6.27 er den første kerne med indbygget
 support for UBIFS som er det filsystem der anvendes på dronens
 flashmemory.
+\subsubsection{Busybox}
+\label{sssec:busybox}
 \\Udover Linux kernen leveres AR.Drone også med Busybox installeret.
 Busybox giver adgang til en række unix værktøjer der er optimeret til
 brug i embeddede systemer og er derfor et meget populært valg blandt
 udviklere af sådanne systemer. Busybox konfigureres så kun de ønskede
 værktøjer medtages og disse pakkes så til en enkelt eksekverbar fil,
 dette betyder at størrelsen holdes på et minimum. Busybox på AR.Drone
-fylder 483 kb.
-\\Den firmware der står for selve styringen, transmitteringen af
+fylder 483 kb og udstyrer dronen med alle de userspacer værktøjer man
+forventer på et standard linux system(cd, ls, mv, ln osv.), men
+leverer desuden også den dhcp-server dronen anvender til at uddele
+ip-adresser, den telnet-server der giver adgang til dronens terminal
+samt den editor(vi) der gør det muligt at redigere filer på dronen. 
+\subsubsection{Program.elf}
+\label{sssec:program.elf}
+Den firmware der står for selve styringen, transmitteringen af
 data og bearbejdning af sensordata i forbindelse med flyvning er
 implementeret i /bin/program.elf. Da der er tale om proprietært
 software kan vi ikke udtale os om hvordan programmet er implementeret,
 vi kan dog udlede forskellige elementer efter at have observeret
 dronen under flyvning. Program.elf indeholder blandt andet en PID
-controller til at stabilisere dronen når der svæves og en algoritme
-til at udlede dronens hastighed ved hjælp af bundkameraet. Program.elf
-modtager kommandoer fra brugeren gennem en UDP port, selve UDP
-interfacet beskrives i afsnit~\ref{ssec:kommunikation}.
+controller til at stabilisere dronen når der svæves, en algoritme
+til at udlede dronens hastighed ved hjælp af bundkameraet samt en
+algoritme til at detektere tags i billeder i forbindelse med augmented
+reality spil. Program.elf modtager kommandoer fra brugeren gennem en
+UDP socket, selve UDP interfacet beskrives i afsnit ~\ref{ssec:kommunikation}. 
 %\lstinputlisting[language=Python]{../drone.py}
+
 \subsection{Kommunikation}
 \label{ssec:kommunikation}
+Kommunikationen med dronen kan indeles i to kategorier, den der
+beskæftiger sig med input til, og output, fra program.elf(flyvning) og
+den der omhandler den almindelige anvendelse af dronens linux
+system.
+
+\subsubsection{TCP baseret kommunikation}
+\label{sssec:tcp}
+For at få adgang til en terminal på dronen anvendes
+en telnetklient. Efter forbindelse til dronens ip-adresse får brugeren
+adgang til en rodterminal, da systemet er sat op som et
+enkeltbrugersystem.
+\\For at overføre en fil til dronen anvendes en FTP-klient. Efter
+forbindelse til dronen, kan filer overføres mellem dronen og brugerens
+system med FTP-protokollens PUT og GET kommandoer. Hvis der ikke
+angives en sti lægges overførte filer som standard i '/data/video' mappen.  
+
+\subsubsection{UDP baseret kommunikation}
+\label{sssec:udp}
+I modsætning til FTP- og telnetklienterne, som er TCP baserede, anvendes
+UDP-protokollen til den kommunikation der sker mellem program.elf og
+brugerens system. Sammenlignet med TCP opererer UDP med noget mindre
+overhead per afsendt besked, tilgengæld garanterer protokollen intet
+om hvorvidt eller hvornår en pakke når frem til sin destination. UDP
+er oftest det første valg når der skal streames video og lyd over et
+netværk, da en enkelt mistet pakke sjældent har stor betydning i denne
+kontekst. Når fokus er på at få sendt så meget
+information(navigationsdata og video) som muligt til brugeren, giver
+det god mening at anvende UDP og så implementere et minimum af
+flowkontrol ovenpå protokollen. Til gengæld kan vi godt se fordele i
+de garantier TCP kunne give når fokus er på at modtage kontrolpakker,
+heldigvis er det forholdsvis simpelt, at kontrollere hvorvidt visse
+kritiske beskeder(land, let etc.) er nået frem til dronen, eller om vi
+skal sende pakken igen. 
+\subsubsection{AT kommando interface}
+\label{sssec:atinterface}
+En bruger applikation kommunikerer med dronens software ved hjælp af
+såkaldte AT-kommandoer, En AT-kommando er basalt set blot en
+tekststreng encodet som 8 bits karakterer, kommandoer sendes til dronens
+kommandoport(5556) som UDP-pakker. Formatet for AT-kommandoer er som følger:\\\\
+{\centering AT*[kommandonavn]=[sekvensnummer][arg1, arg2 ... argN] } 
+En kommando må ikke deles i flere pakker, men en UDP-pakke kan
+indeholde flere AT-kommandoer, kommandoerne skal blot være adskilt med
+en "linefeed" karakter og den samlede længde må ikke overskride 1024
+karakterer. Såfremt en kommando overskrider længdebegrænsningen eller
+på anden måde ikke overholder syntaksen, vil dronen ignorere
+kommandoen. 
 
 \subsection{Fysik}
 \label{ssec:fysik}

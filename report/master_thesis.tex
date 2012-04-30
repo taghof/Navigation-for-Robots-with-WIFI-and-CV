@@ -138,8 +138,9 @@ software kan vi ikke udtale os om hvordan programmet er implementeret,
 vi kan dog udlede forskellige elementer efter at have observeret
 dronen under flyvning. Program.elf indeholder blandt andet en PID
 controller til at stabilisere dronen når der svæves og en algoritme
-til at udlede dronens hastighed ved hjælp af bundkameraet. Program.elf
-modtager kommandoer fra brugeren gennem en UDP port, selve UDP
+til at udlede dronens hastighed ved hjælp af bundkameraet%cite hvor
+% nogle siger at program.elf + motorstyring + radio tager op mod $80 \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
+. Program.elf modtager kommandoer fra brugeren gennem en UDP port, selve UDP
 interfacet beskrives i afsnit~\ref{ssec:kommunikation}.
 %\lstinputlisting[language=Python]{../drone.py}
 \subsection{Kommunikation}
@@ -149,8 +150,7 @@ interfacet beskrives i afsnit~\ref{ssec:kommunikation}.
 \label{ssec:fysik}
 Dronen har 4 rotorvinger siddende i hver sit hjørne af et stativkryds
 på dronen.  2 motorer drejer 2 rotorer den ene vej (med uret), mens det
-andet par motorer og rotorer drejer den anden vej (imod uret)
-\cite{ardroneDevGuide}. Dronens 
+andet par motorer og rotorer drejer den anden vej (imod uret)\cite{ardroneDevGuide}. Dronens 
 flyvning og bevægelser i rummet kan beskrives med 3 bevægelsesakser (x, 
 y og z). Alle dronens bevægelser styres ved
 at kontrolere dronens vinkel i forhold til de 3 akser, eg. skal dronen
@@ -161,12 +161,15 @@ Ligesom med y-akse, er der ved drejning af dronen
 omkring x-aksen(roll) og z-aksen(yaw) en resulterende bevægelse
 henholdsvis sidelæns og omkring dronens center.\\
 Ifølge Wikipedia.org\footnote{Wikipedia.org/wiki/Parrot\_AR.Drone, set april 2012} skal dronen være i 
-stand til at flyve fremad med en hastighed på 5 m/sek svarende til 18 km/t
-%\cite{wikiDrone}
- - krængning?
-
-plus figure
-
+stand til at flyve fremad med en hastighed på 5 m/sek svarende til 18 km/t. %\cite{wikiDrone}
+\begin{figure}[h]
+ \centering
+ \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
+ \caption{Drone-krængning og bevægelser}
+ \label{fig:drone_movements}
+\end{figure}
+ - krængning? ... der er en cutoff-vinkel på 90 grader, dvs. under flyvning tester dronen løbende at pitch- og roll-vinklen ikke kommer over $90 ^{\circ}$, ved den vinkel lukkes systemet ned kraften til rotorene klippes og dronen lader sig falde til jorden.
+man kan på iPhone app'en øge eller sænke grænsen for hvor mange grader man må bede dronen om at tilte, ligesom man kan bestemme grænser for flyvehøjden og hastigheden dronen drejer med.
 \pagebreak
 
 \appendix

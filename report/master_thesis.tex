@@ -3,13 +3,16 @@
 \usepackage[danish]{babel}
 \usepackage[ansinew]{inputenc}
 \usepackage{graphicx}
+\usepackage{framed}
 \usepackage{subfig}
 \usepackage{listings}
 \usepackage{natbib}
 \usepackage{titleref}
 
 \begin{document} 
-
+\newenvironment{nb}
+   {\begin{framed}\begin{quotation}}
+   {\end{framed}\end{quotation}}
 %\newcommand{\oversaet}[1]{(\textit{#1})}
 \newcommand{\uri}[1]{#1}
 
@@ -59,7 +62,7 @@ trykmåler og kompas til platformen.
 skummateriale og kommer med to forskellige skumskjold til henholdsvis
 indendørs og udendørs flyvning.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
   \subfloat[Indendørsskjold]{
     \label{fig:indendoersskjold}
@@ -94,7 +97,7 @@ dronens navboard. Det er værd at bemærke, at højdemåleren ikke måler
 højden på et specifikt punkt, men derimod returnerer den mindste højde
 i et område som det på \ref{fig:sonicbeam}, samt at ultrasoniske
 detektorer generelt har problemer med bløde og skrånende overflader.
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg}
   \caption{Udslagsområde for en ultrasonisk sensor}
@@ -110,7 +113,8 @@ løbende at give estimater af Euler-vinklerne(theta, phi og psi).
 Dronens aktuatorer er de fire børsteløse $15 W$ motorer. Motorerne
 arbejder i intervallet $10350$ til $41400 RPM$ og når dronen står stille i
 luften arbejder motorerne med $28000 RPM$. Dette svarer, grundet gearingen,
-til $3300 RPM$ for propellerne.
+til $3300 RPM$ for propellerne. Motorerne har uden sammenligning det
+største strømforbrug af alle dronens enheder.
 \subsubsection{Styring}
 \label{sssec:styring}
 Den centrale styringsenhed på dronen er en ARM9 468 mHz
@@ -157,15 +161,12 @@ og en algoritme til at detektere tags i billeder i forbindelse med augmented
 reality spil. Program.elf modtager kommandoer fra brugeren gennem en UDP port, selve UDP
 interfacet beskrives i afsnit~\ref{ssec:kommunikation}.
 
-
-
 \subsection{Kommunikation}
 \label{ssec:kommunikation}
 Kommunikationen med dronen kan indeles i to kategorier, den der
 beskæftiger sig med input til, og output, fra program.elf(flyvning) og
 den der omhandler den almindelige anvendelse af dronens linux
 system.
-
 \subsubsection{TCP baseret kommunikation}
 \label{sssec:tcp}
 For at få adgang til en terminal på dronen anvendes
@@ -176,7 +177,6 @@ enkeltbrugersystem.
 forbindelse til dronen, kan filer overføres mellem dronen og brugerens
 system med FTP-protokollens PUT og GET kommandoer. Hvis der ikke
 angives en sti lægges overførte filer som standard i '/data/video' mappen.  
-
 \subsubsection{UDP baseret kommunikation}
 \label{sssec:udp}
 I modsætning til FTP- og telnetklienterne, som er TCP baserede, anvendes
@@ -199,14 +199,54 @@ skal sende pakken igen.
 En bruger applikation kommunikerer med dronens software ved hjælp af
 såkaldte AT-kommandoer, En AT-kommando er basalt set blot en
 tekststreng encodet som 8 bits karakterer, kommandoer sendes til dronens
-kommandoport(5556) som UDP-pakker. Formatet for AT-kommandoer er som følger:\\\\
-{\centering AT*[kommandonavn]=[sekvensnummer][arg1, arg2 ... argN] } 
+kommandoport(5556) som UDP-pakker. Formatet for AT-kommandoer ses på
+figur \ref{fig:atsyntaks}.
+\begin{figure}[ht]
+  \begin{framed}   
+  \begin{quotation}
+    AT*[kommandonavn]=[sekvensnummer][arg1, arg2 ... argN]\newline \newline
+    [kommandonavn] er navnet på den ønskede kommando\newline
+    [sekvensnummer] er et globalt, altid stigende sekvensnummer\newline
+    [arg1, ... argN] er et variende antal parametre
+  \end{quotation}
+  \caption{AT-kommando syntaks}  
+  \label{fig:atsyntaks}
+\end{framed}   
+\end{figure}
+
 En kommando må ikke deles i flere pakker, men en UDP-pakke kan
 indeholde flere AT-kommandoer, kommandoerne skal blot være adskilt med
 en "linefeed" karakter og den samlede længde må ikke overskride 1024
 karakterer. Såfremt en kommando overskrider længdebegrænsningen eller
 på anden måde ikke overholder syntaksen, vil dronen ignorere
-kommandoen. 
+kommandoen.   
+Tabel \ref{tab:kommandoer} viser hvilke kommandoer der
+jf. \cite{ardroneDevGuide} kan bruges til at
+kontrollere dronen.\newline 
+\begin{table}[ht]
+  
+  \begin{center}
+  \begin{tabular}{ l | p{3,5cm} | p{5,5cm} }
+    Navn & Argumenter & beskrivelse\\
+    \hline
+    REF & input & Kommando til takeoff, land og nødstop\\
+    \hline
+    PCMD & flag, roll, pitch, gas, yaw & Flytter dronen\\
+    \hline 
+    FTRIM &  & Sætter den horisontale referenceværdi \\
+    \hline
+    CONFIG & key, value & Ændrer en konfigurationsparameter\\
+    \hline
+    LED & animation, frequency, duration & Viser en LED animation\\
+    \hline
+    ANIM & animation, duration & Afspiller en flyvesekvens\\
+    \hline
+    COMWDG & & Resetter komunikationstimeren
+  \end{tabular}
+  \end{center}
+  \caption{Gyldige AT-kommandoer} 
+  \label{tab:kommandoer}
+\end{table} 
 
 \subsection{Fysik}
 \label{ssec:fysik}
@@ -224,7 +264,7 @@ omkring x-aksen(roll) og z-aksen(yaw) en resulterende bevægelse
 henholdsvis sidelæns og omkring dronens center.\\
 Ifølge Wikipedia.org\footnote{Wikipedia.org/wiki/Parrot\_AR.Drone, set april 2012} skal dronen være i 
 stand til at flyve fremad med en hastighed på 5 m/sek svarende til 18 km/t. %\cite{wikiDrone}
-\begin{figure}[h]
+\begin{figure}[ht]
  \centering
  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
  \caption{Drone-krængning og bevægelser}

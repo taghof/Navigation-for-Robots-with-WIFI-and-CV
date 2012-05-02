@@ -54,7 +54,7 @@ import array
 import datetime
 import struct
 import sys
-import numpy
+import numpy as np
 import cv2.cv as cv
 
 try:
@@ -495,7 +495,7 @@ def get_block(bitreader, has_coeff):
     return inverse_dct(out_list)
 
 
-def get_mb(bitreader, picture, width, offset):
+def get_mb(bitreader, array, width, offset):
     """Get macro block.
 
     This method does not return data but modifies the picture parameter in
@@ -538,14 +538,16 @@ def get_mb(bitreader, picture, width, offset):
             coloff = offset[1]
             
             #index =  offset + row*(width*3) + (col*3)
-            picture[ rowoff+row, coloff+col] =  (r, g, b)
-                        
+            #picture[ rowoff+row, coloff+col] =  (r, g, b)
+            #print str(rowoff+row) + ", " + str(coloff+col) + " - " + str(array.shape) + "\r"
+            
+            array[rowoff+row, coloff+col] = (r, g, b)            
     else:
         print "mbc was not zero"
 
 
 
-def get_gob(bitreader, picture, slicenr, width):
+def get_gob(bitreader, array,  slicenr, width):
     """Read a group of blocks.
     
     The method does not return data, the picture parameter is modified in place
@@ -566,7 +568,7 @@ def get_gob(bitreader, picture, slicenr, width):
         _ = bitreader.read(5)
     offset = slicenr*16*width
     for i in xrange(width / 16):
-        get_mb(bitreader, picture, width, (slicenr*16, i*16))#(offset+16*i))
+        get_mb(bitreader, array, width, (slicenr*16, i*16))#(offset+16*i))
 
 # def cv2array(im): 
 #   depth2dtype = { 
@@ -594,18 +596,20 @@ def read_picture(data):
     if data is None:
         print "no image data"
         return None
-
-
-    #retimg = cv.CreateMat (320, 240, cv.CV_8UC1)
+    
     bitreader = BitReader(data)
     t = datetime.datetime.now()
     width, height = get_pheader(bitreader)
     slices = height / 16
     blocks = width / 16
+    
+    #retarray = np.zeros((height, width, 3), np.uint8)
+    #retarray = cv.CreateImage((width, height), 8, 3)
+    #retarray = np.empty((height, width, 3), np.uint8, 'C')
+    retarray = cv.CreateMat(height, width, cv.CV_8UC3)
 
-    retimg = cv.CreateImage((width, height), 8, 3)
     for i in xrange(0, slices):
-        get_gob(bitreader, retimg, i, width)
+        get_gob(bitreader, retarray, i, width)
 
     # total_red = 0
     # total_green = 0
@@ -655,7 +659,7 @@ def read_picture(data):
 
     t2 = datetime.datetime.now()
 
-    return width, height, retimg, (t2 - t).microseconds / 1000000.
+    return width, height, np.asarray(retarray), (t2 - t).microseconds / 1000000.0
 
 def decode_navdata(packet):
     """Decode a navdata packet."""

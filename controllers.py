@@ -40,10 +40,12 @@ class ControllerManager(object):
 
     def __init__(self, drone):
         self.drone = drone
-        self.interface = ControllerInterface()
-        auto = AutoControl(self.drone,self.interface)
-        man = ManualControl(self.drone, self.interface, auto)
+        #self.interface = drone.interface
+        auto = AutoControl(self.drone)
+        man = ManualControl(self.drone)
+        key = KeyboardControl(self.drone)
         self.controllers = []
+        self.controllers.append(key)
         self.controllers.append(man)
         self.controllers.append(auto)
 
@@ -70,17 +72,28 @@ class ControllerManager(object):
     def stop_controllers(self):
         for con in self.controllers:
             con.stop()
+        #self.interface.stop()
 
-class Controller(object):
+    def start_controllers(self):
+        for con in self.controllers:
+            con.start()
+
+class Controller(threading.Thread):
 
     
-    def __init__(self, drone, interface):
+    def __init__(self, drone):
+        threading.Thread.__init__(self)
         self.drone = drone
-        self.control_interface = interface
+        self.control_interface = drone.get_interface()
         self.control_button = None
         self.control_method = self.process_events
         self.id = None       
         self.stopping = False
+
+    def run(self):
+        while self.control_method is not None and not self.stopping:
+            self.control_method()
+            time.sleep(0.1)
 
     def process_events(self):
         return False
@@ -98,15 +111,14 @@ class Controller(object):
         return self.control_method
 
     def stop(self):
-        print "Shutting " + str(self)
-        self.control_interface.stop()
+        print "Shutting down " + str(self) + "\r"
         self.stopping = True
 
 class AutoControl(Controller):    
 
 
-    def __init__(self, drone, interface):
-        Controller.__init__(self, drone, interface)
+    def __init__(self, drone):
+        Controller.__init__(self, drone)
         self.navdata_sensor = drone.get_navdata_sensor()
         self.wifi_sensor = drone.get_wifi_sensor()
         self.video_sensor = drone.get_video_sensor()
@@ -137,13 +149,13 @@ class AutoControl(Controller):
     def search_for_mark(self):
         matching = None
         frame_org = self.video_sensor.get_data()
-        frame = cv.CreateImage ((frame_org.width, frame_org.height), cv.IPL_DEPTH_8U, 1)
-        cv.CvtColor(frame_org, frame, cv.CV_RGB2GRAY)
-        match_frame = utils.cv2array(frame)
+        #frame = cv.CreateImage ((frame_org.width, frame_org.height), cv.IPL_DEPTH_8U, 1)
+        frame = cv2.cvtColor(frame_org, cv.CV_RGB2GRAY)
+        #match_frame = utils.cv2array(frame)
         num = 0
        
         for m in self.mark:
-            matching = matcher.match(m, match_frame)
+            matching = matcher.match(m, frame)
             if matching is not None and matching[1] > num:
                 num = matching[1]
                 matching = matching
@@ -158,7 +170,6 @@ class AutoControl(Controller):
 
     def process_events(self):
         self.lock.acquire()
-        
         
         if not self.mark_acquired and self.mark_search:
             print 'Searching...'
@@ -179,14 +190,17 @@ class AutoControl(Controller):
         else:
             return not self.stopping
 
-
-    def stop(self):
+    def kill_tasks(self):
         self.lock.acquire()
         for task in self.active_tasks:
             task.stop()
             task.join()
+            self.active_tasks.remove(task)
         self.lock.release()        
+       
+    def stop(self):
         Controller.stop(self)
+        self.kill_tasks()
 
     def move_rotate(self, degrees):
         pass
@@ -224,16 +238,33 @@ class AutoControl(Controller):
     def start_auto_session(self, point=(88,72)):
         tracker = utils.PointTracker(self.video_sensor, self.navdata_sensor, point)
         #t.append(utils.PID(self.get_psi, self.actual_move, 180))
-        t = utils.PIDxy(tracker, self.actual_move)
+        t = utils.PIDxy(tracker, self.drone.interface)
         self.unstarted_tasks.append(t)
+
+    def start_task(self, widget=None):
+        t = utils.CompoundTask(self.drone, self.task_done)
+        self.unstarted_tasks.append(t)
+
+class KeyboardControl(Controller):
+    
+    def __init__(self, drone):
+        Controller.__init__(self, drone)
+        #self.auto_control = drone.controller_manager.get_controller(settings.AUTOCONTROL)
+        self.id = settings.KEYCONTROL
+        self.name = "Keyboard Controller"
+
+    def process_events(self):
+        ch = utils.get_char_with_break()
+        if ch == 'q':
+            self.drone.stop()
 
 class ManualControl(Controller):    
 
 
-    def __init__(self, drone, interface, auto_control):
-        Controller.__init__(self, drone, interface)
+    def __init__(self, drone):
+        Controller.__init__(self, drone)
         pygame.joystick.init()
-        self.auto_control = auto_control
+        
         self.id = settings.JOYCONTROL
         self.name = "Joystick Controller"
         if pygame.joystick.get_count() > 0:
@@ -256,6 +287,7 @@ class ManualControl(Controller):
             return False
 
     def process_events(self):
+        self.auto_control = drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
         if self.control:
             for e in pygame.event.get(): # iterate over event stack
                 utils.dprint("", 'event : ' + str(e.type))
@@ -372,9 +404,15 @@ class ControllerInterface(object):
         self.timer_t = 0.1
         self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
         self.speed = 0.2
-        self.at(at_config, "general:navdata_demo", "TRUE")
+
         self.chan = 1
-   
+        if settings.TEST:
+            self.at = self.at_test
+        else:
+            self.at = self.at_live
+
+        self.at(at_config, "general:navdata_demo", "TRUE")
+
     def zap(self):
         print 'zapping: ' + str(self.chan)
         self.at(at_config, "video:video_channel", str(self.chan))
@@ -463,7 +501,7 @@ class ControllerInterface(object):
             self.at(at_pcmd, True, 0, 0, 0, 0.0)
 
     
-    def at(self, cmd, *args, **kwargs):
+    def at_live(self, cmd, *args, **kwargs):
         """Wrapper for the low level at commands.
 
         This method takes care that the sequence number is increased after each
@@ -478,6 +516,9 @@ class ControllerInterface(object):
         self.com_watchdog_timer.start()
         self.lock.release()
         
+    def at_test(self, cmd, *args, **kwargs):
+        print 'AT test called'
+        pass
 #=====================================================================================
 # Low level functions
 #=====================================================================================

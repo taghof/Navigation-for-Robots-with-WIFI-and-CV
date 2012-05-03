@@ -21,6 +21,8 @@
 #    THE SOFTWARE.
 
 import os
+import sys
+import signal
 
 import controllers
 import receivers
@@ -46,8 +48,11 @@ class Drone(object):
         self.navdata_sensor = receivers.NavdataReceiver(settings.NAVDATA_PORT)
         self.sensors.append(self.navdata_sensor)
         
+        self.interface = controllers.ControllerInterface()
+
+        self.controller_manager = None
         self.controller_manager = controllers.ControllerManager(self)
-        self.gui = presenter.PresenterGui(self)
+        self.gui = presenter.VideoWindow(self.video_sensor, self.controller_manager.get_controller(settings.AUTOCONTROL), self)#PresenterGui(self)
 
     def get_sensors(self):
         return self.sensors
@@ -58,24 +63,14 @@ class Drone(object):
             sensor.start()
             while not sensor.get_status() == settings.RUNNING:
                 pass
-
-        # self.wifi_sensor.start()
-        # while not self.wifi_sensor.get_status() == settings.RUNNING:
-        #     pass
-
-        # self.navdata_sensor.start()
-        # while not self.navdata_sensor.get_status() == settings.RUNNING:
-        #     pass
-       
-        self.gui.start()
-
+        self.controller_manager.start_controllers()
+        self.gui.show()
+        
     def stop(self):
         self.controller_manager.stop()
         for sensor in self.sensors:
             sensor.stop()
-            
-        time.sleep(1)
-        print threading.enumerate()
+        self.gui.stop(None, None)
 
     def get_video_sensor(self):
         return self.video_sensor
@@ -89,10 +84,19 @@ class Drone(object):
     def get_controller_manager(self):
         return self.controller_manager
 
+    def get_interface(self):
+        return self.interface
+   
     def get_gui(self):
         return self.gui
 
+    def sigint_handler():
+        print 'You pressed Ctrl+C!'
+        self.stop()
+        sys.exit(0)
+
 def main():
+    
     os.system('clear')
     if settings.TEST:
         testdevice_ = testdevice.TestDevice(False)
@@ -100,6 +104,7 @@ def main():
 
     drone = Drone()
     drone.start()
+    signal.signal(signal.SIGINT, drone.sigint_handler)
 
     if settings.TEST:
         drone.get_video_sensor().join()

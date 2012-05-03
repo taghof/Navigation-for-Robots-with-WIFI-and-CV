@@ -3,6 +3,7 @@ import time
 import threading
 import datetime
 import cv2.cv as cv
+import cv2
 import numpy as np
 from select import select
 from collections import deque
@@ -29,17 +30,17 @@ def get_char():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
-def get_char_with_break(self):
+def get_char_with_break():
     import sys, tty, termios, select
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
         tty.setraw(sys.stdin.fileno())
-        while not self.stopping:
-            rlist, _, _ = select.select([sys.stdin], [], [], 1)
-            if rlist:
-                s = sys.stdin.read(1)
-                return s
+        #while not self.stopping:
+        rlist, _, _ = select.select([sys.stdin], [], [], 1)
+        if rlist:
+            s = sys.stdin.read(1)
+            return s
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
@@ -250,12 +251,12 @@ class PIDxy(threading.Thread):
     Discrete PID control
     """
 
-    def __init__(self, tracker, move_method, callback_method=None, P=0.125, I=0.0, D=0.05, Integrator_max=500, Integrator_min=-500):
+    def __init__(self, tracker, interface, callback_method=None, P=0.125, I=0.0, D=0.05, Integrator_max=500, Integrator_min=-500):
         threading.Thread.__init__(self)
         self.tracker = tracker
         self.callback_method = callback_method
         self.source_method = tracker.get_point
-        self.move_method = move_method
+        self.move_method = interface.move
         self.start_time = datetime.datetime.now()
         self.tracker.start()
 
@@ -325,7 +326,7 @@ class PIDxy(threading.Thread):
                 break
             else:
                 # Use the calculated PID output to actually move
-                self.move_method(powers[0], powers[1], powers[2], powers[3])
+                self.move_method(powers[0], powers[1], powers[2], powers[3], True)
 
         # remember to put the vehicle in hover mode after moving
         self.tracker.stop()
@@ -538,16 +539,10 @@ class PointTracker(threading.Thread):
         p = self.point
         navdata = self.navdatareceiver.get_data()
         if not p is None and not navdata is None and self.running:
-            retval = []
             theta   = navdata.get(0, dict()).get('theta', 0)
             phi     = navdata.get(0, dict()).get('phi', 0)
             psi     = navdata.get(0, dict()).get('psi', 0)
-            retval.append(p[0])
-            retval.append(p[1])
-            retval.append(phi)
-            retval.append(theta)
-            retval.append(psi)
-            return retval
+            return [p[0], p[1], phi, theta, psi]
         else:
             return None
 
@@ -555,57 +550,142 @@ class PointTracker(threading.Thread):
         self.running = False
 
     def run(self):
-        
-        #self.running = True
         # Get image from video sensor
-        frame0_org = self.videoreceiver.get_data()
-
-        # Convert image to gray
-        self.frame0 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
-        cv.CvtColor(frame0_org, self.frame0, cv.CV_RGB2GRAY)
+        frame0 = self.videoreceiver.get_data()
+        org_width = frame0.width if type(frame0).__name__== 'iplimage' else frame0.shape[1]
+        org_height = frame0.height if type(frame0).__name__== 'iplimage' else frame0.shape[0]
 
         self.point = self.original_point
+        features = np.array([self.point], dtype=np.float32)
+        lk_params = dict( winSize  = (19, 19), 
+                              maxLevel = 2, 
+                              criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 20, 0.03),
+                              flags = 0)
+
         while self.running:
+            
             # Get image from video sensor
-            frame1_org = self.videoreceiver.get_data()
+            frame1 = self.videoreceiver.get_data()
+            width = frame1.width if type(frame1).__name__== 'iplimage' else frame1.shape[1]
+            height = frame1.height if type(frame1).__name__== 'iplimage' else frame1.shape[0]
 
-            # Convert image to gray
-            self.frame1 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
-            cv.CvtColor(frame1_org, self.frame1, cv.CV_RGB2GRAY)
+            if org_width != width or org_height != height:
+                break
 
-            points = []
-            points.append(self.point)
-
-            (features, status, error) = cv.CalcOpticalFlowPyrLK(
-                self.frame0, self.frame1, 
-                None, None, points, 
-                (15, 15), 5, 
-                (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 20, 0.03),
-                0) 
-
-            # Put the good features in a list to be returned and draw them in a
-            # circle on the original iplimage
-            processed_features = []
-            for i in range(len(features)):
-                if status[i]: 
-                    processed_features.append(features[i])
-
-            if len(processed_features) == 0:
+            (features, status, error) = cv2.calcOpticalFlowPyrLK(
+                frame0, frame1, 
+                features, None, **lk_params
+                )
+           
+            features = np.hstack([features, status])
+            features = (features[~(features == 0).any(1)])[:,:2]
+                                        
+            if len(features) == 0:
                 self.point = None
                 break
-            elif len(processed_features) == 1:
-                self.point = processed_features[0]
-            else:
-                self.point = processed_features[0]
-                print "suddenly more points... weird"
-
-            # Set frames up for next round
-            if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
-                cv.Copy(self.frame1, self.frame0) 
-            else:
-                self.frame0 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
-                cv.Copy(self.frame1, self.frame0) 
-
+            elif len(features) >= 1:
+                self.point = features[0]
+           
+            print self.point
+            print '\r'
+            frame0 = frame1.copy()
             time.sleep(0.05)
             
         print 'Shutting down PointTracker'
+
+class Task(threading.Thread):
+    
+    def __init__(self, drone, callback):
+        threading.Thread.__init__(self)
+
+        self.drone = drone
+        self.video_sensor = drone.get_video_sensor()
+        self.navdata_sensor = drone.get_navdata_sensor()
+        self.wifi_sensor = drone.get_wifi_sensor()
+        self.interface = drone.get_interface()
+
+        self.callback = callback
+        self.stopping = False
+        self.tracker = None
+
+    def run(self):
+        pass
+    
+    def stop(self):
+        self.stopping = True
+        self.callback(self)
+
+class MoveTask(Task):
+
+    def __init__(self, drone, callback, time, direction):
+        Task.__init__(self, drone, callback)
+        self.time = time
+        self.direction = direction
+        self.timer = threading.Timer(self.time, self.stop_move)
+
+    def stop_move(self):
+        self.interface.move(0,0,0,0)
+
+    def run(self):
+        if self.direction == 1:
+            self.interface.move(0, 0.5, 0, 0, True)
+            print 'moved forward\r'
+        elif self.direction == 2 :
+            self.interface.move(0.5, 0, 0, 0, True)
+            print 'moved right\r'
+        elif self.direction == 3:
+            self.interface.move(0, -0.5, 0, 0, True)
+            print 'moved backward\r'
+        elif self.direction == 4:
+            self.interface.move(-0.5, 0, 0, 0, True)
+            print 'moved left\r'
+
+
+        self.timer.start()
+        self.timer.join()
+        print 'stopped moving\r'
+        self.stop()
+
+class TakeoffTask(Task):
+    
+    def __init__(self, drone, callback, wait):
+        Task.__init__(self, drone, callback)
+        self.wait = wait
+
+    def run(self):
+        self.interface.take_off()
+        time.sleep(self.wait)
+        self.stop()
+
+class LandTask(Task):
+
+    def __init__(self, drone, callback, wait):
+        Task.__init__(self, drone, callback)
+        self.wait = wait
+
+    def run(self):
+        self.interface.land()
+        time.sleep(self.wait)
+        self.stop()
+
+class CompoundTask(Task):
+
+    def __init__(self, drone, callback):
+        Task.__init__(self, drone, callback)
+        self.subtasks = [TakeoffTask(drone, self.sub_callback, 4),
+                         MoveTask(drone, self.sub_callback, 0.5, 1), 
+                         MoveTask(drone, self.sub_callback, 0.5, 2), 
+                         MoveTask(drone, self.sub_callback, 0.5, 3), 
+                         MoveTask(drone, self.sub_callback, 0.5, 4),
+                         LandTask(drone, self.sub_callback, 4)]
+
+    def sub_callback(self, caller):
+        self.subtasks.remove(caller)
+        if len(self.subtasks) > 0:
+            self.subtasks[0].start()
+        else:
+            self.stop()
+
+    def run(self):
+        if len(self.subtasks) > 0:
+            self.subtasks[0].start()

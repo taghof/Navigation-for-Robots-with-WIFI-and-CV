@@ -21,7 +21,7 @@
 # Run settings
 
 DEBUG = False
-TEST = False#True
+TEST = True
 MULTI = False
 
 # Constants
@@ -48,3 +48,4 @@ CMD_PORT = 5556
 
 AUTOCONTROL = 0
 JOYCONTROL = 1
+KEYCONTROL = 2

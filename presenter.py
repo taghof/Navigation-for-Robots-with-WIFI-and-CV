@@ -120,7 +120,8 @@ class PresenterGui(object):
         self.white_gc = self.drawing.get_style().white_gc
         self.black_gc = self.drawing.get_style().black_gc
 #        self.load_controllers(self.controller_manager.get_controllers())
-        gobject.timeout_add(200, self.update_navdata, None)
+        self.radiobutton3.set_active(True)
+        #gobject.timeout_add(200, self.update_navdata, None)
         gtk.main()
 	   
     def stop(self, widget, event=None):
@@ -195,9 +196,19 @@ class PresenterGui(object):
             elif radio.get_name() == "radiobutton2" and self.wifi_sensor is not None:
                 gobject.timeout_add(200, self.update_samples, radio)
             elif radio.get_name() == "radiobutton3" and self.navdata_sensor is not None:
+                #print 'started timer\r'
+                #utils.PeriodicTimer(5, 10, self.time_psi).start()
+                #threading.Timer(20, self.time_psi).start()
                 gobject.timeout_add(200, self.update_navdata, radio)
             elif radio.get_name() == "radiobutton4" and self.navdata_sensor is not None and self.wifi_sensor is not None and self.video_sensor is not None:
                 gobject.timeout_add(200, self.update_matching, radio)
+
+    def time_psi(self):
+        old_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
+        time.sleep(20)
+        new_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
+        error = old_psi - new_psi
+        print error
 
     def handle_key_pressed(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
@@ -809,6 +820,7 @@ class VideoWindow(gtk.Window):
             y = int(event.y)
             #self.features.append((x,y))
             print "x: ", x, ", y: ", y, "\r"
+            self.autocontrol.kill_tasks()
             self.autocontrol.start_auto_session((x,y))
         return True
 

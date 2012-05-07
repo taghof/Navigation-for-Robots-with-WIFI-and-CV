@@ -36,7 +36,10 @@ import threading
 class Drone(object):
 
 
-    def __init__(self):
+    def __init__(self, video, gui):
+        self.svideo = video
+        self.sgui = gui
+
         self.sensors = []
         
         self.video_sensor = receivers.VideoReceiver(settings.VIDEO_PORT)
@@ -50,10 +53,14 @@ class Drone(object):
         
         self.interface = controllers.ControllerInterface()
 
-        self.controller_manager = None
         self.controller_manager = controllers.ControllerManager(self)
-        self.gui = presenter.VideoWindow(self.video_sensor, self.controller_manager.get_controller(settings.AUTOCONTROL), self)#PresenterGui(self)
-
+        if self.sgui:
+            self.gui = presenter.PresenterGui(self)
+        elif self.svideo:
+            self.gui = presenter.VideoWindow(self.video_sensor, self.controller_manager.get_controller(settings.AUTOCONTROL), self)#PresenterGui(self)
+        else:
+            self.gui = None
+            
     def get_sensors(self):
         return self.sensors
 
@@ -63,14 +70,20 @@ class Drone(object):
             sensor.start()
             while not sensor.get_status() == settings.RUNNING:
                 pass
+        time.sleep(0.1)
+        navdata = self.navdata_sensor.get_data()
+        bat   = navdata.get(0, dict()).get('battery', 0)
+        print 'Battery: ' + str(bat) + '\r'
         self.controller_manager.start_controllers()
-        self.gui.show()
+        if self.svideo or self.sgui:
+            self.gui.show()
         
     def stop(self):
         self.controller_manager.stop()
         for sensor in self.sensors:
             sensor.stop()
-        self.gui.stop(None, None)
+        if self.svideo or self.sgui:
+            self.gui.stop(None, None)
 
     def get_video_sensor(self):
         return self.video_sensor
@@ -96,13 +109,23 @@ class Drone(object):
         sys.exit(0)
 
 def main():
-    
+    video, gui = False, False
+    arg_len = len(sys.argv)
+    for i in range(arg_len):
+        if sys.argv[i] == '-v':
+            video = True
+        elif sys.argv[i] == '-g':
+            gui = True
+        elif sys.argv[i] == '-t':
+            settings.TEST = True
+
+
     os.system('clear')
     if settings.TEST:
         testdevice_ = testdevice.TestDevice(False)
         testdevice_.start()
 
-    drone = Drone()
+    drone = Drone(video, gui)
     drone.start()
     signal.signal(signal.SIGINT, drone.sigint_handler)
 

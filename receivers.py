@@ -129,7 +129,7 @@ class Receiver(multiprocessing.Process):
 
 
         if len(dumplist):
-            ofile = open("./pickled_" + str(self.PORT) + ".data", "w")
+            ofile = open("./testdata/pickled_" + str(self.PORT) + ".data", "w")
             pickle.dump(dumplist, ofile)
             ofile.close()
 

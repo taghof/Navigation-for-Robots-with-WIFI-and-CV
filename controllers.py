@@ -93,7 +93,7 @@ class Controller(threading.Thread):
     def run(self):
         while self.control_method is not None and not self.stopping:
             self.control_method()
-            time.sleep(0.1)
+            time.sleep(0.01)
 
     def process_events(self):
         return False
@@ -242,7 +242,7 @@ class AutoControl(Controller):
         self.unstarted_tasks.append(t)
 
     def start_task(self, widget=None):
-        t = utils.CompoundTask(self.drone, self.task_done)
+        t = utils.ParCompoundTask(self.drone, self.task_done)
         self.unstarted_tasks.append(t)
 
 class KeyboardControl(Controller):
@@ -257,6 +257,8 @@ class KeyboardControl(Controller):
         ch = utils.get_char_with_break()
         if ch == 'q':
             self.drone.stop()
+        if ch == 'z':
+            self.drone.get_interface().zap()
 
 class ManualControl(Controller):    
 
@@ -287,7 +289,7 @@ class ManualControl(Controller):
             return False
 
     def process_events(self):
-        self.auto_control = drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
+        self.auto_control = self.drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
         if self.control:
             for e in pygame.event.get(): # iterate over event stack
                 utils.dprint("", 'event : ' + str(e.type))
@@ -296,8 +298,8 @@ class ManualControl(Controller):
                     roll = self.js.get_axis(0)
                     pitch = self.js.get_axis(1)
                     yaw = self.js.get_axis(3)
-                    print self.js.get_axis(2)
-                    print self.js.get_axis(5)
+                    #print self.js.get_axis(2)
+                    #print self.js.get_axis(5)
                     power2 = self.convert( self.js.get_axis(2) )
                     power1 = self.convert( self.js.get_axis(5) )
                     power = power1 - power2
@@ -309,7 +311,7 @@ class ManualControl(Controller):
                     for b in xrange(self.js.get_numbuttons()):
                                                 
                         if self.js.get_button(b) > 0:
-                            print 'number of button pushed: ' + str(b)
+                            #print 'number of button pushed: ' + str(b)
                             if b==0:
                                 self.control_interface.zap()
                             elif b==1:
@@ -317,7 +319,8 @@ class ManualControl(Controller):
                             elif b==2:
                                 self.drone.gui.toggle_video_window(None)
                             elif b==3:
-                                self.control_interface.flat_trim()
+                                self.auto_control.start_task()
+                                #self.control_interface.flat_trim()
                                 #self.control_interface.led_show(5)
                             elif b==4:
                                 self.drone.gui.set_target(None)
@@ -388,7 +391,7 @@ class ManualControl(Controller):
 # *************************** utils ***************************************
     
     def convert(self, num):
-        print "converting: " + str(num)
+        # print "converting: " + str(num)
         nump = float(num) + 1.0
         if nump > 0:
             return nump/2.0
@@ -404,7 +407,7 @@ class ControllerInterface(object):
         self.timer_t = 0.1
         self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
         self.speed = 0.2
-
+        self.old_vector = (0,0,0,0)
         self.chan = 1
         if settings.TEST:
             self.at = self.at_test
@@ -412,6 +415,13 @@ class ControllerInterface(object):
             self.at = self.at_live
 
         self.at(at_config, "general:navdata_demo", "TRUE")
+        #self.at(at_config, "general:navdata_demo", "FALSE")
+        #self.at(at_config,"control:flying_mode","1")
+        self.at(at_config,"detect:detect_type","10")
+        self.at(at_config,"detect:detections_select_v","4")
+
+
+        #self.at(at_config, "general:navdata_options","1024")
 
     def zap(self):
         print 'zapping: ' + str(self.chan)
@@ -440,6 +450,9 @@ class ControllerInterface(object):
     def take_off(self):
         utils.dprint("", 'Taking off!')
         self.at(at_ftrim)
+        self.at(at_ftrim)
+        self.at(at_ftrim)
+        time.sleep(0.2)
         self.at(at_config, "control:altitude_max", "40000")
         self.at(at_ref, True)
         # TODO: implement check for takeoff
@@ -463,7 +476,45 @@ class ControllerInterface(object):
     def led_show(self, num):
         self.at(at_led, num, 1.0, 2)
         
+    
     def move(self, roll, pitch, power, yaw, auto=False):
+        if roll is None:
+            roll = self.old_vector[0]
+        if pitch is None:
+            pitch = self.old_vector[1]
+        if power is None:
+            power = self.old_vector[2]
+        if yaw is None:
+            yaw = self.old_vector[3]
+                                     
+        if roll > 0.10 or roll < -0.10 or auto:
+            r = roll
+        else:
+            r = 0.0
+
+        if pitch > 0.10 or pitch < -0.10 or auto:
+            pi = pitch 
+        else:
+            pi = 0.0
+
+        if power > 0.10 or power < -0.10 or auto:
+            po = power
+        else:
+            po = power
+
+        if yaw > 0.10 or yaw < -0.10 or auto:
+            y = yaw
+        else:
+            y = 0.0
+        
+        if r == 0.0 and pi == 0.0 and po == 0.0 and y == 0.0:
+            self.at(at_pcmd, False, r, pi, po, y)
+        else:
+            self.at(at_pcmd, True, r, pi, po, y)
+
+        self.old_vector = (roll, pitch, power, yaw)
+
+    def simple_move(self, roll, pitch, power, yaw, auto=False):
         if roll > 0.10 or roll < -0.10 or auto:
             r = roll
         else:

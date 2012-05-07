@@ -5,6 +5,7 @@ import datetime
 import cv2.cv as cv
 import cv2
 import numpy as np
+import math
 from select import select
 from collections import deque
 
@@ -261,7 +262,7 @@ class PIDxy(threading.Thread):
         self.tracker.start()
 
 
-        self.verbose = False
+        self.verbose = True#False
         # variables used in calculating the PID output
         self.Kp=P
         self.Ki=I
@@ -284,21 +285,22 @@ class PIDxy(threading.Thread):
         self.set_point_psi = init_mes[4]
         # our initial errors
 
-        self.center = (88, 72)
+        self.center = (160, 120)#(88, 72)
         self.pixelfactor_x = 3.8
         self.pixelfactor_y = 4.035
         
         angle_correction_x = (init_mes[2]*self.pixelfactor_x) 
         angle_correction_y = (init_mes[3]*self.pixelfactor_y) 
 
+        # TODO fix init val
         # calculate the current error, must be between -88 and 88 and -72 and 72
         self.error_x = (self.set_point_x - (self.center[0])) - angle_correction_x
         self.error_y = (self.set_point_y - (self.center[1])) - angle_correction_y
         self.error_psi = 0
 
         # we can never be more than 88 or 72 pixels from our target
-        self.max_error_x = 88.0
-        self.max_error_y = 72.0
+        self.max_error_x = 3000*(math.tan(46.5)/88.0)*160.0 # 88
+        self.max_error_y = 3000*(math.tan(46.5)/72.0)*120.0 # 72
         self.max_error_psi = 180
         self.running = False
         self.started = False
@@ -347,13 +349,71 @@ class PIDxy(threading.Thread):
         self.set_point_x = currents[0]
         self.set_point_y = currents[1]
 
-        angle_correction_x = (currents[2]*self.pixelfactor_x) 
-        angle_correction_y = (currents[3]*self.pixelfactor_y) 
+        # angle_correction_x = (currents[2]*self.pixelfactor_x) 
+        # angle_correction_y = (currents[3]*self.pixelfactor_y) 
+
+        alt = 500#currents[5]
+        angle_x = currents[2]*(math.pi/180.0)
+        angle_y = currents[3]*(math.pi/180.0)
+        psi_angle = currents[4]
+
+        print '*****************************\r\r'
+        self.read_error_x_pixels = self.set_point_x - self.center[0]
+        #print 'pixel_error:\t' + str(self.read_error_x_pixels) + '\r'
+        self.read_error_x_mm = self.read_error_x_pixels*(alt*(math.tan(32)/88.0)) # error in the plane perpendicular to height
+        #print 'mm_error:\t' + str(self.read_error_x_mm) + '\r'
+        #print 'angle_x:\t' + str(angle_x) + '\r'        
+        extra_angle_x = math.atan(alt/math.fabs(self.read_error_x_mm+0.0000000001))
+        #print 'extra_angle_x:\t' + str(extra_angle_x) + '\r'
+        x_in_error = alt * math.sin(angle_x) # error contributed by the tilting itself
+        #print 'in_error_x:\t ' + str(x_in_error) + '\r'
+
+        if angle_x < 0 and self.read_error_x_mm > 0 or angle_x > 0 and self.read_error_x_mm < 0:
+            # print 'case x_out_1\r'
+            a = math.sin(extra_angle_x)
+            b = math.sin(extra_angle_x-angle_x)
+            # print 'a:\t\t' + str(a) + '\r'
+            # print 'b:\t\t' + str(b) + '\r'
+            x_out_error = self.read_error_x_mm * (a / b)
+        else:
+            # print 'case x_out_2\r'
+            a = math.sin(extra_angle_x)
+            b = math.cos(angle_x)
+            # print 'a:\t\t' + str(a) + '\r'
+            # print 'b:\t\t' + str(b) + '\r'
+            x_out_error = self.read_error_x_mm * (a / b) 
+        self.error_x = x_out_error - x_in_error
+        
+        # *****************************
+        
+        self.read_error_y_pixels = self.set_point_y - self.center[1]
+        self.read_error_y_mm = self.read_error_y_pixels*(alt*(math.tan(32)/72.0)) # error in the plane perpendicular to height
+        extra_angle_y = math.atan(alt/math.fabs(self.read_error_y_mm+0.0000000001))*(180.0/math.pi)
+        y_in_error = alt * math.sin(angle_y*(math.pi/180.0)) # error contributed by the tilting itself
+        
+        
+        if angle_y < 0 and self.read_error_y_mm > 0 or angle_y > 0 and self.read_error_y_mm < 0:
+            # print 'case y_out_1\r'
+            a = math.sin(extra_angle_y)
+            b = math.sin(extra_angle_y-angle_y)
+            # print 'a:\t\t' + str(a) + '\r'
+            # print 'b:\t\t' + str(b) + '\r'
+            y_out_error = self.read_error_y_mm * (a / b)
+        else:
+            # print 'case y_out_2\r'
+            a = math.sin(extra_angle_y)
+            b = math.cos(angle_y)
+            # print 'a:\t\t' + str(a) + '\r'
+            # print 'b:\t\t' + str(b) + '\r'
+            y_out_error = self.read_error_y_mm * (a / b) 
+        self.error_y = y_out_error - y_in_error
+        
+        # *****************************
 
         # calculate the current error, must be between -88 and 88 and -72 and 72
-        self.error_x = (self.set_point_x - (self.center[0])) - angle_correction_x
-        self.error_y = (self.set_point_y - (self.center[1])) - angle_correction_y
-        self.error_psi = (360 + self.set_point_psi - currents[4])%360
+        # self.error_x = (self.set_point_x - (self.center[0])) - angle_correction_x
+        # self.error_y = (self.set_point_y - (self.center[1])) - angle_correction_y
+        self.error_psi = (360 + self.set_point_psi - psi_angle)%360
         if self.error_psi > 180:
             self.error_psi = self.error_psi - 360
 
@@ -413,11 +473,12 @@ class PIDxy(threading.Thread):
 
         # print stuff for debugging purposes
         if self.verbose:
-            print "Current value_x: " + str(self.set_point_x) + ", Error_x: " + str(self.error_x) + "(" + str(angle_correction_x) +") , Engine response_x: " + str(retval_x)
+            print "Error_x: " + str(self.error_x) + ", Engine response_x: " + str(retval_x) + "\r"
+            print "Error_y: " + str(self.error_y) + ", Engine response_y: " + str(retval_y) + "\r"
         #print "Current value_y: " + str(self.set_point_y) + ", Error_y: " + str(self.error_y) + ", Engine response_y: " + str(retval_y)
 
         # # don't let thread suck all power, have a nap
-        time.sleep(0.05)
+        time.sleep(2.5)
         return (retval_x, retval_y, 0.0, retval_psi)
 
     def toggle_verbose(self):
@@ -542,7 +603,8 @@ class PointTracker(threading.Thread):
             theta   = navdata.get(0, dict()).get('theta', 0)
             phi     = navdata.get(0, dict()).get('phi', 0)
             psi     = navdata.get(0, dict()).get('psi', 0)
-            return [p[0], p[1], phi, theta, psi]
+            alt     = navdata.get(0, dict()).get('altitude', 0)
+            return [p[0], p[1], phi, theta, psi, alt]
         else:
             return None
 
@@ -586,8 +648,8 @@ class PointTracker(threading.Thread):
             elif len(features) >= 1:
                 self.point = features[0]
            
-            print self.point
-            print '\r'
+            #print self.point
+            #print '\r'
             frame0 = frame1.copy()
             time.sleep(0.05)
             
@@ -595,15 +657,17 @@ class PointTracker(threading.Thread):
 
 class Task(threading.Thread):
     
-    def __init__(self, drone, callback):
+    def __init__(self, drone, callback, interface=None):
         threading.Thread.__init__(self)
 
         self.drone = drone
         self.video_sensor = drone.get_video_sensor()
         self.navdata_sensor = drone.get_navdata_sensor()
         self.wifi_sensor = drone.get_wifi_sensor()
-        self.interface = drone.get_interface()
-
+        if interface is None:
+            self.interface = drone.get_interface()
+        else:
+            self.interface = interface
         self.callback = callback
         self.stopping = False
         self.tracker = None
@@ -624,26 +688,48 @@ class MoveTask(Task):
         self.timer = threading.Timer(self.time, self.stop_move)
 
     def stop_move(self):
-        self.interface.move(0,0,0,0)
+        self.interface.move(0,0,0,None,False)
+        self.interface.move(0,0,0,None,False)
+        self.interface.move(0,0,0,None,False)
+        
 
     def run(self):
         if self.direction == 1:
-            self.interface.move(0, 0.5, 0, 0, True)
+            self.interface.move(0, -0.5, None, None, True)
+            self.interface.move(0, -0.5, None, None, True)
+            self.interface.move(0, -0.5, None, None, True)
             print 'moved forward\r'
         elif self.direction == 2 :
-            self.interface.move(0.5, 0, 0, 0, True)
+            self.interface.move(0.5, 0, None, None, True)
+            self.interface.move(0.5, 0, None, None, True)
+            self.interface.move(0.5, 0, None, None, True)
             print 'moved right\r'
         elif self.direction == 3:
-            self.interface.move(0, -0.5, 0, 0, True)
+            self.interface.move(0, 0.5, None, None, True)
+            self.interface.move(0, 0.5, None, None, True)
+            self.interface.move(0, 0.5, None, None, True)
             print 'moved backward\r'
         elif self.direction == 4:
-            self.interface.move(-0.5, 0, 0, 0, True)
+            self.interface.move(-0.5, 0, None, None, True)
+            self.interface.move(-0.5, 0, None, None, True)
+            self.interface.move(-0.5, 0, None, None, True)
             print 'moved left\r'
+        elif self.direction == 5:
+            self.interface.move(None, None, 0.5, None, True)
+            self.interface.move(None, None, 0.5, None, True)
+            self.interface.move(None, None, 0.5, None, True)
+            print 'moved up\r'
+        elif self.direction == 6:
+            self.interface.move(None, None, -0.5, None, True)
+            self.interface.move(None, None, -0.5, None, True)
+            self.interface.move(None, None, -0.5, None, True)
+            print 'moved down\r'
 
 
         self.timer.start()
         self.timer.join()
         print 'stopped moving\r'
+        #time.sleep(0.5)
         self.stop()
 
 class TakeoffTask(Task):
@@ -668,24 +754,114 @@ class LandTask(Task):
         time.sleep(self.wait)
         self.stop()
 
-class CompoundTask(Task):
+class KeepDirTask(Task):
+    
+    def __init__(self, drone, callback):
+        Task.__init__(self, drone, callback)
+        self.verbose = False
+        # variables used in calculating the PID output
+        self.Kp = 0.125
+        self.Ki = 0.0
+        self.Kd = 0.05
+        self.Derivator_psi = 0
+        self.Integrator_psi = 0
+        self.Integrator_max = 500
+        self.Integrator_min = -500
+        self.max_error_psi = 180
+                
+    def run(self):
+        self.set_point_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
+        while not self.stopping:
+            val = self.update()
+            self.interface.move(val[0], val[1], val[2], val[3])
+        
+        self.interface.move(None, None, None, 0.0,True)
+            
+    def update(self):
+        """
+        Calculate PID output using the input method and the set point
+        """
+
+        # Get the current reading
+        psi   = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
+        self.error_psi = (360 + self.set_point_psi - psi)%360
+        if self.error_psi > 180:
+            self.error_psi = self.error_psi - 360
+
+        # calculate the P term
+        self.P_value_psi = self.Kp * (self.error_psi/self.max_error_psi)
+
+        # calculate the I term, considering integrator max and min 
+        self.Integrator_psi = self.Integrator_psi + self.error_psi
+
+        if self.Integrator_psi > self.Integrator_max:
+            self.Integrator_psi = self.Integrator_max
+        elif self.Integrator_psi < self.Integrator_min:
+            self.Integrator_psi = self.Integrator_min
+
+        self.I_value_psi = self.Integrator_psi * self.Ki
+       
+        # calculate the D term
+        self.D_value_psi = self.Kd * ((self.error_psi - self.Derivator_psi)/self.max_error_psi)
+        self.Derivator_psi = self.error_psi
+
+
+        # Sum the term values into one PID value
+        PID_psi = self.P_value_psi + self.I_value_psi + self.D_value_psi
+        retval_psi = PID_psi
+
+        # print stuff for debugging purposes
+        if self.verbose:
+            print "Current psi: " + str(psi) + ", Error: " + str(self.error_psi) + ", Engine response: " + str(retval_psi)
+      
+        # # don't let thread suck all power, have a nap
+        time.sleep(0.05)
+        return (None, None, None, retval_psi)
+
+class SeqCompoundTask(Task):
 
     def __init__(self, drone, callback):
         Task.__init__(self, drone, callback)
-        self.subtasks = [TakeoffTask(drone, self.sub_callback, 4),
-                         MoveTask(drone, self.sub_callback, 0.5, 1), 
-                         MoveTask(drone, self.sub_callback, 0.5, 2), 
-                         MoveTask(drone, self.sub_callback, 0.5, 3), 
-                         MoveTask(drone, self.sub_callback, 0.5, 4),
-                         LandTask(drone, self.sub_callback, 4)]
+        self.subtasks = [#TakeoffTask(drone, self.sub_callback, 5),
+                         #MoveTask(drone, self.sub_callback, 0.5, 5), 
+                         MoveTask(drone, self.sub_callback, 0.35, 1), 
+                         MoveTask(drone, self.sub_callback, 0.35, 4), 
+                         MoveTask(drone, self.sub_callback, 0.35, 3), 
+                         MoveTask(drone, self.sub_callback, 0.35, 2)]#,
+                         #LandTask(drone, self.sub_callback, 5)]
 
     def sub_callback(self, caller):
         self.subtasks.remove(caller)
+        time.sleep(1)
         if len(self.subtasks) > 0:
             self.subtasks[0].start()
         else:
+            print 'Sequencial Compound task done\r'
             self.stop()
 
     def run(self):
         if len(self.subtasks) > 0:
             self.subtasks[0].start()
+
+
+class ParCompoundTask(Task):
+
+    def __init__(self, drone, callback):
+        Task.__init__(self, drone, callback)
+        self.subtasks = [KeepDirTask(drone, self.sub_callback), MoveTask(drone, self.sub_callback, 1.5, 5), SeqCompoundTask(drone, self.sub_callback)]
+
+    def sub_callback(self, caller):
+        self.subtasks.remove(caller)
+        if len(self.subtasks) == 1:
+            print 'Parallel Compound task done\r'
+            self.stop()
+     
+    def run(self):
+        for t in self.subtasks:
+            t.start()
+
+    def stop(self):
+        for t in self.subtasks:
+            t.stop()
+
+        Task.stop(self)

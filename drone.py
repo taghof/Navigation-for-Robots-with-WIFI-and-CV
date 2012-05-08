@@ -70,10 +70,13 @@ class Drone(object):
             sensor.start()
             while not sensor.get_status() == settings.RUNNING:
                 pass
+
         time.sleep(0.1)
-        navdata = self.navdata_sensor.get_data()
-        bat   = navdata.get(0, dict()).get('battery', 0)
-        print 'Battery: ' + str(bat) + '\r'
+        if self.gui is None:
+            navdata = self.navdata_sensor.get_data()
+            bat   = navdata.get(0, dict()).get('battery', 0)
+            print 'Battery: ' + str(bat) + '\r'
+
         self.controller_manager.start_controllers()
         if self.svideo or self.sgui:
             self.gui.show()

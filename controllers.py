@@ -417,8 +417,8 @@ class ControllerInterface(object):
         self.at(at_config, "general:navdata_demo", "TRUE")
         #self.at(at_config, "general:navdata_demo", "FALSE")
         #self.at(at_config,"control:flying_mode","1")
-        self.at(at_config,"detect:detect_type","10")
-        self.at(at_config,"detect:detections_select_v","4")
+        #self.at(at_config,"detect:detect_type","10")
+        #self.at(at_config,"detect:detections_select_v","4")
 
 
         #self.at(at_config, "general:navdata_options","1024")
@@ -568,7 +568,7 @@ class ControllerInterface(object):
         self.lock.release()
         
     def at_test(self, cmd, *args, **kwargs):
-        print 'AT test called'
+        print 'AT test called with:\t' + str(cmd) + '\r'
         pass
 #=====================================================================================
 # Low level functions

@@ -311,7 +311,6 @@ class PIDxy(threading.Thread):
         #self.max_PID_y = self.Kp*self.max_error_y + self.Ki*self.Integrator_max
 
     def stop(self):
-        print '*** stopping ***'
         self.running = False
 
     def is_started(self):
@@ -320,7 +319,7 @@ class PIDxy(threading.Thread):
     def run(self):
         self.running = True
         self.started = True
-        print 'Tracking...'
+        print 'PIDxy running\r'
         while self.running:
             # Calculate PID output for this iteration
             powers = self.update()
@@ -473,8 +472,9 @@ class PIDxy(threading.Thread):
 
         # print stuff for debugging purposes
         if self.verbose:
-            print "Error_x: " + str(self.error_x) + ", Engine response_x: " + str(retval_x) + "\r"
-            print "Error_y: " + str(self.error_y) + ", Engine response_y: " + str(retval_y) + "\r"
+            print "Error_x:\t" + str(self.error_x) + ", Engine response_x: " + str(retval_x) + "\r"
+            print "Error_y:\t " + str(self.error_y) + ", Engine response_y: " + str(retval_y) + "\r"
+            print "Error_combined:\t" + str(math.sqrt((self.error_y*self.error_y)+(self.error_x*self.error_x))) + "\r"
         #print "Current value_y: " + str(self.set_point_y) + ", Error_y: " + str(self.error_y) + ", Engine response_y: " + str(retval_y)
 
         # # don't let thread suck all power, have a nap
@@ -588,7 +588,6 @@ class PointTracker(threading.Thread):
         self.navdatareceiver = navdatareceiver
         self.original_point = point
         self.point = point
-        print point
         self.frame0 = None
         self.frame1 = None
         self.running = True
@@ -653,7 +652,7 @@ class PointTracker(threading.Thread):
             frame0 = frame1.copy()
             time.sleep(0.05)
             
-        print 'Shutting down PointTracker'
+        print 'Shutting down PointTracker\r'
 
 class Task(threading.Thread):
     
@@ -725,9 +724,11 @@ class MoveTask(Task):
             self.interface.move(None, None, -0.5, None, True)
             print 'moved down\r'
 
-
+        t1 = datetime.datetime.now()
         self.timer.start()
         self.timer.join()
+        t2 = datetime.datetime.now()
+        print t2-t1
         print 'stopped moving\r'
         #time.sleep(0.5)
         self.stop()

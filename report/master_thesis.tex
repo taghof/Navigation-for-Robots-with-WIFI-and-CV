@@ -134,7 +134,7 @@ support for UBIFS som er det filsystem der anvendes på dronens
 flashmemory.
 \subsubsection{Busybox}
 \label{sssec:busybox}
-\\Udover Linux kernen leveres AR.Drone også med Busybox installeret.
+Udover Linux kernen leveres AR.Drone også med Busybox installeret.
 Busybox giver adgang til en række unix værktøjer der er optimeret til
 brug i embeddede systemer og er derfor et meget populært valg blandt
 udviklere af sådanne systemer. Busybox konfigureres så kun de ønskede
@@ -250,28 +250,43 @@ kontrollere dronen.\newline
 
 \subsection{Fysik}
 \label{ssec:fysik}
-Dronen har 4 rotorvinger siddende i hver sit hjørne af et stativkryds
-på dronen.  2 motorer drejer 2 rotorer den ene vej (med uret), mens det
-andet par motorer og rotorer drejer den anden vej (imod uret)\cite{ardroneDevGuide}. Dronens 
-flyvning og bevægelser i rummet kan beskrives med 3 bevægelsesakser (x, 
-y og z). Alle dronens bevægelser styres ved
-at kontrolere dronens vinkel i forhold til de 3 akser, eg. skal dronen
-flyve fremad roteres dronen så den hælder fremad, dvs.  forenden
-kommer lidt under bagenden ift afstanden til gulvet. Sagt i de
-korrekte termer så roteres dronen en smule om y-aksen (pitch).
+Dronen har 4 rotorvinger eller propeller siddende i hver sit hjørne af et kulfiberkryds
+på dronen. Propellerne er gearet ned i omdrejninger i forhold til motorene der trækker dem.
+2 rotore drejer den ene vej (med uret), mens et andet par motorer og rotorer drejer den anden vej (imod uret)\cite{ardroneDevGuide}.
+
+Dronens flyvning og bevægelser i rummet kan beskrives med 3 bevægelsesakser (x, 
+y og z), det vil giver god mening idet man så kan referere til accelerometer og gyro ombord på dronen.
+Alle dronens bevægelser styres ved at kontrolere dronens vinkel i forhold til de 3 akser, eg. skal dronen
+flyve fremad roteres dronen så den hælder fremad, dvs. forenden
+kommer lidt under bagenden ift afstanden til gulvet se figur \ref{fig:drone_movements}c. 
+Bruges termerne i figur \ref{fig:drone_movements} så laver vi en så roteres dronen en smule om y-aksen (pitch).
 Ligesom med y-akse, er der ved drejning af dronen
 omkring x-aksen(roll) og z-aksen(yaw) en resulterende bevægelse
 henholdsvis sidelæns og omkring dronens center.\\
 Ifølge Wikipedia.org\footnote{Wikipedia.org/wiki/Parrot\_AR.Drone, set april 2012} skal dronen være i 
-stand til at flyve fremad med en hastighed på 5 m/sek svarende til 18 km/t. %\cite{wikiDrone}
+stand til at flyve fremad med en maksimal hastighed på 5 m/sek svarende til 18 km/t. %\cite{wikiDrone}
 \begin{figure}[ht]
- \centering
- \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
- \caption{Drone-krængning og bevægelser}
- \label{fig:drone_movements}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
+  \caption{Drone-krængning og bevægelser}
+  \label{fig:drone_movements}
 \end{figure}
- - krængning? ... der er en cutoff-vinkel på 90 grader, dvs. under flyvning tester dronen løbende at pitch- og roll-vinklen ikke kommer over $90 ^{\circ}$, ved den vinkel lukkes systemet ned kraften til rotorene klippes og dronen lader sig falde til jorden.
+Vinkelhastigheden har selvfølgelig indflydelse på den løftekraft propellerne påvirker dronen med hver især. 
+Kraften ($F$) er som bekendt et resultat af en accelerations ($a$) påvirkning af en masse ($m$), ie. $F = a \times m$. 
+For at dronen kan ``hover'', altså at stå stille i luften, skal der tilføres en trimkraft\footnote{Når helikopteren er ``trimmet'' betyder det at der ikke er ændringer i hastigheden, dvs. ingen acceleration.} hvis resultat er ingen hastighed i alle retninger, men at der stadig er en samlet løftekraft ($\ddot{Z}$) der modsvarer tyngdekraften ($g$) præcist. 
+
+Figur \ref{fig:drone_movements}a er en illustration af hvad der skal til for at flytte dronen vertikalt. 
+Vinkelhastighed på alle 4 propeller ændres fra $\Omega_H$ til $\Omega_H + \Delta_A$. 
+
+Øges eller sænkes vinkelhastigheden ens på hver af propellerne vil det resultere i en ændring af den samlede tilførte kraft, hvilket igen er ensbetydende med en forøgelse eller aftagelse i den samlede acceleration. En accelerationen eller deceleration kan bibeholdes indtil dronen har opnået en ønsket bevægelses hastighed. 
+
+http://www.rcgroups.com/forums/showthread.php?t=1284741&page=5
+
+
+- krængning? ... der er en cutoff-vinkel på 90 grader, dvs. under flyvning tester dronen løbende at pitch- og roll-vinklen ikke kommer over $90 ^{\circ}$, ved den vinkel lukkes systemet ned kraften til rotorene klippes og dronen lader sig falde til jorden.
 man kan på iPhone app'en øge eller sænke grænsen for hvor mange grader man må bede dronen om at tilte, ligesom man kan bestemme grænser for flyvehøjden og hastigheden dronen drejer med.
+
+balancere et kosteskaft på fingeren, positionen skal reguleres aktivt ellers ``drifter'' den ud
 \pagebreak
 
 \appendix

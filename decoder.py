@@ -699,6 +699,7 @@ def decode_navdata(packet):
     drone_state['adc_watchdog_mask']    = _[1] >> 29 & 1 # ADC Watchdog : (1) delay in uart2 dsr (> 5ms), (0) uart2 is good */
     drone_state['com_watchdog_mask']    = _[1] >> 30 & 1 # Communication Watchdog : (1) com problem, (0) Com is ok */
     drone_state['emergency_mask']       = _[1] >> 31 & 1 # Emergency landing : (0) no emergency, (1) emergency */
+    
     data = dict()
     data['drone_state'] = drone_state
     data['header'] = _[0]
@@ -708,6 +709,7 @@ def decode_navdata(packet):
     while 1:
         try:
             id_nr, size =  struct.unpack_from("HH", packet, offset)
+            #print id_nr
             offset += struct.calcsize("HH")
         except struct.error:
             break
@@ -726,7 +728,20 @@ def decode_navdata(packet):
                 #values[i] /= 1000
             psi = values['psi']
             values['psi'] = psi if psi > 0 else 360+psi 
-
+        if id_nr == 2:
+            values = struct.unpack_from("HHHHHHHHHHHHHHHHH", "".join(values))
+            values = dict(zip(['ra_x', 'ra_y', 'ra_z', 'rg_x', 'rg_y', 'rg_z', 'rg_110_x', 'rg_110_y', 'r_vbat', 'us_debut_echo', 'us_fin_echo', 'us_assoc_echo', 'us_dist_echo', 'us_courbe_temps', 'us_courbe_valeur', 'us_courbe_ref', 'flag_echo_ini'], values))
+            #print str(values['us_assoc_echo']) + '\r'
+            #print str(values['ra_y']) + '\r'
+        if id_nr == 10:
+            values = struct.unpack_from("ifiifffffIffI", "".join(values))
+            values = dict(zip(['altitude_vision','altitude_vz','altitude_ref', 'altitude_raw', 'obs_accZ', 'obs_alt', 'obs_x', 'obs_state', 'est_vb', 'est_state'], values))
+            #print str(values['altitude_vision']) + '\r'
+        if id_nr == 16:
+            values = struct.unpack_from("IIIIIIIIIIIIIIIIIIIIIIIIIf", "".join(values))
+            values = dict(zip(['num','t1','t2', 't3', 't4', 'x1', 'x2', 'x3', 'x4', 'y1', 'y2', 'y3', 'y4', 'w1', 'w2', 'w3', 'w4', 'h1', 'h2', 'h3', 'h4', 'd1', 'd2', 'd3', 'd4', 'ori1', 'ori2', 'ori3', 'ori4'], values))
+            #print values
+            #print '\r'
         data[id_nr] = values
     return data
 

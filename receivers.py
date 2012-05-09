@@ -129,7 +129,7 @@ class Receiver(multiprocessing.Process):
 
 
         if len(dumplist):
-            ofile = open("./pickled_" + str(self.PORT) + ".data", "w")
+            ofile = open("./testdata/pickled_" + str(self.PORT) + ".data", "w")
             pickle.dump(dumplist, ofile)
             ofile.close()
 
@@ -263,8 +263,8 @@ class VideoReceiver(Receiver):
         if data:
             if self.display_capture:
                 self.display_dump.append(data)
-            w, h, img, ti = decoder.read_picture(data)
-            return img
+            w, h, arr, ti = decoder.read_picture(data)
+            return arr
         else:
             return None
 

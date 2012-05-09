@@ -48,40 +48,44 @@ class TestDevice(threading.Thread):
         self.pickled_wifi = True
         self.pickled_navdata = True
 
-        if not os.path.isfile('./pickled_5555.data'):
+        print 'Loading Test Data:\r'
+        
+        # Determine whether we should use data from a pickled file or from the raw video packet files
+        if not os.path.isfile('./testdata/pickled_5555.data'):
             self.pickled_video = False
             while os.path.isfile('./testdata/' + str(self.vi) + '.dat'):
                 self.video_packets.append('./testdata/' + str(self.vi) + '.dat')
                 self.vi += 1
-            print "video frames:", self.vi
+            print "video frames:\t", self.vi
         else:
-            print "Gone pickling...\r"
-            fileObj = open('./pickled_5555.data')
+            fileObj = open('./testdata/pickled_5555.data')
             self.video_packets = pickle.load(fileObj)
             fileObj.close()
             self.vi = len(self.video_packets)
-            print self.vi, " video frames"
+            print "video frames:\t", self.vi
 
-        if not os.path.isfile('./pickled_5551.data'):
+        # Determine whether we should use data from a pickled file or nothing at all
+        if not os.path.isfile('./testdata/pickled_5551.data'):
             self.pickled_wifi = False
         else:
-            print "Gone pickling...\r"
-            fileObj = open('./pickled_5551.data')
+            fileObj = open('./testdata/pickled_5551.data')
             self.wifi_packets = pickle.load(fileObj)
             fileObj.close()
             self.wi = len(self.wifi_packets)
-            print self.wi, " wifi frames"
+            print "Wifi frames:\t", self.wi
 
-        if not os.path.isfile('./pickled_5554.data'):
+        # Determine whether we should use data from a pickled file or nothing at all
+        if not os.path.isfile('./testdata/pickled_5554.data'):
             self.pickled_wifi = False
         else:
-            print "Gone pickling...\r"
-            fileObj = open('./pickled_5554.data')
+            fileObj = open('./testdata/pickled_5554.data')
             self.navdata_packets = pickle.load(fileObj)
             fileObj.close()
             self.ni = len(self.navdata_packets)
-            print self.ni, " navdata frames"
+            print "Navdata frames:\t", self.ni
 
+        print "********************************"
+        # initialise the init and sending sockets
         self.init_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.init_sock.bind(('', settings.TEST_DRONE_INIT_PORT))
         

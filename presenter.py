@@ -113,18 +113,19 @@ class PresenterGui(object):
         self.wTree.signal_autoconnect(dic)
 	gtk.quit_add(0, self.drone.stop)
 
-    def start(self):
+    def show(self):
         print "Starting GUI\r"
         self.window.show()
         self.gc = gtk.gdk.GC(self.drawing.window)
         self.white_gc = self.drawing.get_style().white_gc
         self.black_gc = self.drawing.get_style().black_gc
-        self.load_controllers(self.controller_manager.get_controllers())
-        gobject.timeout_add(200, self.update_navdata, None)
+#        self.load_controllers(self.controller_manager.get_controllers())
+        self.radiobutton3.set_active(True)
+        #gobject.timeout_add(200, self.update_navdata, None)
         gtk.main()
 	   
     def stop(self, widget, event=None):
-        print "Shutting down GUI"
+        print "Shutting down GUI\r"
         gtk.main_quit()
         return True
 
@@ -195,9 +196,19 @@ class PresenterGui(object):
             elif radio.get_name() == "radiobutton2" and self.wifi_sensor is not None:
                 gobject.timeout_add(200, self.update_samples, radio)
             elif radio.get_name() == "radiobutton3" and self.navdata_sensor is not None:
+                #print 'started timer\r'
+                #utils.PeriodicTimer(5, 10, self.time_psi).start()
+                #threading.Timer(20, self.time_psi).start()
                 gobject.timeout_add(200, self.update_navdata, radio)
             elif radio.get_name() == "radiobutton4" and self.navdata_sensor is not None and self.wifi_sensor is not None and self.video_sensor is not None:
                 gobject.timeout_add(200, self.update_matching, radio)
+
+    def time_psi(self):
+        old_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
+        time.sleep(20)
+        new_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
+        error = old_psi - new_psi
+        print error
 
     def handle_key_pressed(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
@@ -596,12 +607,16 @@ class VideoWindow(gtk.Window):
     video receiver reference in the constructor. The widget holds an image widget for 
     displaying video frames and a handfull of buttons for manipulation(graying, tracking and such)"""
 
-    def __init__(self, video_sensor, autocontrol):
+    def __init__(self, video_sensor, autocontrol, drone=None):
         """
         Calls the Window super constructor, inits all the GTK gui elements and 
         hooks up all the signal callbacks"""
 
+        gobject.threads_init()
+
+        self.video_sensor = video_sensor
         self.autocontrol = autocontrol
+        self.drone = drone
 
         gtk.Window.__init__(self)
         self.set_title("Video Source")
@@ -623,7 +638,7 @@ class VideoWindow(gtk.Window):
 
         self.video_play_button = gtk.ToggleButton("Play Video")
         self.video_play_button.connect("clicked", self.toggle_video_play)
-
+        self.video_play_button.set_active(True)
         self.video_capture_button = gtk.ToggleButton("Capture Video")
         self.video_capture_button.connect("clicked", self.toggle_video_capture)
 
@@ -636,13 +651,18 @@ class VideoWindow(gtk.Window):
         self.grayscale_button = gtk.ToggleButton("Toggle Grayscale")
         self.grayscale_button.connect("clicked", self.toggle_grayscale)
 
+        self.move_button = gtk.ToggleButton("Start Move Task")
+        self.move_button.connect("clicked", self.autocontrol.start_task)
+
+
         master_vbox.pack_start(self.video_eventbox, False, False)
         master_vbox.pack_start(self.video_play_button, False, False)
         master_vbox.pack_start(self.video_capture_button, False, False)
         master_vbox.pack_start(self.crosshairs_button, False, False)
         master_vbox.pack_start(self.get_features_button, False, False)
         master_vbox.pack_start(self.grayscale_button, False, False)
-        self.video_play_button.show()
+        master_vbox.pack_start(self.move_button, False, False)
+        #self.video_play_button.show()
 
         master_vbox.show_all()
 
@@ -652,60 +672,49 @@ class VideoWindow(gtk.Window):
         self.show_grayscale = False
         self.get_new_features = False
         
-        # our video sensor reference
-        self.video_sensor = video_sensor
+        self.connect("destroy", self.stop)#gtk.main_quit)
+        self.connect('key_press_event', self.handle_key_pressed) 
+        if not self.drone is None:
+            gtk.quit_add(0, self.drone.stop)
+
+    def show(self):
+        self.init_video()
+        gobject.idle_add(self.run)
+        gtk.Window.show(self)
+        gtk.main()
+
+    def stop(self, widget, event=None):
+        print "Shutting down GUI\r"
+        gtk.main_quit()
+        return True
 
     def init_video(self):
         """
         This will setup the variales needed for feature tracking and get the first image
         from the video feed. The initial set of features is extracted to 'self.features'."""
         
-        # Get the first image from the video sensor
-        frame0_org = self.video_sensor.get_data()
-        
-        #self.video_image.set_size_request(frame0_org.width, frame0_org.height)
-        #self.video_eventbox.set_size_request(frame0_org.width, frame0_org.height)
-
-        # Frames and features list for feature tracking
-        self.comparison = cv.CreateImage ((1, 1), cv.IPL_DEPTH_32F, 1)
-        self.frame0 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
-        self.frame1 = cv.CreateImage ((frame0_org.width, frame0_org.height), cv.IPL_DEPTH_8U, 1)
-        self.features = []
-        self.mark1 = cv2.imread('./mark3e.png', 0)
-        self.mark2 = cv2.imread('./mark3f.png', 0)
-        self.mark3 = cv2.imread('./mark3g.png', 0)
-        self.mark4 = cv2.imread('./mark3h.png', 0)
-
         # Make sure we are getting a feed from the video sensor before beginning
         while self.video_sensor.get_data() is None:
-            print "Frame acquisition failed."
+            print "Frame acquisition failed.\r"
+            time.sleep(0.1)
 
-
-        # Make a grayscale copy of the image
-        cv.CvtColor(frame0_org, self.frame0, cv.CV_RGB2GRAY);
-
-        # Smoothen the grayscale image
-        cv.Smooth(self.frame0, self.frame0, param1=7, param2=7, param3=1.5)
-
-        # Extract initial features from the grayscale image
-        #self.features = self.get_features(self.frame0)
-
-        # Add a circle around the extracted features in the original image
-        for (x, y) in self.features:
-            cv.Circle(frame0_org, (int(x),int(y)), 15, (255, 0, 0, 0), 1, 8, 0);
-
+        # Get the first image from the video sensor
+        input_image = self.video_sensor.get_data()
+        width = input_image.width if type(input_image).__name__== 'iplimage' else input_image.shape[1]
+        height = input_image.height if type(input_image).__name__== 'iplimage' else input_image.shape[0]
+    
         # Create a pixbuf from the original iplimage, img must be 3-channeled
-        self.webcam_pixbuf = gtk.gdk.pixbuf_new_from_data(
-            frame0_org.tostring(), 
+        self.input_pixbuf = gtk.gdk.pixbuf_new_from_data(
+            input_image.tostring(), 
             gtk.gdk.COLORSPACE_RGB,
             False,
             8,
-            frame0_org.width,
-            frame0_org.height,
-            frame0_org.width*3)
+            width,
+            height,
+            width*3)
         
         # Set the image widget data from the pixbuf
-        self.video_image.set_from_pixbuf(self.webcam_pixbuf)
+        self.video_image.set_from_pixbuf(self.input_pixbuf)
         return True
 
     def run(self):
@@ -715,115 +724,81 @@ class VideoWindow(gtk.Window):
         also carries out optical flow tracking of features in 'self.features'."""
 
         # Get image from video sensor
-        match_image = self.autocontrol.last_match_image
+        input_image = self.autocontrol.last_match_image
+        if input_image is None:
+            input_image = self.video_sensor.get_data()
         
-        frame1_org = self.video_sensor.get_data()
-        middle_x = frame1_org.width / 2
-        middle_y = frame1_org.height / 2
-        self.frame1 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
-        # Convert image to gray
-        cv.CvtColor(frame1_org, self.frame1, cv.CV_RGB2GRAY)
+        points = []
+        for t in self.autocontrol.active_tasks:
+            if t.tracker is not None and t.tracker.point is not None:
+                points.append(t.tracker.point)
 
-        # Smoothen image to get rid of false features
-        cv.Smooth(self.frame1, self.frame1, param1=7, param2=7, param3=1.5)
+        width = input_image.width if type(input_image).__name__== 'iplimage' else input_image.shape[1]
+        height = input_image.height if type(input_image).__name__== 'iplimage' else input_image.shape[0]
+    
+        middle_x = width / 2
+        middle_y = height / 2
             
         # If we want to display the grayscale image in gtk we must change back to 3-channels
         if self.show_grayscale:
-            cv.CvtColor(self.frame1, frame1_org, cv.CV_GRAY2RGB)
-        
-        # Run the optical flow tracking algorithm, features must be processed before
-        # they are used in next iteration
-        # if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
-        #     (features, status, error) = cv.CalcOpticalFlowPyrLK(
-        #         self.frame0, self.frame1, 
-        #         None, None, self.features, 
-        #         (15, 15), 5, 
-        #         (cv.CV_TERMCRIT_ITER | cv.CV_TERMCRIT_EPS, 20, 0.03),
-        #         0) 
+            input_image_gray = cv2.cvtColor(input_image, cv.CV_RGB2GRAY)
+            input_image = cv2.cvtColor(input_image_gray, cv.CV_GRAY2RGB)
 
-        # else:
-        #     features = []
-        # Put the good features in a list to be returned and draw them in a
-        # circle on the original iplimage
-        processed_features = []
-        # for i in range(len(features)):
-        #     if status[i]: 
-        #         processed_features.append(features[i])
-        #         xy = (int(features[i][0]), int(features[i][1]))
-        #         cv.Circle(frame1_org, xy, 15, (255, 0, 0, 0), 1, 8, 0);
-             
         # Add the target lines if requested
         if self.show_targets:
             target = self.video_sensor.get_target_sample()
 
             if target:
-                target_gray = cv.CreateImage ((target[2].width, target[2].height), cv.IPL_DEPTH_8U, 1)
-                # cv.CvtColor(target[2], target_gray, cv.CV_RGB2GRAY)
-
-                # cv.MatchTemplate(self.frame1, target_gray, self.comparison, cv.CV_TM_CCOEFF_NORMED)#CV_TM_CCORR_NORMED) 
-                print self.video_sensor.match_target_sample()
-
                 lines = target[1]
                 for line in lines:
-                    cv.Line(frame1_org, line[0], line[1], (255,0,0))
+                    cv2.line(input_image, line[0], line[1], (255,0,0))
 
         # Add crosshairs if requested
         if self.show_crosshairs:
-            cv.Line(frame1_org, (middle_x, middle_y-10), (middle_x, middle_y+10), (255,0,0))
-            cv.Line(frame1_org, (middle_x-10, middle_y), (middle_x+10, middle_y), (255,0,0))
+            cv2.line(input_image, (middle_x, middle_y-10), (middle_x, middle_y+10), (255,0,0))
+            cv2.line(input_image, (middle_x-10, middle_y), (middle_x+10, middle_y), (255,0,0))
+        
+        for p in points:
+            cv2.circle(input_image, (p[0], p[1]), 4, (0,255,0))
 
-        # Create a pixbuf from the opencv iplimage, the image must be 3-channeled
-        # incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
-        #     frame1_org.tostring(), 
-        #     gtk.gdk.COLORSPACE_RGB,
-        #     False,
-        #     8,
-        #     frame1_org.width,
-        #     frame1_org.height,
-        #     frame1_org.width*3)
-        if match_image is not None:
-            incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
-                match_image.tostring(), 
-                gtk.gdk.COLORSPACE_RGB,
-                False,
-                8,
-                match_image.shape[1],
-                match_image.shape[0],
-                match_image.shape[1]*3)
-        else:
-            incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
-                frame1_org.tostring(), 
-                gtk.gdk.COLORSPACE_RGB,
-                False,
-                8,
-                frame1_org.width,
-                frame1_org.height,
-                frame1_org.width*3)
+        incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
+            input_image.tostring(), 
+            gtk.gdk.COLORSPACE_RGB,
+            False,
+            8,
+            width,
+            height,
+            width*3)
      
         # Copy the pixbuf image data to the image widget and request a draw
         self.video_image.set_from_pixbuf(incoming_pixbuf)
         self.video_image.queue_draw()
 
-        # Set frames up for next round
-        if self.frame0.width == self.frame1.width and self.frame0.height == self.frame1.height:
-            cv.Copy(self.frame1, self.frame0) 
-        else:
-            self.video_image.set_size_request(frame1_org.width, frame1_org.height)
-            self.video_eventbox.set_size_request(frame1_org.width, frame1_org.height)
-            self.frame0 = cv.CreateImage ((frame1_org.width, frame1_org.height), cv.IPL_DEPTH_8U, 1)
-            cv.Copy(self.frame1, self.frame0) 
-
-        # Set features up for next run, check if there has 
-        # been a request for new features
-        if self.get_new_features:
-            self.get_new_features = False
-            self.features = [] #self.get_features(self.frame1)
-            self.features.append((middle_x, middle_y))
-        else:
-            self.features = processed_features
-        
-        # return whether we should continue running
         return self.video_play_button.get_active()
+
+    def handle_key_pressed(self, widget, event):
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        
+        if keyname == "Escape":
+            self.stop(widget)
+        elif keyname == "q":
+            self.stop(widget)
+        #     self.toggle_video_window(None)
+        elif keyname == "k":
+            self.autocontrol.kill_tasks()
+        #     self.radiobutton1.set_active(True)
+        # elif keyname == "s":
+        #     self.radiobutton2.set_active(True)
+        # elif keyname == "p":
+        #     self.toggle_targets(None)
+        # elif keyname == "t":
+        #     self.set_target(None)
+        # elif keyname == "r":
+        #     self.take_sample(None)
+        # elif keyname == "5":
+        #     self.wifi_sensor.record_samples(5, 5)
+        # elif keyname == "m":
+        #     self.wifi_sensor.match_current_wifi_sample()
 
     def get_features(self, frame):
         """
@@ -843,8 +818,9 @@ class VideoWindow(gtk.Window):
         if event.button == 1:
             x = int(event.x)
             y = int(event.y)
-            self.features.append((x,y))
+            #self.features.append((x,y))
             print "x: ", x, ", y: ", y, "\r"
+            self.autocontrol.kill_tasks()
             self.autocontrol.start_auto_session((x,y))
         return True
 
@@ -870,7 +846,7 @@ class VideoWindow(gtk.Window):
         from the video feed"""
         if widget.get_active():
             #gobject.timeout_add(125, self.run )
-            gobject.idle_add(self.run )
+            gobject.idle_add( self.run )
 
     def toggle_video_capture(self, widget):
         """

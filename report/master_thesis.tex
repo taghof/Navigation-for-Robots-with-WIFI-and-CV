@@ -250,43 +250,44 @@ kontrollere dronen.\newline
 
 \subsection{Fysik}
 \label{ssec:fysik}
-AR.Dronen har 4 rotorvinger eller propeller siddende i hver sit hjørne af et kulfiberkryds
-på dronen. Propellerne er gearet ned i omdrejninger i forhold til motorene der trækker dem.
-2 rotore drejer den ene vej (med uret), mens et andet par motorer og rotorer drejer den anden vej (imod uret)\cite{ardroneDevGuide}.
+AR.Dronen har 4 rotorvinger (propeller) siddende i hver sit hjørne af et kulfiberkryds
+på dronen. 
 
-Dronens flyvning og bevægelser i rummet kan beskrives med 3 bevægelsesakser (x, 
-y og z), det vil giver god mening idet man så kan referere til accelerometer og gyro ombord på dronen.
-Alle dronens bevægelser styres ved at kontrolere dronens vinkel i forhold til de 3 akser, eg. skal dronen
-flyve fremad roteres dronen så den hælder fremad, dvs. forenden
-kommer lidt under bagenden ift afstanden til gulvet se figur \ref{fig:drone_movements}c. 
-Bruges termerne i figur \ref{fig:drone_movements} så laver vi en så roteres dronen en smule om y-aksen (pitch).
-Ligesom med y-akse, er der ved drejning af dronen
-omkring x-aksen(roll) og z-aksen(yaw) en resulterende bevægelse
-henholdsvis sidelæns og omkring dronens center.\\
-Ifølge Wikipedia.org\footnote{Wikipedia.org/wiki/Parrot\_AR.Drone, set april 2012} skal dronen være i 
-stand til at flyve fremad med en maksimal hastighed på 5 m/sek svarende til 18 km/t. %\cite{wikiDrone}
+Når en propel på dronen rotere om sin akse flytter den luften i et areal rundt om propellen. Lufttrykket på undersiden af propellen bliver herved større end lufttrykket på oversiden af propellen. Hvis dronen ligger vandret vil forskellen i lufttryk giver en Bernoullieffekt som påvirker dronen med en kraft modsat tyngdekraften (thrust). Udover thrust påvirker den roterende bevægelse også propellens base med et moment (torque) modsat propellens retning. Eksempelvis vil en helikopter uden haleror dreje ukontrolerbart rundt om sig selv, men fordi AR.Drone har et par rotore som drejer een vej (med uret), mens et andet par drejer modsat (imod uret)\cite{ardroneDevGuide}, bliver summen af momentpåvirkning nul, hvis de 4 rotere drejer med samme hastighed.
+Denne egenskab bruges til at styre dronens flyvning og bevægelser i rummet, som kan beskrives med 3 bevægelsesakser (x, y og z).
+
+Dronens bevægelser styres ved at kontrollere dens vinkel i forhold til de 3 akser. Skal dronen f.eks. flyve fremad, sættes forenden til at være lidt under bagenden i forhold til det vandrette plan. I praksis sker det ved at sænke vinkelhastigheden på den forreste propel samtidig med at omdrejningsantallet øges %spørgsmålet er hvad er moment påvirkningen af  (2*omega_H + delta_A - delta_B) - (2*omega_H) . . .
+ på den bageste propel. Det resultere i at dronen hælder lidt fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig gældende når dronen skal flytte sig sideværts som på figur \ref{fig:drone_movements}b.
+
+Hvis dronen skal dreje om sin egen akse for at kigge længere til venstre bruges samme egenskab som før; det moment som tilføres af de 2 propeller der drejermed uret skal overstige det momentet som tilføres af de to propeller der drejer modsat. Det gøres ved at øge vinkelhastigheden på de to førstnævnte og sænke hastigheden på de propeller der drejer modsat uret.
+
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
-  \caption{Drone-krængning og bevægelser}
+  \caption{Drone thrust, torque og bevægelser}
   \label{fig:drone_movements}
 \end{figure}
-Vinkelhastigheden har selvfølgelig indflydelse på den løftekraft propellerne påvirker dronen med hver især. 
-Kraften ($F$) er som bekendt et resultat af en accelerations ($a$) påvirkning af en masse ($m$), ie. $F = a \cdot m$. %\times
-For at dronen kan ``hover'', altså at stå stille i luften, skal der tilføres en trimkraft\footnote{Når helikopteren er ``trimmet'' betyder det at der ikke er ændringer i hastigheden, dvs. ingen acceleration.} hvis resultat er ingen hastighed i alle retninger, men at der stadig er en samlet løftekraft ($\ddot{Z}$) der modsvarer tyngdeaccelerationens påvirkning præcist. 
 
-Figur \ref{fig:drone_movements}a er en illustration af hvad der skal til for at flytte dronen vertikalt. 
-Vinkelhastighed på alle 4 propeller ændres fra $\Omega_H$ til $\Omega_H + \Delta_A$. 
+Når dronen går fra at ligge vandret til istedet at hælde, så flyttes noget af thrust fra at virke lodret imod tyngdekraften til også virke sideværts. Det betyder at propellernes samlede vinkelhastighed skal øges for at opretholde den samme afstand til jorden. Ifølge SDK DevGuide\cite{ardroneDevGuide} bør hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$) ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan sættes til f.eks. 0.25 radianer via AT-kommandoen i figur \ref{fig:ateulerangle}.
 
-Øges eller sænkes vinkelhastigheden ens på hver af propellerne vil det resultere i en ændring af den samlede tilførte kraft, hvilket igen er ensbetydende med en forøgelse eller aftagelse i den samlede acceleration. En accelerationen eller deceleration kan bibeholdes indtil dronen har opnået en ønsket bevægelses hastighed. 
+\begin{figure}[ht]
+  \begin{framed}   
+    \begin{quotation}
+      AT*CONFIG=605,"control:euler\_angle\_max","0.25"
+    \end{quotation}
+    \caption{AT-kommando til at sætte max hældning på $\Phi$ og $\Theta$}  
+    \label{fig:ateulerangle}
+  \end{framed}
+\end{figure}
 
-%http://www.rcgroups.com/forums/showthread.php?t=1284741&page=5
+Der er en øvre grænse for hvor meget dronen max kan krænge \emph{ Euler\_angle\_max } virker som en cut-offvinkel, dvs. under flyvning tester dronen løbende at hverken pitch- eller roll-vinklen overskrider grænsen. Sker det lukkes systemet ned; kraften til rotorene klippes og dronen lader sig falde til jorden.\\
+%
 
+%\subsection{begrænsninger} %i et andet sup_sektion..?
+Ifølge Wikipedia.org\footnote{Wikipedia.org/wiki/Parrot\_AR.Drone, set april 2012} skal dronen være i stand til at flyve fremad med en maksimal hastighed på $5 m/sek$ svarende til 18 km/t. %\cite{wikiDrone}
+Selvom at det synes at give mening at beskrive dronens bevægelser i 3 dimensioner og deri nemmere at bruge accelerometer- og gyro-målinger fra sensorene ombord. Så kan vi egentlig ikke sige noget udfra accelerometer og gyroer omkring hvor langt dronen har fløjet eller med hvilken hastighed dronen bevæger sig.
+Vi kan måske udlede estimater for hastigheder ved at integrere over accelerationen, men hastigheden i det horisontale plan er i praksis afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch værdierne kan være sat til 0 og dronen vil ligge horisontal, men kan stadig godt bevæge sig sideværts i luften\footnote{Dronen siges at være ``trimmet'' (med en konstant hastighed, evt. 0m/S) hvis den ikke påvirkes af en resulterende kraft og acceleration dermed er 0} på grund af indebåren inerti eller f.eks. en stille konstant vind. Bevæger dronen sig med en konstant hastighed kan det ikke aflæses af accelerometeret, afstande dronen har flyttet sig kan således heller ikke aflæses af accelerometer og gyro alene. Firmwaren fra parrot tager istedet bundkameraet til hjælp ved at bruge opticalflow til at udlede hastigheder i planet, man kan således alligevel bede dronen om et estimat for hastigheden over jorden som en værdi i navdatapakken.
 
-- krængning? ... der er en cutoff-vinkel på 90 grader, dvs. under flyvning tester dronen løbende at pitch- og roll-vinklen ikke kommer over $90 ^{\circ}$, ved den vinkel lukkes systemet ned kraften til rotorene klippes og dronen lader sig falde til jorden.
-man kan på iPhone app'en øge eller sænke grænsen for hvor mange grader man må bede dronen om at tilte, ligesom man kan bestemme grænser for flyvehøjden og hastigheden dronen drejer med.
-
-balancere et kosteskaft på fingeren, positionen skal reguleres aktivt ellers ``drifter'' den ud
 \pagebreak
 
 \appendix

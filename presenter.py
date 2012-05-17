@@ -111,7 +111,7 @@ class PresenterGui(object):
                "btn7OnClick" : self.start_auto_track}
 	
         self.wTree.signal_autoconnect(dic)
-	gtk.quit_add(0, self.drone.stop)
+	gtk.quit_add(0, self.drone.stop, True)
 
     def show(self):
         print "Starting GUI\r"
@@ -654,6 +654,9 @@ class VideoWindow(gtk.Window):
         self.move_button = gtk.ToggleButton("Start Move Task")
         self.move_button.connect("clicked", self.autocontrol.start_task)
 
+        self.photo_button = gtk.Button("Save picture")
+        self.photo_button.connect("clicked", self.save_picture)
+
 
         master_vbox.pack_start(self.video_eventbox, False, False)
         master_vbox.pack_start(self.video_play_button, False, False)
@@ -662,6 +665,7 @@ class VideoWindow(gtk.Window):
         master_vbox.pack_start(self.get_features_button, False, False)
         master_vbox.pack_start(self.grayscale_button, False, False)
         master_vbox.pack_start(self.move_button, False, False)
+        master_vbox.pack_start(self.photo_button, False, False)
         #self.video_play_button.show()
 
         master_vbox.show_all()
@@ -675,11 +679,12 @@ class VideoWindow(gtk.Window):
         self.connect("destroy", self.stop)#gtk.main_quit)
         self.connect('key_press_event', self.handle_key_pressed) 
         if not self.drone is None:
-            gtk.quit_add(0, self.drone.stop)
+            gtk.quit_add(0, self.drone.stop, True)
 
     def show(self):
         self.init_video()
-        gobject.idle_add(self.run)
+        gobject.timeout_add(750, self.run)
+        #gobject.idle_add(self.run)
         gtk.Window.show(self)
         gtk.main()
 
@@ -717,6 +722,17 @@ class VideoWindow(gtk.Window):
         self.video_image.set_from_pixbuf(self.input_pixbuf)
         return True
 
+    def print_points(self, tasks):
+        points = []
+        for t in tasks:
+            if t.subtasks is None:
+                if t.point is not None:
+                    points.append(t.point)
+            else:
+                points.extend(self.print_points(t.subtasks))
+        
+        return points
+
     def run(self):
         """
         The run method is primarily responsible for updating the image widget with
@@ -728,10 +744,7 @@ class VideoWindow(gtk.Window):
         if input_image is None:
             input_image = self.video_sensor.get_data()
         
-        points = []
-        for t in self.autocontrol.active_tasks:
-            if t.tracker is not None and t.tracker.point is not None:
-                points.append(t.tracker.point)
+        points = self.print_points(self.autocontrol.active_tasks)
 
         width = input_image.width if type(input_image).__name__== 'iplimage' else input_image.shape[1]
         height = input_image.height if type(input_image).__name__== 'iplimage' else input_image.shape[0]
@@ -776,6 +789,11 @@ class VideoWindow(gtk.Window):
 
         return self.video_play_button.get_active()
 
+    def save_picture(self, widget):
+        im = self.video_sensor.get_data()
+        im = input_image = cv2.cvtColor(im, cv.CV_RGB2BGR)
+        cv.SaveImage( "images/pic.png", cv.fromarray(im))
+
     def handle_key_pressed(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
         
@@ -786,20 +804,7 @@ class VideoWindow(gtk.Window):
         #     self.toggle_video_window(None)
         elif keyname == "k":
             self.autocontrol.kill_tasks()
-        #     self.radiobutton1.set_active(True)
-        # elif keyname == "s":
-        #     self.radiobutton2.set_active(True)
-        # elif keyname == "p":
-        #     self.toggle_targets(None)
-        # elif keyname == "t":
-        #     self.set_target(None)
-        # elif keyname == "r":
-        #     self.take_sample(None)
-        # elif keyname == "5":
-        #     self.wifi_sensor.record_samples(5, 5)
-        # elif keyname == "m":
-        #     self.wifi_sensor.match_current_wifi_sample()
-
+    
     def get_features(self, frame):
         """
         Extracts features from 'frame' with the opencv SURF algorithm, the extracted
@@ -845,8 +850,8 @@ class VideoWindow(gtk.Window):
         Button callback method. Starts or stops updating of the image widget with data 
         from the video feed"""
         if widget.get_active():
-            #gobject.timeout_add(125, self.run )
-            gobject.idle_add( self.run )
+            gobject.timeout_add(25000, self.run)
+            #gobject.idle_add( self.run )
 
     def toggle_video_capture(self, widget):
         """
@@ -893,8 +898,6 @@ class ControllerWindow(gtk.Window):
         for controller in self.controllers:
             button = gtk.ToggleButton(controller.name)
             controller.set_control_button(button)
-        # self.video_play_button = 
-        # self.video_play_button.connect("clicked", self.toggle_video_play)
 
 def cv2array(im): 
   depth2dtype = { 

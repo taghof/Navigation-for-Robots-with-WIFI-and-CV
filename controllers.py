@@ -32,6 +32,7 @@ import cv2.cv as cv
 import cv2
 
 import utils
+import tasks
 import settings
 import matcher
 
@@ -40,7 +41,6 @@ class ControllerManager(object):
 
     def __init__(self, drone):
         self.drone = drone
-        #self.interface = drone.interface
         auto = AutoControl(self.drone)
         man = ManualControl(self.drone)
         key = KeyboardControl(self.drone)
@@ -57,7 +57,6 @@ class ControllerManager(object):
         for con in controllers:
             if con.id == id:
                 return con
-            
         return None
 
     def add_controller(self, controller):
@@ -72,8 +71,7 @@ class ControllerManager(object):
     def stop_controllers(self):
         for con in self.controllers:
             con.stop()
-        #self.interface.stop()
-
+        
     def start_controllers(self):
         for con in self.controllers:
             con.start()
@@ -89,12 +87,13 @@ class Controller(threading.Thread):
         self.control_method = self.process_events
         self.id = None       
         self.stopping = False
+        self.update_time = 0.01
 
     def run(self):
         while self.control_method is not None and not self.stopping:
             self.control_method()
-            time.sleep(0.01)
-
+            time.sleep(self.update_time)
+        print 'Ended: ', str(self), '\r'
     def process_events(self):
         return False
     
@@ -119,6 +118,7 @@ class AutoControl(Controller):
 
     def __init__(self, drone):
         Controller.__init__(self, drone)
+        self.drone = drone
         self.navdata_sensor = drone.get_navdata_sensor()
         self.wifi_sensor = drone.get_wifi_sensor()
         self.video_sensor = drone.get_video_sensor()
@@ -182,7 +182,7 @@ class AutoControl(Controller):
             task.start()
             self.unstarted_tasks.remove(task)
             self.active_tasks.append(task)
-
+            print self.active_tasks, '\r'
         self.lock.release()
 
         if self.control_button is not None:
@@ -194,28 +194,13 @@ class AutoControl(Controller):
         self.lock.acquire()
         for task in self.active_tasks:
             task.stop()
-            task.join()
-            self.active_tasks.remove(task)
+            #task.join()
+            #self.active_tasks.remove(task)
         self.lock.release()        
        
     def stop(self):
         Controller.stop(self)
         self.kill_tasks()
-
-    def move_rotate(self, degrees):
-        pass
-
-    def get_altitude(self):
-        return self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0)
-
-    def get_psi(self):
-        return self.navdata_sensor.get_data().get(0, dict()).get('psi', 0)
-
-    def get_phi(self):
-        return self.navdata_sensor.get_data().get(0, dict()).get('phi', 0)
-
-    def get_theta(self):
-        return self.navdata_sensor.get_data().get(0, dict()).get('theta', 0)
 
     def actual_move(self, x, y, power, yaw):
         self.control_interface.move(x, y, power, yaw, True)
@@ -231,18 +216,19 @@ class AutoControl(Controller):
         self.active_tasks.remove(caller)
 
     def create_track_point_task(self, point=(88,72)):
-        tracker = utils.PointTracker(self.video_sensor, self.navdata_sensor, point)
-        t = utils.PIDxy(tracker, self.actual_move, self.lost_track)
+        #tracker = utils.PointTracker(self.drone, point)
+        t = utils.PIDxy(self.drone, point, self.lost_track)
         return t
 
     def start_auto_session(self, point=(88,72)):
-        tracker = utils.PointTracker(self.video_sensor, self.navdata_sensor, point)
+
         #t.append(utils.PID(self.get_psi, self.actual_move, 180))
-        t = utils.PIDxy(tracker, self.drone.interface)
+        t = utils.PIDxy(self.drone, point)
         self.unstarted_tasks.append(t)
 
     def start_task(self, widget=None):
-        t = utils.ParCompoundTask(self.drone, self.task_done)
+        t = tasks.SeqCompoundTask(self.drone, self.task_done)
+        t.set_conf_4()
         self.unstarted_tasks.append(t)
 
 class KeyboardControl(Controller):
@@ -250,8 +236,10 @@ class KeyboardControl(Controller):
     def __init__(self, drone):
         Controller.__init__(self, drone)
         #self.auto_control = drone.controller_manager.get_controller(settings.AUTOCONTROL)
+        self.navdata_sensor = drone.get_navdata_sensor()
         self.id = settings.KEYCONTROL
         self.name = "Keyboard Controller"
+        self.update_time = 0.1
 
     def process_events(self):
         ch = utils.get_char_with_break()
@@ -259,7 +247,14 @@ class KeyboardControl(Controller):
             self.drone.stop()
         if ch == 'z':
             self.drone.get_interface().zap()
+        if ch == 'f':
+            self.drone.get_interface().flat_trim()
+        if ch == 'b':
+            navdata = self.navdata_sensor.get_data()
+            bat   = navdata.get(0, dict()).get('battery', 0)
+            print 'Battery: ' + str(bat) + '\r'
 
+            
 class ManualControl(Controller):    
 
 
@@ -317,22 +312,24 @@ class ManualControl(Controller):
                             elif b==1:
                                 self.control_interface.reset() 
                             elif b==2:
-                                self.drone.gui.toggle_video_window(None)
+                                self.auto_control.kill_tasks()
+                                #self.drone.gui.toggle_video_window(None) 
                             elif b==3:
                                 self.auto_control.start_task()
                                 #self.control_interface.flat_trim()
                                 #self.control_interface.led_show(5)
                             elif b==4:
-                                self.drone.gui.set_target(None)
+                                pass
+                                #self.drone.gui.set_target(None)
                             elif b==5:
                                 self.drone.gui.take_sample(None)
-#
                             elif b==6:
-                                c = self.auto_control.current
-                                if c is not None:
-                                    c.toggle_verbose()
-                                else:
-                                    print "No task"
+                                pass
+                            # c = self.auto_control.current
+                                # if c is not None:
+                                #     c.toggle_verbose()
+                                # else:
+                                #     print "No task"
                           
                             # elif b==7:
                             #     pass
@@ -419,8 +416,6 @@ class ControllerInterface(object):
         #self.at(at_config,"control:flying_mode","1")
         #self.at(at_config,"detect:detect_type","10")
         #self.at(at_config,"detect:detections_select_v","4")
-
-
         #self.at(at_config, "general:navdata_options","1024")
 
     def zap(self):
@@ -570,9 +565,11 @@ class ControllerInterface(object):
     def at_test(self, cmd, *args, **kwargs):
         print 'AT test called with:\t' + str(cmd) + '\r'
         pass
+
 #=====================================================================================
 # Low level functions
 #=====================================================================================
+
 def at_ref(seq, takeoff, emergency=False):
     """
     Basic behaviour of the drone: take-off/landing, emergency stop/reset)

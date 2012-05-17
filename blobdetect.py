@@ -4,16 +4,24 @@ import cv2.cv as cv
 import sys
 import datetime
 
-RED = 2
+import utils
+
+RED = 0
 GREEN = 1
-BLUE = 0
+BLUE = 2
 
 def _is_red( img_a, x, y, radius):
     """
     Takes an image array (numpy) as an argument, and calculates the average color in a square of with width = height = radius around the pixel coordiantes x, y.
     The calculated average color is used to determine if the pixel area around  
     """
-    h, w, c = img_a.shape
+    # h, w, c = img_a.shape
+    # img = utils.array2cv(img_a) 
+    #h, w, c = img_a.shape
+    h = img_a.height
+    w = img_a.width
+    c = 3
+
     R,G,B = 0.0,0.0,0.0
     if radius < 2:
         R,G,B = img_a[y][x][RED], img_a[y][x][GREEN], img_a[y][x][BLUE]
@@ -29,19 +37,27 @@ def _is_red( img_a, x, y, radius):
 
         for Y in range(start_y, end_y):
             for X in range(start_x, end_x):
-                R += img_a[Y][X][RED]
-                G += img_a[Y][X][GREEN]
-                B += img_a[Y][X][BLUE]
-
+                # R += img_a[Y][X][RED]
+                # G += img_a[Y][X][GREEN]
+                # B += img_a[Y][X][BLUE]
+                R += img_a[Y,X][RED]
+                G += img_a[Y,X][GREEN]
+                B += img_a[Y,X][BLUE]
+    
     denom = 0.0+R+G+B
-    if 0.35 < R/float(denom):
+    if 0.40 < R/float(denom):
         return True
     return False
 
 
 
-def detect_red_blob( img_a, step=3, avg_rad=3 ):
-    h, w, c = img_a.shape
+def detect_red_blob( img_a, step=5, avg_rad=3 ):
+    img = utils.array2cv(img_a) 
+    #h, w, c = img_a.shape
+    h = img.height
+    w = img.width
+    c = 3
+
     TOP, BOTTOM, LEFT, RIGHT = h,-1,w,-1
     step, avg_rad = int(step), int(avg_rad)
 
@@ -49,12 +65,12 @@ def detect_red_blob( img_a, step=3, avg_rad=3 ):
     while y < h:
         x = 0
         while x < w:
-            if _is_red(img_a, x, y, avg_rad):
+            if _is_red(img, x, y, avg_rad):
                 TOP = min(TOP, y)
                 BOTTOM = max(BOTTOM, y)
                 LEFT = min(LEFT, x)
                 RIGHT = max(RIGHT, x)
-            else:
+                
             x += step
         y += step
 
@@ -65,7 +81,6 @@ def detect_red_blob( img_a, step=3, avg_rad=3 ):
     height = BOTTOM - TOP
     xpos = LEFT + width/2
     ypos = TOP + height/2
-
     return (xpos, ypos),(width, height)
 
 

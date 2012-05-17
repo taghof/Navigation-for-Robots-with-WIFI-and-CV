@@ -23,15 +23,13 @@
 import os
 import sys
 import signal
+import threading
 
 import controllers
 import receivers
-import presenter
-import testdevice
 import utils
 import settings
 import time
-import threading
 
 class Drone(object):
 
@@ -55,8 +53,10 @@ class Drone(object):
 
         self.controller_manager = controllers.ControllerManager(self)
         if self.sgui:
+            import presenter
             self.gui = presenter.PresenterGui(self)
         elif self.svideo:
+            import presenter
             self.gui = presenter.VideoWindow(self.video_sensor, self.controller_manager.get_controller(settings.AUTOCONTROL), self)#PresenterGui(self)
         else:
             self.gui = None
@@ -72,7 +72,7 @@ class Drone(object):
                 pass
 
         time.sleep(0.1)
-        if self.gui is None:
+        if self.svideo or self.gui is None:
             navdata = self.navdata_sensor.get_data()
             bat   = navdata.get(0, dict()).get('battery', 0)
             print 'Battery: ' + str(bat) + '\r'
@@ -81,12 +81,20 @@ class Drone(object):
         if self.svideo or self.sgui:
             self.gui.show()
         
-    def stop(self):
+    def stop(self, gui=False):
+        if not gui:
+            if self.svideo or self.sgui:
+                self.gui.stop(None, None)
+                return 0
+
         self.controller_manager.stop()
+
         for sensor in self.sensors:
             sensor.stop()
-        if self.svideo or self.sgui:
-            self.gui.stop(None, None)
+        
+        self.interface.stop()
+        return 0
+                
 
     def get_video_sensor(self):
         return self.video_sensor
@@ -106,7 +114,7 @@ class Drone(object):
     def get_gui(self):
         return self.gui
 
-    def sigint_handler():
+    def sigint_handler(self, arg1, arg2):
         print 'You pressed Ctrl+C!'
         self.stop()
         sys.exit(0)
@@ -125,6 +133,7 @@ def main():
 
     os.system('clear')
     if settings.TEST:
+        import testdevice
         testdevice_ = testdevice.TestDevice(False)
         testdevice_.start()
 

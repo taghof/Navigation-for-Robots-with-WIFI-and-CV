@@ -204,6 +204,7 @@ Hvis AR.Dronen skal dreje om sin egen akse for at kigge længere til venstre brug
 
 Når AR.Dronen går fra at ligge vandret til istedet at hælde, så flyttes noget af thrust fra at virke lodret imod tyngdekraften til også virke sideværts. Det betyder at propellernes samlede vinkelhastighed skal øges for at opretholde den samme afstand til jorden. Ifølge SDK DevGuide\cite{techreport:ardroneDevGuide} bør hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$) ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan sættes til f.eks. 0.25 radianer via AT-kommandoen i figur \ref{fig:ateulerangle}.
 
+%TODO Hvilken port??????
 \begin{figure}[ht]
   \begin{framed}   
     \begin{quotation}
@@ -239,62 +240,80 @@ brug i embeddede systemer. Busybox konfigureres så kun de ønskede
 værktøjer medtages og disse pakkes så til en enkelt eksekverbar fil.
 Dette betyder at størrelsen holdes på et minimum. Busybox på AR.Drone
 fylder $483 kbyte$ og udstyrer AR.Dronen med alle unix brugerkommandoer man
-forventer på et standard linux system(\code{cd}, \code{ls}, \code{mv}, \code{ln} osv.), men
-leverer desuden også en Dynamic Host Configuration Protocol (DHCP) service; den DHCP-server AR.Dronen anvender til at uddele %DHCP cite?
-IP-adresser, den telnet-server der giver adgang til AR.Dronens terminal %telnet cite?
-samt den editor(Vi) der gør det muligt at redigere filer på AR.Dronen. 
+forventer på et standard linux system, e.g. \code{cd}, \code{ls}, \code{mv}, \code{ln} osv.
+Busybox på AR.Dronen leverer desuden en Dynamic Host Configuration Protocol\cite{rfc2131} (DHCP) service; den DHCP-server AR.Dronen anvender til at uddele %DHCP cite?
+IP\cite{rfc791}-adresser og lave et netværk mellem en klient og AR.Dronen selv, samt en telnet\cite{frc854}-server der giver adgang til AR.Dronens terminal %telnet cite?
+og en texteditor %(Vi)
+der gør det muligt at redigere filer direkte på AR.Dronen.
+
 \subsubsection{Program.elf -- AR.Dronens styreprogram}
 \label{sssec:program.elf}
 Den firmware der står for selve styringen, transmitteringen af
 data og bearbejdning af sensordata i forbindelse med flyvning er
 implementeret i \uri{/bin/program.elf}. Da der er tale om proprietært
-software betragtes programmet som en lukket kasse, vi kan dog udlede forskellige elementer efter at have observeret
-AR.Dronen under flyvning. Program.elf indeholder blandt andet
+software betragtes programmet som en lukket kasse uden hensyntagen til implementeringen, vi kan dog udlede forskellige elementer efter at have observeret
+AR.Dronen under flyvning. -- Program.elf indeholder blandt andet
 \begin{itemize}
 \item en PID controller til at stabilisere AR.Dronen når der svæves, 
-\item en algoritme
-til at udlede AR.Dronens hastighed ved hjælp af bundkameraet %cite hvor
+\item en algoritme til at udlede AR.Dronens hastighed ved hjælp af bundkameraet (bekræftes også i en artikel af Parrot selv\cite{velocity_estimation_inside_the_drone}.)%cite hvor
 % nogle siger at program.elf + motorstyring + radio tager op mod $80
 % \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
 \item og en algoritme til at detektere tags i billeder i forbindelse med augmented
 reality spil. 
 \end{itemize}
-Program.elf modtager kommandoer fra brugeren gennem en User Datagram Protocol (UDP) 
+Program.elf modtager kommandoer fra brugeren gennem en User Datagram Protocol\cite{rfc768} (UDP) 
 port. Kommunikationsinterfacet mellem bruger og quadrokopteren beskrives i afsnit~\ref{ssec:kommunikation}.
 
-\subsection{Kommunikation}
+\subsection{Kommunikation med AR.Dronen}
 \label{ssec:kommunikation}
-Kommunikationen med AR.Dronen kan indeles i to kategorier, den der
-beskæftiger sig med input til, og output, fra program.elf(flyvning) og
-den der omhandler den almindelige anvendelse af AR.Dronens linux
-system.
+Interaktion med de programmer der kører på AR.Dronens linux-platform kan kategoriseres i 3 grupper:
+\begin{itemize}
+  \item som klient (PC, smartphone eller lignende) via Telnet eller FTP\cite{frc959} til AR.Dronen, hvor AR.Dronen fungere som server,
+  \item ved at eksekvere en applikation på en klient (PC, smartphone eller lignende) der sender og modtager UDP-pakker og AT-kommandoer\footnote{AT(tention)-kommandoer gennemgåes nærmere i sektion \ref{sssec:atinterface}} til det kørende firmware \url{program.elf} på AR.Dronen,
+  \item eller ved at eksekvere et program på selve AR.Dronen der kommunikerer over 3 UDP-porte og køre parallelt med firmware'en \url{program.elf} på AR.Dronen.
+\end{itemize}
+
 \subsubsection{TCP baseret kommunikation}
 \label{sssec:tcp}
-For at få adgang til en terminal på AR.Dronen anvendes
-en telnetklient. Efter forbindelse til AR.Dronens ip-adresse får brugeren
-adgang til en rodterminal, da systemet er sat op som et
-enkeltbrugersystem.
-\\For at overføre en fil til AR.Dronen anvendes en FTP-klient. Efter
-forbindelse til AR.Dronen, kan filer overføres mellem AR.Dronen og brugerens
-system med FTP-protokollens PUT og GET kommandoer. Hvis der ikke
-angives en sti lægges overførte filer som standard i '/data/video' mappen.  
+Fra en klient-computer er det muligt at få adgang til AR.Dronens 
+installerede linuxinstallation ved at telnet'te til AR.Dronens 
+faste IP-adresse (192.168.1.1). Efter at forbindelsen er etableret 
+får brugeren her adgang til en rodterminal. %root .. eller?
+
+Ved at oprette forbindelse gennem FTP, fra et FTP-program på en 
+ekstern klientcomputer til AR.Dronens FTP-server, kan man overfører 
+filer imellem AR.Dronen og klientcomputeren med FTP-protokollens 
+PUT og GET kommandoer. Hvis klienten ikke angives en sti lægges 
+overførte filer som standard i \url{~/data/video} mappen.
+
 \subsubsection{UDP baseret kommunikation}
 \label{sssec:udp}
-I modsætning til FTP- og telnetklienterne, som er TCP baserede, anvendes
-UDP-protokollen til den kommunikation der sker mellem program.elf og
-brugerens system. Sammenlignet med TCP opererer UDP med noget mindre
-overhead per afsendt besked, tilgengæld garanterer protokollen intet
+I modsætning til FTP- og Telnet-klienterne, som er TCP baserede, anvendes
+UDP-protokollen til den kommunikation der sker mellem \url{program.elf} og
+brugerens system (iPhone eller PC).
+
+Firmware'en \url{program.elf} på AR.Dronen sender og modtager pakker på 3 UDP-porte:
+\begin{itemize}
+  \item På port 5556 lytter quadrokopteren efter brugerkommandoer, e.g. takeoff, flyv frem, drej, land osv.
+  \item fra port 5555 sendes
+  \item fra port 5554 
+\end{itemize}
+ Sammenlignet med TCP opererer UDP med noget mindre
+overhead per afsendt besked. Tilgengæld garanterer protokollen intet
 om hvorvidt eller hvornår en pakke når frem til sin destination. UDP
 er oftest det første valg når der skal streames video og lyd over et
 netværk, da en enkelt mistet pakke sjældent har stor betydning i denne
 kontekst. Når fokus er på at få sendt så meget
-information(navigationsdata og video) som muligt til brugeren, giver
+information (navigationsdata og video) som muligt til brugeren, giver
 det god mening at anvende UDP og så implementere et minimum af
-flowkontrol ovenpå protokollen. Til gengæld kan vi godt se fordele i
+flowkontrol ovenpå protokollen, e.g.  
+
+Til gengæld kan vi godt se fordele i
 de garantier TCP kunne give når fokus er på at modtage kontrolpakker,
 heldigvis er det forholdsvis simpelt, at kontrollere hvorvidt visse
 kritiske beskeder(land, let etc.) er nået frem til AR.Dronen, eller om vi
-skal sende pakken igen. 
+skal sende pakken igen.
+
 \subsubsection{AT kommando interface}
 \label{sssec:atinterface}
 En bruger applikation kommunikerer med AR.Dronens software ved hjælp af

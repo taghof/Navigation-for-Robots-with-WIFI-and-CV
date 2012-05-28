@@ -71,6 +71,7 @@ class Drone(object):
             while not sensor.get_status() == settings.RUNNING:
                 pass
 
+
         time.sleep(0.1)
         if self.svideo or self.gui is None:
             navdata = self.navdata_sensor.get_data()

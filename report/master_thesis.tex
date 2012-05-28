@@ -15,14 +15,15 @@
    {\end{framed}\end{quotation}}
 %\newcommand{\oversaet}[1]{(\textit{#1})}
 \newcommand{\uri}[1]{#1}
+\newcommand{\code}[1]{\texttt{#1}}
 
 \title{Master Thesis}
 \author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
 \hline\\
 \vspace{4cm}\\
 \makeatletter
-\texttt{Semi Autonomous Navigation}\\
-\texttt{for Arial Robots}\\
+\texttt{Semi Autonomous Indoor}\\ %Indoor? - nogle udendørs robotter heller ikke bruge gps, for dyrt i præcision...
+\texttt{Navigation for Arial Robots}\\
 \vspace{4cm}\\
 \hline\\
 }
@@ -32,7 +33,12 @@
 
 \pagestyle{headings}
 
-\section*{Resume Abstrakt}
+\section*{Abstract}
+In english...
+
+\section*{Resume}
+Indeholder og gennemgår i det følgende (på dansk).
+
 
 \pagebreak
 
@@ -41,26 +47,65 @@
 \pagebreak
 
 \section{Introduktion}
+\label{sec:introduktion}
 \subsection{området, teknologi}
-%\subsection{}
-%\subsection{}
+-Kort intro hvad vil vi gøre...
+
+-problem domæne,
+-introduktion til andres arbejde / resultater, 
+-hvad bygger vi videre på (hvis arbejde), 
+-hvad er vores antagelser til at starte med
+
+Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
+%\titleref{sec:AR.Drone}
+
 
 \pagebreak
+
+\section{Motivation}
+\label{sec:motivation}
+Hvorfor i det hele taget begive sig herudi noget der ikke lader sig gøre
+-Hvem vil vores resultater komme til gode
+-anvendelses områder
+-hvorfor er det bedre/billigere med vores løsninger
+-Cost efficiency?
+
+\section{Teseformulering}
+\label{sec:tese}
+HVAD er det præcis vi vil vise eller afvise?!
+nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen.
+
+\section{Metode}
+\label{sec:metode}
+Antagelser, problemdomæne formuleret i introduktionen sektion \ref{sec:introduktion}.
+(Lavpraktisk:)
+- hvilke værktøjer vil vi tage i brug AR.Dronen, PC, joystick/controller, Python, => hvorfor, argumentation.
+   tage AR.Dronen gå fra at bruge den som en fjernstyrbar enhed til at gøre den til en næsten selvstændig semi autonom enhed.
+
+- hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det(relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
+
+-Hvordan vil vi faktisk teste vores tese? - arbejde går imod at lave en testopstilling, hvad skal der til for at opstillingen virker? framework, processor-kraft båndbredde
+
+Højniveau?:
+- er der noget højt,... abstraktion?
+
+
 \section{AR.Drone}
+\label{sec:AR.Drone}
 AR.Drone er en quadrocopter fremstillet og udviklet af det franske
-firma Parrot. En quadrocopter benytter fire faste rotorer til at
-generere opdrift, samt til at styre sin bevægelse i rummet. 
-\\AR.Drone blev introduceret i 2010 og har siden fundet stor anvendelse, ikke
-blot som et stykke avanceret legetøj, men også som en
-udviklingsplatform til forskere og studerende. En AR.Drone kommer med et
-sæt sensorer bestående af to kameraer(et vertikalt nedadrettet og et
-horisontalt fremadrettet), en højdemåler, gyroskop(til at måle
-hældning, krængning og drejning), samt et accelerometer. I 2012 ventes
-en opdateret udgave af AR.Drone, denne forventes at tilføje HD kamera,
-trykmåler og kompas til platformen.
-\\AR.Drone er opbygget som en letvægtskonstruktion af kulfiber, plast og
+firma Parrot\cite{electronic:parrot}\cite{electronic:wiki_parrot}. En quadrocopter benytter fire faste rotorer til at
+generere opdrift, samt til at styre sin bevægelse i rummet.%\\
+
+AR.Drone blev introduceret i 2010 som ``the Flying Videogame'' og promoveres stadig af producenten som et stykke legetøj. Det har siden fundet stor anvendelse, ikke blot som et avanceret stykke legetøj. Forskere, studerende og hobbyister har taget den fjernstyrede quadrocopter til sig som en færdig platform til at udvikle videre ovenpå\cite{electronic:ludep} og som platform til selv at ombygge.%\cite evt. flere som har brugt AR.Dronen i deres forsøg forskning, bl.a. LUDEP.
+
+Parrots quadrocopter kommer med et sæt sensorer bestående af to kameraer; et vertikalt 
+nedadrettet og et horisontalt fremadrettet, en højdemåler, et gyroskop%(til at måle hældning, krængning og drejning)<- senere detalje, her kun intro
+, samt et accelerometer. I 2012 ventes en opdateret udgave af AR.Drone. Den nye version tilføjer yderligere et kamera i høj opløsning (HD),
+en trykmåler (digitalt barometer) og et kompas til platformen.
+
+AR.Drone er opbygget som en letvægtskonstruktion af kulfiber, plast og
 skummateriale og kommer med to forskellige skumskjold til henholdsvis
-indendørs og udendørs flyvning.
+indendørs (figur~\ref{fig:indendoersskjold}) og udendørs flyvning (figur~\ref{fig:udendoersskjold}).
 
 \begin{figure}[ht]
 \centering
@@ -73,132 +118,207 @@ indendørs og udendørs flyvning.
     \label{fig:udendoersskjold}
     \includegraphics[width=0.45\textwidth]{grafik/parrot-ardrone-outdoor.jpg}
   }
-  \caption{AR.Drone med indendørs- og udendørsskjold}
+  \caption{AR.Drone med indendørs- og udendørsskjold. Figurene er fra AR.Drone Developer Guide\cite{techreport:ardroneDevGuide}}
   \label{fig:ardrone}
 \end{figure}
  
 \subsection{Hardware}
 \label{ssec:hardware}
-Som de fleste robotter består AR.Drone af et antal sensorer, et antal
-aktuatorer og en styringsenhed. 
+Som de fleste robotplatforme består AR.Drone af et antal sensorer, et antal
+aktuatorer og en processorenhed.
+
 \subsubsection{Sensorer}
-\label{sssec:sensorer}
-AR.Drone er udstyret med to kameraer, det fremadrettede er en $93 ^{\circ}$
-CMOS sensor som kan levere $640 \times 480$ billeder (selvom
-resourceknaphed gør at opløsningen der transmitteres fra dronen
-kun er $320 \times 240$ (QVGA)) med en framerate på $15 FPS$. Det nedadvendte kamera er
-en $64 ^{\circ}$ CMOS sensor, der tager billeder i $176 \times 144$ (QCIF) med en
-framerate på $60 FPS$.
-\\Til at bestemme dronens højde over jorden anvendes en ultrasonisk
-højdemåler, denne opererer ved at udsende en ultralydspuls og herefter
-måle tidsintervallet der går før ekkoet måles. Højdemåleren er angivet
-til at virke op til 6 meter og er rent fysisk placeret på
-dronens navboard. Det er værd at bemærke, at højdemåleren ikke måler
-højden på et specifikt punkt, men derimod returnerer den mindste højde
-i et område som det på figur \ref{fig:sonicbeam}, samt at ultrasoniske
-detektorer generelt har problemer med bløde og skrånende overflader.
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg}
-  \caption{Udslagsområde for en ultrasonisk sensor}
-  \label{fig:sonicbeam}
+  \includegraphics[width=0.80\textwidth]{grafik/navboard.png}
+  \caption{Over- og underside af Navigationsprint til undersiden af AR.Dronen. Navboardet indeholder bl.a. ultralydssensoren. Figurene er fra to internetbutikker \uri{droneparts.de} og \uri{aust-rc-tech.com.au} hvorfra der kan bestilles AR.Drone reservedele.}
+  \label{fig:navboard}
 \end{figure}
-AR.drone er udstyret med to gyroskoper, et 2-akses gyroskop til at
-måle hældningsraten om x- og y-aksen samt et piezoelektrisk gyroskop
-til at måle rotationen om z-aksen. Gyroskoperne kombineres med et
-3-akses accelerometer i en samlet IMU-enhed, denne anvendes til
-løbende at give estimater af Euler-vinklerne(theta, phi og psi).  
+\label{sssec:sensorer}
+AR.Drone er som sagt udstyret med to kameraer; et nedadrettet og et fremadrettet.
+Det fremadrettede er med en synsvinkel på $93 ^{\circ}$ og består af en CMOS\footnote{Complimentary-Symmetry Metal Oxide Semiconductor, på dansk: en sensor af komplimentær metaloxid halvleder teknologi.}-billedsensor som kan levere $640 \times 480$ billeder, AR.Dronen transmittere dog kun med en opløsning på Quarter Video Graphics Array (QVGA) $320 \times 240$ med en framerate på $15 FPS$.
+Det nedadrettede kamera er en CMOS sensor med $64 ^{\circ}$ vinkel, der tager billeder i Quarter Common Intermediate Format (QCIF) $176 \times 144$ opløsning, med en framerate på $60 FPS$.
+
+Til at bestemme AR.Dronens afstand til jorden anvendes en ultrasonisk
+afstandsmåler. Denne opererer ved at udsende en ultralydspuls og herefter
+måle tidsintervallet der går før ekkoet måles. Ultralydsmåleren er angivet
+til at virke op til 6 meter og er rent fysisk placeret på navboardet (se figur \ref{fig:navboard}) på AR.Dronens underside.
+%%  Det er værd at bemærke, at højdemåleren ikke måler
+%% højden på et specifikt punkt, men derimod returnerer den mindste højde
+%% i et område som det på figur \ref{fig:sonicbeam}, samt at ultrasoniske
+%% detektorer generelt har problemer med bløde og skrånende overflader%cite?.
+%% \begin{figure}[ht]
+%%   \centering
+%%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg}
+%%   \caption{Udbredelsesområde for ultralydssensorsignal, man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://picaxe.hobbizine.com/srf05.html}).}
+%%   \label{fig:sonicbeam}
+%% \end{figure}
+
+AR.Drone er udstyret med to gyroskoper, et 2-akses gyroskop til at
+måle hældningsraten om x- og y-aksen (pitch og roll) samt et 1-akses piezoelektrisk gyroskop
+til at måle rotationen om z-aksen (yaw). Gyroskoperne kombineres med et
+3-akses accelerometer i en samlet enhed til at måle inerti (IMU), denne anvendes til
+løbende at give estimater af Euler-vinklerne; theta, phi og psi. Hvor phi og theta er henholdsvis pitch og roll, mens at psi er yaw. For en grafisk repræsentation se evt figur \ref{fig:drone_movements}.
+  
 \subsubsection{Aktuatorer}
 \label{sssec:aktuatorer}
-Dronens aktuatorer er de fire børsteløse $15 W$ motorer. Motorerne
-arbejder i intervallet $10350$ til $41400 RPM$ og når dronen står stille i
+AR.Dronens aktuatorer er de fire børsteløse $15 Watt$ motorer. Motorerne
+arbejder i intervallet $10350$ til $41400$ omdrejninger per minut ($RPM$) og når AR.Dronen står stille i
 luften arbejder motorerne med $28000 RPM$. Dette svarer, grundet gearingen,
 til $3300 RPM$ for propellerne. Motorerne har uden sammenligning det
-største strømforbrug af alle dronens enheder.
-\subsubsection{Styring}
-\label{sssec:styring}
-Den centrale styringsenhed på dronen er en ARM9 468 mHz
-processor(Parrot 6 ARM926EJ) med 128 mb DDR ram og et integreret
-trådløst netværkskort(Atheros AR6102G-BM2D). Enheden giver også adgang
-til en On-The-Go USB port som primært anvendes ved opdateringer.
-\\Batterierne der driver alle enhederne er af lithium-polymer typen og
-giver ifølge dokumentationen ca. 12 minutters flyvetid.
-  
+største strømforbrug af alle AR.Dronens enheder.
+
+\subsubsection{Den indlejrede computer}
+\label{sssec:processor}
+Den centrale beregnerenhed på AR.Dronen er en ARM9 $468 MHz$
+processor (Parrot 6 ARM926EJ) med $128 Mbyte$ DDR RAM til 
+arbejdshukommelse og $128 Mbyte$ NAND flash til persistent (vedvarende) hukommelse.
+
+Til den embeddede computer er der et integreret trådløst netværkskort(Atheros AR6102G-BM2D) til wifi. 
+
+På undersiden af quadrokopteren er der et 7 benet molex-stik til ekstern serialkommunikation. Porten virker bl.a. som en On-The-Go USB-port, der primært anvendes ved opdateringer.
+
+\subsubsection{Strømforsyning}
+\label{sssec:forsyning}
+Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri med en open-circuit\footnote{Open-circuit spændingen er den spænding der er over batteriet når det er uden belastning og ikke oplades.} spænding på $11,1 Volt$, med ladning på $1000$ milli-ampere-timer ($mAh$) og en afladnings hastighed på $10$ Coulomb ($C$). Opladning af batteriet kan foregå i løbet af 90 minutter. Efter sigende skulle batteriet give omking 12 minutters flyvetid\cite{electronic:ar.drone_parrot_technologies}\cite{electronic:wiki_ar.drone}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
+  \caption{(a) vinkelhastigheden $\Omega$ øges med $\Delta_A$ på alle 4 propeller, quadrokopteren øger dermed løftekraften (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og mindskes på højre propel, quadrokopteren laver et ``roll'' til højre (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de med-uret-drejende propeller gør at torque bliver ulige og at quadrokopteren drejer mod venstre (acceleration i yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts ($V_y$)}
+  \label{fig:drone_movements}
+\end{figure}
+
+
+\subsection{Fysik}
+\label{ssec:fysik}
+AR.Dronen fåes som sagt med 2 skrog eller skjold (figur~\ref{fig:indendoersskjold}), og vejer 420 gram med det indendørs skrog monteret. Et pund er en relativ lille vægt, andre\cite{quteprints33767} quadrokoptere har f.eks. 4-5 kg som de skal løfte rundt på.
+
+De 4 propeller sidder i hver sit hjørne af et kulfiberkryds på AR.Dronen. Når en propel på AR.Dronen rotere om sin akse flytter den luften i et areal rundt om propellen. Lufttrykket på undersiden af propellen bliver herved større end lufttrykket på oversiden af propellen. Hvis AR.Dronen ligger vandret vil forskellen i lufttryk giver en Bernoullieffekt\cite{electronic:wiki_bernoulli} som påvirker AR.Dronen med en kraft modsat tyngdekraften (thrust)\cite{electronic:wiki_quadrotor}. Udover thrust påvirker den roterende bevægelse også propellens base med et moment (torque) modsat propellens retning. Eksempelvis vil en helikopter uden haleror dreje ukontrolerbart rundt om sig selv, men fordi AR.Drone har et par rotore som drejer een vej (med uret), mens et andet par drejer modsat (imod uret)\cite{techreport:ardroneDevGuide}, bliver summen af momentpåvirkning nul, hvis de 4 rotere drejer med samme hastighed.
+Denne egenskab bruges til at styre AR.Dronens flyvning og bevægelser i rummet, som kan beskrives med 3 bevægelsesakser; x, y og z (se figur~\ref{fig:drone_movements}) som er lokale for quadrokopteren.
+
+AR.Dronens bevægelser styres ved at kontrollere dens vinkel i forhold til de 3 akser. Skal AR.Dronen f.eks. flyve fremad, sættes forenden til at være lidt under bagenden i forhold til det vandrette plan. I praksis sker det ved at sænke vinkelhastigheden på den forreste propel samtidig med at omdrejningsantallet øges %spørgsmålet er hvad er moment påvirkningen af  (2*omega_H + delta_A - delta_B) - (2*omega_H) . . .
+ på den bageste propel. Det resultere i at AR.Dronen hælder lidt fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig gældende når AR.Dronen skal flytte sig sideværts som på figur \ref{fig:drone_movements}b.
+
+Hvis AR.Dronen skal dreje om sin egen akse for at kigge længere til venstre bruges samme egenskab som før; det moment som tilføres af de 2 propeller der drejer med uret skal overstige det moment som tilføres af de 2 propeller der drejer modsat. Det gøres ved at øge vinkelhastigheden på de to førstnævnte og sænke hastigheden på de propeller der drejer modsat uret.
+
+Når AR.Dronen går fra at ligge vandret til istedet at hælde, så flyttes noget af thrust fra at virke lodret imod tyngdekraften til også virke sideværts. Det betyder at propellernes samlede vinkelhastighed skal øges for at opretholde den samme afstand til jorden. Ifølge SDK DevGuide\cite{techreport:ardroneDevGuide} bør hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$) ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan sættes til f.eks. 0.25 radianer via AT-kommandoen i figur \ref{fig:ateulerangle}.
+
+%TODO Hvilken port??????
+\begin{figure}[ht]
+  \begin{framed}   
+    \begin{quotation}
+      AT*CONFIG=605,"control:euler\_angle\_max","0.25"
+    \end{quotation}
+    \caption{AT-kommando til at sætte max hældning på $\Phi$ og $\Theta$}  
+    \label{fig:ateulerangle}
+  \end{framed}
+\end{figure}
+
+I styreprogrammet på AR.Dronens computer kan man sætte en konstant til at styre den øvre grænse for hvor meget quadrokopteren maximalt kan krænge. Konstanten \emph{ Euler\_angle\_max } virker som en cut-offvinkel, dvs. under flyvning tester AR.Dronen løbende at hverken pitch- eller roll-vinklen overskrider grænsen. Sker det lukkes systemet ned; kraften til rotorene klippes og AR.Dronen lader sig falde til jorden.\\
+%
+
+%\subsection{begrænsninger} %i et andet sup_sektion..? evt. +ultralydsting
+Ifølge Wikipedia.org\cite{electronic:wiki_ar.drone} skal AR.Dronen være i stand til at flyve fremad med en maksimal hastighed på $5 m/sek$ svarende til 18 km/t. %\cite{wikiDrone}
+Selvom det synes at give mening at beskrive AR.Dronens bevægelser i 3 dimensioner og deri nemmere at bruge accelerometer- og gyro-målinger fra sensorene om bord. Så kan man egentlig ikke sige noget udfra accelerometer og gyroer omkring hvor langt AR.Dronen har fløjet eller med hvilken hastighed AR.Dronen bevæger sig.
+Vi kan måske udlede estimater for hastigheder ved at integrere over accelerationen, men hastigheden i det horisontale plan er i praksis afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch værdierne kan være sat til 0 og AR.Dronen vil ligge horisontal, men kan stadig godt bevæge sig sideværts i luften\footnote{AR.Dronen siges at være ``trimmet'' (med en konstant hastighed, evt. 0m/S) hvis den ikke påvirkes af en resulterende kraft og acceleration dermed er 0} på grund af indebåren inerti eller f.eks. en stille konstant vind. Bevæger AR.Dronen sig med en konstant hastighed kan det ikke aflæses af accelerometeret, afstande AR.Dronen har flyttet sig kan således heller ikke aflæses af accelerometer og gyro alene. Firmwaren fra parrot tager istedet bundkameraet til hjælp ved at bruge opticalflow til at udlede hastigheder i planet, man kan således alligevel bede AR.Dronen om et estimat for hastigheden over jorden som en værdi i navdatapakken.
+
+
+
 \subsection{Software}
 \label{ssec:software}
-\subsubsection{Linux}
-\label{sssec:linux}
-Dronens microcomputer kommer med en Linux 2.6.27 kerne
+AR.Dronens microcomputer kommer med en Linux 2.6.27 kerne
 installeret. Det bemærkes at 2.6.27 er den første kerne med indbygget
-support for UBIFS som er det filsystem der anvendes på dronens
-flashmemory.
-\subsubsection{Busybox}
+support for UBIFS\cite{electronic:wiki_ubifs} som er det filsystem der anvendes på AR.Dronens
+NAND flashhukommelse.
+
+\subsubsection{Busybox linux platformen på AR.Dronen}
 \label{sssec:busybox}
-Udover Linux kernen leveres AR.Drone også med Busybox installeret.
-Busybox giver adgang til en række unix værktøjer der er optimeret til
-brug i embeddede systemer og er derfor et meget populært valg blandt
-udviklere af sådanne systemer. Busybox konfigureres så kun de ønskede
-værktøjer medtages og disse pakkes så til en enkelt eksekverbar fil,
-dette betyder at størrelsen holdes på et minimum. Busybox på AR.Drone
-fylder 483 kb og udstyrer dronen med alle de userspacer værktøjer man
-forventer på et standard linux system(cd, ls, mv, ln osv.), men
-leverer desuden også den dhcp-server dronen anvender til at uddele
-ip-adresser, den telnet-server der giver adgang til dronens terminal
-samt den editor(vi) der gør det muligt at redigere filer på dronen. 
-\subsubsection{Program.elf}
+Udover Linux kernen leveres AR.Drone også med Busybox\cite{electronic:busybox} installeret.
+Busybox giver adgang til en række Unix værktøjer (copy \code{cp}, list \code{ls} osv.) optimeret til
+brug i embeddede systemer. Busybox konfigureres så kun de ønskede
+værktøjer medtages og disse pakkes så til en enkelt eksekverbar fil.
+Dette betyder at størrelsen holdes på et minimum. Busybox på AR.Drone
+fylder $483 kbyte$ og udstyrer AR.Dronen med alle unix brugerkommandoer man
+forventer på et standard linux system, e.g. \code{cd}, \code{ls}, \code{mv}, \code{ln} osv.
+Busybox på AR.Dronen leverer desuden en Dynamic Host Configuration Protocol\cite{rfc2131} (DHCP) service; den DHCP-server AR.Dronen anvender til at uddele %DHCP cite?
+IP\cite{rfc791}-adresser og lave et netværk mellem en klient og AR.Dronen selv, samt en telnet\cite{frc854}-server der giver adgang til AR.Dronens terminal %telnet cite?
+og en texteditor %(Vi)
+der gør det muligt at redigere filer direkte på AR.Dronen.
+
+\subsubsection{Program.elf -- AR.Dronens styreprogram}
 \label{sssec:program.elf}
 Den firmware der står for selve styringen, transmitteringen af
 data og bearbejdning af sensordata i forbindelse med flyvning er
 implementeret i \uri{/bin/program.elf}. Da der er tale om proprietært
-software kan vi ikke udtale os om hvordan programmet er implementeret,
-vi kan dog udlede forskellige elementer efter at have observeret
-dronen under flyvning. Program.elf indeholder blandt andet en PID
-controller til at stabilisere dronen når der svæves, en algoritme
-til at udlede dronens hastighed ved hjælp af bundkameraet%cite hvor
+software betragtes programmet som en lukket kasse uden hensyntagen til implementeringen, vi kan dog udlede forskellige elementer efter at have observeret
+AR.Dronen under flyvning. -- Program.elf indeholder blandt andet
+\begin{itemize}
+\item en PID controller til at stabilisere AR.Dronen når der svæves, 
+\item en algoritme til at udlede AR.Dronens hastighed ved hjælp af bundkameraet (bekræftes også i en artikel af Parrot selv\cite{velocity_estimation_inside_the_drone}.)%cite hvor
 % nogle siger at program.elf + motorstyring + radio tager op mod $80
 % \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
-og en algoritme til at detektere tags i billeder i forbindelse med augmented
-reality spil. Program.elf modtager kommandoer fra brugeren gennem en UDP port, selve UDP
-interfacet beskrives i afsnit~\ref{ssec:kommunikation}.
+\item og en algoritme til at detektere tags i billeder i forbindelse med augmented
+reality spil. 
+\end{itemize}
+Program.elf modtager kommandoer fra brugeren gennem en User Datagram Protocol\cite{rfc768} (UDP) 
+port. Kommunikationsinterfacet mellem bruger og quadrokopteren beskrives i afsnit~\ref{ssec:kommunikation}.
 
-\subsection{Kommunikation}
+\subsection{Kommunikation med AR.Dronen}
 \label{ssec:kommunikation}
-Kommunikationen med dronen kan indeles i to kategorier, den der
-beskæftiger sig med input til, og output, fra program.elf(flyvning) og
-den der omhandler den almindelige anvendelse af dronens linux
-system.
+Interaktion med de programmer der kører på AR.Dronens linux-platform kan kategoriseres i 3 grupper:
+\begin{itemize}
+  \item som klient (PC, smartphone eller lignende) via Telnet eller FTP\cite{frc959} til AR.Dronen, hvor AR.Dronen fungere som server,
+  \item ved at eksekvere en applikation på en klient (PC, smartphone eller lignende) der sender og modtager UDP-pakker og AT-kommandoer\footnote{AT(tention)-kommandoer gennemgåes nærmere i sektion \ref{sssec:atinterface}} til det kørende firmware \url{program.elf} på AR.Dronen,
+  \item eller ved at eksekvere et program på selve AR.Dronen der kommunikerer over 3 UDP-porte og køre parallelt med firmware'en \url{program.elf} på AR.Dronen.
+\end{itemize}
+
 \subsubsection{TCP baseret kommunikation}
 \label{sssec:tcp}
-For at få adgang til en terminal på dronen anvendes
-en telnetklient. Efter forbindelse til dronens ip-adresse får brugeren
-adgang til en rodterminal, da systemet er sat op som et
-enkeltbrugersystem.
-\\For at overføre en fil til dronen anvendes en FTP-klient. Efter
-forbindelse til dronen, kan filer overføres mellem dronen og brugerens
-system med FTP-protokollens PUT og GET kommandoer. Hvis der ikke
-angives en sti lægges overførte filer som standard i '/data/video' mappen.  
+Fra en klient-computer er det muligt at få adgang til AR.Dronens 
+installerede linuxinstallation ved at telnet'te til AR.Dronens 
+faste IP-adresse (192.168.1.1). Efter at forbindelsen er etableret 
+får brugeren her adgang til en rodterminal. %root .. eller?
+
+Ved at oprette forbindelse gennem FTP, fra et FTP-program på en 
+ekstern klientcomputer til AR.Dronens FTP-server, kan man overfører 
+filer imellem AR.Dronen og klientcomputeren med FTP-protokollens 
+PUT og GET kommandoer. Hvis klienten ikke angives en sti lægges 
+overførte filer som standard i \url{~/data/video} mappen.
+
 \subsubsection{UDP baseret kommunikation}
 \label{sssec:udp}
-I modsætning til FTP- og telnetklienterne, som er TCP baserede, anvendes
-UDP-protokollen til den kommunikation der sker mellem program.elf og
-brugerens system. Sammenlignet med TCP opererer UDP med noget mindre
-overhead per afsendt besked, tilgengæld garanterer protokollen intet
+I modsætning til FTP- og Telnet-klienterne, som er TCP baserede, anvendes
+UDP-protokollen til den kommunikation der sker mellem \url{program.elf} og
+brugerens system (iPhone eller PC).
+
+Firmware'en \url{program.elf} på AR.Dronen sender og modtager pakker på 3 UDP-porte:
+\begin{itemize}
+  \item På port 5556 lytter quadrokopteren efter brugerkommandoer, e.g. takeoff, flyv frem, drej, land osv.
+  \item fra port 5555 sendes
+  \item fra port 5554 
+\end{itemize}
+ Sammenlignet med TCP opererer UDP med noget mindre
+overhead per afsendt besked. Tilgengæld garanterer protokollen intet
 om hvorvidt eller hvornår en pakke når frem til sin destination. UDP
 er oftest det første valg når der skal streames video og lyd over et
 netværk, da en enkelt mistet pakke sjældent har stor betydning i denne
 kontekst. Når fokus er på at få sendt så meget
-information(navigationsdata og video) som muligt til brugeren, giver
+information (navigationsdata og video) som muligt til brugeren, giver
 det god mening at anvende UDP og så implementere et minimum af
-flowkontrol ovenpå protokollen. Til gengæld kan vi godt se fordele i
+flowkontrol ovenpå protokollen, e.g.  
+
+Til gengæld kan vi godt se fordele i
 de garantier TCP kunne give når fokus er på at modtage kontrolpakker,
 heldigvis er det forholdsvis simpelt, at kontrollere hvorvidt visse
-kritiske beskeder(land, let etc.) er nået frem til dronen, eller om vi
-skal sende pakken igen. 
+kritiske beskeder(land, let etc.) er nået frem til AR.Dronen, eller om vi
+skal sende pakken igen.
+
 \subsubsection{AT kommando interface}
 \label{sssec:atinterface}
-En bruger applikation kommunikerer med dronens software ved hjælp af
+En bruger applikation kommunikerer med AR.Dronens software ved hjælp af
 såkaldte AT-kommandoer, En AT-kommando er basalt set blot en
-tekststreng encodet som 8 bits karakterer, kommandoer sendes til dronens
+tekststreng encodet som 8 bits karakterer, kommandoer sendes til AR.Dronens
 kommandoport(5556) som UDP-pakker. Formatet for AT-kommandoer ses på
 figur \ref{fig:atsyntaks}.
 \begin{figure}[ht]
@@ -218,11 +338,11 @@ En kommando må ikke deles i flere pakker, men en UDP-pakke kan
 indeholde flere AT-kommandoer, kommandoerne skal blot være adskilt med
 en "linefeed" karakter og den samlede længde må ikke overskride 1024
 karakterer. Såfremt en kommando overskrider længdebegrænsningen eller
-på anden måde ikke overholder syntaksen, vil dronen ignorere
+på anden måde ikke overholder syntaksen, vil AR.Dronen ignorere
 kommandoen.   
 Tabel \ref{tab:kommandoer} viser hvilke kommandoer der
-jf. \cite{ardroneDevGuide} kan bruges til at
-kontrollere dronen.\newline 
+jf. \cite{techreport:ardroneDevGuide} kan bruges til at
+kontrollere AR.Dronen.\newline 
 \begin{table}[ht]
   
   \begin{center}
@@ -231,7 +351,7 @@ kontrollere dronen.\newline
     \hline
     REF & input & Kommando til takeoff, land og nødstop\\
     \hline
-    PCMD & flag, roll, pitch, gas, yaw & Flytter dronen\\
+    PCMD & flag, roll, pitch, gas, yaw & Flytter AR.Dronen\\
     \hline 
     FTRIM &  & Sætter den horisontale referenceværdi \\
     \hline
@@ -248,45 +368,7 @@ kontrollere dronen.\newline
   \label{tab:kommandoer}
 \end{table} 
 
-\subsection{Fysik}
-\label{ssec:fysik}
-AR.Dronen har 4 rotorvinger (propeller) siddende i hver sit hjørne af et kulfiberkryds
-på dronen. 
 
-Når en propel på dronen rotere om sin akse flytter den luften i et areal rundt om propellen. Lufttrykket på undersiden af propellen bliver herved større end lufttrykket på oversiden af propellen. Hvis dronen ligger vandret vil forskellen i lufttryk giver en Bernoullieffekt som påvirker dronen med en kraft modsat tyngdekraften (thrust). Udover thrust påvirker den roterende bevægelse også propellens base med et moment (torque) modsat propellens retning. Eksempelvis vil en helikopter uden haleror dreje ukontrolerbart rundt om sig selv, men fordi AR.Drone har et par rotore som drejer een vej (med uret), mens et andet par drejer modsat (imod uret)\cite{ardroneDevGuide}, bliver summen af momentpåvirkning nul, hvis de 4 rotere drejer med samme hastighed.
-Denne egenskab bruges til at styre dronens flyvning og bevægelser i rummet, som kan beskrives med 3 bevægelsesakser (x, y og z).
-
-Dronens bevægelser styres ved at kontrollere dens vinkel i forhold til de 3 akser. Skal dronen f.eks. flyve fremad, sættes forenden til at være lidt under bagenden i forhold til det vandrette plan. I praksis sker det ved at sænke vinkelhastigheden på den forreste propel samtidig med at omdrejningsantallet øges %spørgsmålet er hvad er moment påvirkningen af  (2*omega_H + delta_A - delta_B) - (2*omega_H) . . .
- på den bageste propel. Det resultere i at dronen hælder lidt fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig gældende når dronen skal flytte sig sideværts som på figur \ref{fig:drone_movements}b.
-
-Hvis dronen skal dreje om sin egen akse for at kigge længere til venstre bruges samme egenskab som før; det moment som tilføres af de 2 propeller der drejermed uret skal overstige det momentet som tilføres af de to propeller der drejer modsat. Det gøres ved at øge vinkelhastigheden på de to førstnævnte og sænke hastigheden på de propeller der drejer modsat uret.
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
-  \caption{Drone thrust, torque og bevægelser}
-  \label{fig:drone_movements}
-\end{figure}
-
-Når dronen går fra at ligge vandret til istedet at hælde, så flyttes noget af thrust fra at virke lodret imod tyngdekraften til også virke sideværts. Det betyder at propellernes samlede vinkelhastighed skal øges for at opretholde den samme afstand til jorden. Ifølge SDK DevGuide\cite{ardroneDevGuide} bør hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$) ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan sættes til f.eks. 0.25 radianer via AT-kommandoen i figur \ref{fig:ateulerangle}.
-
-\begin{figure}[ht]
-  \begin{framed}   
-    \begin{quotation}
-      AT*CONFIG=605,"control:euler\_angle\_max","0.25"
-    \end{quotation}
-    \caption{AT-kommando til at sætte max hældning på $\Phi$ og $\Theta$}  
-    \label{fig:ateulerangle}
-  \end{framed}
-\end{figure}
-
-Der er en øvre grænse for hvor meget dronen max kan krænge \emph{ Euler\_angle\_max } virker som en cut-offvinkel, dvs. under flyvning tester dronen løbende at hverken pitch- eller roll-vinklen overskrider grænsen. Sker det lukkes systemet ned; kraften til rotorene klippes og dronen lader sig falde til jorden.\\
-%
-
-%\subsection{begrænsninger} %i et andet sup_sektion..?
-Ifølge Wikipedia.org\footnote{Wikipedia.org/wiki/Parrot\_AR.Drone, set april 2012} skal dronen være i stand til at flyve fremad med en maksimal hastighed på $5 m/sek$ svarende til 18 km/t. %\cite{wikiDrone}
-Selvom at det synes at give mening at beskrive dronens bevægelser i 3 dimensioner og deri nemmere at bruge accelerometer- og gyro-målinger fra sensorene ombord. Så kan vi egentlig ikke sige noget udfra accelerometer og gyroer omkring hvor langt dronen har fløjet eller med hvilken hastighed dronen bevæger sig.
-Vi kan måske udlede estimater for hastigheder ved at integrere over accelerationen, men hastigheden i det horisontale plan er i praksis afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch værdierne kan være sat til 0 og dronen vil ligge horisontal, men kan stadig godt bevæge sig sideværts i luften\footnote{Dronen siges at være ``trimmet'' (med en konstant hastighed, evt. 0m/S) hvis den ikke påvirkes af en resulterende kraft og acceleration dermed er 0} på grund af indebåren inerti eller f.eks. en stille konstant vind. Bevæger dronen sig med en konstant hastighed kan det ikke aflæses af accelerometeret, afstande dronen har flyttet sig kan således heller ikke aflæses af accelerometer og gyro alene. Firmwaren fra parrot tager istedet bundkameraet til hjælp ved at bruge opticalflow til at udlede hastigheder i planet, man kan således alligevel bede dronen om et estimat for hastigheden over jorden som en værdi i navdatapakken.
 
 \pagebreak
 

@@ -45,7 +45,7 @@ def _is_red( img_a, x, y, radius):
                 B += img_a[Y,X][BLUE]
     
     denom = 0.0+R+G+B
-    if 0.40 < R/float(denom):
+    if denom > 0 and 0.40 < R/float(denom):
         return True
     return False
 

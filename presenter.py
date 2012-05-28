@@ -203,13 +203,6 @@ class PresenterGui(object):
             elif radio.get_name() == "radiobutton4" and self.navdata_sensor is not None and self.wifi_sensor is not None and self.video_sensor is not None:
                 gobject.timeout_add(200, self.update_matching, radio)
 
-    def time_psi(self):
-        old_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
-        time.sleep(20)
-        new_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
-        error = old_psi - new_psi
-        print error
-
     def handle_key_pressed(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
         
@@ -232,6 +225,10 @@ class PresenterGui(object):
         elif keyname == "m":
             self.wifi_sensor.match_current_wifi_sample()
    
+
+
+    def show_map(self, widget):
+        pass
 
     def update_matching(self, widget):
         match_val_video = self.video_sensor.match_target_sample()
@@ -740,9 +737,9 @@ class VideoWindow(gtk.Window):
         also carries out optical flow tracking of features in 'self.features'."""
 
         # Get image from video sensor
-        input_image = self.autocontrol.last_match_image
-        if input_image is None:
-            input_image = self.video_sensor.get_data()
+        # input_image = self.autocontrol.last_match_image
+        # if input_image is None:
+        input_image = self.video_sensor.get_data()
         
         points = self.print_points(self.autocontrol.active_tasks)
 

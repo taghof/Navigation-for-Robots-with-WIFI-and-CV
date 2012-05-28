@@ -76,7 +76,8 @@ class Drone(object):
             navdata = self.navdata_sensor.get_data()
             bat   = navdata.get(0, dict()).get('battery', 0)
             print 'Battery: ' + str(bat) + '\r'
-
+        
+        self.interface.start()
         self.controller_manager.start_controllers()
         if self.svideo or self.sgui:
             self.gui.show()

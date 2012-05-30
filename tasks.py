@@ -10,6 +10,7 @@ import cv2.cv as cv
 import map
 import os
 import pickle
+import Gnuplot, Gnuplot.funcutils
 
 d2r = (math.pi/180.0) # ratio for switching from degrees to radians
 
@@ -361,11 +362,14 @@ class HoverTrackTask(Task):
     Discrete PID control
     """
 
-    def __init__(self, drone, callback, context=None):
+    def __init__(self, drone, callback, context=None, time=None):
         Task.__init__(self, drone, callback, context)
         self.tracker = None
         self.verbose = False
-
+        if time is not None:
+            self.timer = threading.Timer(time, self.stop)
+        else:
+            self.timer = None
         # variables used in calculating the PID output
         self.Kp=1.0
         self.Ki=0.0
@@ -388,16 +392,13 @@ class HoverTrackTask(Task):
         self.max_error_y = (4000*(math.tan(26.18*(math.pi/180))/72.0))*72.0#120.0 # 72
         self.max_error_psi = 180
         self.psi_offset = 0
-        self.running = False
-        self.started = False
         self.loop_sleep = 0.05
+        self.data_points = ([],[],[],[],[],[])
 
     def is_started(self):
         return self.started
 
     def pre_loop(self):
-        self.started = True
-
         while not self.stopping:
             if self.context[0] is not None:
                 self.tracker = utils.PointTracker(self.drone.get_video_sensor(), self.drone.get_navdata_sensor(), self.context[0])
@@ -406,9 +407,11 @@ class HoverTrackTask(Task):
                 self.set_point_psi = self.navdata_sensor.get_data().get('psi', 0) + self.psi_offset
                 self.interface.set(0, 0, 0, 0, False)
                 print 'Hovering...\r'
+                if self.timer is not None:
+                    self.timer.start()
                 break
             time.sleep(0.001)
-       
+         
        
     def loop(self):
         # Calculate PID output for this iteration
@@ -423,7 +426,17 @@ class HoverTrackTask(Task):
         # remember to put the vehicle in hover mode after moving
         self.context[0] = None
         self.interface.set(0, 0, 0, 0, False)
-        
+
+        if len(self.data_points) > 0:
+            print self.data_points
+            g = Gnuplot.Gnuplot(persist=1)
+            g.title('Error measurements')
+            g.xlabel('Time')
+            g.ylabel('Error Distances')
+            d1 = Gnuplot.Data(self.data_points[0], self.data_points[1], title='error x')
+            d2 = Gnuplot.Data(self.data_points[0], self.data_points[2], title='error y')
+            g.plot(d1, d2)
+            #raw_input('Please press return to continue...\n')
 
     def update(self):
         """
@@ -550,22 +563,28 @@ class HoverTrackTask(Task):
             PID_y = PID_y + (vx/5000)
             #print 'added: ', (vx/5000), ' to y-power\r'
 
-
         if PID_x < 0 and vy < 0:
             PID_x = PID_x - (vy/5000)
             #print 'added: ', (vy/5000), ' to x-power\r'
         elif PID_x > 0 and vy > 0:
             PID_x = PID_x + (vy/5000)
             #print 'added: ', (vy/5000), ' to x-power\r'
-
         
         # print stuff for debugging purposes
         if self.verbose:
             print "Error_x_pixels: " + str(self.read_error_x_pixels) + "\tError_x_mm:\t" + str(self.error_x) + "\tError_angle_x: " + str(angle_x/d2r) + "\tEngine response_x: " + str(PID_x) + "\r"
             print "Error_y_pixels: " + str(self.read_error_y_pixels) + "\tError_y_mm:\t" + str(self.error_y) + "\tError_angle_y: " + str(angle_y/d2r) + "\tEngine response_y: " + str(PID_y) + "\r"
-            print "Error_combined: " + str(math.sqrt((self.error_y*self.error_y)+(self.error_x*self.error_x))) + "\r"
+            print "Error_combined: " + str(error_dist) + "\r"
             print "Altitude:\t", alt, "\r"
-                
+        t = time.time()
+        print t, '\r'
+        self.data_points[0].append(t)
+        self.data_points[1].append(self.error_x)
+        self.data_points[2].append(self.error_y)
+        self.data_points[3].append(error_dist)
+        self.data_points[4].append(PID_x)
+        self.data_points[5].append(PID_y)
+
         return (PID_x, PID_y, None, PID_psi)
 
     def correct_angle(self, val, angle, alt):
@@ -586,7 +605,6 @@ class SeqCompoundTask(Task):
 
     def __init__(self, drone, callback, context=None):
         Task.__init__(self, drone, callback, context)
-        # self.subtasks = [#TakeoffTask(drone, self.sub_callback, 5), MoveTask(drone, self.sub_callback, 0.5, 5), MoveTask(drone, self.sub_callback, 0.35, 1), MoveTask(drone, self.sub_callback, 0.35, 2), MoveTask(drone, self.sub_callback, 0.35, 3), MoveTask(drone, self.sub_callback, 0.35, 4), LandTask(drone, self.sub_callback)]
         if context is None:
             self.context = [None, self, None, None]
         else:
@@ -598,7 +616,6 @@ class SeqCompoundTask(Task):
 
     def sub_callback(self, caller):
         pass
-        #print caller, ' ended\r'
 
     def set_conf_1(self):
         self.subtasks = [SearchTask(self.drone, self.sub_callback, self.context), 
@@ -737,18 +754,17 @@ class FollowTourTask(SeqCompoundTask):
         res = []
         for i in range(len(self.tour)):
 
-            if i+2 > len(self.tour)-1:
+            if i+1 > len(self.tour)-1:
                 turn_angle = 0
             else:
-                previous = self.tour[i]
-                current = self.tour[i+1]
-                next = self.tour[i+2]
+                current = self.tour[i]
+                next = self.tour[i+1]
 
-                x1 = current[1] - previous[1]
-                y1 = current[2] - previous[2]
+                x1 = current[1][1] - current[0][1]
+                y1 = current[1][2] - current[0][2]
                 
-                x2 = next[1] - current[1]
-                y2 = next[2] - current[2]
+                x2 = next[1][1] - next[0][1]
+                y2 = next[1][2] - next[0][2]
                 
                 dp = x1*x2 + y1*y2
                 
@@ -758,13 +774,14 @@ class FollowTourTask(SeqCompoundTask):
                 print '(',x2, ',', y2, ')\r'
                 print '**************\r'
            
-            print turn_angle, '\r'
+            print 'turn angle: ',turn_angle, '\r'
+            # use modifiers to start movetasks with different algorithms
+            modifiers = self.tour[i][2]
             t = ParCompoundTask(self.drone, self.sub_callback, self.context)
-            h = HoverTrackTask(t.drone, t.sub_callback, t.context)
+            h = HoverTrackTask(t.drone, t.sub_callback, t.context, 5.0)
             h.psi_offset = turn_angle
             
             t.subtasks.append(h)
-
             res.append(t)
 
         res.append(LandTask(self.drone,self.sub_callback, self.context, 5))

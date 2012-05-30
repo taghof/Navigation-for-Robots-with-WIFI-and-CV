@@ -187,7 +187,11 @@ class AutoControl(Controller):
             t = tasks.FollowTourTask(self.drone, self.task_done)
             #t.set_conf_5()
             self.start_task(t)
-            
+        elif num == 3:
+            t = #indsæt thomas' task her
+            self.start_task(t)
+       
+     
         else:
             return
 
@@ -202,6 +206,7 @@ class KeyboardControl(Controller):
         self.update_time = 0.1
 
     def process_events(self):
+        self.auto_control = self.drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
         ch = utils.get_char_with_break()
         if ch == 'q':
             self.drone.stop()
@@ -213,7 +218,12 @@ class KeyboardControl(Controller):
             navdata = self.navdata_sensor.get_data()
             bat   = navdata.get(0, dict()).get('battery', 0)
             print 'Battery: ' + str(bat) + '\r'
-            
+        if ch == 't':
+            self.auto_control.start_task_num(6)
+        if ch == '3':
+            self.auto_control.start_task_num(3)
+
+
 class ManualControl(Controller):    
 
 

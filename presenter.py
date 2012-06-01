@@ -722,9 +722,10 @@ class VideoWindow(gtk.Window):
     def print_points(self, tasks):
         points = []
         for t in tasks:
-            if t.subtasks is None:
-                if t.point is not None:
-                    points.append(t.point)
+            if len(t.subtasks) == 0:
+                p = t.get_point()
+                if p is not None:
+                    points.append(p)
             else:
                 points.extend(self.print_points(t.subtasks))
         

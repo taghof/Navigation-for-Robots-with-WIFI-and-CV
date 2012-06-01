@@ -641,7 +641,7 @@ class PointTracker(threading.Thread):
         self.navdatareceiver = navdatareceiver
         self.original_point = point
         if point is None:
-            print 'point from centext was None\r'
+            print 'point from context was None\r'
             self.point = (88,72)
         else:
             self.point = point

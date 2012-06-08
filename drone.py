@@ -34,7 +34,15 @@ import time
 class Drone(object):
 
 
-    def __init__(self, video, gui):
+    def __init__(self, video, gui, test):
+
+
+        if test:
+            settings.TEST = True
+            import testdevice
+            self.testdevice = testdevice.TestDevice(False)
+
+
         self.svideo = video
         self.sgui = gui
 
@@ -65,12 +73,13 @@ class Drone(object):
         return self.sensors
 
     def start(self):
+        if settings.TEST:
+            self.testdevice.start()
        
         for sensor in self.sensors:
             sensor.start()
             while not sensor.get_status() == settings.RUNNING:
                 pass
-
 
         time.sleep(0.1)
         if self.svideo or self.gui is None:
@@ -95,6 +104,9 @@ class Drone(object):
             sensor.stop()
         
         self.interface.stop()
+        if settings.TEST:
+            self.testdevice.stop()
+
         return 0
                 
 
@@ -122,7 +134,7 @@ class Drone(object):
         sys.exit(0)
 
 def main():
-    video, gui = False, False
+    video, gui, test = False, False, False
     arg_len = len(sys.argv)
     for i in range(arg_len):
         if sys.argv[i] == '-v':
@@ -130,24 +142,14 @@ def main():
         elif sys.argv[i] == '-g':
             gui = True
         elif sys.argv[i] == '-t':
-            settings.TEST = True
-
-
+            test = True
+    
     os.system('clear')
-    if settings.TEST:
-        import testdevice
-        testdevice_ = testdevice.TestDevice(False)
-        testdevice_.start()
 
-    drone = Drone(video, gui)
+    drone = Drone(video, gui, test)
     drone.start()
-    signal.signal(signal.SIGINT, drone.sigint_handler)
-
-    if settings.TEST:
-        drone.get_video_sensor().join()
-        testdevice_.stop()
-
-
+    return drone
+    
    
 if __name__ == '__main__':
     main()

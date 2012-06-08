@@ -176,22 +176,20 @@ class AutoControl(Controller):
 
     def start_task_num(self, num):
         if num == 4:
-            t = tasks.SeqCompoundTask(self.drone, self.task_done)
+            t = tasks.SeqCompoundTask(self.drone, self.task_done, None)
             t.set_conf_4()
             self.start_task(t)
         elif num == 5:
-            t = tasks.SeqCompoundTask(self.drone, self.task_done)
+            t = tasks.SeqCompoundTask(self.drone, self.task_done, None)
             t.set_conf_5()
             self.start_task(t)
         elif num == 6:
-            t = tasks.FollowTourTask(self.drone, self.task_done)
+            t = tasks.FollowTourTask(self.drone, self.task_done, None)
             #t.set_conf_5()
             self.start_task(t)
         elif num == 3:
-            t = #indsæt thomas' task her
-            self.start_task(t)
-       
-     
+            t = None#indsaet thomas' task her
+            #self.start_task(t)
         else:
             return
 
@@ -364,6 +362,10 @@ class ControllerInterface(threading.Thread):
         #self.at(at_config,"detect:detections_select_v","4")
         #self.at(at_config, "general:navdata_options","1024")
 
+    def get_values(self):
+        return [self.pitch, self.roll, self.yaw, self.gaz, self.auto]
+
+
     def run(self):
         while not self.stopping:
             #print self.roll, ', ', self.pitch, ', ', self.yaw, ', ', self.gaz, '\r'
@@ -533,7 +535,7 @@ class ControllerInterface(threading.Thread):
         self.lock.release()
         
     def at_test(self, cmd, *args, **kwargs):
-        print 'AT test called with:\t' + str(cmd) + '\r'
+        #print 'AT test called with:\t' + str(cmd) + '\r'
         pass
 
 #=====================================================================================

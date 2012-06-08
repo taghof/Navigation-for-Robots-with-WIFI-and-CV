@@ -308,20 +308,28 @@ port. Kommunikationsinterfacet mellem bruger og quadrokopteren beskrives i afsni
 \label{ssec:kommunikation}
 Interaktion med de programmer der kører på AR.Dronens linux-platform kan kategoriseres i 3 grupper:
 \begin{itemize}
-  \item som klient (PC, smartphone eller lignende) via Telnet eller FTP\cite{rfc959} til AR.Dronen, hvor AR.Dronen fungere som server,
-  \item ved at eksekvere en applikation på en klient (PC, smartphone eller lignende) der sender og modtager UDP-pakker og AT-kommandoer\footnote{AT(tention)-kommandoer gennemgåes nærmere i sektion \ref{sssec:atinterface}} til det kørende firmware \uri{program.elf} på AR.Dronen,
-  \item eller ved at eksekvere et program på selve AR.Dronen der kommunikerer over 3 UDP-porte og køre parallelt med firmware'en \uri{program.elf} på AR.Dronen.
+  \item Som klient (PC, smartphone eller lignende) via Telnet eller
+    FTP\cite{rfc959} over trådløst netværk til AR.Dronen, hvor AR.Dronen fungere som server.
+  \item Ved at eksekvere en applikation på en klient (PC, smartphone
+    eller lignende) der sender og modtager UDP-pakker og
+    AT-kommandoer\footnote{AT(tention)-kommandoer over trådløst netværk (gennemgåes nærmere i
+      sektion \ref{sssec:atinterface}}) til det kørende firmware
+    \uri{program.elf} på AR.Dronen. 
+  \item Ved at eksekvere et program der kører
+    og kommunikerer internt på AR.Dronen. Programmet kommunikerer med
+    AR.Dronens firmware \uri{program.elf} gennem de tre UDP-porte der
+    også anvendes ved almindelig trådløs kommunikation.
 \end{itemize}
 
 \subsubsection{TCP baseret kommunikation}
 \label{sssec:tcp}
 Fra en klient-computer er det muligt at få adgang til AR.Dronens 
-installerede linuxinstallation ved at telnet'te til AR.Dronens 
+installerede linuxinstallation ved at oprette en telnetforbindelse til AR.Dronens 
 faste IP-adresse (192.168.1.1). Efter at forbindelsen er etableret 
 får brugeren her adgang til en rodterminal. %root .. eller?
 
 Ved at oprette forbindelse gennem FTP, fra et FTP-program på en 
-ekstern klientcomputer til AR.Dronens FTP-server, kan man overfører 
+ekstern klientcomputer til AR.Dronens FTP-server, kan man overføre 
 filer imellem AR.Dronen og klientcomputeren med FTP-protokollens 
 PUT og GET kommandoer. Hvis klienten ikke angiver en sti lægges 
 overførte filer som standard i \uri{~/data/video} mappen på AR.Dronen.
@@ -332,7 +340,7 @@ I modsætning til FTP- og Telnet-klienterne, som er TCP baserede, anvendes
 UDP-protokollen til den kommunikation der sker mellem \uri{program.elf} og
 brugerens system, f.eks iPhone eller PC.
 
-Firmware'en \uri{program.elf} på AR.Dronen sender og modtager pakker på 3 UDP-porte:
+Firmwaren \uri{program.elf} på AR.Dronen sender og modtager pakker på tre UDP-porte:
 \begin{itemize}
   \item På port 5556 (command port) lytter quadrokopteren efter brugerkommandoer, afsendt fra klientenheden e.g. ``takeoff'', flyv-frem, drej, land osv.
   \item på port 5555 (video port) sender AR.Dronen en videostream til klientenheden.
@@ -372,11 +380,18 @@ figur \ref{fig:atsyntaks}.
  AT*[kommandonavn]=[sekvensnummer],[arg1, arg2 ... argN]<LF>
 \end{verbatim}
   \end{framed}
-\caption{Syntaksen for en AT-kommando; [kommandonavn] kan f.eks. være \code{PCMD}. [sekvensnummer]-heltallet skal være stigende for hver ny afsendt AT-besked. Listen med argumenter; [arg1, arg2 ... argN], variere i antal afhægig af konteksten. Ved afsending af en \code{PCMD}-kommando skal der medsendes 5 talværdier for hhv. flag, roll, pitch, gas og yaw.}
+\caption{Syntaksen for en AT-kommando; [kommandonavn] kan f.eks. være
+  \code{PCMD}. [sekvensnummer]-heltallet skal være stigende for hver
+  ny afsendt AT-besked. Listen med argumenter; [arg1, arg2 ... argN],
+  variere i antal afhægig af konteksten. Ved afsending af en
+  \code{PCMD}-kommando skal der medsendes 5 talværdier for hhv. flag,
+  roll, pitch, gas og yaw.} 
 \label{fig:atsyntaks}
 \end{figure}
 
-Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer man hvorledes AR.Dronen skal bevæge sig ved translation og rotation, som beskrevet i \titleref{ssec:fysik} sektion \ref{ssec:fysik}.
+Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer
+man hvorledes AR.Dronen skal bevæge sig ved translation og rotation,
+som beskrevet i \titleref{ssec:fysik} sektion \ref{ssec:fysik}. 
 
 \begin{figure}
   \begin{framed}   
@@ -384,14 +399,21 @@ Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer man hvorle
  AT*PCMD=21625,1,0,0,0,0<LF>
 \end{verbatim}
   \end{framed}
-\caption{Eksempel med en \code{PCMD} AT-kommando. [sekvensnummer]'et er 21625. Listen med argumenter er hhv. flag=1, roll=0, pitch=0, gas=0 og yaw=0.}
+\caption{Eksempel på en \code{PCMD} AT-kommando. Denne specifikke
+  kommando bringer AR.Dronen i hovertilstand. [sekvensnummer]'et er 21625. Listen med argumenter er hhv. flag=1, roll=0, pitch=0, gas=0 og yaw=0.}
 \label{fig:ateksempel}   
 \end{figure}
 %    [kommandonavn] er navnet på den ønskede kommando
 %    [sekvensnummer] er et globalt, altid stigende sekvensnummer
 %    [arg1, ... argN] er et variende antal parametre
 
-Brugen, syntaksen og betydningen af 7 forskellige AT-kommando navne beskrives i detaljer i afsnit 6 af AR.Drone Development Guide\cite{techreport:ardroneDevGuide}. Blot kan det kort nævnes at man i reglen skal sikre sig at man vedbliver at sende beskeder periodisk for at AR.Dronen ikke skal tolke forbindelsen til klientenheden som tabt. En tabel med navnene kan ses i tabel \ref{tab:kommandoer} i appendiks \ref{sec:at}.
+Brugen, syntaksen og betydningen af 7 forskellige AT-kommando navne
+beskrives i detaljer i afsnit 6 af AR.Drone Development
+Guide\cite{techreport:ardroneDevGuide}. Det skal dog nævnes at
+man i reglen skal sikre sig at man vedbliver at sende beskeder
+periodisk for at AR.Dronen ikke skal tolke forbindelsen til
+klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
+\ref{tab:kommandoer} i appendiks \ref{sec:at}. 
 
 
 \subsection{Vurdering af AR.Dronen som robotplatform}
@@ -401,6 +423,89 @@ Brugen, syntaksen og betydningen af 7 forskellige AT-kommando navne beskrives i 
 %%%%     Resultater - section
 %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduktion til styring af AR.Drone med Python}
+\subsection{AT-kommando Python interface}
+Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
+enheder der er indenfor rækkevidde af dens trådløse netværk. For at
+gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
+på en python-wrapper \cite{electronic:venthur}. Vi har implementeret
+interfacet som en Python tråd der løbende sender kommandoer til
+AR.Dronen, hvilket betyder at vores system ikke afhænger af at alle
+UDP-pakker når deres destination. Ved at sende al kontrolkommunikation
+gennem interfacet, behøves vi ikke at tænke på deltaljer som
+sekvensnumre og watchdog-beskeder, da disse håndteres transparent af
+systemet.  
+Vores interface(REF TIL EGEN KODE) definerer en række metoder til at
+kontrollere dronens opførsel og bevægelser. Interfacet kan i det
+simpleste tilfælde anvendes direkte fra Pythons interpreter, men
+fungerer også som en del af vores større system.
+
+\subsection{Eksempel på anvendelse af Python interface til AR.Dronen}
+Et simpelt eksempel på anvendelse af vores kontrolinterface gives ved at
+starte pythons fortolker, importere examples-modulet og herefter
+afvikle en metode indeholdende kommandoer til
+AR.Dronen. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex}.
+
+\begin{figure}[ht]
+  \begin{framed}   
+    \begin{verbatim}
+>>> import examples as e
+>>> e.square()
+    \end{verbatim}
+  \end{framed}
+\caption{Import og afvikling af simpelt kontrolinterface-eksempel i pythonfortolkeren}
+\label{fig:pythoninterpex}
+\end{figure}
+
+Metoden \code{square()} der kaldes i eksemplet i figur~\ref{fig:pythoninterpex},
+lader AR.Dronen lette, flyve rundt i en firkant og for herefter at
+lande igen(under antagelse af at klientcomputeren er forbundet med AR.Dronens
+trådløse netværk). Bevægelsesmønstret opnåes ved at der kaldes en
+metode(take\_off, move eller land) på kontrolinterfacet, hvorefter der afventes en periode
+før den næste metode kaldes. Metodekaldende oversættes af interfacet til
+AT-kommandoer og sendes så som UDP-pakker til AR.Dronens
+kommandoport. Den konkrete implementation af \code{square()} ses i
+figur~\ref{fig:pythonimpl1}. Det bemærkes at kontrolinterfacetråden
+skal startes før kommandoerne har nogen effekt.
+
+Beskrivelse af selve flyvningen...
+
+\begin{figure}[ht]
+  \lstset{language=Python, frame=single}
+  \begin{lstlisting}
+def square():
+    import controllers
+    import time
+
+    c = controllers.ControllerInterface()
+    c.start()
+
+    print 'taking off'
+    c.take_off()
+    time.sleep(5.0)
+    print 'moving Forward'
+    c.move(0.0, 0.2, 0.0, 0.0, True)
+    time.sleep(2.0)
+    print 'moving right'
+    c.move(0.2, 0.0, 0.0, 0.0, True)
+    time.sleep(2.0)
+    print 'moving back'
+    c.move(0.0, -0.2, 0.0, 0.0, True)
+    time.sleep(2.0)
+    print 'moving left'
+    c.move(-0.2, 0.0, 0.0, 0.0, True)
+    time.sleep(2.0)
+    print 'landing'
+    c.land()
+
+    c.stop()
+\end{lstlisting}
+\caption{Python implementation der importerer og anvender vores kontrolinterface til en
+  simpel flyvning}
+\label{fig:pythonimpl1}
+\end{figure}
+
 
 \section{Resultater}
 

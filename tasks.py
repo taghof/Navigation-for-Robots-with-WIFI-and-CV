@@ -73,11 +73,6 @@ class Task(threading.Thread, object):
         self.loop_sleep = 0.1
         self.stopping = False
         #self.tracker = None
-        self.point = None
-
-    def get_point(self):
-        """ returns the positions of the point currently tracked, only relevant for some subtasks. """
-        return self.point
 
     def pre_loop(self):
         """ pre_loop
@@ -569,6 +564,11 @@ class HoverTrackTask(Task):
         self.psi_offset = 0
         self.loop_sleep = 0.05
         self.data_points = ([],[],[],[],[],[])
+        self.point = None
+
+    def get_point(self):
+        """ returns the positions of the point currently tracked, only relevant for some subtasks. """
+        return self.point
 
     def pre_loop(self):
         # t1 = datetime.datetime.now()

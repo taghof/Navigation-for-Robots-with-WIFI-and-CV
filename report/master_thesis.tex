@@ -16,6 +16,7 @@
 %\newcommand{\oversaet}[1]{(\textit{#1})}
 \newcommand{\uri}[1]{#1}
 \newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\todo}[1]{\textbf{#1}}
 
 \title{Master Thesis}
 \author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
@@ -38,7 +39,7 @@ In english...
 
 \section*{Resume}
 Indeholder og gennemgår i det følgende (på dansk).
-
+\todo{hello}
 
 \pagebreak
 
@@ -166,16 +167,7 @@ Til at bestemme AR.Dronens afstand til jorden anvendes en ultrasonisk
 afstandsmåler. Denne opererer ved at udsende en ultralydspuls og herefter
 måle tidsintervallet der går før ekkoet måles. Ultralydsmåleren er angivet
 til at virke op til 6 meter og er rent fysisk placeret på navboardet (se figur \ref{fig:navboard}) på AR.Dronens underside.
-%%  Det er værd at bemærke, at højdemåleren ikke måler
-%% højden på et specifikt punkt, men derimod returnerer den mindste højde
-%% i et område som det på figur \ref{fig:sonicbeam}, samt at ultrasoniske
-%% detektorer generelt har problemer med bløde og skrånende overflader%cite?.
-%% \begin{figure}[ht]
-%%   \centering
-%%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg}
-%%   \caption{Udbredelsesområde for ultralydssensorsignal, man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://picaxe.hobbizine.com/srf05.html}).}
-%%   \label{fig:sonicbeam}
-%% \end{figure}
+
 
 AR.Drone er udstyret med to gyroskoper, et 2-akses gyroskop til at
 måle hældningsraten om x- og y-aksen (pitch og roll) samt et 1-akses piezoelektrisk gyroskop
@@ -274,25 +266,19 @@ hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$)
 ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan
 sættes til f.eks. 0.25 radianer via AT-kommandoen i figur
 \ref{fig:ateulerangle}.
-
 \begin{figure}
   \begin{framed}
 \begin{verbatim}
  AT*CONFIG=605,"control:euler_angle_max","0.25"
 \end{verbatim}
   \end{framed}
-  \caption{AT-kommando sendes på UDP-port 5556 fra klient-enheden til AR.Dronen. Beskeden sætter konstanten for den maksimalt tilladte hældning på $\Phi$ og $\Theta$.}  
+  \caption{Eksempel på indholdet af en AT-kommandobesked. Beskeden overføres fra klient-enheden til AR.Dronen på UDP-port 5556. Lige netop denne besked sætter en softwarekonstant i AR.Dronens firmware, der bestemmer den maksimalt tilladte hældning på $\Phi$ og $\Theta$.}  
   \label{fig:ateulerangle}
 \end{figure}
 
 I styreprogrammet på AR.Dronens computer kan man sætte en konstant (se figur~\ref{fig:ateulerangle}) til at styre den øvre grænse for hvor meget quadrokopteren maximalt kan krænge. Konstanten \emph{ Euler\_angle\_max } virker som en cut-offvinkel, dvs. under flyvning tester AR.Dronen løbende at hverken pitch ($\Phi$)- eller roll ($\Theta$)-vinklen overskrider grænsen. Sker det lukkes systemet ned; kraften til rotorene klippes og AR.Dronen lader sig falde til jorden.
 %
 
-% flyttes til vurdering af dronen-sektion
-%\subsection{begrænsninger} %i et andet sup_sektion..? evt. +ultralydsting
-%% Ifølge Wikipedia.org\cite{electronic:wiki_ar.drone} skal AR.Dronen være i stand til at flyve fremad med en maksimal hastighed på $5 m/sek$ svarende til $18 km/t$. %\cite{wikiDrone}
-%% Selvom det synes at give mening at beskrive AR.Dronens bevægelser i 3 dimensioner og deri nemmere at bruge accelerometer- og gyro-målinger fra sensorene om bord. Så kan man egentlig ikke sige noget udfra accelerometer og gyroer omkring hvor langt AR.Dronen har fløjet eller med hvilken hastighed AR.Dronen bevæger sig.
-%% Vi kan måske udlede estimater for hastigheder ved at integrere over accelerationen, men hastigheden i det horisontale plan er i praksis afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch værdierne kan være sat til 0 og AR.Dronen vil ligge horisontal, men kan stadig godt bevæge sig sideværts i luften\footnote{AR.Dronen siges at være ``trimmet'' (med en konstant hastighed, evt. 0m/S) hvis den ikke påvirkes af en resulterende kraft og acceleration dermed er 0} på grund af indebåren inerti eller f.eks. en stille konstant vind. Bevæger AR.Dronen sig med en konstant hastighed kan det ikke aflæses af accelerometeret, afstande AR.Dronen har flyttet sig kan således heller ikke aflæses af accelerometer og gyro alene. Firmwaren fra parrot tager istedet bundkameraet til hjælp ved at bruge opticalflow til at udlede hastigheder i planet, man kan således alligevel bede AR.Dronen om et estimat for hastigheden over jorden som en værdi i navdatapakken.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
@@ -407,24 +393,6 @@ Firmwaren \uri{program.elf} på AR.Dronen sender og modtager pakker på tre UDP-po
   \item på port 5554 (video port) sender AR.Drone løbende statusinformation om f.eks. hastighed, eulervinkler, afstand til jorden osv. Pakkerne fra port 5554 kaldes \emph{navdata} fordi pakkerne indeholder information om navigationstilstanden.
 \end{itemize}
 
-%%% flyttes til sektion med vurdering af dronen
-%Sammenlignet med TCP opererer UDP med noget mindre
-%overhead per afsendt besked. Tilgengæld garanterer protokollen intet
-%om hvorvidt eller hvornår en pakke når frem til sin destination.
-
-% UDP
-%er oftest det første valg, når der skal streames video og lyd over et
-%netværk, da en enkelt mistet pakke sjældent har stor betydning i denne
-%kontekst. Når fokus er på at få sendt så meget
-%information (navigationsdata og video) som muligt til brugeren, giver
-%det god mening at anvende UDP og så implementere et minimum af
-%flowkontrol ovenpå protokollen, e.g.  
-
-%Til gengæld kan vi godt se fordele i
-%de garantier TCP kunne give når fokus er på at modtage kontrolpakker,
-%heldigvis er det forholdsvis simpelt, at kontrollere hvorvidt visse
-%kritiske beskeder(land, let etc.) er nået frem til AR.Dronen, eller om vi
-%skal sende pakken igen.
 
 \subsubsection{AT kommando interface}
 \label{sssec:atinterface}
@@ -477,12 +445,50 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 
 
 \subsection{Vurdering af AR.Dronen som robotplatform}
+En elaboreret tekst omkring hvad man kan sige af pro et con omkring AR.Dronen som platform til udvikling af en flyvende robot.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%
-%%%%     Resultater - section
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%cite hvor
+% nogle siger at program.elf + motorstyring + radio tager op mod $80
+% \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
+
+% flyttes til vurdering af dronen-sektion
+%\subsection{begrænsninger} %i et andet sup_sektion..? evt. +ultralydsting
+%% Ifølge Wikipedia.org\cite{electronic:wiki_ar.drone} skal AR.Dronen være i stand til at flyve fremad med en maksimal hastighed på $5 m/sek$ svarende til $18 km/t$. %\cite{wikiDrone}
+%% Selvom det synes at give mening at beskrive AR.Dronens bevægelser i 3 dimensioner og deri nemmere at bruge accelerometer- og gyro-målinger fra sensorene om bord. Så kan man egentlig ikke sige noget udfra accelerometer og gyroer omkring hvor langt AR.Dronen har fløjet eller med hvilken hastighed AR.Dronen bevæger sig.
+%% Vi kan måske udlede estimater for hastigheder ved at integrere over accelerationen, men hastigheden i det horisontale plan er i praksis afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch værdierne kan være sat til 0 og AR.Dronen vil ligge horisontal, men kan stadig godt bevæge sig sideværts i luften\footnote{AR.Dronen siges at være ``trimmet'' (med en konstant hastighed, evt. 0m/S) hvis den ikke påvirkes af en resulterende kraft og acceleration dermed er 0} på grund af indebåren inerti eller f.eks. en stille konstant vind. Bevæger AR.Dronen sig med en konstant hastighed kan det ikke aflæses af accelerometeret, afstande AR.Dronen har flyttet sig kan således heller ikke aflæses af accelerometer og gyro alene. Firmwaren fra parrot tager istedet bundkameraet til hjælp ved at bruge opticalflow til at udlede hastigheder i planet, man kan således alligevel bede AR.Dronen om et estimat for hastigheden over jorden som en værdi i navdatapakken.
+
+
+%%  Det er værd at bemærke, at højdemåleren ikke måler
+%% højden på et specifikt punkt, men derimod returnerer den mindste højde
+%% i et område som det på figur \ref{fig:sonicbeam}, samt at ultrasoniske
+%% detektorer generelt har problemer med bløde og skrånende overflader%cite?.
+%% \begin{figure}[ht]
+%%   \centering
+%%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg}
+%%   \caption{Udbredelsesområde for ultralydssensorsignal, man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://picaxe.hobbizine.com/srf05.html}).}
+%%   \label{fig:sonicbeam}
+%% \end{figure}
+
+
+%%% flyttes til sektion med vurdering af dronen
+%Sammenlignet med TCP opererer UDP med noget mindre
+%overhead per afsendt besked. Tilgengæld garanterer protokollen intet
+%om hvorvidt eller hvornår en pakke når frem til sin destination.
+
+% UDP
+%er oftest det første valg, når der skal streames video og lyd over et
+%netværk, da en enkelt mistet pakke sjældent har stor betydning i denne
+%kontekst. Når fokus er på at få sendt så meget
+%information (navigationsdata og video) som muligt til brugeren, giver
+%det god mening at anvende UDP og så implementere et minimum af
+%flowkontrol ovenpå protokollen, e.g.  
+
+%Til gengæld kan vi godt se fordele i
+%de garantier TCP kunne give når fokus er på at modtage kontrolpakker,
+%heldigvis er det forholdsvis simpelt, at kontrollere hvorvidt visse
+%kritiske beskeder(land, let etc.) er nået frem til AR.Dronen, eller om vi
+%skal sende pakken igen.
+
 
 \section{Introduktion til styring af AR.Drone med Python}
 \subsection{AT-kommando Python interface}
@@ -492,11 +498,12 @@ gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
 på en python-wrapper \cite{electronic:venthur}. Vi har implementeret
 interfacet som en Python tråd der løbende sender kommandoer til
 AR.Dronen, hvilket betyder at vores system ikke afhænger af at alle
-UDP-pakker når deres destination. Ved at sende al kontrolkommunikation
+UDP-pakker når deres destination. %think I understand but humor me and elaborate...
+ Ved at sende al kontrolkommunikation
 gennem interfacet, behøves vi ikke at tænke på deltaljer som
 sekvensnumre og watchdog-beskeder, da disse håndteres transparent af
 systemet.  
-Vores interface(REF TIL EGEN KODE) definerer en række metoder til at
+Vores interface(\todo{REF TIL EGEN KODE}) definerer en række metoder til at
 kontrollere dronens opførsel og bevægelser. Interfacet kan i det
 simpleste tilfælde anvendes direkte fra Pythons interpreter, men
 fungerer også som en del af vores større system.
@@ -522,12 +529,12 @@ Metoden \code{square()} der kaldes i eksemplet i figur~\ref{fig:pythoninterpex},
 lader AR.Dronen lette, flyve rundt i en firkant og for herefter at
 lande igen(under antagelse af at klientcomputeren er forbundet med AR.Dronens
 trådløse netværk). Bevægelsesmønstret opnåes ved at der kaldes en
-metode(take\_off, move eller land) på kontrolinterfacet, hvorefter der afventes en periode
+metode(take\_off, move eller land) på kontrolinterfacet, hvorefter der er en pause
 før den næste metode kaldes. Metodekaldende oversættes af interfacet til
 AT-kommandoer og sendes så som UDP-pakker til AR.Dronens
 kommandoport. Den konkrete implementation af \code{square()} ses i
 figur~\ref{fig:pythonimpl1}. Det bemærkes at kontrolinterfacetråden
-skal startes før kommandoerne har nogen effekt.
+skal startes (kald af \code{c.start()}) før kommandoerne har nogen effekt.
 
 Beskrivelse af selve flyvningen...
 
@@ -589,6 +596,26 @@ controlinterfacet. Joystickcontrolleren kan desuden anvendes til at
 starte prædefinerede opgaver på autocontrolleren, således kan piloten
 manuelt bringe AR.Dronen i en given position for herefter at starte
 den automatiske afvikling af et forudbestemt bevægemønster
+
+\section{Optisk flow navigation}
+Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra vi har fået inspiration.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.40\textwidth]{grafik/polar2cartesian.png}
+  \caption{En linie beskrevet ved det velkendte almindelige cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i polar koordinatsystem ved en vinkel $\Theta$ og en afstand $\rho$.
+}
+  \label{fig:polar2cartesian}
+\end{figure}
+
+That is it maybe
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%
+%%%%     Resultater - section
+%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Resultater}
 

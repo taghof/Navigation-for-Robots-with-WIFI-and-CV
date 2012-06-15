@@ -103,7 +103,15 @@ AR.Drone er en quadrokopter fremstillet og udviklet af det franske
 firma Parrot\cite{electronic:parrot}\cite{electronic:wiki_parrot}. En quadrokopter benytter fire faste rotorer til at
 generere opdrift, samt til at styre sin bevægelse i rummet.%\\
 
-AR.Drone blev introduceret i 2010 som ``the Flying Videogame'' og promoveres stadig af producenten som et stykke legetøj. Det har siden fundet stor anvendelse, ikke blot som et avanceret stykke legetøj. Forskere, studerende og hobbyister har taget den fjernstyrede quadrokopter til sig som en færdig platform til at udvikle videre ovenpå\cite{electronic:ludep} og som platform til selv at ombygge.%\cite evt. flere som har brugt AR.Dronen i deres forsøg forskning, bl.a. LUDEP.
+AR.Drone blev introduceret i 2010 som ``the Flying Videogame'' og
+promoveres stadig af producenten som et stykke legetøj, der fjernstyres fra
+brugerens iPhone eller iPad. Det har siden
+fundet stor anvendelse, ikke blot som et avanceret stykke
+legetøj. Forskere, studerende og hobbyister har taget den fjernstyrede
+quadrokopter til sig som en færdig platform til at udvikle videre
+ovenpå\cite{electronic:ludep} og som platform til selv at
+ombygge.%\cite evt. flere som har brugt AR.Dronen i deres forsøg
+        %forskning, bl.a. LUDEP. 
 
 Parrots quadrokopter kommer med et sæt sensorer bestående af to kameraer; et vertikalt 
 nedadrettet og et horisontalt fremadrettet, en højdemåler, et gyroskop%(til at måle hældning, krængning og drejning)<- senere detalje, her kun intro
@@ -214,18 +222,58 @@ Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri me
 
 \subsection{Quadrokopter fysik}
 \label{ssec:fysik}
-AR.Dronen fåes som sagt med 2 skrog eller skjold (figur~\ref{fig:indendoersskjold}), og vejer 420 gram med det indendørs skrog monteret. Et pund er en relativ lille vægt, andre quadrokoptere\cite{quteprints33767} har f.eks. 4-5 kg som de skal løfte rundt på.
+AR.Dronen fåes som nævnt med 2 skrog eller skjold
+(figur~\ref{fig:indendoersskjold}), og vejer 420 gram med det
+indendørs skrog monteret. Et pund er en relativ lille vægt, andre
+quadrokoptere\cite{quteprints33767} har f.eks. 4-5 kg som de skal
+løfte rundt på. 
 
-De 4 propeller sidder i hver sit hjørne af et kulfiberkryds på AR.Dronen. Når en propel på AR.Dronen rotere om sin akse flytter den luften i et areal rundt om propellen. Lufttrykket på undersiden af propellen bliver herved større end lufttrykket på oversiden af propellen. Hvis AR.Dronen ligger vandret vil forskellen i lufttryk giver en Bernoullieffekt\cite{nla.cat-vn856146}%\cite{electronic:wiki_bernoulli}
- som påvirker AR.Dronen med en kraft modsat tyngdekraften (thrust)\cite{electronic:wiki_quadrotor}. Udover thrust påvirker den roterende bevægelse også propellens base med et moment (torque) modsat propellens retning. Eksempelvis vil en helikopter uden haleror dreje ukontrolerbart rundt om sig selv, men fordi AR.Drone har et par rotore som drejer een vej (med uret), mens et andet par drejer modsat (imod uret)\cite{techreport:ardroneDevGuide}, bliver summen af momentpåvirkning nul, hvis de 4 rotere drejer med samme hastighed.
-Denne egenskab bruges til at styre AR.Dronens flyvning og bevægelser i rummet, som kan beskrives med 3 bevægelsesakser; x, y og z (se figur~\ref{fig:drone_movements}) som er lokale for quadrokopteren.
+De 4 propeller sidder i hver sit hjørne af et kulfiberkryds på
+AR.Dronen. Når en propel på AR.Dronen rotere om sin akse flytter den
+luften i et areal rundt om propellen. Lufttrykket på undersiden af
+propellen bliver herved større end lufttrykket på oversiden af
+propellen. Hvis AR.Dronen ligger vandret vil forskellen i lufttryk
+giver en
+Bernoullieffekt\cite{nla.cat-vn856146}%\cite{electronic:wiki_bernoulli} 
+ som påvirker AR.Dronen med en kraft modsat tyngdekraften
+ (thrust)\cite{electronic:wiki_quadrotor}. Udover thrust påvirker den
+ roterende bevægelse også propellens base med et moment (torque)
+ modsat propellens retning. Eksempelvis vil en helikopter uden haleror
+ dreje ukontrolerbart rundt om sig selv, men fordi AR.Drone har et par
+ rotore som drejer een vej (med uret), mens et andet par drejer modsat
+ (imod uret)\cite{techreport:ardroneDevGuide}, bliver summen af
+ momentpåvirkning nul, hvis de 4 rotere drejer med samme hastighed. 
+Denne egenskab bruges til at styre AR.Dronens flyvning og bevægelser i
+rummet, som kan beskrives med 3 bevægelsesakser; x, y og z (se
+figur~\ref{fig:drone_movements}) som er lokale for quadrokopteren. 
 
-AR.Dronens bevægelser styres ved at kontrollere dens vinkel i forhold til de 3 akser. Skal AR.Dronen f.eks. flyve fremad, sættes forenden til at være lidt under bagenden i forhold til det vandrette plan. I praksis sker det ved at sænke vinkelhastigheden på den forreste propel samtidig med at omdrejningsantallet øges %spørgsmålet er hvad er moment påvirkningen af  (2*omega_H + delta_A - delta_B) - (2*omega_H) . . .
- på den bageste propel. Det resultere i at AR.Dronen hælder lidt fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig gældende når AR.Dronen skal flytte sig sideværts som på figur \ref{fig:drone_movements}b.
+AR.Dronens bevægelser styres ved at kontrollere dens vinkel i forhold
+til de 3 akser. Skal AR.Dronen f.eks. flyve fremad, sættes forenden
+til at være lidt under bagenden i forhold til det vandrette plan. I
+praksis sker det ved at sænke vinkelhastigheden på den forreste propel
+samtidig med at omdrejningsantallet øges %spørgsmålet er hvad er
+moment påvirkningen af (2*omega_H + delta_A - delta_B) - (2*omega_H)
+. . .  på den bageste propel. Det resultere i at AR.Dronen hælder lidt
+fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig
+gældende når AR.Dronen skal flytte sig sideværts som på figur
+\ref{fig:drone_movements}b.
 
-Hvis AR.Dronen skal dreje om sin egen akse for at kigge længere til venstre bruges samme egenskab som før; det moment som tilføres af de 2 propeller der drejer med uret skal overstige det moment som tilføres af de 2 propeller der drejer modsat. Det gøres ved at øge vinkelhastigheden på de to førstnævnte og sænke hastigheden på de propeller der drejer modsat uret.
+Hvis AR.Dronen skal dreje om sin egen akse for at kigge længere til
+venstre bruges samme egenskab som før; det moment som tilføres af de 2
+propeller der drejer med uret skal overstige det moment som tilføres
+af de 2 propeller der drejer modsat. Det gøres ved at øge
+vinkelhastigheden på de to førstnævnte og sænke hastigheden på de
+propeller der drejer modsat uret.
 
-Når AR.Dronen går fra at ligge vandret til istedet at hælde, så flyttes noget af thrust fra at virke lodret imod tyngdekraften til også virke sideværts. Det betyder at propellernes samlede vinkelhastighed skal øges for at opretholde den samme afstand til jorden. Ifølge SDK DevGuide\cite{techreport:ardroneDevGuide} bør hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$) ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan sættes til f.eks. 0.25 radianer via AT-kommandoen i figur \ref{fig:ateulerangle}.
+Når AR.Dronen går fra at ligge vandret til istedet at hælde, så
+flyttes noget af thrust fra at virke lodret imod tyngdekraften til
+også virke sideværts. Det betyder at propellernes samlede
+vinkelhastighed skal øges for at opretholde den samme afstand til
+jorden. Ifølge SDK DevGuide\cite{techreport:ardroneDevGuide} bør
+hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$)
+ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan
+sættes til f.eks. 0.25 radianer via AT-kommandoen i figur
+\ref{fig:ateulerangle}.
 
 \begin{figure}
   \begin{framed}
@@ -259,40 +307,52 @@ I styreprogrammet på AR.Dronens computer kan man sætte en konstant (se figur~\re
 \label{ssec:software}
 AR.Dronens microcomputer kommer med en Linux 2.6.27 kerne
 installeret. Det bemærkes at 2.6.27 er den første kerne med indbygget
-support for UBIFS\cite{electronic:wiki_ubifs} som er det filsystem der anvendes på AR.Dronens
-NAND flashhukommelse.
+support for UBIFS\cite{electronic:wiki_ubifs} som er det filsystem der
+anvendes på AR.Dronens NAND flashhukommelse.
 
 \subsubsection{Busybox linux platformen på AR.Dronen}
 \label{sssec:busybox}
-Udover Linux kernen leveres AR.Drone også med Busybox\cite{electronic:busybox} installeret.
-Busybox giver adgang til en række Unix værktøjer (copy \code{cp}, list \code{ls} osv.) optimeret til
-brug i embeddede systemer. Busybox konfigureres så kun de ønskede
-værktøjer medtages og disse pakkes så til en enkelt eksekverbar fil.
-Dette betyder at størrelsen holdes på et minimum. Busybox på AR.Drone
-fylder $483 kbyte$ og udstyrer AR.Dronen med alle unix brugerkommandoer man
-forventer på et standard linux system, e.g. \code{cd}, \code{ls}, \code{mv}, \code{ln} osv.
-Busybox på AR.Dronen leverer desuden en Dynamic Host Configuration Protocol\cite{rfc2131} (DHCP) service; den DHCP-server AR.Dronen anvender til at uddele %DHCP cite?
-IP\cite{rfc791}-adresser og lave et netværk mellem en klient og AR.Dronen selv, samt en telnet\cite{rfc854}-server der giver adgang til AR.Dronens terminal %telnet cite?
-og en texteditor %(Vi)
-der gør det muligt at redigere filer direkte på AR.Dronen.
+Udover Linux kernen leveres AR.Drone også med
+Busybox\cite{electronic:busybox} installeret.  Busybox giver adgang
+til en række Unix værktøjer (copy \code{cp}, list \code{ls} osv.)
+optimeret til brug i embeddede systemer. Busybox konfigureres så kun
+de ønskede værktøjer medtages og disse pakkes så til en enkelt
+eksekverbar fil.  Dette betyder at størrelsen holdes på et
+minimum. Busybox på AR.Drone fylder $483 kbyte$ og udstyrer AR.Dronen
+med alle unix brugerkommandoer man forventer på et standard linux
+system, e.g. \code{cd}, \code{ls}, \code{mv}, \code{ln} osv.  Busybox
+på AR.Dronen leverer desuden en Dynamic Host Configuration
+Protocol\cite{rfc2131} (DHCP) service; den DHCP-server AR.Dronen
+anvender til at uddele %DHCP cite?  IP\cite{rfc791}-adresser og lave
+et netværk mellem en klient og AR.Dronen selv, samt en
+telnet\cite{rfc854}-server der giver adgang til AR.Dronens terminal
+%telnet cite?  og en texteditor %(Vi) der gør det muligt at redigere
+filer direkte på AR.Dronen.
 
 \subsubsection{Program.elf -- AR.Dronens styreprogram}
 \label{sssec:program.elf}
-Den firmware der står for selve styringen, transmitteringen af
-data og bearbejdning af sensordata i forbindelse med flyvning er
-implementeret i \uri{/bin/program.elf}. Da der er tale om proprietært
-software betragtes programmet som en lukket kasse uden hensyntagen til implementeringen, vi kan dog udlede forskellige elementer efter at have observeret
-AR.Dronen under flyvning. -- \uri{Program.elf} indeholder blandt andet
+Den firmware der står for selve styringen, transmitteringen af data og
+bearbejdning af sensordata i forbindelse med flyvning er implementeret
+i \uri{/bin/program.elf}. Da der er tale om proprietært software
+betragtes programmet som en lukket kasse uden hensyntagen til
+implementeringen, vi kan dog udlede forskellige elementer efter at
+have observeret AR.Dronen under flyvning. -- \uri{Program.elf}
+indeholder blandt andet
 \begin{itemize}
-\item en PID controller til at stabilisere AR.Dronen når der svæves, 
-\item en algoritme til at udlede AR.Dronens hastighed ved hjælp af bundkameraet (bekræftes også i en artikel\cite{velocity_estimation_inside_the_drone} af Parrot selv.)%cite hvor
+\item en PID controller til at stabilisere AR.Dronen når der svæves,
+\item en algoritme til at udlede AR.Dronens hastighed ved hjælp af
+  bundkameraet (bekræftes også i en
+  artikel\cite{velocity_estimation_inside_the_drone} af Parrot
+  selv.)%cite hvor
 % nogle siger at program.elf + motorstyring + radio tager op mod $80
 % \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
-\item og en algoritme til at detektere tags i billeder i forbindelse med augmented
-reality spil. 
+\item og en algoritme til at detektere tags i billeder i forbindelse
+  med augmented reality spil.
 \end{itemize}
-\uri{Program.elf} modtager kommandoer fra brugeren gennem en User Datagram Protocol\cite{rfc768} (UDP) 
-port. Kommunikationsinterfacet mellem bruger og quadrokopteren beskrives i afsnit~\ref{ssec:kommunikation}.
+\uri{Program.elf} modtager kommandoer fra brugeren gennem en User
+Datagram Protocol\cite{rfc768} (UDP) port. Kommunikationsinterfacet
+mellem bruger og quadrokopteren beskrives i
+afsnit~\ref{ssec:kommunikation}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
@@ -506,6 +566,29 @@ def square():
 \label{fig:pythonimpl1}
 \end{figure}
 
+\section{Brugerens interaktionsmuligheder med systemet}
+For at gøre styringen af dronen anvendelig i praksis har vi
+implementeret softwaremoduler til at tage mod input fra brugeren. Vi
+har tre input muligheder: En keyboardcontroller der lytter efter input
+fra tastaturet, en joystickcontroller der er tilknyttet en Xbox360
+controller samt en autocontroller der kan initiere og afslutte givne
+opgaver. Vi har mulighed for at starte systemet op med alle
+controllere på samme tid, eller undlade en eller flere. Under
+udviklingen af systemet har vi oftest anvendt alle tre controllere på
+samme tid, da de komplimenterer hinanden, for eksempel kan man godt
+anvende autocontrolleren for sig selv, men i det tilfælde at noget
+skulle gå galt i udførslen af en opgave, har man ingen mulighed for at
+bringe AR.Dronen manuelt ned.
+
+\subsection{Joystickcontroller}
+Joystickcontrolleren står i vores system istedet for en iPhone eller
+iPad, den anvendes til at fjernstyre AR.Drone manuelt i forbindelse
+med testflyvninger. Fjernstyringsdelen fungerer ved at oversætte
+værdier fra Xbox360 controlleren og så sende disse til
+controlinterfacet. Joystickcontrolleren kan desuden anvendes til at
+starte prædefinerede opgaver på autocontrolleren, således kan piloten
+manuelt bringe AR.Dronen i en given position for herefter at starte
+den automatiske afvikling af et forudbestemt bevægemønster
 
 \section{Resultater}
 

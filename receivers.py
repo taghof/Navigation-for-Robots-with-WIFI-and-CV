@@ -39,7 +39,6 @@ import settings
 
 class Receiver(multiprocessing.Process):
 
-
     def __init__(self, port):
 
         # Communication between parent and child process happens via a shared list 'comlist', the fields represents the following values:
@@ -211,7 +210,7 @@ class Receiver(multiprocessing.Process):
 
 class VideoReceiver(Receiver):
 
-    def __init__(self, port):
+    def __init__(self, port=settings.VIDEO_PORT):
         Receiver.__init__(self, port)
         self.display_capture = False
         self.display_dump = []
@@ -393,7 +392,7 @@ class WifiReceiver(Receiver):
 class NavdataReceiver(Receiver):
 
 
-    def __init__(self, port):
+    def __init__(self, port=settings.NAVDATA_PORT):
         Receiver.__init__(self, port)
         
     def on_request_data(self, data):

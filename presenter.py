@@ -723,9 +723,10 @@ class VideoWindow(gtk.Window):
         points = []
         for t in tasks:
             if len(t.subtasks) == 0:
-                p = t.get_point()
-                if p is not None:
-                    points.append(p)
+                if isinstance(t, tasks.HoverTrackTask):
+                    p = t.get_point()
+                    if p is not None:
+                        points.append(p)
             else:
                 points.extend(self.print_points(t.subtasks))
         

@@ -618,12 +618,8 @@ class HoverTrackTask(Task):
         self.psi_offset = 0
         self.loop_sleep = 0.05
         self.data_points = ([],[],[],[],[],[])
-<<<<<<< HEAD
-        self.last_errors = utils.DiscardingQueue(50)
-=======
         self.point = None
         self.last_errors = utils.DiscardingQueue(20)
->>>>>>> 70cb314996ba74e57bdd54faadde2a53a864e109
 
 
     def get_point(self):

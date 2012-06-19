@@ -120,7 +120,7 @@ class AutoControl(Controller):
         Controller.__init__(self, drone)
         self.drone = drone
         self.navdata_sensor = drone.get_navdata_sensor()
-        self.wifi_sensor = drone.get_wifi_sensor()
+        #self.wifi_sensor = drone.get_wifi_sensor()
         self.video_sensor = drone.get_video_sensor()
         self.id = settings.AUTOCONTROL
         self.name = "Auto Controller"
@@ -148,6 +148,7 @@ class AutoControl(Controller):
     def kill_tasks(self):
         self.lock.acquire()
         for task in self.active_tasks:
+            print 'killing: ', task, '\r'
             task.stop()
         self.lock.release()        
        
@@ -156,6 +157,7 @@ class AutoControl(Controller):
         self.kill_tasks()
 
     def task_done(self, caller):
+        print 'top level stopped: ', caller, '\r'
         self.active_tasks.remove(caller)
 
     def start_task_gui(self, widget=None):
@@ -169,10 +171,11 @@ class AutoControl(Controller):
     def start_task(self, task):
         self.lock.acquire()
         if not self.stopping:
-            print 'starting ', task, '\r'
             self.active_tasks.append(task)
-            task.start()
+            threading.Thread(target=task.run).start() 
+
         self.lock.release()
+        return task
 
     def start_task_num(self, num):
         if num == 4:
@@ -201,7 +204,7 @@ class KeyboardControl(Controller):
         self.navdata_sensor = drone.get_navdata_sensor()
         self.id = settings.KEYCONTROL
         self.name = "Keyboard Controller"
-        self.update_time = 0.1
+        self.update_time = 0.05
 
     def process_events(self):
         self.auto_control = self.drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
@@ -220,6 +223,9 @@ class KeyboardControl(Controller):
             self.auto_control.start_task_num(6)
         if ch == '3':
             self.auto_control.start_task_num(3)
+        if ch == 'c':
+            print self.auto_control.active_tasks, '\r'
+            print threading.enumerate(), '\r'
 
 
 class ManualControl(Controller):    
@@ -266,7 +272,7 @@ class ManualControl(Controller):
             
                     
 
-                    self.control_interface.set(roll, pitch, power, yaw, False)
+                    self.control_interface.move(roll, pitch, power, yaw, False)
                     
                     # print self.js.get_axis(2)
                     # print self.js.get_axis(5)
@@ -334,16 +340,15 @@ class ManualControl(Controller):
 class ControllerInterface(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.landed = True
         self.lock = threading.Lock()
+        self.zaplock = threading.Lock()
         self.seq_num = 1
-        #self.timer_t = 0.1
-        #self.com_watchdog_timer = threading.Timer(self.timer_t, self.commwdg)
-        self.speed = 0.2
-        self.old_vector = (0,0,0,0)
-        self.chan = 1
+        
         self.stopping = False
         self.sleep_time = 1.0
+        
+        self.chan = 1
+        self.landed = True
         self.pitch = 0.0
         self.roll = 0.0
         self.yaw = 0.0
@@ -351,9 +356,9 @@ class ControllerInterface(threading.Thread):
         self.auto = False
 
         if settings.TEST:
-            self.at = self.at_test
+            self.at = self.__at_test
         else:
-            self.at = self.at_live
+            self.at = self.__at_live
 
         self.at(at_config, "general:navdata_demo", "TRUE")
         #self.at(at_config, "general:navdata_demo", "FALSE")
@@ -362,19 +367,17 @@ class ControllerInterface(threading.Thread):
         #self.at(at_config,"detect:detections_select_v","4")
         #self.at(at_config, "general:navdata_options","1024")
 
-    def get_values(self):
-        return [self.pitch, self.roll, self.yaw, self.gaz, self.auto]
-
-
     def run(self):
         while not self.stopping:
-            #print self.roll, ', ', self.pitch, ', ', self.yaw, ', ', self.gaz, '\r'
-            self.commwdg()
-            self.simple_move(self.roll, self.pitch, self.gaz, self.yaw, self.auto)
+            self.__commwdg()
+            self.__update(self.roll, self.pitch, self.gaz, self.yaw, self.auto)
             time.sleep(self.sleep_time)
+    
+    def stop(self):
+        self.land()
+        self.stopping = True
 
-    def set(self, roll, pitch, gaz, yaw, auto):
-        
+    def move(self, roll, pitch, gaz, yaw, auto):
         if not roll is None:
             self.roll = roll
         if not pitch is None:
@@ -385,32 +388,6 @@ class ControllerInterface(threading.Thread):
             self.yaw = yaw
         if not auto is None:
             self.auto = auto
-        
-
-    def zap(self):
-        print 'zapping: ' + str(self.chan)
-        self.at(at_config, "video:video_channel", str(self.chan))
-
-        self.chan += 1
-        self.chan = self.chan % 4
-
-    def stop(self):
-        self.land()
-        self.stopping = True
-        #self.com_watchdog_timer.cancel()
-    
-    def commwdg(self):
-        self.at(at_comwdg)
-        if not self.landed:
-            self.at(at_ref, True)
-        else:
-            self.at(at_ref, False)
-
-    def get_landed(self):
-        return self.landed
-
-    def set_landed(self, state):
-        self.landed = state
 
     def take_off(self):
         utils.dprint("", 'Taking off!')
@@ -421,16 +398,30 @@ class ControllerInterface(threading.Thread):
         self.at(at_config, "control:altitude_max", "40000")
         self.at(at_ref, True)
         # TODO: implement check for takeoff
-        self.set_landed(False)
+        self.__set_landed(False)
            
     def land(self):
         utils.dprint("", 'Landing')
         self.at(at_ref, False)
         # TODO: implement check for landed
-        self.set(0.0, 0.0, 0.0, 0.0, False)
+        self.move(0.0, 0.0, 0.0, 0.0, False)
         self.sleep_time = 1.0
-        self.set_landed(True)
+        self.__set_landed(True)
         
+    def zap(self, ch=None):
+        if ch is None:
+            #print 'zapping: ' + str(self.chan) + '\r'
+            self.at(at_config, "video:video_channel", str(self.chan))
+
+            self.chan += 1
+            self.chan = self.chan % 4
+        else:
+            #print 'zapping: ' + str(ch) + '\r'
+            self.at(at_config, "video:video_channel", str(ch))
+
+    def get_zaplock(self):
+        return self.zaplock
+
     def flat_trim(self):
         self.at(at_ftrim)
         self.at(at_config, "control:altitude_max", "40000")
@@ -442,46 +433,22 @@ class ControllerInterface(threading.Thread):
                
     def led_show(self, num):
         self.at(at_led, num, 1.0, 2)
-        
-    
-    # def move(self, roll, pitch, power, yaw, auto=False):
-    #     if roll is None:
-    #         roll = self.old_vector[0]
-    #     if pitch is None:
-    #         pitch = self.old_vector[1]
-    #     if power is None:
-    #         power = self.old_vector[2]
-    #     if yaw is None:
-    #         yaw = self.old_vector[3]
-                                     
-    #     if roll > 0.10 or roll < -0.10 or auto:
-    #         r = roll
-    #     else:
-    #         r = 0.0
+   
+    def rotate(self, dir, speed=0.2):
+        if dir > 0:
+            utils.dprint("", ' Rotating clockwise!')
+            self.at(at_pcmd, True, 0, 0, 0, -speed)
+        elif dir < 0:
+            utils.dprint("", 'Rotating counterclockwise!')
+            self.at(at_pcmd, True, 0, 0, 0, speed)
+        else:
+            utils.dprint("", 'Stopping rotation!')
+            self.at(at_pcmd, True, 0, 0, 0, 0.0)
 
-    #     if pitch > 0.10 or pitch < -0.10 or auto:
-    #         pi = pitch 
-    #     else:
-    #         pi = 0.0
-
-    #     if power > 0.10 or power < -0.10 or auto:
-    #         po = power
-    #     else:
-    #         po = power
-
-    #     if yaw > 0.10 or yaw < -0.10 or auto:
-    #         y = yaw
-    #     else:
-    #         y = 0.0
-        
-    #     if r == 0.0 and pi == 0.0 and po == 0.0 and y == 0.0:
-    #         self.at(at_pcmd, False, r, pi, po, y)
-    #     else:
-    #         self.at(at_pcmd, True, r, pi, po, y)
-
-    #     self.old_vector = (roll, pitch, power, yaw)
-
-    def simple_move(self, roll, pitch, power, yaw, auto=False):
+    def get_values(self):
+        return [self.pitch, self.roll, self.yaw, self.gaz, self.auto]
+     
+    def __update(self, roll, pitch, power, yaw, auto=False):
         if roll > 0.10 or roll < -0.10 or auto:
             r = roll
         else:
@@ -506,20 +473,21 @@ class ControllerInterface(threading.Thread):
             self.at(at_pcmd, False, r, pi, po, y)
         else:
             self.at(at_pcmd, True, r, pi, po, y)
-            
-    def rotate(self, dir, speed=0.2):
-        if dir > 0:
-            utils.dprint("", ' Rotating clockwise!')
-            self.at(at_pcmd, True, 0, 0, 0, -speed)
-        elif dir < 0:
-            utils.dprint("", 'Rotating counterclockwise!')
-            self.at(at_pcmd, True, 0, 0, 0, speed)
-        else:
-            utils.dprint("", 'Stopping rotation!')
-            self.at(at_pcmd, True, 0, 0, 0, 0.0)
 
-    
-    def at_live(self, cmd, *args, **kwargs):
+    def get_landed(self):
+        return self.landed
+
+    def __set_landed(self, state):
+        self.landed = state
+   
+    def __commwdg(self):
+        self.at(at_comwdg)
+        if not self.landed:
+            self.at(at_ref, True)
+        else:
+            self.at(at_ref, False)
+ 
+    def __at_live(self, cmd, *args, **kwargs):
         """Wrapper for the low level at commands.
 
         This method takes care that the sequence number is increased after each
@@ -534,7 +502,7 @@ class ControllerInterface(threading.Thread):
         #self.com_watchdog_timer.start()
         self.lock.release()
         
-    def at_test(self, cmd, *args, **kwargs):
+    def __at_test(self, cmd, *args, **kwargs):
         #print 'AT test called with:\t' + str(cmd) + '\r'
         pass
 
@@ -641,13 +609,15 @@ def at(command, seq, params):
             param_str += ',"'+p+'"'
             
     msg = "AT*%s=%i%s\r" % (command, seq, param_str)
-
+    
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.sendto(msg, (settings.DRONE_IP, settings.CMD_PORT))
                 
 def f2i(f):
     #Interpret IEEE-754 floating-point value as signed integer.
     return struct.unpack('i', struct.pack('f', f))[0]
+
+
 #======================================================================================
 
 

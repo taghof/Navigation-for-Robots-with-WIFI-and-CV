@@ -55,16 +55,18 @@ def get_char_with_break():
     import sys, tty, termios, select
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
+    s = ''
     try:
         tty.setraw(sys.stdin.fileno())
         #while not self.stopping:
         rlist, _, _ = select.select([sys.stdin], [], [], 1)
         if rlist:
             s = sys.stdin.read(1)
-            return s
+
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-
+        
+    return s
 
 def get_random_num(self):
     return random.randint(-5, 5)
@@ -641,7 +643,6 @@ class PointTracker(threading.Thread):
         self.navdatareceiver = navdatareceiver
         self.original_point = point
         if point is None:
-            print 'point from context was None\r'
             self.point = (88,72)
         else:
             self.point = point
@@ -675,13 +676,20 @@ class PointTracker(threading.Thread):
             time.sleep(0.05)
         print 'Shutting down PointTracker\r'
 
-    def init(self):
-        # Get image from video sensor
-        self.frame0 = self.videoreceiver.get_data()
+    def init(self, p=None, image=None):
+        # if image is None, get image from video sensor
+        if image is None:
+            self.frame0 = self.videoreceiver.get_data()
+        else:
+            self.frame0 = image
         self.org_width = self.frame0.width if type(self.frame0).__name__== 'iplimage' else self.frame0.shape[1]
         self.org_height = self.frame0.height if type(self.frame0).__name__== 'iplimage' else self.frame0.shape[0]
 
-        self.point = self.original_point
+        if p is None:
+            self.point = self.original_point
+        else:
+            self.point = p
+
         self.features = np.array([self.point], dtype=np.float32)
         self.lk_params = dict( winSize  = (29, 29), 
                               maxLevel = 2, 
@@ -690,6 +698,7 @@ class PointTracker(threading.Thread):
       
         self.maxvx = 0
         self.maxvy = 0
+        self.track()
 
     def track(self):
 
@@ -708,9 +717,13 @@ class PointTracker(threading.Thread):
                 self.features, None, **self.lk_params
                 )
            
-            self.features = np.hstack([self.features, status])
-            self.features = (self.features[~(self.features == 0).any(1)])[:,:2]
-                                        
+            if self.features is not None and len(self.features) > 0:
+                self.features = np.hstack([self.features, status])
+                self.features = (self.features[~(self.features == 0).any(1)])[:,:2]
+            else:
+                self.point = None
+                return None
+
             if len(self.features) == 0:
                 self.point = None
                 return None

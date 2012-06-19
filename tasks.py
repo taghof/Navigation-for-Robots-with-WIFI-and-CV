@@ -34,6 +34,7 @@ import map
 import os
 import pickle
 import Gnuplot, Gnuplot.funcutils
+import pdb
 
 """ Context format : ['point of blob', root task reference, currect distance travelled ] """
 
@@ -49,7 +50,7 @@ class Task(object):
 
     """
 
-    def __init__(self, drone, callback, context):
+    def __init__(self, drone, callback, context, level):
         """ Constructor 
 
         The contructor takes references to the drone, a callback method and a context(a list).
@@ -66,7 +67,9 @@ class Task(object):
         else:
             self.context = context
 
+        self.level = level
         self.interface = drone.get_interface()
+        self.zaplock = self.interface.get_zaplock()
         self.video_sensor = drone.get_video_sensor()
         self.navdata_sensor = drone.get_navdata_sensor()
         #self.wifi_sensor = drone.get_wifi_sensor()
@@ -133,7 +136,7 @@ class Task(object):
 
             self.loop()
             time.sleep(self.loop_sleep)
-
+        
         self.post_loop()
         print 'Ending ', self.__class__.__name__, ', ran for ', time.time() - t1, ' seconds \r'
         self.done()
@@ -182,9 +185,9 @@ class NoneTask(Task):
     Does nothing, could be replaced with the base Task class.
 
     """
-    def __init__(self, drone, callback, context):
+    def __init__(self, drone, callback, context, level=0):
          """ Just calls the super contructor, a very boring task indeed """
-         Task.__init__(self, drone, callback, context)
+         Task.__init__(self, drone, callback, context, level)
 
 class MeasureDistanceTask(Task):
     """ MeasureDistanceTask
@@ -194,9 +197,9 @@ class MeasureDistanceTask(Task):
     a dependent subtasks of a moveTask.
 
     """
-    def __init__(self, drone, callback, context):
+    def __init__(self, drone, callback, context, level=0):
         
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
        
         self.dist_x = 0
         self.dist_y = 0
@@ -290,10 +293,10 @@ class MoveTask(Task):
     The task can be time or distance limited, but is also able to continue until stopped by another task
 
     """
-    def __init__(self, drone, callback, context, timeout, distance, speed, direction):
+    def __init__(self, drone, callback, context, timeout=10.0, distance=None, speed=0.2, direction=1, level=0):
         """ constructor which besides the three common task parameters also takes time, speed and direction """
 
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
        
         if distance is not None:
             print 'should not happen in FollowTour\r'
@@ -348,7 +351,6 @@ class MoveTask(Task):
         """ Super override, starts the stop-timer if one is present and then uses the move method. """
         if self.time is not None:
             self.timer = threading.Timer(self.time, self.stop)
-            print 'stop timer start\r'
             self.timer.start()
 
 
@@ -372,9 +374,9 @@ class TakeoffTask(Task):
     Basically sends the takeoff command to the drone and waits for a given time
 
     """
-    def __init__(self, drone, callback, context, wait=7.0):
+    def __init__(self, drone, callback, context, wait=7.0, level=0):
         """ One additional parameter; the time to wait before ending the task """
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
         self.wait = float(wait)
 
     def pre_loop(self):
@@ -391,9 +393,9 @@ class LandTask(Task):
     the waits for a given time to end
 
     """
-    def __init__(self, drone, callback, context, wait=5.0):
+    def __init__(self, drone, callback, context, wait=5.0, level=0):
         """ The constructor takes one extra parameter, the time to wait before ending. """
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
         self.wait = float(wait)
 
     def pre_loop(self):
@@ -409,9 +411,9 @@ class SearchMarkTask(Task):
     the coordinate is shared through the context and the task stops 
 
     """
-    def __init__(self, drone, callback, context, markpics=None):
+    def __init__(self, drone, callback, context, markpics=None, level=0):
         """ Beyond the standard parameters, the SearchMarkTask can be instantiated with a list of reference images """
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
         self.mark = []
 
         # if not supplied with reference images use some test images
@@ -463,9 +465,9 @@ class SearchTask(Task):
     and the task stops.
 
     """
-    def __init__(self, drone, callback, context, delay=0.0):
+    def __init__(self, drone, callback, context, delay=0.0, level=0):
         """ The constructor can be supplied with an additional delay parameter, to delay the start of the task """
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
         self.blob = None
         self.loop_sleep = 0.05
         self.delay = float(delay)
@@ -498,9 +500,9 @@ class KeepDirTask(Task):
     uses the drone navdata as input and the calculated engine response is fed to the control interface.
 
     """
-    def __init__(self, drone, callback, context):
+    def __init__(self, drone, callback, context, level=0):
         """ The task constructor only takes the standard parameters """
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
         self.verbose = False
 
         # variables used in calculating the PID output
@@ -569,8 +571,8 @@ class HoverTrackTask(Task):
     Discrete PID control
     """
 
-    def __init__(self, drone, callback, context, time=10.0, turn_delay=5.0, mode='detect'):
-        Task.__init__(self, drone, callback, context)
+    def __init__(self, drone, callback, context, time=10.0, turn_delay=5.0, mode='detect', level=0):
+        Task.__init__(self, drone, callback, context, level)
         self.drone.interface.zap(1)
         self.tracker = None
         self.verbose = False
@@ -590,9 +592,9 @@ class HoverTrackTask(Task):
         self.turn = False
 
         # variables used in calculating the PID output
-        self.Kp=1.5
+        self.Kp=2.0
         self.Ki=0.0
-        self.Kd=0.5
+        self.Kd=0.75
         self.Derivator_x = 0
         self.Derivator_y = 0
         self.Derivator_psi = 0
@@ -616,8 +618,12 @@ class HoverTrackTask(Task):
         self.psi_offset = 0
         self.loop_sleep = 0.05
         self.data_points = ([],[],[],[],[],[])
+<<<<<<< HEAD
+        self.last_errors = utils.DiscardingQueue(50)
+=======
         self.point = None
         self.last_errors = utils.DiscardingQueue(20)
+>>>>>>> 70cb314996ba74e57bdd54faadde2a53a864e109
 
 
     def get_point(self):
@@ -628,9 +634,9 @@ class HoverTrackTask(Task):
         self.current_blob = None
         self.timers = []
         if self.timeout is not None:
-            timers.append(threading.Timer(self.timeout, self.stop))
+            self.timers.append(threading.Timer(self.timeout, self.stop))
         if self.turn_time_delay is not None:
-            timers.append(threading.Timer(self.turn_time_delay, self.start_turn))
+            self.timers.append(threading.Timer(self.turn_time_delay, self.start_turn))
         
         self.tracker = utils.PointTracker(self.drone.get_video_sensor(), self.drone.get_navdata_sensor())
         self.source_method = self.tracker.track
@@ -644,8 +650,12 @@ class HoverTrackTask(Task):
     def loop(self):
         
         if self.mode == 'detect':
-            print 'detecting\r'
+            self.zaplock.acquire()
+            self.interface.zap(1)
             img = self.video_sensor.get_data()
+            while img.shape[1] != 176:
+                img = self.video_sensor.get_data()
+            self.zaplock.release()
             blob = bd.detect_red_blob(img)
            
             # we have a new blob
@@ -655,9 +665,10 @@ class HoverTrackTask(Task):
                     print 'Blob found\r'
                     self.current_blob = blob
                     self.mode = 'track'
-                    self.parent.inhibit(self, 1)
+                    if self.parent is not None:
+                        self.parent.inhibit(self, 1)
                     self.interface.move(0, 0, 0, 0, False)
-                    self.tracker.init(position)
+                    self.tracker.init(position, img)
                     print 'Hovering...\r'
                     self.t1 = time.time()
                     for t in self.timers: t.start()
@@ -666,14 +677,13 @@ class HoverTrackTask(Task):
                 
             # we detected current blop
             elif blob is not None  and self.current_blob is not None:
-                print 'same blob... have not moved... cheating for test\r'
-                self.current_blob = None
+                pass
             # we have lost track of blob, next detection will cause track mode 
-            elif not blop:
+            elif not blob:
                 self.current_blob = None
 
         elif self.mode == 'track':
-            print 'tracking\r'
+            self.interface.zap(1)
             powers = self.update()
             
             if powers is not None and not self.suppressed:
@@ -686,14 +696,12 @@ class HoverTrackTask(Task):
             elif powers is None and not self.suppressed:
                 # try to recover
                 self.recover()
-
+        
      
-    def post_loop(self):       
+    def post_loop(self):
         # remember to cancel timers and to put the vehicle in hover mode after moving
-        if self.timer is not None:
-            self.timer.cancel()
-        if self.turn_timer is not None:
-            self.turn_timer.cancel()
+        for t in self.timers:
+            t.cancel()
                 
         self.context[0] = None
         self.interface.move(0, 0, 0, 0, False)
@@ -722,14 +730,20 @@ class HoverTrackTask(Task):
         self.interface.move(0.0, 0.0, 0.2, 0.0, False)
         while not self.state == settings.STOPPING:
             if self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0) >= 2500:
-                self.interface.move(0.0, 0.0, 0.2, 0.0, False)
+                self.interface.move(0.0, 0.0, 0.0, 0.0, False)
+            self.zaplock.acquire()
+            self.interface.zap(1)
             img = self.video_sensor.get_data()
+            while img.shape[1] != 176:
+                img = self.video_sensor.get_data()
+            self.zaplock.release()
             self.blob = bd.detect_red_blob(img)
             if self.blob is not None:
                 (xpos, ypos), (width, height) = position, size = self.blob
                 if width*height > 15:
-                    print 'Blob found\r'
-                    self.tracker.init(position)
+                    print 'Blob found, done recovering\r'
+                    self.current_blob = self.blob
+                    self.tracker.init(position, img)
                     return
 
     def update(self):
@@ -860,15 +874,15 @@ class HoverTrackTask(Task):
         # if PID_y < 0 and vx < 0:
         #     PID_y = PID_y - (vx/5000)/4
             #print 'added: ', (vx/5000), ' to y-power\r'
-        if PID_y > 0 and vx > 0:
-            PID_y = PID_y + (vx/5000)
+        # if PID_y > 0 and vx > 0:
+        #     PID_y = PID_y + (vx/5000)
             #print 'added: ', (vx/5000), ' to y-power\r'
 
-        if PID_x < 0 and vy < 0:
-            PID_x = PID_x - (vy/5000)/1.5
-            #print 'added: ', (vy/5000), ' to x-power\r'
-        elif PID_x > 0 and vy > 0:
-            PID_x = PID_x + (vy/5000)/1.5
+        # if PID_x < 0 and vy < 0:
+        #     PID_x = PID_x - (vy/5000)/1.5
+        #     #print 'added: ', (vy/5000), ' to x-power\r'
+        # elif PID_x > 0 and vy > 0:
+        #     PID_x = PID_x + (vy/5000)/1.5
             #print 'added: ', (vy/5000), ' to x-power\r'
         
         # print stuff for debugging purposes
@@ -886,8 +900,8 @@ class HoverTrackTask(Task):
         # self.data_points[4].append(PID_x*100)
         # self.data_points[5].append(PID_y*100)
         
-        
-        if time_spend > 10 or (self.error_psi is not None and -0.5 < self.error_psi < 0.5 and self.last_errors.get_avg() <= 15 and self.error_alt <= 20):
+        #print 'xy_error: ', self.last_errors.get_avg(), ' (20), alt_error: ', self.error_alt, ' (20), psi_error: ', self.error_psi, ' (0.5)\r'
+        if self.error_psi is not None and -0.5 < self.error_psi < 0.5 and self.last_errors.get_avg() <= 20 and self.error_alt <= 20:
             if not self.parent is None:
                 self.mode = 'detect'
                 self.parent.inhibit(self, 0)
@@ -896,10 +910,10 @@ class HoverTrackTask(Task):
                 self.stop()
 
         time_spend = (time.time() - self.t1)
-        if (not time_spend > 5.0) or not error_dist <= 30:
+        if (not time_spend > 2.0) or not error_dist <= 50:
             PID_psi = 0
 
-        return (PID_x, PID_y, PID_alt, PID_psi/2)
+        return (PID_x, PID_y, PID_alt, PID_psi)
 
     def start_turn(self):
         """ Sets the self.turn flag to true allowing the psi val to corrected """
@@ -929,9 +943,9 @@ class CompoundTask(Task):
     and stops when either all subtasks has completed or it is stop method is called.
 
     """
-    def __init__(self, drone, callback, context):
+    def __init__(self, drone, callback, context, level= 0):
         """ The contructor will create a context if None was supplied, subtasks need the context for communicating """
-        Task.__init__(self, drone, callback, context)
+        Task.__init__(self, drone, callback, context, level)
        
         self.subtasks = []
         self.loop_sleep = 0.0001
@@ -962,20 +976,19 @@ class CompoundTask(Task):
 
     def add_subtask(self, task, index=None):
         task.parent = self
-        task.level = self.level
         task.drone = self.drone
-        task.callback = self.sub_callback
+        if task.callback is None:
+            task.callback = self.sub_callback
         task.context = self.context
         self.subtasks.append(task)
 
     def add_subtasks(self, tasks):
         for t in tasks:
              t.parent = self
-             t.level = self.level
              t.drone = self.drone
-             t.callback = self.sub_callback
+             if t.callback is None:
+                 t.callback = self.sub_callback
              t.context = self.context
-
         self.subtasks.extend(tasks)
 
     def remove_subtask(self, t):
@@ -998,18 +1011,29 @@ class CompoundTask(Task):
                 elif isinstance(t, CompoundTask):
                     t.stop(ty)
         else:
-            if self.state == settings.RUNNING:
-                self.state = settings.STOPPING
+            self.state = settings.STOPPING
             for t in self.subtasks:
                 t.stop()
 
-            stopped = False
-            while not stopped:
-                stopped = True
-                for t in self.subtasks:
-                    if not (t.state == settings.STOPPED or t.state == settings.INIT):
-                        stopped = False
-            
+            # stopped = False
+            # while not stopped:
+            #     stopped = True
+            #     for t in self.subtasks:
+            #         if not (t.state == settings.STOPPED or t.state == settings.INIT):
+            #             # print t, ' not dead!\r'
+            #             # if t.state == settings.STOPPED:
+            #             #     print 'settings.STOPPED\r'
+            #             # elif t.state == settings.INIT:
+            #             #     print 'settings.INIT\r'
+            #             # elif t.state == settings.RUNNING:
+            #             #     print 'settings.RUNNING\r'
+            #             # else:
+            #             #     print t.state, '\r'
+            #             stopped = False
+
+            # if self.state == settings.RUNNING:
+            #     self.state = settings.STOPPING
+
     def done(self, args=None):
         """ Super extension, adds some print to better localise compound stop. """
         Task.done(self)
@@ -1022,8 +1046,8 @@ class SeqCompoundTask(CompoundTask):
     starting another. Terminates when the lists of subtasks is empty.
 
     """
-    def __init__(self, drone, callback, context):
-        CompoundTask.__init__(self, drone, callback, context)
+    def __init__(self, drone, callback, context, level=0):
+        CompoundTask.__init__(self, drone, callback, context, level)
        
     def set_conf_1(self):
         """ Sets a specific list of subtasks """
@@ -1092,14 +1116,37 @@ class SeqCompoundTask(CompoundTask):
                 th.start()
                 th.join()
 
-        self.stop()
+        self.state = settings.STOPPING
 
 class ParCompoundTask(CompoundTask):
 
-    def __init__(self, drone, callback, context):
-        CompoundTask.__init__(self, drone, callback, context)
+    def __init__(self, drone, callback, context, level=0):
+        CompoundTask.__init__(self, drone, callback, context, level)
         self.subtasks = []
         self.threads = []
+
+    def stop(self, ty=None):
+        """ If the stop method is supplied with a type parameter all subtasks of this type will be terminated, else
+        all subtasks will terminated and thus the compound task itself will end.
+        """
+        if ty is not None:
+            for t in self.subtasks:
+                if isinstance(t, ty):
+                    t.stop()
+                elif isinstance(t, CompoundTask):
+                    t.stop(ty)
+        else:
+            for t in self.subtasks:
+                print 'stopping: ', t, '\r' 
+                t.stop()
+
+            # stopped = False
+            # while not stopped:
+            #     stopped = True
+            #     for t in self.subtasks:
+            #         if not (t.state == settings.STOPPED or t.state == settings.INIT):
+            #             stopped = False
+
 
     def set_conf_1(self):
         """ Sets a specific list of subtasks """
@@ -1126,7 +1173,8 @@ class ParCompoundTask(CompoundTask):
         for t in self.threads:
             if t.is_alive():
                 return
-        self.stop()
+
+        self.state = settings.STOPPING
 
 
 class FollowTourTask(SeqCompoundTask):
@@ -1136,9 +1184,9 @@ class FollowTourTask(SeqCompoundTask):
     Based on the tour describtion the tasks creates the necessary subtasks.
 
     """
-    def __init__(self, drone, callback, context, the_map=None):
+    def __init__(self, drone, callback, context, the_map=None, level=0):
         """ The constructor can be supplied with a map containing points and a tour """
-        SeqCompoundTask.__init__(self, drone, callback, context)
+        SeqCompoundTask.__init__(self, drone, callback, context, level)
 
         # If no map is supplied load one from file
         if the_map is None:
@@ -1154,45 +1202,48 @@ class FollowTourTask(SeqCompoundTask):
         self.tour = self.map.tour
         self.positions = self.map.positions
 
-
         self.current_segment = 0
         # build subtasks
         self.add_subtasks(self.create_subtasks())
 
 
     def setup_next_segment(self, caller):
-        
-        self.h.set_turn(self.angles[self.current_segment])
-        # self.m.set_mode(self.angles[self.current_segment])
-        self.current_segment += 1
-
         if not self.current_segment < len(self.tour):
             self.p.stop()
-            print 'THREADS: ', threading.enumerate(), '\r'
+            return
+
+        if self.current_segment < len(self.tour):
+            self.h.set_turn(self.angles[self.current_segment])
+            # self.m.set_mode(self.angles[self.current_segment])
+            self.current_segment += 1
+            
 
     def create_subtasks(self):
         self.angles = []
         self.modifiers = []
         res = []
 
-        self.to = TakeoffTask(self.drone, self.sub_callback, self.context, 6.0)
+        self.to = TakeoffTask(self.drone, self.sub_callback, self.context, 2.0)
         self.to.level = 0
 
-        self.p = ParCompoundTask(self.drone, self.sub_callback, self.context)
-        self.h = HoverTrackTask(self.p.drone, self.setup_next_segment, self.p.context, None, None, mode='detect')
-        self.m = MoveTask(self.p.drone, self.p.sub_callback, self.p.context, None, None, 0.065, 1)
-        self.m.suppressed = True
+        self.la = LandTask(self.drone,self.sub_callback, self.context, 5)
+        self.la.level = 0
 
+        self.p = ParCompoundTask(self.drone, self.sub_callback, self.context)
         self.p.level = 0
-        self.m.level = 0
+
+        self.h = HoverTrackTask(self.p.drone, self.setup_next_segment, self.p.context, None, None, mode='detect')
         self.h.level = 1
+
+        self.m = MoveTask(self.p.drone, self.p.sub_callback, self.p.context, None, None, 0.065, 1)
+        self.m.level = 0
+        self.m.suppressed = True
         
-        self.p.subtasks = [self.h, self.m]
-        for st in self.p.subtasks:
-            st.parent = self.p
+        self.p.add_subtasks([self.h, self.m])
         
         res.append(self.to)
         res.append(self.p)
+        res.append(self.la)
 
         for i in range(len(self.tour)):
 
@@ -1212,9 +1263,9 @@ class FollowTourTask(SeqCompoundTask):
                 
                 turn_angle = (math.atan2(y2,x2) - math.atan2(y1,x1))/d2r
 
-                print '(',x1, ',', y1, ')\r'
-                print '(',x2, ',', y2, ')\r'
-                print '**************\r'
+                # print '(',x1, ',', y1, ')\r'
+                # print '(',x2, ',', y2, ')\r'
+                # print '**************\r'
            
             print 'turn angle: ',turn_angle, '\r'
             self.angles.append(turn_angle)
@@ -1238,7 +1289,6 @@ class FollowTourTask(SeqCompoundTask):
             # t.add_subtask(h)
             # res.append(t)
 
-        res.append(LandTask(self.drone,self.sub_callback, self.context, 5))
         return res
 
     def hover_callback(self, caller):
@@ -1246,8 +1296,48 @@ class FollowTourTask(SeqCompoundTask):
         self.context[0] = None
         self.context[2] = None
 
+class AvoidTask(Task):
+    """ AvoidTask
+    
+    A task designed to make the drone avoid an object by moving up.
 
+    """
+    def __init__(self, drone, callback, context, level=0):
+        """ The constructor can be supplied with a map containing points and a tour """
+        Task.__init__(self, drone, callback, context, level)
+        self.level = 1
+        self.loop_sleep = 0.01
+    def pre_loop(self):
+        self.current_blob = None
 
+    def loop(self):
+        self.zaplock.acquire()
+        self.interface.zap(0)
+        img = self.video_sensor.get_data()
+        while img.shape[1] != 320:
+            img = self.video_sensor.get_data()
+        self.zaplock.release()
+        blob = bd.detect_green_blob(img)
+        # we have a new blob
+        if blob is not None and self.current_blob is None:
+                (xpos, ypos), (width, height) = position, size = blob
+                if width*height > 500:
+                    print 'AVOIDING!!!\r'
+                    self.current_blob = blob
+                    if self.parent is not None:
+                        self.parent.inhibit(self, 1)
+                    self.interface.move(0.0, 0.0, 0.5, 0.0, False)
+        
+        elif blob is not None and self.current_blob is None:
+            print 'Still avoiding\r'
+            self.interface.move(0.0, 0.0, 0.5, 0.0, False)
+
+        elif blob is None and self.current_blob is not None:
+            print 'Blob avoided...\r'
+            self.current_blob = None
+            if self.parent is not None:
+                self.parent.inhibit(self, 0)
+            self.interface.move(0.0, 0.0, 0.0, 0.0, False)
 
 def get_all_tasks():
     """ returns a list of all the subtasks extending Task """

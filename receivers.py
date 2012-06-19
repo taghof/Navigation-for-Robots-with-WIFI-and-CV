@@ -102,7 +102,7 @@ class Receiver(multiprocessing.Process):
         time_start = datetime.datetime.now()
         self.init()
         self.set_status(settings.RUNNING)
-        while l[3]:
+        while l[3] == settings.RUNNING:
             
             inputready, outputready, exceptready = select.select([self.sock], [], [], 1)
 

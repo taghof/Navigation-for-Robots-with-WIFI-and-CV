@@ -92,13 +92,13 @@ class Receiver(multiprocessing.Process):
         self.sock.sendto(self.INITMSG, (self.DRONE_IP, self.INIT_PORT))
         self.sock.sendto(self.INITMSG, (self.DRONE_IP, self.INIT_PORT))
 
-        inputready, outputready, exceptready = select.select([self.sock], [], [], 5)
-        if len(inputready) < 1:
-            print 'No data received after 5 seconds, shutting down receiver\r'
-            return 0
-        else:
-            return 1
-
+        # inputready, outputready, exceptready = select.select([self.sock], [], [], 5)
+        # if len(inputready) < 1:
+        #     print 'No data received after 5 seconds, shutting down receiver\r'
+        #     return 0
+        # else:
+        return 1
+         
     def runner(self, l):
         print 'Starting receiver ', self.PORT, '\r'
         history = OrderedDict()

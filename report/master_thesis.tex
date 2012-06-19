@@ -248,8 +248,8 @@ til de 3 akser. Skal AR.Dronen f.eks. flyve fremad, sættes forenden
 til at være lidt under bagenden i forhold til det vandrette plan. I
 praksis sker det ved at sænke vinkelhastigheden på den forreste propel
 samtidig med at omdrejningsantallet øges %spørgsmålet er hvad er
-moment påvirkningen af (2*omega_H + delta_A - delta_B) - (2*omega_H)
-. . .  på den bageste propel. Det resultere i at AR.Dronen hælder lidt
+moment påvirkningen af $(2*omega_H + delta_A - delta_B) - (2*omega_H)$ 
+på den bageste propel. Det resulterer i at AR.Dronen hælder lidt 
 fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig
 gældende når AR.Dronen skal flytte sig sideværts som på figur
 \ref{fig:drone_movements}b.
@@ -276,11 +276,21 @@ sættes til f.eks. 0.25 radianer via AT-kommandoen i figur
  AT*CONFIG=605,"control:euler_angle_max","0.25"
 \end{verbatim}
   \end{framed}
-  \caption{Eksempel på indholdet af en AT-kommandobesked. Beskeden overføres fra klient-enheden til AR.Dronen på UDP-port 5556. Lige netop denne besked sætter en softwarekonstant i AR.Dronens firmware, der bestemmer den maksimalt tilladte hældning på $\Phi$ og $\Theta$.}  
+  \caption{Eksempel på indholdet af en AT-kommandobesked. Beskeden
+    overføres fra klient-enheden til AR.Dronen på UDP-port 5556. Lige
+    netop denne besked sætter en softwarekonstant i AR.Dronens
+    firmware, der bestemmer den maksimalt tilladte hældning på $\Phi$
+    og $\Theta$.}   
   \label{fig:ateulerangle}
 \end{figure}
 
-I styreprogrammet på AR.Dronens computer kan man sætte en konstant (se figur~\ref{fig:ateulerangle}) til at styre den øvre grænse for hvor meget quadrokopteren maximalt kan krænge. Konstanten \emph{ Euler\_angle\_max } virker som en cut-offvinkel, dvs. under flyvning tester AR.Dronen løbende at hverken pitch ($\Phi$)- eller roll ($\Theta$)-vinklen overskrider grænsen. Sker det lukkes systemet ned; kraften til rotorene klippes og AR.Dronen lader sig falde til jorden.
+I styreprogrammet på AR.Dronens computer kan man sætte en konstant (se
+figur~\ref{fig:ateulerangle}) til at styre den øvre grænse for hvor
+meget quadrokopteren maximalt kan krænge. Konstanten \emph{
+  Euler\_angle\_max } virker som en cut-offvinkel, dvs. under flyvning
+tester AR.Dronen løbende at hverken pitch ($\Phi$)- eller roll
+($\Theta$)-vinklen overskrider grænsen. Sker det lukkes systemet ned;
+kraften til rotorene klippes og AR.Dronen lader sig falde til jorden. 
 %
 
 
@@ -500,11 +510,13 @@ Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
 gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
 på en python-wrapper \cite{electronic:venthur}. Vi har implementeret
-interfacet som en Python tråd der løbende sender kommandoer til
-AR.Dronen, hvilket betyder at vores system ikke afhænger af at alle
-UDP-pakker når deres destination. %think I understand but humor me and elaborate...
+interfacet som en Python tråd der løbende sender kommandoer med de
+aktuelle kontrolværdier til
+AR.Dronen. Dette betyder at vores system ikke afhænger af at alle
+kontrolpakker når deres destination, hvilket er praktisk da
+UDP-protokollen netop ikke garanterer at en pakke når sin destination. %think I understand but humor me and elaborate...
  Ved at sende al kontrolkommunikation
-gennem interfacet, behøves vi ikke at tænke på deltaljer som
+gennem interfacet, behøves vi ikke heller ikke at tænke på detaljer som
 sekvensnumre og watchdog-beskeder, da disse håndteres transparent af
 systemet.  
 Vores interface(\todo{REF TIL EGEN KODE}) definerer en række metoder til at
@@ -516,7 +528,7 @@ fungerer også som en del af vores større system.
 Et simpelt eksempel på anvendelse af vores kontrolinterface gives ved at
 starte pythons fortolker, importere examples-modulet og herefter
 afvikle en metode indeholdende kommandoer til
-AR.Dronen. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex}.
+AR.Dronen. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex1}.
 
 \begin{figure}[ht]
   \begin{framed}   
@@ -526,10 +538,10 @@ AR.Dronen. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex}.
     \end{verbatim}
   \end{framed}
 \caption{Import og afvikling af simpelt kontrolinterface-eksempel i pythonfortolkeren}
-\label{fig:pythoninterpex}
+\label{fig:pythoninterpex1}
 \end{figure}
 
-Metoden \code{square()} der kaldes i eksemplet i figur~\ref{fig:pythoninterpex},
+Metoden \code{square()} der kaldes i eksemplet i figur~\ref{fig:pythoninterpex1},
 lader AR.Dronen lette, flyve rundt i en firkant og for herefter at
 lande igen(under antagelse af at klientcomputeren er forbundet med AR.Dronens
 trådløse netværk). Bevægelsesmønstret opnåes ved at der kaldes en
@@ -553,7 +565,7 @@ def square():
     c.start()
 
     print 'taking off'
-    c.take_off()
+    c.take\_off()
     time.sleep(5.0)
     print 'moving Forward'
     c.move(0.0, 0.2, 0.0, 0.0, True)
@@ -577,29 +589,124 @@ def square():
 \label{fig:pythonimpl1}
 \end{figure}
 
-\section{Brugerens interaktionsmuligheder med systemet}
-For at gøre styringen af dronen anvendelig i praksis har vi
-implementeret softwaremoduler til at tage mod input fra brugeren. Vi
-har tre input muligheder: En keyboardcontroller der lytter efter input
-fra tastaturet, en joystickcontroller der er tilknyttet en Xbox360
-controller samt en autocontroller der kan initiere og afslutte givne
-opgaver. Vi har mulighed for at starte systemet op med alle
+\section{Vores systems kommunikation med AR.Dronen} %Brugerens interaktionsmuligheder med systemet}
+Som nævnt i sektion~\ref{SEKTIONNOGET} kanaliserer vores system al
+kontrolkommunikation med dronen gennem kontrolinterfacet, i praksis er
+det dog ikke anvendeligt at brugeren skal afvikle scripts der anvender
+kontrolinterfacet for hver ønsket bevægelse(som det ses i
+figur~\ref{fig:pythonimpl1}), i stedet har vi implementeret
+moduler(controllere) til at tage mod input fra brugeren. Vi 
+har tre inputmuligheder: En keyboardcontroller der lytter efter input
+fra tastaturet, en joystickcontroller der er tilknyttet en fysisk
+Xbox360-controller samt en autocontroller der kan initiere og afslutte
+givne opgaver. Vi har mulighed for at starte systemet op med alle
 controllere på samme tid, eller undlade en eller flere. Under
 udviklingen af systemet har vi oftest anvendt alle tre controllere på
 samme tid, da de komplimenterer hinanden, for eksempel kan man godt
 anvende autocontrolleren for sig selv, men i det tilfælde at noget
-skulle gå galt i udførslen af en opgave, har man ingen mulighed for at
-bringe AR.Dronen manuelt ned.
+skulle ske noget uforudset under udførslen af en opgave, vil der ikke
+være nogen mulighed for at bringe AR.Dronen manuelt ned. 
 
 \subsection{Joystickcontroller}
 Joystickcontrolleren står i vores system istedet for en iPhone eller
-iPad, den anvendes til at fjernstyre AR.Drone manuelt i forbindelse
-med testflyvninger. Fjernstyringsdelen fungerer ved at oversætte
-værdier fra Xbox360 controlleren og så sende disse til
-controlinterfacet. Joystickcontrolleren kan desuden anvendes til at
-starte prædefinerede opgaver på autocontrolleren, således kan piloten
-manuelt bringe AR.Dronen i en given position for herefter at starte
-den automatiske afvikling af et forudbestemt bevægemønster
+iPad og anvendes til at fjernstyre AR.Drone manuelt i forbindelse
+med testflyvninger. Der var flere praktiske grunde til at vi valgte at
+implementere en alternativ fjernstyring, blandt andet havde vi et
+behov for at kunne interagere både med vores eget system og AR.Dronen
+på samme tid, mens vi til stadighed måtte have øjne på AR.Dronen. Vi
+fandt desuden ikke iphonestyringen tilstrækkelig præcis eller særlig
+intuitiv, Xbox360 controlleren derimod omtales som en af de bedst
+designede controllere og har endda fundet anvendelse af militære
+styrker i USA og
+storbritannien\cite{electronic:zdnet}\cite{electronic:joystiq}\cite{electronic:youtube1}.
+Fjernstyringsdelen er meget simpel og fungerer ved at oversætte
+værdier fra Xbox360 controlleren(som vi får givet af pygames
+joystickmodul\cite{electronic:pygame}) og så sende disse til
+kontrolinterfacet.  Joystickcontrolleren kan udover simpel
+fjernstyring også anvendes til at starte prædefinerede opgaver(REF TIL
+TASK SECTION) på autocontrolleren, således kan piloten manuelt bringe
+AR.Dronen i en ønsket position for herefter at starte den automatiske
+afvikling af et forudbestemt bevægemønster. På
+figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
+controlleren.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/xbox360layout.png}
+  \caption{Standardopsætning af Xbox360 controlleren}
+  \label{fig:xboxlayout}
+\end{figure}
+
+
+\section{Introduktion til modtagelse af video-, navigations- og wifi-data fra AR.Dronen}
+For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
+indsamle data fra de ombordværende sensorer, samt at kunne stille
+disse data til rådighed for andre dele af systemet. Til dette formål
+har vi designet og implementeret en receiver-struktur bestående af tre
+receiver-moduler, disse moduler eksekveres i hver deres process og
+sørger selv for at initiere forbindelsen med dronen. Efter
+initialiseringen lytter hver receiver efter enten video-, navigations-
+eller wifi-pakker og når en sådan modtages udføres en passende
+afkodning af pakken og den afkodede data deles med processen der
+startede receiveren. De tre receivere er ikke
+afhængige af hinanden og kan afvikles hver for sig, ligeledes kan vi
+vælge at afvikle vores samlede system med en eller flere receivere
+tilkoblet(hvilket dog vil resultere i begrænset
+funktionalitet). Sektion~\ref{subsection:receiver} giver et eksempel
+på hvordan man lettest anvender videoreceiveren, til at modtage og vise
+et enkelt billede fra AR.Dronens videostrøm. Anvendelsen af de to
+andre receivere foregår på fuldstændig samme måde som videoreceiveren,
+den eneste forskel er typen af data der returneres. 
+
+\subsection{Eksempel på anvendelse af videoreceiveren}
+Eftersom vores videoreceiver kan anvendes for sig selv, vises her et
+eksempel på hvor få linier kode man behøver for at modtage og vise et
+billede fra AR.Dronens kamera. Eksemplet antager som tidligere, at der
+allerede er oprettet en virkende forbindelse med AR.Dronens trådløse
+netværk, og startes fra Pythons kommandopromt.  
+\begin{figure}[ht]
+  \begin{framed}   
+    \begin{verbatim}
+>>> import examples as e
+>>> e.receive\_and\_show\_picture()
+    \end{verbatim}
+  \end{framed}
+\caption{Import og afvikling af simpelt videoreceiver-eksempel i pythonfortolkeren}
+\label{fig:pythoninterpex2}
+\end{figure}
+Som det ses på figur~\ref{fig:pythonimpl2} kræver det tre liniers reel
+kode for at modtage et billede(og endnu fire for at vise det), vi
+mener at dette fint illustrerer, hvordan vi med dette abstraktionslag kan
+tilbyde et let anvendeligt interface til AR.Dronens forskellige
+sensoroutput.   
+\begin{figure}[ht]
+  \lstset{language=Python, frame=single}
+  \begin{lstlisting}
+def receive\_and\_show\_picture():
+    import receivers, settings, time
+    import cv2.cv as cv
+   
+    video\_sensor = receivers.VideoReceiver(settings.VIDEO_PORT)
+    video\_sensor.start()
+    time.sleep(1)
+    pic = video\_sensor.get_data()
+      
+    cv.StartWindowThread()
+    win = cv.NamedWindow('win')
+    cv.ShowImage('win', cv.fromarray(pic))
+    cv.WaitKey()
+    cv.DestroyWindow('win')
+
+    video\_sensor.stop()
+
+  \end{lstlisting}
+  \caption{Python implementation der importerer og anvender
+    videoreceiver til at modtage og vise et billede}
+\label{fig:pythonimpl2}
+\end{figure}
+
+
+\label{subsection:receiver}
+
 
 \section{Optisk flow navigation}
 Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra vi har fået inspiration.

@@ -743,7 +743,7 @@ class VideoWindow(gtk.Window):
         # if input_image is None:
         input_image = self.video_sensor.get_data()
         
-        points = self.print_points(self.autocontrol.active_tasks)
+        #points = self.print_points(self.autocontrol.active_tasks)
 
         width = input_image.width if type(input_image).__name__== 'iplimage' else input_image.shape[1]
         height = input_image.height if type(input_image).__name__== 'iplimage' else input_image.shape[0]
@@ -770,8 +770,8 @@ class VideoWindow(gtk.Window):
             cv2.line(input_image, (middle_x, middle_y-10), (middle_x, middle_y+10), (255,0,0))
             cv2.line(input_image, (middle_x-10, middle_y), (middle_x+10, middle_y), (255,0,0))
         
-        for p in points:
-            cv2.circle(input_image, (p[0], p[1]), 4, (0,255,0))
+        # for p in points:
+        #     cv2.circle(input_image, (p[0], p[1]), 4, (0,255,0))
 
         incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
             input_image.tostring(), 

@@ -621,7 +621,6 @@ class HoverTrackTask(Task):
         self.point = None
         self.last_errors = utils.DiscardingQueue(20)
 
-
     def get_point(self):
         """ returns the positions of the point currently tracked, only relevant for some subtasks. """
         return self.point
@@ -640,12 +639,13 @@ class HoverTrackTask(Task):
         psi = self.navdata_sensor.get_data().get(0, dict()).get('psi', 0)
         self.set_point_psi = psi + self.psi_offset
 
-        self.set_point_alt = 1750.0
+        self.set_point_alt = 1950.0
 
 
     def loop(self):
         
         if self.mode == 'detect':
+            print 'detecting\r'
             self.zaplock.acquire()
             self.interface.zap(1)
             img = self.video_sensor.get_data()
@@ -679,6 +679,7 @@ class HoverTrackTask(Task):
                 self.current_blob = None
 
         elif self.mode == 'track':
+            print 'tracking\r'
             self.interface.zap(1)
             powers = self.update()
             

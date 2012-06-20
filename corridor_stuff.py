@@ -121,7 +121,7 @@ def findCorridorVanishPoint(img_a, y_tilt, from_main=False):
 
     # eventuelt lave en gauss filtrering...
 
-    bc = [0.0]
+    bc = [0.0, 0, 0]
     for row in range(len(cells)):
         for c in range(len(cells[row])):
             if cells[row][c] > bc[0]:
@@ -132,7 +132,7 @@ def findCorridorVanishPoint(img_a, y_tilt, from_main=False):
     ## # Debugg
     if from_main:
         print "number of diagonal_lines:", len(diagonal_lines)
-        print cells
+        #print cells
         print "bc[]:", bc
         p1 = (bc[2]*cell_width, bc[1]*cell_height)
         p2 = (bc[2]*cell_width+cell_width, bc[1]*cell_height+cell_height)
@@ -193,15 +193,15 @@ def findCorridorVanishPoint(img_a, y_tilt, from_main=False):
         cv.PutText( color_dst, "Theta %2.2f" % y_tilt, (h_w-85, h_h), font, cv.RGB(255,0,255))
         
 
-        print type(color_dst)
+        #print type(color_dst)
 
-        thumbnail = cv.CreateMat( 600, 800, cv.CV_8UC3)
-        cv.Resize(color_dst, thumbnail)
-        
-        cv.NamedWindow("Hough", 1)
-    # cv.ShowImage("Hough", color_dst)
-        cv.ShowImage("Hough", thumbnail) #color_dst)
-        cv.SaveImage( "out_put.png", thumbnail) #color_dst)
+        #cv.NamedWindow("Hough", 1)
+
+        #thumbnail = cv.CreateMat( 600, 800, cv.CV_8UC3)
+        #cv.Resize(color_dst, thumbnail)
+        #cv.ShowImage("Hough", thumbnail) #color_dst)
+        cv.ShowImage("Hough", color_dst)
+        #cv.SaveImage( "out_put.png", thumbnail) #color_dst)
     ## #
 
     return vp, (float(bc[0])/float(maxlines)) # tell tell sign also if the color behind the cell is very bright, af feature of the IT-byen cooridors...

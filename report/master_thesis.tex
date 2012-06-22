@@ -19,15 +19,11 @@
 \newcommand{\todo}[1]{\textbf{#1}}
 
 \title{Master Thesis}
-\author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{
-    tysse, taghof }@cs.au.dk\\\\ Department of Computer Science,
-  University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\ 
+\author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
 \hline\\
 \vspace{4cm}\\
 \makeatletter
-\texttt{Semi Autonomous Indoor}\\ %Indoor? - nogle udendørs robotter
-                                %heller ikke bruge gps, for dyrt i
-                                %præcision... 
+\texttt{Semi Autonomous Indoor}\\ %Indoor? - nogle udendørs robotter heller ikke bruge gps, for dyrt i præcision...
 \texttt{Navigation for Arial Robots}\\
 \vspace{4cm}\\
 \hline\\
@@ -77,8 +73,8 @@ Hvorfor i det hele taget begive sig herudi noget der ikke lader sig gøre
 
 \section{Teseformulering}
 \label{sec:tese}
-HVAD er det præcis vi vil vise eller afvise?! 
-nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen. 
+HVAD er det præcis vi vil vise eller afvise?!
+nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen.
 
 \section{Metode}
 \label{sec:metode}
@@ -592,20 +588,33 @@ def square():
 \section{Vores systems kommunikation med AR.Dronen} %Brugerens interaktionsmuligheder med systemet}
 Som nævnt i sektion~\ref{SEKTIONNOGET} kanaliserer vores system al
 kontrolkommunikation med dronen gennem kontrolinterfacet, i praksis er
-det dog ikke anvendeligt at brugeren skal afvikle scripts der anvender
-kontrolinterfacet for hver ønsket bevægelse(som det ses i
+det dog ikke anvendeligt at brugeren skal afvikle scripts, der anvender
+kontrolinterfacet, for hver ønsket bevægelse(som det ses i
 figur~\ref{fig:pythonimpl1}), i stedet har vi implementeret
 moduler(controllere) til at tage mod input fra brugeren. Vi 
 har tre inputmuligheder: En keyboardcontroller der lytter efter input
 fra tastaturet, en joystickcontroller der er tilknyttet en fysisk
 Xbox360-controller samt en autocontroller der kan initiere og afslutte
-givne opgaver. Vi har mulighed for at starte systemet op med alle
+givne opgaver. 
+
+Vi har mulighed for at starte systemet op med alle
 controllere på samme tid, eller undlade en eller flere. Under
 udviklingen af systemet har vi oftest anvendt alle tre controllere på
 samme tid, da de komplimenterer hinanden, for eksempel kan man godt
 anvende autocontrolleren for sig selv, men i det tilfælde at noget
 skulle ske noget uforudset under udførslen af en opgave, vil der ikke
 være nogen mulighed for at bringe AR.Dronen manuelt ned. 
+
+\subsection{Opbygningen af det grundlæggende controllermodul}
+Alle tre controllermoduler nedarver fra en grundlæggende
+controllerklasse(Controller), denne er implementeret som en tråd der med et givent
+tidsinterval kalder en kontrolmetode(process_events()). Denne simple
+opbygning betyder, at hvis man ønsker at implementere en anden type
+controller, er det nok at nedarve Controller og implementere
+process_events() metoden. Da python behandler metoder som
+førsteklasses objekter, er det let at lade en controller skifte mellem
+forskellige tilstande, dette gøres ved at kalde \code{set_control_method} med
+en ny kontrolmetode som argument. 
 
 \subsection{Joystickcontroller}
 Joystickcontrolleren står i vores system istedet for en iPhone eller
@@ -635,6 +644,19 @@ controlleren.
   \caption{Standardopsætning af Xbox360 controlleren}
   \label{fig:xboxlayout}
 \end{figure}
+
+\subsection{Keyboardcontroller}
+Hvis vi ønsker at starte vores system uden grafisk brugerflade(og
+tilhørende GTK keyboardbindinger), er det
+praktisk stadig at kunne anvende tastaturet som input(evt i kombination med Xbox360
+controlleren). Vi har derfor implementeret en simpel
+keyboardcontroller der læser input fra terminalen. Vi anvender ikke
+keyboardcontrolleren til direkte styring af AR.Dronen(da det ikke er
+praktisk i forhold til Xbox360 controlleren), men til at få udskrevet
+nuværende batteriniveau('b'), til at skifte kamera('z'), til at få
+udskrevet aktive opgaver på autocontrolleren('c'), til at få udskrevet
+en oversigt over tråde i programmet('t'), samt til at starte opgaver
+på autocontrolleren('1', '2' og '3'). 
 
 
 \section{Introduktion til modtagelse af video-, navigations- og wifi-data fra AR.Dronen}

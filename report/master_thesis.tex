@@ -44,7 +44,6 @@ In english...
 
 \section*{Resume}
 Indeholder og gennemgår i det følgende (på dansk).
-\todo{hello}
 
 \pagebreak
 
@@ -52,9 +51,9 @@ Indeholder og gennemgår i det følgende (på dansk).
 
 \pagebreak
 
-\section{Introduktion}
+\section{Introduktion} %Thomas
 \label{sec:introduktion}
-\subsection{området, teknologi}
+%\subsection{området, teknologi}
 -Kort intro hvad vil vi gøre...
 
 -problem domæne,
@@ -62,40 +61,107 @@ Indeholder og gennemgår i det følgende (på dansk).
 -hvad bygger vi videre på (hvis arbejde), 
 -hvad er vores antagelser til at starte med
 
-Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
+
 %\titleref{sec:AR.Drone}
 
 
-\pagebreak
-
-\section{Motivation}
+\subsection{Motivation} % Thomas & Morten, Hvorfor
 \label{sec:motivation}
-Hvorfor i det hele taget begive sig herudi noget der ikke lader sig gøre
 -Hvem vil vores resultater komme til gode
 -anvendelses områder
 -hvorfor er det bedre/billigere med vores løsninger
 -Cost efficiency?
 
-\section{Teseformulering}
+referencer til lignende arbejde, vores forskellig fordi..
+
+\subsection{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
 HVAD er det præcis vi vil vise eller afvise?!
 nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen.
 
-\section{Metode}
+Det er noget med en [semi autonom] [navigation] [indendørs] [luftbåren]
+
+fra semiautonom og navigation er der noget, 1) bevægelse i forskellige miljøer, og 2) avoid opførsel, møde med silhuet eller lavt batteri.
+
+at det er indendørs giver nogle begrænsninger, kan bestemme et bestemt miljø ala Hopper-gangene / Ada-gangene eller Zuse.
+
+Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
+
+
+\subsection{Metode} % Thomas, Hvordan, skal den være en SUBsection eller section?
 \label{sec:metode}
-Antagelser, problemdomæne formuleret i introduktionen sektion \ref{sec:introduktion}.
-(Lavpraktisk:)
-- hvilke værktøjer vil vi tage i brug AR.Dronen, PC, joystick/controller, Python, => hvorfor, argumentation.
-   tage AR.Dronen gå fra at bruge den som en fjernstyrbar enhed til at gøre den til en næsten selvstændig semi autonom enhed.
-
-- hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det (relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
-
--Hvordan vil vi faktisk teste vores tese? - arbejde går imod at lave en testopstilling, hvad skal der til for at opstillingen virker? framework, processor-kraft båndbredde
-
-Højniveau?:
-- er der noget højt,... abstraktion?
+%% Antagelser, problemdomæne formuleret i introduktionen sektion \ref{sec:introduktion}.
+%% (Lavpraktisk:)
+%% - hvilke værktøjer vil vi tage i brug AR.Dronen, PC, joystick/controller, Python, => hvorfor, argumentation.
+%%    tage AR.Dronen gå fra at bruge den som en fjernstyrbar enhed til at gøre den til en næsten selvstændig semi autonom enhed.
+%% - hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det (relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
+%% -Hvordan vil vi faktisk teste vores tese? - arbejde går imod at lave en testopstilling, hvad skal der til for at opstillingen virker? framework, processor-kraft båndbredde
+%% Højniveau?:
+%% - er der noget højt,... abstraktion?
 
 
+%%%% Introduction - Metode
+\subsubsection{AR.Drone} % Thomas,
+Selvstændig selvstående paragraf omkring, valg af AR.Dronen. Hvorfor har vi valgt den, hvad tilfredstiller den, hvad tilfredstiller den ikke. Hvad skal den bruges til.
+generelle sensore på dronen; 2 kameraer, acceleration, rotation, hastighed, 
+wifi-kommunikation
+
+\paragraph{2 AR.Droner} % Thomas, en med ekstern lab-forsyning, en flyvende
+
+\paragraph{Nu med USB-driver}% Thomas & Morten
+
+
+%%%% Introduction - Metode
+\subsubsection{Domæne/navigationsmiljø} % Thomas,
+Nogle bygninger på Katrinebjerg, indendørs...
+
+\subsubsection{/Miljø} % Thomas,
+\paragraph{Indendørs}
+
+\paragraph{PC-linux}
+
+\paragraph{Python}
+
+
+
+%%%% Introduction - Metode
+\subsubsection{Hjælpeværktøjer} % Thomas & Morten
+Python ---
+
+\paragraph{vores Platform}
+selvstående afsnit om; Et værktøj udviklet til hjælp til os. Hvad kan det; hjælp til kontrolbeskeder til fjernstyring, indgang til at modtage datapakker fra AR.Dronen...
+
+
+%%%% Introduction - Metode
+\paragraph{GUI til datarepræsentation}
+
+
+%%%% Introduction - Metode
+\paragraph{Mapdrawer / turplanlægger}
+
+
+%%%% Introduction - Metode
+\paragraph{Task manager plugin og tasks}
+
+
+\subsubsection{Eksperimenter} % Thomas,
+
+\paragraph{Lokalisering via Wifi-fingerprinting}
+%\paragraph{Simpel-blob}
+\paragraph{Blob-detection og PID styring} simpel blob, og udbygget nested blob
+\paragraph{Korridor vanishpoint}
+\paragraph{distance-measurererere}
+
+\paragraph{avoid silhouet}
+\paragraph{low battery}
+\paragraph{Erkendelse af miljø...}
+ Korridor (Hopper) vs. Åbent område (Zuse)
+
+%%%% Introduction
+\subsection{Raport struktur} % Thomas, %/læsevejledning
+Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
+
+\pagebreak
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
@@ -106,7 +172,7 @@ Højniveau?:
 \section{AR.Drone}
 \label{sec:AR.Drone}
 AR.Drone er en quadrokopter fremstillet og udviklet af det franske
-firma Parrot \cite{electronic:parrot, electronic:wiki_parrot}.%\cite{electronic:parrot} \cite{electronic:wiki_parrot}.
+firma Parrot \cite{electronic:parrot, electronic:wiki_parrot}.
  En quadrokopter benytter fire faste rotorer til at
 generere opdrift, samt til at styre sin bevægelse i rummet.%\\
 
@@ -144,13 +210,9 @@ indendørs (figur~\ref{fig:indendoersskjold}) og udendørs flyvning (figur~\ref{fi
   \label{fig:ardrone}
 \end{figure}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%
 %%%%     AR.Drone - section
 %%%%      + Hardware - subsection
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
 \subsection{Hardware}
 \label{ssec:hardware}
@@ -293,19 +355,14 @@ meget quadrokopteren maximalt kan krænge. Konstanten \emph{
 tester AR.Dronen løbende at hverken pitch ($\Phi$)- eller roll
 ($\Theta$)-vinklen overskrider grænsen. Sker det lukkes systemet ned;
 kraften til rotorene klippes og AR.Dronen lader sig falde til jorden. 
-%
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%
 %%%%     AR.Drone - section
-%%%%      - Hardware -
-%%%%      - Fysik - 
 %%%%      + Software - subsection
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Software}
+\subsection{Software på AR.Dronen}
 \label{ssec:software}
 AR.Dronens microcomputer kommer med en Linux 2.6.27 kerne
 installeret. Det bemærkes at 2.6.27 er den første kerne med indbygget
@@ -357,16 +414,11 @@ mellem bruger og quadro\-kopteren beskrives i
 afsnit~\ref{ssec:kommunikation}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%
 %%%%     AR.Drone - section
-%%%%      - Hardware -
-%%%%      - Fysik -
-%%%%      - Software
 %%%%      + Klient/server kommunikation - subsection
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Kommunikation mellem \drone{}n og en klient-enhed}
+
+\subsection{Kommunikation mellem AR.Dronen og klient} %mellem AR.Dronen og en klient-enhed
 \label{ssec:kommunikation}
 Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan kategoriseres i 3 grupper:
 \begin{itemize}
@@ -383,8 +435,6 @@ Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan k
     AR.\ $\!$Dronens firmware \uri{program.\ $\!$elf} gennem de tre UDP-porte der
     også anvendes ved almindelig trådløs kommunikation.
 \end{itemize}
-
-$4 \dot 3$
 
 \subsubsection{TCP baseret kommunikation}
 \label{sssec:tcp}
@@ -463,8 +513,10 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \ref{tab:kommandoer} i appendiks \ref{sec:at}. 
 
 
-\subsection{Vurdering af AR.Dronen som robotplatform}
+\subsection{Vurdering af AR.Dronen som robotplatform} % Thomas,
 En elaboreret tekst omkring hvad man kan sige af pro et con omkring AR.Dronen som platform til udvikling af en flyvende robot.
+
+tradeoff - Billedopløsning eksperiment f.eks. QR-koder kontra hurtig transmission
 
 %cite hvor
 % nogle siger at program.elf + motorstyring + radio tager op mod $80
@@ -508,9 +560,12 @@ En elaboreret tekst omkring hvad man kan sige af pro et con omkring AR.Dronen so
 %kritiske beskeder(land, let etc.) er nået frem til AR.Dronen, eller om vi
 %skal sende pakken igen.
 
+\pagebreak
+\section{Fasciliterende platform} % Morten,
+\subsection{Fjernstyring af AR.Dronen med Python}
+%        Introduktion til styring af AR.\ $\!$Drone med Python}
 
-\section{Introduktion til styring af AR.\ $\!$Drone med Python}
-\subsection{AT-kommando Python interface}
+\subsubsection{AT-kommando Python interface}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
 gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
@@ -529,7 +584,8 @@ kontrollere dronens opførsel og bevægelser. Interfacet kan i det
 simpleste tilfælde anvendes direkte fra Pythons interpreter, men
 fungerer også som en del af vores større system.
 
-\subsection{Eksempel på anvendelse af Python interface til AR.Dronen}
+%           Eksempel på anvendelse af Python interface til AR.Dronen
+\subsubsection{Python-eksempel nem fjenstyring af AR.Dronen}
 Et simpelt eksempel på anvendelse af vores kontrolinterface gives ved at
 starte pythons fortolker, importere examples-modulet og herefter
 afvikle en metode indeholdende kommandoer til
@@ -594,7 +650,10 @@ def square():
 \label{fig:pythonimpl1}
 \end{figure}
 
-\section{Vores systems kommunikation med AR.Dronen} %Brugerens interaktionsmuligheder med systemet}
+
+\pagebreak
+%        Vores systems kommunikation med AR.Dronen
+\subsection{Styring af AR.Dronen gennem den ny platform} %Brugerens interaktionsmuligheder med systemet}
 Som nævnt i sektion~\todo{\\ref{SEKTIONNOGET}}
  kanaliserer vores system al
 kontrolkommunikation med dronen gennem kontrolinterfacet, i praksis er
@@ -615,7 +674,7 @@ anvende autocontrolleren for sig selv, men i det tilfælde at noget
 skulle ske noget uforudset under udførslen af en opgave, vil der ikke
 være nogen mulighed for at bringe AR.Dronen manuelt ned. 
 
-\subsection{Opbygningen af det grundlæggende controllermodul}
+\subsubsection{Opbygningen af det grundlæggende controllermodul}%styringsmodul?
 Alle tre controllermoduler nedarver fra en grundlæggende
 controllerklasse (Controller), denne er implementeret som en tråd der med et givent
 tidsinterval kalder en kontrolmetode(\code{process\_events()}). Denne simple
@@ -626,7 +685,7 @@ førsteklasses objekter, er det let at lade en controller skifte mellem
 forskellige tilstande, dette gøres ved at kalde \code{set\_control\_method} med
 en ny kontrolmetode som argument. 
 
-\subsection{Joystickcontroller}
+\subsubsection{Joystickcontroller}
 Joystickcontrolleren står i vores system istedet for en iPhone eller
 iPad og anvendes til at fjernstyre AR.Drone manuelt i forbindelse
 med testflyvninger. Der var flere praktiske grunde til at vi valgte at
@@ -655,7 +714,7 @@ controlleren.
   \label{fig:xboxlayout}
 \end{figure}
 
-\subsection{Keyboardcontroller}
+\subsubsection{Keyboardcontroller}
 Hvis vi ønsker at starte vores system uden grafisk brugerflade(og
 tilhørende GTK keyboardbindinger), er det
 praktisk stadig at kunne anvende tastaturet som input(evt i kombination med Xbox360
@@ -669,7 +728,8 @@ en oversigt over tråde i programmet('t'), samt til at starte opgaver
 på autocontrolleren('1', '2' og '3'). 
 
 
-\section{Introduktion til modtagelse af video\-, navigations\- og wifi\-data fra AR.\ $\!$Dronen}
+\subsection{Modtagelse af ``sensor''-data fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
+I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og wifi-data fra AR.Dronen.
 For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
 indsamle data fra de ombordværende sensorer, samt at kunne stille
 disse data til rådighed for andre dele af systemet. Til dette formål
@@ -690,7 +750,7 @@ et enkelt billede fra AR.Dronens videostrøm. Anvendelsen af de to
 andre receivere foregår på fuldstændig samme måde som videoreceiveren,
 den eneste forskel er typen af data der returneres. 
 
-\subsection{Eksempel på anvendelse af videoreceiveren}
+\subsubsection{Eksempel på anvendelse af videoreceiveren}
 \label{subsection:receiver}
 Eftersom vores videoreceiver kan anvendes for sig selv, vises her et
 eksempel på hvor få linier kode man behøver for at modtage og vise et
@@ -739,24 +799,81 @@ def receive_and_show_picture():
 \label{fig:pythonimpl2}
 \end{figure}
 
+\pagebreak
+
+\section{Hjælpeværktøjer} % Morten,
+
+\subsection{GUI til datarepræsentation}
+
+
+\subsection{Mapdrawer / turplanlægger}
 
 
 
+\subsection{Wifi-signalstyrkesample presenter}
+\pagebreak
 
-\section{Optisk flow navigation}
-\todo{fedt hvis vi kan nå at lave det...}
+\section{Tasks ``plugin''} % Morten
 
 
 
-\section{Korridors forsvindingspunkt}
-Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra vi har fået inspiration.
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%     Eksperimenter - section
+\section{Eksperimenter} % Thomas & Morten
+
+\subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
+%,skal disse have hver deres egen hovedsektion (istedet for SUBsection)?
+Hvad vil vi vise, afvise teste?
+Hvad kan/skal resultatet bruges til?
+Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+Hvad var resultatet?
+perspektiver, hvad skal / kan vi bruge den nye viden til?
+Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+
+Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
+
+\subsection{Lokalisering via blobs} % Thomas & Morten
+%Blob-detection og PID styring} 
+Hvad vil vi vise, afvise teste?
+Hvad kan/skal resultatet bruges til?
+Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+Hvad var resultatet?
+perspektiver, hvad skal / kan vi bruge den nye viden til?
+Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+
+\todo{simpel blob}, og \todo{udbygget nested blob}
+
+
+\subsection{Lokalisering via QR-koder} % Morten
+Hvad vil vi vise, afvise teste?
+Hvad kan/skal resultatet bruges til?
+Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+Hvad var resultatet?
+perspektiver, hvad skal / kan vi bruge den nye viden til?
+Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+
+
+\subsection{Optisk flow navigation} % tt
+\todo{fedt hvis det kan nåes at lave det...}
+
+%\subsection{Korridor vanishpoint}
+\subsection{Korridors forsvindingspunkt} % Thomas
+%Hvad vil vi vise, afvise teste?
+%Hvad kan/skal resultatet bruges til?
+%Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+%Hvad var resultatet?
+%perspektiver, hvad skal / kan vi bruge den nye viden til?
+%Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
+
+Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra der er kommet inspiration.
 finde edges -> finde houghlines -> sortere linier (diagonale)
 -> finde skæringspunkter blandt diagonale linier, tælle område med
 flest skæringspunkter
 +augmenter med phi
 
-
-\subsection{At finde kanter i et billede}
+\subsubsection{At finde kanter i et billede}
 
 \begin{figure}
   \centering
@@ -769,42 +886,24 @@ flest skæringspunkter
   \label{fig:kanter1}
 \end{figure}
 
-Kanter i et billede defineres som abrupt skift i farveværdi eller lysintensitet lokalt mellem
-naboer af pixels\footnote{Man kan også lede efter kanter globalt (se f.eks.\newline
+Kanter i et billede defineres som abrupt skift i farveværdi eller lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt (se f.eks.\newline
   \uri{http://en.wikipedia.org/wiki/Step\_detection\#Global}), men det
-  er en anden tilgang. I dette afsnit beskrives en metode der søger lokalt.}. Kanter er ofte en
+  er en anden tilgang. I dette afsnit beskrives en metode der søger lokalt.} mellem
+naboer af pixels. Kanter er ofte en
 indikator for eksistensen af bl.a. ændringer i dybden af et billede og for
 overfladeændringer m.fl.
 
 Figur~\ref{fig:kanter1} illustrerer hvordan ændringerne i intensitet imellem tilstødende billedpunkter (pixel) kan ses som en graf af højder. De steder hvor der er stor højdemæssig afstand, altså hvor hældningen er stejl, er der som oftest en kant at finde. 
 
-Cannyfilteret\cite{Canny1986}, som er en af de metoder vi bruger, tager et billede og returnere et binært billede (sort/hvid). Hvide billedpunkter indikere at der er en kant i det oprindellige billede, mens sort betyder at der ikke er ændringer. Cannyfilteret bruger gradienten som skrives
-\begin{equation}
-  \label{eq:edge_slope}
-  %\bigtriangledown
-  \bm{J} = \bigtriangledown I (\bm{x} ) = \left(\frac{ \partial I }{ \partial x }, \frac{
-    \partial I }{ \partial y }\right)(\bm{x})
-\end{equation}
-og er ændringen i intensiteten i $x$ og i $y$ retningen. Udfra denne fåes magnituden og orienteringen af gradienten som
-\begin{equation}
-  \label{eq:gradient}
-  \begin{split}
-  G &= \sqrt{ G_x^2 + G_y^2 }\\
-  \theta &= \arctan \left( \frac{G_y}{G_x} \right)\\
-  \text{ hvor } G_x & = \frac{ \partial I }{ \partial x } \text{ og } G_y \frac{\partial I }{ \partial y }
-  \end{split}
-\end{equation}
-Cannyfilterets arbejde besværliggøres af støj i rå billeder. Støjen introducerer fejl i lokationsestimatet for kanterne. En reducering af støjen kan fortages forinden eller imens beregning af hældning
-foregår. Specielt i tilfældet med AR.Dronens ringe kamera vil det give et bedre slutresultat at bruge et båndpasfilter til at lave en ``udglatning'' af billedet. Udglatningsoperationen udføres med et gaussisk filter\footnote{Fra billedbehandlingsprogrammer som Photoshop og GIMP hedder det ``Gaussian blur'' filter.} (en klokkegraf).
-%convolution oversat til dansk; en foldning. = sliding window (gauss bruges sådan)
+Til at finde kanter (edges) kan cannyfilteret\cite{Canny1986} anvendes. Det tager et billede og returnere et binært billede (sort/hvid). Hvide billedpunkter indikere at der er en kant i det oprindellige billede, mens sort betyder at der ikke er ændringer. 
 
-Gradienten af gauss-udglatningen convoleres på billedets pixelintensiteter og skrives som
-\begin{equation}
-  \label{eq:gauss_edge_slope}
-  \bm{J}_{\sigma} = \bigtriangledown [ G_{\sigma} (\bm{x} ) \times I
-    (\bm{x} ) ] = 
-     [ \bigtriangledown G_{\sigma} ] (\bm{x} ) \times I (\bm{x} )
-\end{equation}
+% \bm{J} = \bigtriangledown I (\bm{x} ) = \left(\frac{ \partial I }{ \partial x }, \frac{\partial I }{ \partial y }\right)(\bm{x})
+%  G &= \sqrt{ G_x^2 + G_y^2 }\\ \theta &= \arctan \left( \frac{G_y}{G_x} \right)\\ \text{ hvor } G_x & = \frac{ \partial I }{ \partial x } \text{ og } G_y \frac{\partial I }{ \partial y }
+Fordi AR.Dronens kamera er med lille opløsning og det billeder af så tilpas ringe kvalitet vil det forbedre slutresultatet at bruge et båndpasfilter til at lave en ``udglatning'' af billedet. Udglatningsoperationen udføres med et gaussisk filter\footnote{Fra billedbehandlingsprogrammer som Photoshop og GIMP hedder det ``Gaussian blur'' filter.} en klokkegraf\cite{electronic:wiki_gaussklokke}.
+% \bm{J}_{\sigma} = \bigtriangledown [ G_{\sigma} (\bm{x} ) \times I (\bm{x} ) ] = [ \bigtriangledown G_{\sigma} ] (\bm{x} ) \times I (\bm{x} )
+Tager man alle pixelpositioner hvor den første afledte er over threshold kan man ende op med mange tykke kanter, for at præcisere placeringen kan man udtynde dem, ved at søge i retningen af den lokale gradient og istedet finde maximum/minimum. Videreudbygninger af Cannyfilteret efter 1986 bruger bl.a. endnu en retningsbestemt afledt af gradienten og finder maximum ved dens skærring med 0.
+% \bm{S}_{\sigma}(\bm{x} )=\bigtriangledown \dot{} \bm{J}_{\sigma}(\bm{x} )=[ \bigtriangledown ^2 G_{\sigma} (\bm{x} ) \times * \bm{I} (\bm{x} ) ]
+% \bigtriangledown G_{\sigma}(\bm{x} )=(\frac{\partial G_{\sigma}}{\partial x},\frac{\partial G_{\sigma}}{\partial y})(\bm{x})=[-x -y]\frac{1}{\sigma^3} \exp \left( - \frac{x^2 + y^2}{2 \sigma ^2} \right)
 
 \begin{figure}
   \centering
@@ -814,21 +913,13 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
   \label{fig:derivatives}
 \end{figure}
 
-Figur~\ref{fig:derivatives} illustrerer et eksempel hvor lysintensitet ($f(x)$) per pixelposition $x$ går fra lav værdi til høj værdi. Kanten skal findes i skiftet hvor $f(x)$ går mellem at være tiltagende til at være aftagende; der er den største ændring (mest abrupt). Er gradienten, altså ændringen i punktet ($f'(x)$) over en hvis værdi (threshold) antages der at være en kant i området. I gradienten kan man begynde at lede efter lokale optimum; hvor der er lokalt optimum er der som sagt en kant. Det originale cannyfilter kan udbygges med brugen af den anden afledtes skærring med 0, som skrives
-\begin{equation}
-  \label{eq:gradient2gauss}
-  \bigtriangledown ^2 G_{\sigma} (\bm{x} ) = \frac{1}{\sigma ^3} \left( 2 - \frac{x^2 + y^2}{2 \sigma ^2} \right) \exp 
-  \left( - \frac{x^2 + y^2}{2 \sigma ^2} \right) 
-\end{equation}
+% \bigtriangledown^2G_{\sigma}(\bm{x})=\frac{1}{\sigma^3}\left(2-\frac{x^2+y^2}{2\sigma^2}\right)\exp\left(-\frac{x^2+y^2}{2\sigma^2}\right) 
 
 % Lindeberg98 edges found by second and third derivatives
 % second derivative = laplacian
-%Se $f(x)$ som lysintensitet per pixel (hvor $x$ er pixelposition i vandret plan), og $f'(x)$ som gradient, mens den anden afledte; $f''(x)$ er ændringen i ændringen
 
 
-
-
-\subsection{Houghlinier}
+\subsubsection{Houghlinier}
 
 \begin{figure}
   \centering
@@ -837,29 +928,59 @@ Figur~\ref{fig:derivatives} illustrerer et eksempel hvor lysintensitet ($f(x)$) 
 }
   \label{fig:polar2cartesian}
 \end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
-That is it maybe
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%
-%%%%     Resultater - section
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distance-measurererererererere} % Thomas
+Hvad vil vi vise, afvise teste?
+Hvad kan/skal resultatet bruges til?
+Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+Hvad var resultatet?
+perspektiver, hvad skal / kan vi bruge den nye viden til?
+Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
 
-\section{Resultater}
+Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
+
+Algoritme integration over afstand
+
+Test, hvor virker det godt hvor er det problematisk
+reference til Parrots egen artikle herom; hastighed udledning bundkamera hvis muligt ellers udledning af accelerometer.
+
+\subsection{Inhibition/subsumtion} % Morten
+Hvad vil vi vise, afvise teste?
+Hvad kan/skal resultatet bruges til?
+Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+Hvad var resultatet?
+perspektiver, hvad skal / kan vi bruge den nye viden til?
+Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+
+\todo{avoid silhouet}, \todo{low battery}
+Task, silhuet, batteri, at skifte kamera forfra til underside - problematisk.
+
+\subsection{Erkendelse af miljø...}
+Hvad vil vi vise, afvise teste?
+Hvad kan/skal resultatet bruges til?
+Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+Hvad var resultatet?
+perspektiver, hvad skal / kan vi bruge den nye viden til?
+Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+
+Korridor (Hopper) vs. Åbent område (Zuse)
+Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi kan nå at måle afstande foran i optisk flow...
+
 
 \pagebreak
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%
 %%%%     Konklusion - section
-%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Konklusion}
 
+\section{Perspektivering}
+
+\section{Fremtidig arbejde}
 \pagebreak
 
 
@@ -867,8 +988,6 @@ That is it maybe
 
 \bibliographystyle{abbrv}
 \bibliography{referencer}
-
-\section{Appendix header A}
 
 \section{AT kommandoer}
 \label{sec:at}
@@ -907,6 +1026,8 @@ kontrollere AR.Dronen.
   \label{tab:kommandoer}
 \end{table} 
 
+\section{Medfølgende CD / internet}
+\todo{Readme} Hvad skal læseren gøre, hvad er tilgængeligt
 
 
 \end{document}

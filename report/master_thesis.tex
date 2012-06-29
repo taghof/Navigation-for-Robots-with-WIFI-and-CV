@@ -8,15 +8,20 @@
 \usepackage{listings}
 \usepackage{natbib}
 \usepackage{titleref}
+\usepackage{bm}
+\usepackage{amssymb,amsmath}
+%\usepackage{url}
 
 \begin{document} 
 \newenvironment{nb}
    {\begin{framed}\begin{quotation}}
    {\end{framed}\end{quotation}}
 %\newcommand{\oversaet}[1]{(\textit{#1})}
-\newcommand{\uri}[1]{#1}
+\newcommand{\uri}[1]{ #1 }
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\todo}[1]{\textbf{#1}}
+\newcommand{\dronen}[1]{#1}
+\newcommand{\drone}[0]{AR.\ $\!$Drone}
 
 \title{Master Thesis}
 \author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
@@ -83,7 +88,7 @@ Antagelser, problemdomæne formuleret i introduktionen sektion \ref{sec:introdukt
 - hvilke værktøjer vil vi tage i brug AR.Dronen, PC, joystick/controller, Python, => hvorfor, argumentation.
    tage AR.Dronen gå fra at bruge den som en fjernstyrbar enhed til at gøre den til en næsten selvstændig semi autonom enhed.
 
-- hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det(relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
+- hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det (relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
 
 -Hvordan vil vi faktisk teste vores tese? - arbejde går imod at lave en testopstilling, hvad skal der til for at opstillingen virker? framework, processor-kraft båndbredde
 
@@ -101,7 +106,8 @@ Højniveau?:
 \section{AR.Drone}
 \label{sec:AR.Drone}
 AR.Drone er en quadrokopter fremstillet og udviklet af det franske
-firma Parrot\cite{electronic:parrot}\cite{electronic:wiki_parrot}. En quadrokopter benytter fire faste rotorer til at
+firma Parrot \cite{electronic:parrot, electronic:wiki_parrot}.%\cite{electronic:parrot} \cite{electronic:wiki_parrot}.
+ En quadrokopter benytter fire faste rotorer til at
 generere opdrift, samt til at styre sin bevægelse i rummet.%\\
 
 AR.Drone blev introduceret i 2010 som ``the Flying Videogame'' og
@@ -115,8 +121,8 @@ ombygge.%\cite evt. flere som har brugt AR.Dronen i deres forsøg
         %forskning, bl.a. LUDEP. 
 
 Parrots quadrokopter kommer med et sæt sensorer bestående af to kameraer; et vertikalt 
-nedadrettet og et horisontalt fremadrettet, en højdemåler, et gyroskop%(til at måle hældning, krængning og drejning)<- senere detalje, her kun intro
-, samt et accelerometer. I 2012 ventes en opdateret udgave af AR.Drone. Den nye version tilføjer yderligere et kamera i høj opløsning (HD),
+nedadrettet og et horisontalt fremadrettet, en højdemåler, et gyroskop %(til at måle hældning, krængning og drejning)<- senere detalje, her kun intro
+, samt et accelerometer. I 2012 ventes en opdateret udgave af AR\.Dronen. Den nye version tilføjer yderligere et kamera i høj opløsning (HD),
 en trykmåler (digitalt barometer) og et kompas til platformen.
 
 AR.Drone er opbygget som en letvægtskonstruktion af kulfiber, plast og
@@ -189,7 +195,7 @@ Den centrale beregnerenhed på AR.Dronen er en ARM9 $468 MHz$
 processor (Parrot 6 ARM926EJ) med $128 Mbyte$ DDR RAM til 
 arbejdshukommelse og $128 Mbyte$ NAND flash til persistent (vedvarende) hukommelse.
 
-Til den embeddede computer er der et integreret trådløst netværkskort(Atheros AR6102G-BM2D) til wifi. 
+Til den embeddede computer er der et integreret trådløst netværkskort (Atheros AR6102G-BM2D) til wifi. 
 
 På undersiden af quadrokopteren er der et 7 benet molex-stik til ekstern serialkommunikation. Porten virker bl.a. som en On-The-Go USB-port, der primært anvendes ved opdateringer.
 
@@ -347,7 +353,7 @@ indeholder blandt andet
 \end{itemize}
 \uri{Program.elf} modtager kommandoer fra brugeren gennem en User
 Datagram Protocol\cite{rfc768} (UDP) port. Kommunikationsinterfacet
-mellem bruger og quadrokopteren beskrives i
+mellem bruger og quadro\-kopteren beskrives i
 afsnit~\ref{ssec:kommunikation}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -360,22 +366,25 @@ afsnit~\ref{ssec:kommunikation}.
 %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Kommunikation mellem AR.Dronen og en klient-enhed}
+\subsection{Kommunikation mellem \drone{}n og en klient-enhed}
 \label{ssec:kommunikation}
-Interaktion med de programmer der kører på AR.Dronens linux-platform kan kategoriseres i 3 grupper:
+Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan kategoriseres i 3 grupper:
 \begin{itemize}
   \item Som klient (PC, smartphone eller lignende) via Telnet eller
-    FTP\cite{rfc959} over trådløst netværk til AR.Dronen, hvor AR.Dronen fungere som server.
+    FTP\cite{rfc959} over trådløst netværk til AR.\ $\!$Dronen, hvor AR.\ $\!$Dronen fungere som server.
   \item Ved at eksekvere en applikation på en klient (PC, smartphone
     eller lignende) der sender og modtager UDP-pakker og
     AT-kommandoer\footnote{AT(tention)-kommandoer over trådløst netværk (gennemgåes nærmere i
       sektion \ref{sssec:atinterface}}) til det kørende firmware
-    \uri{program.elf} på AR.Dronen. 
+    \uri{program.\ $\!$elf} på AR.\ $\!$Dronen.
   \item Ved at eksekvere et program der kører
-    og kommunikerer internt på AR.Dronen. Programmet kommunikerer med
-    AR.Dronens firmware \uri{program.elf} gennem de tre UDP-porte der
+    og kommunikerer internt på AR.\ Dronen.
+    Programmet kommunikerer med
+    AR.\ $\!$Dronens firmware \uri{program.\ $\!$elf} gennem de tre UDP-porte der
     også anvendes ved almindelig trådløs kommunikation.
 \end{itemize}
+
+$4 \dot 3$
 
 \subsubsection{TCP baseret kommunikation}
 \label{sssec:tcp}
@@ -421,14 +430,14 @@ figur \ref{fig:atsyntaks}.
 \caption{Syntaksen for en AT-kommando; [kommandonavn] kan f.eks. være
   \code{PCMD}. [sekvensnummer]-heltallet skal være stigende for hver
   ny afsendt AT-besked. Listen med argumenter; [arg1, arg2 ... argN],
-  variere i antal afhægig af konteksten. Ved afsending af en
+  variere i antal afhængig af konteksten. Ved afsending af en
   \code{PCMD}-kommando skal der medsendes 5 talværdier for hhv. flag,
   roll, pitch, gas og yaw.} 
 \label{fig:atsyntaks}
 \end{figure}
 
 Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer
-man hvorledes AR.Dronen skal bevæge sig ved translation og rotation,
+man hvorledes AR.\ $\!$Dronen skal bevæge sig ved translation og rotation,
 som beskrevet i \titleref{ssec:fysik} sektion \ref{ssec:fysik}. 
 
 \begin{figure}
@@ -500,7 +509,7 @@ En elaboreret tekst omkring hvad man kan sige af pro et con omkring AR.Dronen so
 %skal sende pakken igen.
 
 
-\section{Introduktion til styring af AR.Drone med Python}
+\section{Introduktion til styring af AR.\ $\!$Drone med Python}
 \subsection{AT-kommando Python interface}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
@@ -541,7 +550,7 @@ Metoden \code{square()} der kaldes i eksemplet i figur~\ref{fig:pythoninterpex1}
 lader AR.Dronen lette, flyve rundt i en firkant og for herefter at
 lande igen(under antagelse af at klientcomputeren er forbundet med AR.Dronens
 trådløse netværk). Bevægelsesmønstret opnåes ved at der kaldes en
-metode(take\_off, move eller land) på kontrolinterfacet, hvorefter der er en pause
+metode(\code{take\_off}, \code{move} eller \code{land}) på kontrolinterfacet, hvorefter der er en pause
 før den næste metode kaldes. Metodekaldende oversættes af interfacet til
 AT-kommandoer og sendes så som UDP-pakker til AR.Dronens
 kommandoport. Den konkrete implementation af \code{square()} ses i
@@ -561,7 +570,7 @@ def square():
     c.start()
 
     print 'taking off'
-    c.take\_off()
+    c.take_off()
     time.sleep(5.0)
     print 'moving Forward'
     c.move(0.0, 0.2, 0.0, 0.0, True)
@@ -586,15 +595,16 @@ def square():
 \end{figure}
 
 \section{Vores systems kommunikation med AR.Dronen} %Brugerens interaktionsmuligheder med systemet}
-Som nævnt i sektion~\ref{SEKTIONNOGET} kanaliserer vores system al
+Som nævnt i sektion~\todo{\\ref{SEKTIONNOGET}}
+ kanaliserer vores system al
 kontrolkommunikation med dronen gennem kontrolinterfacet, i praksis er
 det dog ikke anvendeligt at brugeren skal afvikle scripts, der anvender
 kontrolinterfacet, for hver ønsket bevægelse(som det ses i
 figur~\ref{fig:pythonimpl1}), i stedet har vi implementeret
-moduler(controllere) til at tage mod input fra brugeren. Vi 
+moduler (controllere) til at tage mod input fra brugeren. Vi 
 har tre inputmuligheder: En keyboardcontroller der lytter efter input
 fra tastaturet, en joystickcontroller der er tilknyttet en fysisk
-Xbox360-controller samt en autocontroller der kan initiere og afslutte
+Xbox360-controller (se figur~\ref{fig:xboxlayout}) samt en autocontroller der kan initiere og afslutte
 givne opgaver. 
 
 Vi har mulighed for at starte systemet op med alle
@@ -607,13 +617,13 @@ være nogen mulighed for at bringe AR.Dronen manuelt ned.
 
 \subsection{Opbygningen af det grundlæggende controllermodul}
 Alle tre controllermoduler nedarver fra en grundlæggende
-controllerklasse(Controller), denne er implementeret som en tråd der med et givent
-tidsinterval kalder en kontrolmetode(process_events()). Denne simple
+controllerklasse (Controller), denne er implementeret som en tråd der med et givent
+tidsinterval kalder en kontrolmetode(\code{process\_events()}). Denne simple
 opbygning betyder, at hvis man ønsker at implementere en anden type
 controller, er det nok at nedarve Controller og implementere
-process_events() metoden. Da python behandler metoder som
+\code{process\_events()} metoden. Da python behandler metoder som
 førsteklasses objekter, er det let at lade en controller skifte mellem
-forskellige tilstande, dette gøres ved at kalde \code{set_control_method} med
+forskellige tilstande, dette gøres ved at kalde \code{set\_control\_method} med
 en ny kontrolmetode som argument. 
 
 \subsection{Joystickcontroller}
@@ -665,7 +675,7 @@ joystick- og keyboardcontrollerne arbejder autocontrolleren ikke
 direkte med kontrolinterfacet. Autocontrollerens opgave er at starte
 forudspecificerede opgaver(tasks) og stoppe dem igen hvis det er nødvendigt 
 
-\section{Introduktion til modtagelse af video-, navigations- og wifi-data fra AR.Dronen}
+\section{Introduktion til modtagelse af video\-, navigations\- og wifi\-data fra AR.\ $\!$Dronen}
 For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
 indsamle data fra de ombordværende sensorer, samt at kunne stille
 disse data til rådighed for andre dele af systemet. Til dette formål
@@ -678,29 +688,32 @@ afkodning af pakken og den afkodede data deles med processen der
 startede receiveren. De tre receivere er ikke
 afhængige af hinanden og kan afvikles hver for sig, ligeledes kan vi
 vælge at afvikle vores samlede system med en eller flere receivere
-tilkoblet(hvilket dog vil resultere i begrænset
-funktionalitet). Sektion~\ref{subsection:receiver} giver et eksempel
+tilkoblet (hvilket dog vil resultere i begrænset
+funktionalitet). %Wut? begrænset?
+ Sektion~\ref{subsection:receiver} giver et eksempel
 på hvordan man lettest anvender videoreceiveren, til at modtage og vise
 et enkelt billede fra AR.Dronens videostrøm. Anvendelsen af de to
 andre receivere foregår på fuldstændig samme måde som videoreceiveren,
 den eneste forskel er typen af data der returneres. 
 
 \subsection{Eksempel på anvendelse af videoreceiveren}
+\label{subsection:receiver}
 Eftersom vores videoreceiver kan anvendes for sig selv, vises her et
 eksempel på hvor få linier kode man behøver for at modtage og vise et
 billede fra AR.Dronens kamera. Eksemplet antager som tidligere, at der
 allerede er oprettet en virkende forbindelse med AR.Dronens trådløse
-netværk, og startes fra Pythons kommandopromt.  
+netværk. Eksemplet startes fra Pythons kommandopromt.  
 \begin{figure}[ht]
   \begin{framed}   
     \begin{verbatim}
 >>> import examples as e
->>> e.receive\_and\_show\_picture()
+>>> e.receive_and_show_picture()
     \end{verbatim}
   \end{framed}
 \caption{Import og afvikling af simpelt videoreceiver-eksempel i pythonfortolkeren}
 \label{fig:pythoninterpex2}
 \end{figure}
+
 Som det ses på figur~\ref{fig:pythonimpl2} kræver det tre liniers reel
 kode for at modtage et billede(og endnu fire for at vise det), vi
 mener at dette fint illustrerer, hvordan vi med dette abstraktionslag kan
@@ -709,14 +722,14 @@ sensoroutput.
 \begin{figure}[ht]
   \lstset{language=Python, frame=single}
   \begin{lstlisting}
-def receive\_and\_show\_picture():
+def receive_and_show_picture():
     import receivers, settings, time
     import cv2.cv as cv
    
-    video\_sensor = receivers.VideoReceiver(settings.VIDEO_PORT)
-    video\_sensor.start()
+    video_sensor = receivers.VideoReceiver(VIDEO_PORT)
+    video_sensor.start()
     time.sleep(1)
-    pic = video\_sensor.get_data()
+    pic = video_sensor.get_data()
       
     cv.StartWindowThread()
     win = cv.NamedWindow('win')
@@ -724,7 +737,7 @@ def receive\_and\_show\_picture():
     cv.WaitKey()
     cv.DestroyWindow('win')
 
-    video\_sensor.stop()
+    video_sensor.stop()
 
   \end{lstlisting}
   \caption{Python implementation der importerer og anvender
@@ -733,11 +746,95 @@ def receive\_and\_show\_picture():
 \end{figure}
 
 
-\label{subsection:receiver}
+
 
 
 \section{Optisk flow navigation}
+\todo{fedt hvis vi kan nå at lave det...}
+
+
+
+\section{Korridors forsvindingspunkt}
 Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra vi har fået inspiration.
+finde edges -> finde houghlines -> sortere linier (diagonale)
+-> finde skæringspunkter blandt diagonale linier, tælle område med
+flest skæringspunkter
++augmenter med phi
+
+
+\subsection{At finde kanter i et billede}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/kant_detektering1a.png}
+  \caption{Graf over rød-, grøn-, blå-farveværdier for en linie i
+    billedet med pixel indeks $j=67,\ i=\{0,1,\ldots,320-1 \}$. Samt
+    pixel intensitet, her givet ved summen af de tre farver for $i$ og
+    $j$. Der hvor grafens hældning er stejl er der stor sandsynlighed for en
+    kant i billedet.}
+  \label{fig:kanter1}
+\end{figure}
+
+Kanter i et billede defineres som abrupt skift i farveværdi eller lysintensitet lokalt mellem
+naboer af pixels\footnote{Man kan også lede efter kanter globalt (se f.eks.\newline
+  \uri{http://en.wikipedia.org/wiki/Step\_detection\#Global}), men det
+  er en anden tilgang. I dette afsnit beskrives en metode der søger lokalt.}. Kanter er ofte en
+indikator for eksistensen af bl.a. ændringer i dybden af et billede og for
+overfladeændringer m.fl.
+
+Figur~\ref{fig:kanter1} illustrerer hvordan ændringerne i intensitet imellem tilstødende billedpunkter (pixel) kan ses som en graf af højder. De steder hvor der er stor højdemæssig afstand, altså hvor hældningen er stejl, er der som oftest en kant at finde. 
+
+Cannyfilteret\cite{Canny1986}, som er en af de metoder vi bruger, tager et billede og returnere et binært billede (sort/hvid). Hvide billedpunkter indikere at der er en kant i det oprindellige billede, mens sort betyder at der ikke er ændringer. Cannyfilteret bruger gradienten som skrives
+\begin{equation}
+  \label{eq:edge_slope}
+  %\bigtriangledown
+  \bm{J} = \bigtriangledown I (\bm{x} ) = \left(\frac{ \partial I }{ \partial x }, \frac{
+    \partial I }{ \partial y }\right)(\bm{x})
+\end{equation}
+og er ændringen i intensiteten i $x$ og i $y$ retningen. Udfra denne fåes magnituden og orienteringen af gradienten som
+\begin{equation}
+  \label{eq:gradient}
+  \begin{split}
+  G &= \sqrt{ G_x^2 + G_y^2 }\\
+  \theta &= \arctan \left( \frac{G_y}{G_x} \right)\\
+  \text{ hvor } G_x & = \frac{ \partial I }{ \partial x } \text{ og } G_y \frac{\partial I }{ \partial y }
+  \end{split}
+\end{equation}
+Cannyfilterets arbejde besværliggøres af støj i rå billeder. Støjen introducerer fejl i lokationsestimatet for kanterne. En reducering af støjen kan fortages forinden eller imens beregning af hældning
+foregår. Specielt i tilfældet med AR.Dronens ringe kamera vil det give et bedre slutresultat at bruge et båndpasfilter til at lave en ``udglatning'' af billedet. Udglatningsoperationen udføres med et gaussisk filter\footnote{Fra billedbehandlingsprogrammer som Photoshop og GIMP hedder det ``Gaussian blur'' filter.} (en klokkegraf).
+%convolution oversat til dansk; en foldning. = sliding window (gauss bruges sådan)
+
+Gradienten af gauss-udglatningen convoleres på billedets pixelintensiteter og skrives som
+\begin{equation}
+  \label{eq:gauss_edge_slope}
+  \bm{J}_{\sigma} = \bigtriangledown [ G_{\sigma} (\bm{x} ) \times I
+    (\bm{x} ) ] = 
+     [ \bigtriangledown G_{\sigma} ] (\bm{x} ) \times I (\bm{x} )
+\end{equation}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.90\textwidth]{grafik/derivatives.png}
+  \caption{Se $f(x)$ som lysintensitet per pixellokation $x$. $f'(x)$ og $f''(x)$ er den hhv. første- og anden- afledte. Når $f''(x)$ skærre med nul har $f(x)$ den største hældning.
+Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivatives.gif}}
+  \label{fig:derivatives}
+\end{figure}
+
+Figur~\ref{fig:derivatives} illustrerer et eksempel hvor lysintensitet ($f(x)$) per pixelposition $x$ går fra lav værdi til høj værdi. Kanten skal findes i skiftet hvor $f(x)$ går mellem at være tiltagende til at være aftagende; der er den største ændring (mest abrupt). Er gradienten, altså ændringen i punktet ($f'(x)$) over en hvis værdi (threshold) antages der at være en kant i området. I gradienten kan man begynde at lede efter lokale optimum; hvor der er lokalt optimum er der som sagt en kant. Det originale cannyfilter kan udbygges med brugen af den anden afledtes skærring med 0, som skrives
+\begin{equation}
+  \label{eq:gradient2gauss}
+  \bigtriangledown ^2 G_{\sigma} (\bm{x} ) = \frac{1}{\sigma ^3} \left( 2 - \frac{x^2 + y^2}{2 \sigma ^2} \right) \exp 
+  \left( - \frac{x^2 + y^2}{2 \sigma ^2} \right) 
+\end{equation}
+
+% Lindeberg98 edges found by second and third derivatives
+% second derivative = laplacian
+%Se $f(x)$ som lysintensitet per pixel (hvor $x$ er pixelposition i vandret plan), og $f'(x)$ som gradient, mens den anden afledte; $f''(x)$ er ændringen i ændringen
+
+
+
+
+\subsection{Houghlinier}
 
 \begin{figure}
   \centering

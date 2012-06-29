@@ -27,11 +27,16 @@ def findCorridorVanishPoint(img_a, y_tilt, from_main=False):
     #gray = numpy.asarray(cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY))
     #gray = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY)
     #gray = numpy.asarray(img_a)
-    gray = cv.fromarray(img_a)
+    #gray = cv.fromarray(img_a)
     #gray = img_a
 
+    #if 2 < len(img_a.shape) and img_a.shape[2] < 1:
+    gray = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY)
+    #dst = cv.CreateMat(h, w, cv.CV_8UC1) #cv2.cv.cvmat
+    gray = cv.fromarray( gray )
     #dst = cv2.Canny( gray, 50, 200, 3 )
-    cv.Canny( gray, dst, 50, 200, 3 )
+    cv.Canny( gray, gray, 50, 200, 3 )
+    dst = gray
     #dst = cv2.Canny(img_a, 50, 200, 3)
     storage = cv.CreateMemStorage(0)
     lines = cv.HoughLines2(dst, storage, cv.CV_HOUGH_STANDARD, 1, math.pi/180, 100, 0, 0)

@@ -40,6 +40,90 @@ import pdb
 
 d2r = (math.pi/180.0) # ratio for switching from degrees to radians
 
+# class AutoControl(Controller):    
+
+
+#     def __init__(self, drone):
+#         Controller.__init__(self, drone)
+#         self.drone = drone
+#         self.navdata_sensor = drone.get_navdata_sensor()
+#         #self.wifi_sensor = drone.get_wifi_sensor()
+#         self.video_sensor = drone.get_video_sensor()
+#         self.id = settings.AUTOCONTROL
+#         self.name = "Auto Controller"
+        
+#         self.unstarted_tasks = []
+#         self.active_tasks = []
+        
+#         self.lock = threading.Lock()
+
+#     def process_events(self):
+#         self.lock.acquire()
+                        
+#         for task in self.unstarted_tasks:
+#             task.start()
+#             self.unstarted_tasks.remove(task)
+#             self.active_tasks.append(task)
+#             print self.active_tasks, '\r'
+#         self.lock.release()
+
+#         if self.control_button is not None:
+#             return self.control_button.get_active()
+#         else:
+#             return not self.stopping
+
+#     def kill_tasks(self):
+#         self.lock.acquire()
+#         for task in self.active_tasks:
+#             print 'killing: ', task, '\r'
+#             task.stop()
+#         self.lock.release()        
+       
+#     def stop(self):
+#         Controller.stop(self)
+#         self.kill_tasks()
+
+#     def task_done(self, caller):
+#         print 'top level stopped: ', caller, '\r'
+#         self.active_tasks.remove(caller)
+
+#     def start_task_gui(self, widget=None):
+#         #self.lock.acquire()
+#         t = tasks.SeqCompoundTask(self.drone, self.task_done)
+#         t.set_conf_5()
+#         self.start_task(t)
+#         #self.unstarted_tasks.append(t)
+#         #self.lock.release()
+
+#     def start_task(self, task):
+#         self.lock.acquire()
+#         if not self.stopping:
+#             self.active_tasks.append(task)
+#             threading.Thread(target=task.run).start() 
+
+#         self.lock.release()
+#         return task
+
+#     def start_task_num(self, num):
+#         if num == 4:
+#             t = tasks.SeqCompoundTask(self.drone, self.task_done, None)
+#             t.set_conf_4()
+#             self.start_task(t)
+#         elif num == 5:
+#             t = tasks.SeqCompoundTask(self.drone, self.task_done, None)
+#             t.set_conf_5()
+#             self.start_task(t)
+#         elif num == 6:
+#             t = tasks.FollowTourTask(self.drone, self.task_done, None)
+#             #t.set_conf_5()
+#             self.start_task(t)
+#         elif num == 3:
+#             t = None#indsaet thomas' task her
+#             #self.start_task(t)
+#         else:
+#             return
+
+
 class Task(object):
     """ The base Task
 
@@ -485,10 +569,10 @@ class SearchTask(Task):
         if self.blob is not None:
             (xpos, ypos), (width, height) = position, size = self.blob
             if width*height > 15:
-                print 'Blob found, stopping movetasks\r'
-                self.interface.move(0.0, 0.0, 0.0, 0.0, True)
-                self.context[1].stop(MoveTask)
-                self.context[0] = position
+                print 'Blob found\r' #, stopping movetasks\r'
+                # self.interface.move(0.0, 0.0, 0.0, 0.0, True)
+                # self.context[1].stop(MoveTask)
+                # self.context[0] = position
                 self.stop()
             else:
                 self.blob = None
@@ -571,26 +655,14 @@ class HoverTrackTask(Task):
     Discrete PID control
     """
 
-    def __init__(self, drone, callback, context, time=10.0, turn_delay=5.0, mode='detect', level=0):
+    def __init__(self, drone, callback, context, time_out=-1.0, mode='detect', level=0):
         Task.__init__(self, drone, callback, context, level)
         self.drone.interface.zap(1)
         self.tracker = None
         self.verbose = False
         self.mode = mode
-
-        self.timer = None
-        if time is not None and time > 0.0:
-            self.timeout = time
-        else:
-            self.timeout = None
-        
-        self.turn_timer = None
-        if turn_delay is not None and turn_delay > 0.0:
-            self.turn_time_delay = turn_delay
-        else:
-            self.turn_time_delay = None
-        self.turn = False
-
+        self.timeout = time_out
+                
         # variables used in calculating the PID output
         self.Kp=2.0
         self.Ki=0.0
@@ -620,70 +692,78 @@ class HoverTrackTask(Task):
         self.data_points = ([],[],[],[],[],[])
         self.point = None
         self.last_errors = utils.DiscardingQueue(20)
+        self.target_position = None
 
     def get_point(self):
         """ returns the positions of the point currently tracked, only relevant for some subtasks. """
         return self.point
 
     def pre_loop(self):
-        self.current_blob = None
+        self.first = True
+        self.current_pos = None
         self.timers = []
-        if self.timeout is not None:
+        if self.timeout > 0.0:
             self.timers.append(threading.Timer(self.timeout, self.stop))
-        if self.turn_time_delay is not None:
-            self.timers.append(threading.Timer(self.turn_time_delay, self.start_turn))
-        
+              
         self.tracker = utils.PointTracker(self.drone.get_video_sensor(), self.drone.get_navdata_sensor())
         self.source_method = self.tracker.track
         
         psi = self.navdata_sensor.get_data().get(0, dict()).get('psi', 0)
         self.set_point_psi = psi + self.psi_offset
-
-        self.set_point_alt = 1950.0
+        self.set_point_alt = 1400.0
 
 
     def loop(self):
         
         if self.mode == 'detect':
-            print 'detecting\r'
+            if self.first:
+                self.first = False
+                self.recover()
+                return
+            #print 'detecting\r'
             self.zaplock.acquire()
             self.interface.zap(1)
             img = self.video_sensor.get_data()
-            while img.shape[1] != 176:
+            while img.shape[1] != 176 and not self.state == settings.STOPPING:
                 img = self.video_sensor.get_data()
             self.zaplock.release()
-            blob = bd.detect_red_blob(img)
+            pos = bd.detect_position(img)
            
             # we have a new blob
-            if blob is not None and self.current_blob is None:
-                (xpos, ypos), (width, height) = position, size = blob
-                if width*height > 15:
-                    print 'Blob found\r'
-                    self.current_blob = blob
-                    self.mode = 'track'
-                    if self.parent is not None:
-                        self.parent.inhibit(self, 1)
-                    self.interface.move(0, 0, 0, 0, False)
-                    self.tracker.init(position, img)
-                    print 'Hovering...\r'
-                    self.t1 = time.time()
-                    for t in self.timers: t.start()
-                else:
-                    blob = None
-                
-            # we detected current blop
-            elif blob is not None  and self.current_blob is not None:
-                pass
-            # we have lost track of blob, next detection will cause track mode 
-            elif not blob:
-                self.current_blob = None
+            if pos is not None:
+                print self.target_position.color, '\r'
+                print pos[2], '\r'
 
+            if pos is not None and self.target_position.color == pos[2]:
+                self.current_pos = pos
+                print 'begin tracking\r'
+                self.mode = 'track'
+                if self.parent is not None:
+                    self.parent.inhibit(self, 1)
+                self.interface.move(0, 0, 0, 0, True)
+                self.tracker.init((pos[0], pos[1]), img)
+                print 'Hovering...\r'
+                self.t1 = time.time()
+                for t in self.timers: t.start()
+           
         elif self.mode == 'track':
-            print 'tracking\r'
             self.interface.zap(1)
             powers = self.update()
             
             if powers is not None and not self.suppressed:
+                # check if we are within error limits
+                if self.error_psi is not None and -0.5 < self.error_psi < 0.5 and self.last_errors.get_avg() <= 20 and self.error_alt <= 20:
+                    if not self.parent is None:
+                        print 'begin detect\r'
+                        self.mode = 'detect'
+                        self.parent.inhibit(self, 0)
+                        self.callback(self)
+                        return
+                    else:
+                        self.stop()
+                        return
+                else:
+                    print 'xy_error: ', self.last_errors.get_avg(), ' (20), alt_error: ', self.error_alt, ' (20), psi_error: ', self.error_psi, ' (+/-0.5)\r'
                 # Use the calculated PID output to actually move
                 if powers[0] == powers[1] == powers[2] == powers[3] == 0.0:
                     self.interface.move(powers[0], powers[1], powers[2], powers[3], False)
@@ -722,26 +802,27 @@ class HoverTrackTask(Task):
 
     def recover(self):
         print 'Lost track, trying to recover\r'
-        self.interface.move(0.0, 0.0, 0.0, 0.0, False)
+        self.interface.move(0.0, 0.0, 0.0, 0.0, True)
         time.sleep(1.0)
-        self.interface.move(0.0, 0.0, 0.2, 0.0, False)
+        self.interface.move(0.0, 0.0, 0.2, 0.0, True)
         while not self.state == settings.STOPPING:
-            if self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0) >= 2500:
-                self.interface.move(0.0, 0.0, 0.0, 0.0, False)
+            print 'searching...\r'
+            if self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0) >= 1500:
+                self.interface.move(0.0, 0.0, 0.0, 0.0, True)
+            else:
+                self.interface.move(0.0, 0.0, 0.2, 0.0, True)
             self.zaplock.acquire()
             self.interface.zap(1)
             img = self.video_sensor.get_data()
             while img.shape[1] != 176:
                 img = self.video_sensor.get_data()
             self.zaplock.release()
-            self.blob = bd.detect_red_blob(img)
-            if self.blob is not None:
-                (xpos, ypos), (width, height) = position, size = self.blob
-                if width*height > 15:
-                    print 'Blob found, done recovering\r'
-                    self.current_blob = self.blob
-                    self.tracker.init(position, img)
-                    return
+            pos = bd.detect_position(img)
+            if pos is not None and self.target_position.color == pos[2]:
+                print 'Position found, done recovering\r'
+                self.current_pos = pos
+                self.tracker.init((pos[0], pos[1]), img)
+                return
 
     def update(self):
         """
@@ -750,15 +831,39 @@ class HoverTrackTask(Task):
         
         currents = self.source_method()
         
-        if currents is None:
-            print 'Currents was None\r'
+        # if currents is None:
+        #     print 'Currents was None\r'
+        #     return None
+
+        self.zaplock.acquire()
+        self.interface.zap(1)
+        tries=0
+        img = self.video_sensor.get_data()
+        pos = None
+        while img.shape[1] != 176 and not self.state == settings.STOPPING:
+            self.interface.zap(1)
+            img = self.video_sensor.get_data()
+        self.zaplock.release()
+
+        pos = bd.detect_position(img)
+        if pos is not None and currents is not None:
+            self.set_point_x = pos[0]
+            self.set_point_y = pos[1]
+        elif currents is not None and currents[0] is not None:
+            self.set_point_x = currents[0]
+            self.set_point_y = currents[1]
+        else:
             return None
-
-        self.point = (currents[0], currents[1])
-        self.set_point_x = currents[0]
-        self.set_point_y = currents[1]
-
+        
+        self.point = (self.set_point_x, self.set_point_y)
+        # print 'point: ', self.point, '\r'
+        # self.point = (pos[0], pos[1])
+        # print 'point: ', self.point, '\r'
+        # print '******\r'
+        #
         alt = currents[5]
+        if alt == 0:
+            alt = 150
         angle_x = currents[2]*d2r
         angle_y = currents[3]*d2r
         psi_angle = currents[4]
@@ -868,12 +973,12 @@ class HoverTrackTask(Task):
 
         PID_alt = self.P_value_alt + self.I_value_alt + self.D_value_alt
 
-        # if PID_y < 0 and vx < 0:
-        #     PID_y = PID_y - (vx/5000)/4
-            #print 'added: ', (vx/5000), ' to y-power\r'
-        # if PID_y > 0 and vx > 0:
-        #     PID_y = PID_y + (vx/5000)
-            #print 'added: ', (vx/5000), ' to y-power\r'
+        if PID_y < 0 and vx < 0:
+            PID_y = PID_y - (vx/5000)/4
+            print 'added: ', (vx/5000), ' to y-power\r'
+        if PID_y > 0 and vx > 0:
+            PID_y = PID_y + (vx/5000)
+            print 'added: ', (vx/5000), ' to y-power\r'
 
         # if PID_x < 0 and vy < 0:
         #     PID_x = PID_x - (vy/5000)/1.5
@@ -897,25 +1002,13 @@ class HoverTrackTask(Task):
         # self.data_points[4].append(PID_x*100)
         # self.data_points[5].append(PID_y*100)
         
-        #print 'xy_error: ', self.last_errors.get_avg(), ' (20), alt_error: ', self.error_alt, ' (20), psi_error: ', self.error_psi, ' (0.5)\r'
-        if self.error_psi is not None and -0.5 < self.error_psi < 0.5 and self.last_errors.get_avg() <= 20 and self.error_alt <= 20:
-            if not self.parent is None:
-                self.mode = 'detect'
-                self.parent.inhibit(self, 0)
-                self.callback(self)
-            else:
-                self.stop()
 
+       
         time_spend = (time.time() - self.t1)
         if (not time_spend > 2.0) or not error_dist <= 50:
             PID_psi = 0
 
         return (PID_x, PID_y, PID_alt, PID_psi)
-
-    def start_turn(self):
-        """ Sets the self.turn flag to true allowing the psi val to corrected """
-        print 'Activating turn\r'
-        self.turn = True
 
     def set_turn(self, degrees):
         self.set_point_psi = (360+(self.set_point_psi + degrees))%360
@@ -1187,11 +1280,7 @@ class FollowTourTask(SeqCompoundTask):
 
         # If no map is supplied load one from file
         if the_map is None:
-            if os.path.isfile('./testdata/map.data'):
-                fileObj = open('./testdata/map.data')
-                self.map = pickle.load(fileObj)
-            else:
-                self.map = map.PosMap()
+            self.map = map.PosMap()
         else:
             self.map = the_map
        
@@ -1211,6 +1300,7 @@ class FollowTourTask(SeqCompoundTask):
 
         if self.current_segment < len(self.tour):
             self.h.set_turn(self.angles[self.current_segment])
+            self.h.target_position = self.tour[self.current_segment][1]
             # self.m.set_mode(self.angles[self.current_segment])
             self.current_segment += 1
             
@@ -1229,13 +1319,14 @@ class FollowTourTask(SeqCompoundTask):
         self.p = ParCompoundTask(self.drone, self.sub_callback, self.context)
         self.p.level = 0
 
-        self.h = HoverTrackTask(self.p.drone, self.setup_next_segment, self.p.context, None, None, mode='detect')
+        self.h = HoverTrackTask(self.p.drone, self.setup_next_segment, self.p.context, None, mode='detect')
+        self.h.target_position = self.tour[0][0]
         self.h.level = 1
 
         self.m = MoveTask(self.p.drone, self.p.sub_callback, self.p.context, None, None, 0.065, 1)
         self.m.level = 0
         self.m.suppressed = True
-        
+        self.m.dep_subtasks.append(MeasureDistanceTask(self.p.drone, self.p.sub_callback, self.p.context))
         self.p.add_subtasks([self.h, self.m])
         
         res.append(self.to)
@@ -1250,48 +1341,26 @@ class FollowTourTask(SeqCompoundTask):
                 current = self.tour[i]
                 next = self.tour[i+1]
 
-                x1 = current[1][1] - current[0][1]
-                y1 = current[1][2] - current[0][2]
+                x1 = current[1].x - current[0].x
+                y1 = current[1].y - current[0].y
                 
-                x2 = next[1][1] - next[0][1]
-                y2 = next[1][2] - next[0][2]
+                x2 = next[1].x - next[0].x
+                y2 = next[1].y - next[0].y
                 
                 dp = x1*x2 + y1*y2
                 
                 turn_angle = (math.atan2(y2,x2) - math.atan2(y1,x1))/d2r
-
-                # print '(',x1, ',', y1, ')\r'
-                # print '(',x2, ',', y2, ')\r'
-                # print '**************\r'
            
             print 'turn angle: ',turn_angle, '\r'
             self.angles.append(turn_angle)
             self.modifiers.append(self.tour[i][2])
-            # use modifiers to start movetasks with different algorithms
-            # modifiers = self.tour[i][2]
-            # t = ParCompoundTask(self.drone, self.sub_callback, self.context)
-            
-            # m = MoveTask(t.drone, t.sub_callback, t.context, None, None, 0.065, 1)
-            # s = SearchTask(t.drone, t.sub_callback, t.context, 4.0)
-            # h = HoverTrackTask(t.drone, self.hover_callback, t.context, None, 3.0, mode='tour')
-            # h.psi_offset = turn_angle
-       
-            # t.level = 0
-            # m.level = 0
-            # s.level = 0
-            # h.level = 1
-            
-            # t.add_subtask(m)
-            # t.add_subtask(s)
-            # t.add_subtask(h)
-            # res.append(t)
-
+           
         return res
 
-    def hover_callback(self, caller):
-        """ Sets the blob/mark coordinate to None after each hover task """
-        self.context[0] = None
-        self.context[2] = None
+    # def hover_callback(self, caller):
+    #     """ Sets the blob/mark coordinate to None after each hover task """
+    #     self.context[0] = None
+    #     self.context[2] = None
 
 class AvoidTask(Task):
     """ AvoidTask

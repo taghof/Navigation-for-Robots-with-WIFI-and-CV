@@ -212,21 +212,35 @@ class KeyboardControl(Controller):
         if ch == 'q':
             self.drone.stop()
         if ch == 'z':
+            print 'Zapping\r'
             self.drone.get_interface().zap()
         if ch == 'f':
+            print 'Flat trimming\r'
             self.drone.get_interface().flat_trim()
         if ch == 'b':
             navdata = self.navdata_sensor.get_data()
             bat   = navdata.get(0, dict()).get('battery', 0)
             print 'Battery: ' + str(bat) + '\r'
+        if ch == 'c':
+            print 'Active tasks:\r'
+            if len (self.auto_control.active_tasks) > 0:
+                for t in self.auto_control.active_tasks: 
+                    print t, '\r'
+            else:
+                print 'No active Tasks\r'
+
         if ch == 't':
+            print 'Current threads:\r'
+            for t in threading.enumerate(): 
+                print t, '\r'
+
+
+        if ch == '1':
             self.auto_control.start_task_num(6)
+        if ch == '2':
+            self.auto_control.start_task_num(3)
         if ch == '3':
             self.auto_control.start_task_num(3)
-        if ch == 'c':
-            print self.auto_control.active_tasks, '\r'
-            print threading.enumerate(), '\r'
-
 
 class ManualControl(Controller):    
 

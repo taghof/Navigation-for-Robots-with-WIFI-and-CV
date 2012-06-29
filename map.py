@@ -1,5 +1,7 @@
 import math
 import pickle
+import settings
+import os
 
 class PosMap(object):
 
@@ -7,34 +9,38 @@ class PosMap(object):
 
         self.verbose = True
         
-        pos1 = ['pos1',1000,1000]
-        pos2 = ['pos2', 2000,1000]
-        pos3 = ['pos3', 2000, 2000]
-        pos4 = ['pos4', 1000, 2000]
-        pos5 = ['pos5', 1000, 3000]
+        saved_map = self.load_map()
+        if saved_map is None:
+            pos1 = Position(1000, 1000, 'pos1', settings.BLUE)
+            pos2 = Position(2000, 1000, 'pos2', settings.GREEN)
+            pos3 = Position(2000, 2000, 'pos3', settings.YELLOW)
+            pos4 = Position(1000, 2000, 'pos4', settings.PURPLE)
+            pos5 = Position(1000, 3000, 'pos5', settings.TURQOISE)
+            self.positions = [pos1, pos2, pos3, pos4, pos5]
+            self.tour = []
+        else:
+            self.positions = saved_map.positions
+            self.tour = saved_map.tour
 
-        self.positions = [pos1, pos2, pos3, pos4, pos5]
         self.distances = self.calc_distances()
-        self.tour = []
 
     def add_pos(self, p):
         i = 1
         stop = False
-    
         while not stop:
             exist = False
             try_name = 'pos' + str(i)
             print try_name
             for pos in self.positions:
-                if pos[0] == try_name:
+                if pos.name == try_name:
                     exist = True
             
             if not exist:
-                p[0] = try_name
+                p.name = try_name
                 self.positions.append(p)
                 stop = True
             i += 1
-
+                   
         print self.positions
 
     def remove_pos(self, p):
@@ -65,7 +71,7 @@ class PosMap(object):
                 if p1 == p2:
                     row.append(0)
                 else:
-                    d = math.sqrt( (p1[1] - p2[1])**2 + (p1[2] - p2[2])**2 )
+                    d = math.sqrt( (p1.x - p2.x)**2 + (p1.y - p2.y)**2 )
                     row.append(d)
             if self.verbose:
                 print row, '\r'
@@ -78,8 +84,28 @@ class PosMap(object):
 
         return self.distances[i1][i2]
 
+    def load_map(self):
+        if os.path.isfile('./testdata/map.data'):
+            fileObj = open('./testdata/map.data')
+            posmap = pickle.load(fileObj)
+            return posmap
+        else:
+            return None
+
     def save_map(self):
         ofile = open("./testdata/map.data", "w")
         pickle.dump(self, ofile)
         ofile.close()
+
+class Position(object):
+
+    def __init__(self, x, y, name='Unnamed pos', color=settings.BLUE):
+        self.x = x
+        self.y = y
+        self.name = name
+        self.color = color
+        self.wifi = None
+
+
+
 

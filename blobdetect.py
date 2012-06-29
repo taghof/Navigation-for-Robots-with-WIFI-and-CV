@@ -1,14 +1,80 @@
 
-import numpy
-import cv2.cv as cv 
+import numpy as np
+import cv2.cv as cv
+import cv2 
 import sys
 import datetime
-
+import settings
 import utils
 
 RED = 0
 GREEN = 1
 BLUE = 2
+
+def detect_color(img):
+
+    pic = cv2.inRange(img, np.asarray((50, 10, 40)), np.asarray((80, 255, 255)))
+    
+    moments = cv2.moments(pic, 0)
+    area = moments.get('m00')
+    if(area > 10000):
+        x = moments.get('m10')/area 
+        y = moments.get('m01')/area
+        print 'green'
+        return (x, y, pic, 'green')
+
+    pic = cv2.inRange(img, np.asarray((97, 10, 40)), np.asarray((116, 255, 255)))
+    
+    moments = cv2.moments(pic, 0)
+    area = moments.get('m00')
+    if(area > 10000):
+        x = moments.get('m10')/area 
+        y = moments.get('m01')/area 
+        print 'blue'
+        return (x, y, pic, 'blue')
+
+    return None
+
+
+def detect_position(img):
+    org = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    pic = cv2.cvtColor(org, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(org, cv2.COLOR_BGR2HSV)
+    thresh_l = cv2.inRange(hsv, np.asarray((0, 10, 30)), np.asarray((15, 255, 255)))
+    thresh_h = cv2.inRange(hsv, np.asarray((172, 10, 30)), np.asarray((180, 255, 255)))
+    thresh = cv2.add(thresh_l, thresh_h)
+    
+    contours,hierarchy = cv2.findContours(thresh ,cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+            #print cv2.contourArea(cnt), '\r'
+        if cv2.contourArea(cnt)>20:
+            [x,y,w,h] = cv2.boundingRect(cnt)
+            if  h > 20 and w > 20:
+                print 'red\r'
+                mini_pic = hsv[(y):(y+h),(x):(x+w)]
+                res = detect_color(mini_pic)
+                if res is not None:
+                    
+                    x = x + res[0]
+                    y = y + res[1]
+                    if res[3] == 'green':
+                        print 'green\r'
+                        color = settings.GREEN
+                    elif res[3] == 'blue':
+                        print 'blue\r'
+                        color = settings.BLUE
+                    elif res[3] == 'yellow':
+                        color = settings.YELLOW
+                    elif res[3] == 'purple':
+                        color = settings.PURPLE
+                    elif res[3] == 'turqoise':
+                        color = settings.TURQOISE
+                                            
+                    return x, y, color, org
+                else:
+                    print 'not red\r'
+    return None
+
 
 def _is_red( img_a, x, y, radius):
     """
@@ -167,7 +233,7 @@ def main(filename = "images/mark3.png", search_step = 3):
         filename = sys.argv[1]
     print "Reads in", filename
 
-    img_array = numpy.asarray( cv.LoadImageM( filename ) )
+    img_array = np.asarray( cv.LoadImageM( filename ) )
 
     if 2 < len(sys.argv):
         search_step = sys.argv[2]
@@ -177,7 +243,7 @@ def main(filename = "images/mark3.png", search_step = 3):
     blob = detect_red_blob( img_array, search_step)
     dt2 = datetime.datetime.now() - dt1
 
-    dba = numpy.asarray( cv.LoadImageM( filename ) )
+    dba = np.asarray( cv.LoadImageM( filename ) )
     if blob is not None:
         (xpos, ypos), (width, height) = position, size = blob
         print " Results:\n  Blob center position (x,y):",position,"\n  Blob size (width, height):", size

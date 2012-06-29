@@ -54,6 +54,10 @@ import array
 import datetime
 import struct
 import sys
+try:
+    import numpypy
+except ImportError:
+    print 'Not using pypy'
 import numpy as np
 import cv2.cv as cv
 
@@ -660,6 +664,8 @@ def read_picture(data):
     t2 = datetime.datetime.now()
 
     return width, height, np.asarray(retarray), (t2 - t).microseconds / 1000000.0
+    #return width, height, retarray, (t2 - t).microseconds / 1000000.0
+    #return retarray
 
 def decode_navdata(packet):
     """Decode a navdata packet."""
@@ -669,7 +675,7 @@ def decode_navdata(packet):
 
     offset = 0
     _ =  struct.unpack_from("IIII", packet, offset)
-    drone_state = dict()
+    drone_state = {} #dict()
     drone_state['fly_mask']             = _[1]       & 1 # FLY MASK : (0) ardrone is landed, (1) ardrone is flying
     drone_state['video_mask']           = _[1] >>  1 & 1 # VIDEO MASK : (0) video disable, (1) video enable
     drone_state['vision_mask']          = _[1] >>  2 & 1 # VISION MASK : (0) vision disable, (1) vision enable */
@@ -700,7 +706,7 @@ def decode_navdata(packet):
     drone_state['com_watchdog_mask']    = _[1] >> 30 & 1 # Communication Watchdog : (1) com problem, (0) Com is ok */
     drone_state['emergency_mask']       = _[1] >> 31 & 1 # Emergency landing : (0) no emergency, (1) emergency */
     
-    data = dict()
+    data = {}#dict()
     data['drone_state'] = drone_state
     data['header'] = _[0]
     data['seq_nr'] = _[2]
@@ -745,15 +751,51 @@ def decode_navdata(packet):
         data[id_nr] = values
     return data
 
-try:
-    psyco.bind(BitReader)
-    psyco.bind(get_block)
-    psyco.bind(get_gob)
-    psyco.bind(get_mb)
-    psyco.bind(inverse_dct)
-    psyco.bind(read_picture)
-except NameError:
-    print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
+# try:
+#     psyco.bind(BitReader)
+#     psyco.bind(get_block)
+#     psyco.bind(get_gob)
+#     psyco.bind(get_mb)
+#     psyco.bind(inverse_dct)
+#     psyco.bind(read_picture)
+# except NameError:
+#     print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
+
+
+# __________  Entry point for stand-alone builds __________
+
+import time
+
+def entry_point(argv):
+    import os
+    if len(argv) > 1:
+        N = int(argv[1])
+    else:
+        N = 200
+    T = time.time()
+    for i in range(N):
+        fname = './testdata/1.dat'
+        d = open(fname, 'r')
+        data = d.read()
+        print 'derp'
+        read_picture(data)
+        d.close()  
+
+    t1 = time.time() - T
+    print "%d iterations, %s milliseconds per iteration" % (N, 1000.0*t1/N)
+    return 0
+
+# _____ Define and setup target ___
+
+def target(*args):
+    return entry_point, None
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        sys.argv.append('1')
+    entry_point(sys.argv)
+    print __doc__
+
  
 # def main():
 #     data = open('testdata/100.dat').read()

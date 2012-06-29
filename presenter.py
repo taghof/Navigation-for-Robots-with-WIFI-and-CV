@@ -52,16 +52,20 @@ import matcher
 class PresenterGui(object):
 
 
-    def __init__(self, drone):
+    def __init__(self, drone=None):
             
         gobject.threads_init()
-
-        self.drone = drone
-        self.sensors = drone.get_sensors()
-	self.wifi_sensor = drone.get_wifi_sensor()
-	self.video_sensor = drone.get_video_sensor()
-	self.navdata_sensor = drone.get_navdata_sensor()
-        self.controller_manager = drone.get_controller_manager()
+        if drone is not None:
+            self.drone = drone
+        else:
+            import drone
+            self.drone = drone.main()
+ 
+        self.sensors = self.drone.get_sensors()
+	self.wifi_sensor = self.drone.get_wifi_sensor()
+	self.video_sensor = self.drone.get_video_sensor()
+	self.navdata_sensor = self.drone.get_navdata_sensor()
+        self.controller_manager = self.drone.get_controller_manager()
 
 	self.show_targets = False
 	self.show_significance = False
@@ -916,3 +920,8 @@ def cv2array(im):
          count=im.width*im.height*im.nChannels) 
   a.shape = (im.height,im.width,im.nChannels) 
   return a 
+
+
+if __name__ == '__main__':
+    presenter = PresenterGui()
+    presenter.show()

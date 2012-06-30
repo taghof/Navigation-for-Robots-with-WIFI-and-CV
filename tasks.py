@@ -40,89 +40,75 @@ import pdb
 
 d2r = (math.pi/180.0) # ratio for switching from degrees to radians
 
-# class AutoControl(Controller):    
+class TaskManager(object):    
 
+    def __init__(self, drone):
+        self.drone = drone
+        self.control_interface = drone.get_interface()
+        self.stopping = False
+        self.active_tasks = []
+        self.lock = threading.Lock()
+    
+    def set_required_runlevel(caller, level):
+        if caller.level >= self.required_runlevel and level <= caller.level:
+            self.required_level = caller.level
+            for t in self.subtasks:
+                if t.level < level:
+                    t.suppress()
+                else:
+                    t.de_suppress()
 
-#     def __init__(self, drone):
-#         Controller.__init__(self, drone)
-#         self.drone = drone
-#         self.navdata_sensor = drone.get_navdata_sensor()
-#         #self.wifi_sensor = drone.get_wifi_sensor()
-#         self.video_sensor = drone.get_video_sensor()
-#         self.id = settings.AUTOCONTROL
-#         self.name = "Auto Controller"
-        
-#         self.unstarted_tasks = []
-#         self.active_tasks = []
-        
-#         self.lock = threading.Lock()
+    def suppress(self):
+        for t in self.active_tasks:
+            t.suppress()
 
-#     def process_events(self):
-#         self.lock.acquire()
-                        
-#         for task in self.unstarted_tasks:
-#             task.start()
-#             self.unstarted_tasks.remove(task)
-#             self.active_tasks.append(task)
-#             print self.active_tasks, '\r'
-#         self.lock.release()
+    def de_suppress(self):
+        for t in self.active_tasks:
+                t.de_suppress()
 
-#         if self.control_button is not None:
-#             return self.control_button.get_active()
-#         else:
-#             return not self.stopping
-
-#     def kill_tasks(self):
-#         self.lock.acquire()
-#         for task in self.active_tasks:
-#             print 'killing: ', task, '\r'
-#             task.stop()
-#         self.lock.release()        
+    def kill_tasks(self):
+        self.lock.acquire()
+        for task in self.active_tasks:
+            print 'killing: ', task, '\r'
+            task.stop()
+        self.lock.release()        
        
-#     def stop(self):
-#         Controller.stop(self)
-#         self.kill_tasks()
+    def stop(self):
+        print "Shutting down " + str(self) + "\r"
+        self.stopping = True
+        self.kill_tasks()
 
-#     def task_done(self, caller):
-#         print 'top level stopped: ', caller, '\r'
-#         self.active_tasks.remove(caller)
+    def task_done(self, caller):
+        print 'top level stopped: ', caller, '\r'
+        self.active_tasks.remove(caller)
 
-#     def start_task_gui(self, widget=None):
-#         #self.lock.acquire()
-#         t = tasks.SeqCompoundTask(self.drone, self.task_done)
-#         t.set_conf_5()
-#         self.start_task(t)
-#         #self.unstarted_tasks.append(t)
-#         #self.lock.release()
+    def start_task(self, task):
+        self.lock.acquire()
+        if not self.stopping:
+            task.parent = self
+            self.active_tasks.append(task)
+            threading.Thread(target=task.run).start() 
 
-#     def start_task(self, task):
-#         self.lock.acquire()
-#         if not self.stopping:
-#             self.active_tasks.append(task)
-#             threading.Thread(target=task.run).start() 
+        self.lock.release()
+        return task
 
-#         self.lock.release()
-#         return task
-
-#     def start_task_num(self, num):
-#         if num == 4:
-#             t = tasks.SeqCompoundTask(self.drone, self.task_done, None)
-#             t.set_conf_4()
-#             self.start_task(t)
-#         elif num == 5:
-#             t = tasks.SeqCompoundTask(self.drone, self.task_done, None)
-#             t.set_conf_5()
-#             self.start_task(t)
-#         elif num == 6:
-#             t = tasks.FollowTourTask(self.drone, self.task_done, None)
-#             #t.set_conf_5()
-#             self.start_task(t)
-#         elif num == 3:
-#             t = None#indsaet thomas' task her
-#             #self.start_task(t)
-#         else:
-#             return
-
+    def start_task_num(self, num):
+        if num == 4:
+            t = SeqCompoundTask(self.drone, self.task_done, None)
+            t.set_conf_4()
+            self.start_task(t)
+        elif num == 5:
+            t = SeqCompoundTask(self.drone, self.task_done, None)
+            t.set_conf_5()
+            self.start_task(t)
+        elif num == 6:
+            t = FollowTourTask(self.drone, self.task_done, None)
+            self.start_task(t)
+        elif num == 3:
+            t = None#indsaet thomas' task her
+            #self.start_task(t)
+        else:
+            return
 
 class Task(object):
     """ The base Task
@@ -142,7 +128,6 @@ class Task(object):
         subtasks and dependant subtasks are left as empty lists to be overridden.
         
         """
-        #threading.Thread.__init__(self)
         self.parent = None
         self.drone = drone
         self.callback = callback
@@ -739,7 +724,7 @@ class HoverTrackTask(Task):
                 print 'begin tracking\r'
                 self.mode = 'track'
                 if self.parent is not None:
-                    self.parent.inhibit(self, 1)
+                    self.parent.set_required_runlevel(self, 1)
                 self.interface.move(0, 0, 0, 0, True)
                 self.tracker.init((pos[0], pos[1]), img)
                 print 'Hovering...\r'
@@ -756,7 +741,7 @@ class HoverTrackTask(Task):
                     if not self.parent is None:
                         print 'begin detect\r'
                         self.mode = 'detect'
-                        self.parent.inhibit(self, 0)
+                        self.parent.set_required_runlevel(self, 0)
                         self.callback(self)
                         return
                     else:
@@ -814,7 +799,7 @@ class HoverTrackTask(Task):
             self.zaplock.acquire()
             self.interface.zap(1)
             img = self.video_sensor.get_data()
-            while img.shape[1] != 176:
+            while img.shape[1] != 176 and not self.state == settings.STOPPING:
                 img = self.video_sensor.get_data()
             self.zaplock.release()
             pos = bd.detect_position(img)
@@ -1044,15 +1029,25 @@ class CompoundTask(Task):
         self.minimum_level = 0
         self.suppressed = False
 
-    def inhibit(self, caller, level):
-        if caller.level >= self.minimum_level:
-            self.minimum_level = level
+    # def inhibit(self, caller, level):
+    #     if caller.level >= self.minimum_level:
+    #         self.minimum_level = level
+    #         for t in self.subtasks:
+    #             if t.level < level:
+    #                 t.suppress()
+    #             else:
+    #                 t.de_suppress()
+
+    def set_required_runlevel(caller, level):
+        if caller.level >= self.required_runlevel and level <= caller.level:
+            self.required_level = caller.level
             for t in self.subtasks:
                 if t.level < level:
                     t.suppress()
                 else:
                     t.de_suppress()
-
+        
+    
     def suppress(self):
         self.suppressed = True
         for t in self.subtasks:
@@ -1303,7 +1298,6 @@ class FollowTourTask(SeqCompoundTask):
             self.h.target_position = self.tour[self.current_segment][1]
             # self.m.set_mode(self.angles[self.current_segment])
             self.current_segment += 1
-            
 
     def create_subtasks(self):
         self.angles = []
@@ -1391,7 +1385,7 @@ class AvoidTask(Task):
                     print 'AVOIDING!!!\r'
                     self.current_blob = blob
                     if self.parent is not None:
-                        self.parent.inhibit(self, 1)
+                        self.parent.set_required_runlevel(self, 1)
                     self.interface.move(0.0, 0.0, 0.5, 0.0, False)
         
         elif blob is not None and self.current_blob is None:
@@ -1402,7 +1396,7 @@ class AvoidTask(Task):
             print 'Blob avoided...\r'
             self.current_blob = None
             if self.parent is not None:
-                self.parent.inhibit(self, 0)
+                self.parent.set_required_runlevel(self, 0)
             self.interface.move(0.0, 0.0, 0.0, 0.0, False)
 
 def get_all_tasks():

@@ -32,6 +32,7 @@ from collections import OrderedDict
 from collections import deque
 
 import cv2.cv as cv
+import cv2
 
 import utils
 import decoder
@@ -111,7 +112,7 @@ class Receiver(multiprocessing.Process):
         #     import sys
         #     sys.exit()
         self.set_status(settings.RUNNING)
-        while l[3] == settings.RUNNING:
+        while l[3] == settings.RUNNING or l[3] == settings.CAPTURE:
             
             inputready, outputready, exceptready = select.select([self.sock], [], [], 1)
 
@@ -212,40 +213,30 @@ class VideoReceiver(Receiver):
 
     def __init__(self, port=settings.VIDEO_PORT):
         Receiver.__init__(self, port)
-        self.display_capture = False
-        self.display_dump = []
-        
+               
     def stop(self):
         Receiver.stop(self)    
-        if self.display_capture:
-            fileObj = open("./pickled_played_video.data", "a")
-            pickle.dump(self.display_dump, fileObj)
-            fileObj.close()
-
+       
     def on_record_sample(self, data):
         
         img = data
-        s = (img.width, img.height)
-        saveimg  = cv.CreateImage (s, cv.IPL_DEPTH_8U, 3)
-        cv.CvtColor(img, saveimg,cv.CV_BGR2RGB)
-        cv.SaveImage("../images/target-image-"+ str(time.time()) + ".png", saveimg)    
-        
-        gray  = cv.CreateImage (s, cv.IPL_DEPTH_8U, 1)
-        canny = cv.CreateImage (s, cv.IPL_DEPTH_8U, 1)
-        cv.CvtColor(img, gray,cv.CV_BGR2GRAY)
-        cv.Canny(gray, canny, 10, 15)
-        
-        li = cv.HoughLines2(canny, cv.CreateMemStorage(), cv.CV_HOUGH_STANDARD, 1, math.pi/180, 100, 0, 0)
+        saveimg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        cv2.imwrite("../images/target-image-"+ str(time.time()) + ".png", saveimg)    
+       
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        canny = cv2.Canny(gray, 10, 15)
+       
+        li = cv2.HoughLines(canny, 1, math.pi/180, 100)#, 0, 0)
               
         p = {}
         coords =  []
-        for (rho,theta) in li:
+        for (rho, theta) in li[0]:
             if theta < 0.04:
                 c = math.cos(theta)
                 s = math.sin(theta)
                 x0 = c*rho
                 y0 = s*rho
-                cv.Line(img,
+                cv2.line(img,
                         ( int(x0 + 1000*(-s)) , int(y0 + 1000*c) ),
                         (int(x0 + -1000*(-s)), int( y0 - 1000*c)),
                         (0,0,255))
@@ -262,29 +253,16 @@ class VideoReceiver(Receiver):
         else:
             target = self.get_target_sample()[2]
             current = self.get_data()
-            comparison = cv.CreateImage ((1, 1), cv.IPL_DEPTH_32F, 1)
-            cv.MatchTemplate(current, target, comparison, cv.CV_TM_CCOEFF_NORMED)#CV_TM_CCORR_NORMED) 
+            comparison = cv2.matchTemplate(current, target, cv.CV_TM_CCOEFF_NORMED)#CV_TM_CCORR_NORMED) 
             res = comparison[0,0]
             return res
 
     def on_request_data(self, data):
         if data:
-            if self.display_capture:
-                self.display_dump.append(data)
             w, h, arr, ti = decoder.read_picture(data)
             return arr
         else:
             return None
-
-    def toggle_display_capture(self):
-        print "toggleDislayCapture\r"
-        if self.display_capture:
-            fileObj = open("./pickled.data", "a")
-            pickle.dump(self.display_dump, fileObj)
-            fileObj.close()
-
-        self.display_capture = not self.display_capture
-
 
 class WifiReceiver(Receiver):
     
@@ -300,7 +278,6 @@ class WifiReceiver(Receiver):
             return None
         else:
             res = self.match_wifi_sample(1, self.target_sample, self.get_data())
-            #print "match score: ", res, "%\r"
             return res
 
     def match_wifi_sample(self, min_match_len, p1, p2):

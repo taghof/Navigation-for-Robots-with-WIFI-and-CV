@@ -41,13 +41,13 @@ class ControllerManager(object):
 
     def __init__(self, drone):
         self.drone = drone
-        auto = AutoControl(self.drone)
-        man = ManualControl(self.drone)
+        #auto = AutoControl(self.drone)
+        man = JoystickControl(self.drone)
         key = KeyboardControl(self.drone)
         self.controllers = []
         self.controllers.append(key)
         self.controllers.append(man)
-        self.controllers.append(auto)
+        #self.controllers.append(auto)
 
     def get_controllers(self):
         return self.controllers
@@ -200,14 +200,14 @@ class KeyboardControl(Controller):
     
     def __init__(self, drone):
         Controller.__init__(self, drone)
-        #self.auto_control = drone.controller_manager.get_controller(settings.AUTOCONTROL)
+        self.task_manager = drone.get_task_manager()
         self.navdata_sensor = drone.get_navdata_sensor()
         self.id = settings.KEYCONTROL
         self.name = "Keyboard Controller"
         self.update_time = 0.05
 
     def process_events(self):
-        self.auto_control = self.drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
+        #self.auto_control = self.drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
         ch = utils.get_char_with_break()
         if ch == 'q':
             self.drone.stop()
@@ -223,8 +223,8 @@ class KeyboardControl(Controller):
             print 'Battery: ' + str(bat) + '\r'
         if ch == 'c':
             print 'Active tasks:\r'
-            if len (self.auto_control.active_tasks) > 0:
-                for t in self.auto_control.active_tasks: 
+            if len (self.task_manager.active_tasks) > 0:
+                for t in self.task_manager.active_tasks: 
                     print t, '\r'
             else:
                 print 'No active Tasks\r'
@@ -236,13 +236,13 @@ class KeyboardControl(Controller):
 
 
         if ch == '1':
-            self.auto_control.start_task_num(6)
+            self.task_manager.start_task_num(6)
         if ch == '2':
-            self.auto_control.start_task_num(3)
+            self.task_manager.start_task_num(3)
         if ch == '3':
-            self.auto_control.start_task_num(3)
+            self.task_manager.start_task_num(3)
 
-class ManualControl(Controller):    
+class JoystickControl(Controller):    
 
 
     def __init__(self, drone):
@@ -251,6 +251,7 @@ class ManualControl(Controller):
         
         self.id = settings.JOYCONTROL
         self.name = "Joystick Controller"
+        self.task_manager = self.drone.get_task_manager()
         if pygame.joystick.get_count() > 0:
             pygame.display.init()
             self.js = pygame.joystick.Joystick(0)
@@ -271,7 +272,7 @@ class ManualControl(Controller):
             return False
 
     def process_events(self):
-        self.auto_control = self.drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
+
         if self.control:
             for e in pygame.event.get(): # iterate over event stack
                 utils.dprint("", 'event : ' + str(e.type))
@@ -303,13 +304,13 @@ class ManualControl(Controller):
                             elif b==1:
                                 self.control_interface.reset() 
                             elif b==2:
-                                self.auto_control.kill_tasks()
+                                self.task_manager.kill_tasks()
                             elif b==3:
-                                self.auto_control.start_task_num(4)
+                                self.task_manager.start_task_num(4)
                             elif b==4:
                                 pass
                             elif b==5:
-                                self.auto_control.start_task_num(6)
+                                self.task_manager.start_task_num(6)
                             elif b==6:
                                 pass
                             elif b==8:
@@ -333,7 +334,7 @@ class ManualControl(Controller):
 
     def stop(self):
         Controller.stop(self)
-        self.control_interface.stop()
+        #self.control_interface.stop()
         pygame.joystick.quit()
         pygame.display.quit()
 

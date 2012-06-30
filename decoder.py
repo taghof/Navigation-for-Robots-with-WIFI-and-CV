@@ -606,56 +606,10 @@ def read_picture(data):
     width, height = get_pheader(bitreader)
     slices = height / 16
     blocks = width / 16
-    
-    #retarray = np.zeros((height, width, 3), np.uint8)
-    #retarray = cv.CreateImage((width, height), 8, 3)
-    #retarray = np.empty((height, width, 3), np.uint8, 'C')
     retarray = cv.CreateMat(height, width, cv.CV_8UC3)
 
     for i in xrange(0, slices):
         get_gob(bitreader, retarray, i, width)
-
-    # total_red = 0
-    # total_green = 0
-    # total_blue = 0
-
-    # pixels = width*height
-
-    # for w in range(width):
-    #     for h in range(height):
-    #         (r, g, b) = retimg[ h, w]
-    #         total_red += r
-    #         total_green += g
-    #         total_blue += b
-
-    # avg_red = total_red / pixels
-    # avg_green = total_green / pixels    
-    # avg_blue = total_blue / pixels
-
-    # #print avg_red, avg_green, avg_blue
-
-    # var_red = 0
-    # var_green = 0
-    # var_blue = 0
-
-    # for w in range(width):
-    #     for h in range(height):
-    #         (r, g, b) = retimg[ h, w]
-    #         var_red += (r-avg_red)**2
-    #         var_green += (g-avg_green)**2
-    #         var_blue += (b-avg_blue)**2
-
-    # var_red = var_red/pixels
-    # var_green = var_green/pixels
-    # var_blue = var_blue/pixels
-    
-    # #print var_red, var_green, var_blue 
-
-    # dev_red = var_red**0.5
-    # dev_green = var_green**0.5
-    # dev_blue = var_blue**0.5
-
-    # print dev_red, dev_green, dev_blue 
 
     bitreader.align()
     eos = bitreader.read(22)
@@ -664,8 +618,6 @@ def read_picture(data):
     t2 = datetime.datetime.now()
 
     return width, height, np.asarray(retarray), (t2 - t).microseconds / 1000000.0
-    #return width, height, retarray, (t2 - t).microseconds / 1000000.0
-    #return retarray
 
 def decode_navdata(packet):
     """Decode a navdata packet."""
@@ -751,18 +703,19 @@ def decode_navdata(packet):
         data[id_nr] = values
     return data
 
-# try:
-#     psyco.bind(BitReader)
-#     psyco.bind(get_block)
-#     psyco.bind(get_gob)
-#     psyco.bind(get_mb)
-#     psyco.bind(inverse_dct)
-#     psyco.bind(read_picture)
-# except NameError:
-#     print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
+try:
+    psyco.bind(BitReader)
+    psyco.bind(get_block)
+    psyco.bind(get_gob)
+    psyco.bind(get_mb)
+    psyco.bind(inverse_dct)
+    psyco.bind(read_picture)
+    #psyco.bind(decode_navdata)
+except NameError:
+    print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
 
 
-# __________  Entry point for stand-alone builds __________
+# # __________  Entry point for stand-alone builds __________
 
 import time
 

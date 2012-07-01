@@ -54,6 +54,10 @@ import array
 import datetime
 import struct
 import sys
+try:
+    import numpypy
+except ImportError:
+    print 'Not using pypy'
 import numpy as np
 import cv2.cv as cv
 
@@ -602,56 +606,10 @@ def read_picture(data):
     width, height = get_pheader(bitreader)
     slices = height / 16
     blocks = width / 16
-    
-    #retarray = np.zeros((height, width, 3), np.uint8)
-    #retarray = cv.CreateImage((width, height), 8, 3)
-    #retarray = np.empty((height, width, 3), np.uint8, 'C')
     retarray = cv.CreateMat(height, width, cv.CV_8UC3)
 
     for i in xrange(0, slices):
         get_gob(bitreader, retarray, i, width)
-
-    # total_red = 0
-    # total_green = 0
-    # total_blue = 0
-
-    # pixels = width*height
-
-    # for w in range(width):
-    #     for h in range(height):
-    #         (r, g, b) = retimg[ h, w]
-    #         total_red += r
-    #         total_green += g
-    #         total_blue += b
-
-    # avg_red = total_red / pixels
-    # avg_green = total_green / pixels    
-    # avg_blue = total_blue / pixels
-
-    # #print avg_red, avg_green, avg_blue
-
-    # var_red = 0
-    # var_green = 0
-    # var_blue = 0
-
-    # for w in range(width):
-    #     for h in range(height):
-    #         (r, g, b) = retimg[ h, w]
-    #         var_red += (r-avg_red)**2
-    #         var_green += (g-avg_green)**2
-    #         var_blue += (b-avg_blue)**2
-
-    # var_red = var_red/pixels
-    # var_green = var_green/pixels
-    # var_blue = var_blue/pixels
-    
-    # #print var_red, var_green, var_blue 
-
-    # dev_red = var_red**0.5
-    # dev_green = var_green**0.5
-    # dev_blue = var_blue**0.5
-
-    # print dev_red, dev_green, dev_blue 
 
     bitreader.align()
     eos = bitreader.read(22)
@@ -669,7 +627,7 @@ def decode_navdata(packet):
 
     offset = 0
     _ =  struct.unpack_from("IIII", packet, offset)
-    drone_state = dict()
+    drone_state = {} #dict()
     drone_state['fly_mask']             = _[1]       & 1 # FLY MASK : (0) ardrone is landed, (1) ardrone is flying
     drone_state['video_mask']           = _[1] >>  1 & 1 # VIDEO MASK : (0) video disable, (1) video enable
     drone_state['vision_mask']          = _[1] >>  2 & 1 # VISION MASK : (0) vision disable, (1) vision enable */
@@ -700,7 +658,7 @@ def decode_navdata(packet):
     drone_state['com_watchdog_mask']    = _[1] >> 30 & 1 # Communication Watchdog : (1) com problem, (0) Com is ok */
     drone_state['emergency_mask']       = _[1] >> 31 & 1 # Emergency landing : (0) no emergency, (1) emergency */
     
-    data = dict()
+    data = {}#dict()
     data['drone_state'] = drone_state
     data['header'] = _[0]
     data['seq_nr'] = _[2]
@@ -752,8 +710,45 @@ try:
     psyco.bind(get_mb)
     psyco.bind(inverse_dct)
     psyco.bind(read_picture)
+    #psyco.bind(decode_navdata)
 except NameError:
     print "Unable to bind video decoding methods with psyco. Proceeding anyways, but video decoding will be slow!"
+
+
+# # __________  Entry point for stand-alone builds __________
+
+import time
+
+def entry_point(argv):
+    import os
+    if len(argv) > 1:
+        N = int(argv[1])
+    else:
+        N = 200
+    T = time.time()
+    for i in range(N):
+        fname = './testdata/1.dat'
+        d = open(fname, 'r')
+        data = d.read()
+        print 'derp'
+        read_picture(data)
+        d.close()  
+
+    t1 = time.time() - T
+    print "%d iterations, %s milliseconds per iteration" % (N, 1000.0*t1/N)
+    return 0
+
+# _____ Define and setup target ___
+
+def target(*args):
+    return entry_point, None
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        sys.argv.append('1')
+    entry_point(sys.argv)
+    print __doc__
+
  
 # def main():
 #     data = open('testdata/100.dat').read()

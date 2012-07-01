@@ -27,14 +27,16 @@ import threading
 
 import controllers
 import receivers
+import tasks
 import utils
 import settings
 import time
 
+
 class Drone(object):
 
 
-    def __init__(self, video, gui, test):
+    def __init__(self, test):
 
 
         if test:
@@ -42,9 +44,7 @@ class Drone(object):
             import testdevice
             self.testdevice = testdevice.TestDevice(False)
 
-
-        self.svideo = video
-        self.sgui = gui
+        self.gui = None
 
         self.sensors = []
         
@@ -59,18 +59,12 @@ class Drone(object):
         
         self.interface = controllers.ControllerInterface()
 
+        self.task_manager = tasks.TaskManager(self)
         self.controller_manager = controllers.ControllerManager(self)
-        if self.sgui:
-            import presenter
-            self.gui = presenter.PresenterGui(self)
-        elif self.svideo:
-            import presenter
-            self.gui = presenter.VideoWindow(self.video_sensor, self.controller_manager.get_controller(settings.AUTOCONTROL), self)#PresenterGui(self)
-        else:
-            self.gui = None
+
             
     def get_sensors(self):
-        return self.sensors
+         return self.sensors
 
     def start(self):
         if settings.TEST:
@@ -82,33 +76,34 @@ class Drone(object):
                 pass
 
         time.sleep(0.2)
-        if self.svideo or self.gui is None:
+        if self.gui is None:
             navdata = self.navdata_sensor.get_data()
             bat   = navdata.get(0, dict()).get('battery', 0)
             print 'Battery: ' + str(bat) + '\r'
         
         self.interface.start()
         self.controller_manager.start_controllers()
-        if self.svideo or self.sgui:
-            self.gui.show()
+               
+    def stop(self, gui_stop=False):
+        if not gui_stop and self.gui is not None:
+            self.gui.stop(None, None)
+            self.gui = None
+            return 0
+                    
+        self.task_manager.stop()
         
-    def stop(self, gui=False):
-        if not gui:
-            if self.svideo or self.sgui:
-                self.gui.stop(None, None)
-                return 0
-
-        self.controller_manager.stop()
-
         for sensor in self.sensors:
             sensor.stop()
         
         self.interface.stop()
         if settings.TEST:
             self.testdevice.stop()
-
+        
+        self.controller_manager.stop()
         return 0
-                
+
+    def get_task_manager(self):
+        return self.task_manager
 
     def get_video_sensor(self):
         return self.video_sensor
@@ -143,13 +138,32 @@ def main():
             gui = True
         elif sys.argv[i] == '-t':
             test = True
-    
+        elif sys.argv[i] == '-m':
+            map = True
+            
     os.system('clear')
 
-    drone = Drone(video, gui, test)
+    drone = Drone(test)
     drone.start()
-    return drone
     
+    if gui:
+        import presenter
+        gui = presenter.PresenterGui(drone)
+        drone.gui = gui
+    
+    elif video:
+        import presenter
+        gui = presenter.VideoWindow(drone)
+        drone.gui = gui
+    elif map:
+        import mapdraw
+        gui = mapdraw.TaskGUI(drone)
+        drone.gui = gui
+    else:
+        gui = None
+       
+    if gui is not None:
+        gui.show()
    
 if __name__ == '__main__':
     main()

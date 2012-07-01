@@ -744,4 +744,4 @@ class PointTracker(threading.Thread):
                 vy      = navdata.get(0, dict()).get('vy', 0)
                 return [self.point[0], self.point[1], phi, theta, psi, alt, vx, vy]
             else:
-                return None
+                return [None, None, phi, theta, psi, alt, vx, vy]

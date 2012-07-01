@@ -759,6 +759,12 @@ udskrevet aktive opgaver på autocontrolleren('c'), til at få udskrevet
 en oversigt over tråde i programmet('t'), samt til at starte opgaver
 på autocontrolleren('1', '2' og '3'). 
 
+\subsection{Autocontroller}
+Autocontrolleren skiller sig ud fra de andre controllere, den nedarver
+stadig samme grundlæggende controllerklasse, men i modsætning til
+joystick- og keyboardcontrollerne arbejder autocontrolleren ikke
+direkte med kontrolinterfacet. Autocontrollerens opgave er at starte
+forudspecificerede opgaver(tasks) og stoppe dem igen hvis det er nødvendigt 
 
 \subsection{Modtagelse af ``sensor''-data fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
 I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og wifi-data fra AR.Dronen.

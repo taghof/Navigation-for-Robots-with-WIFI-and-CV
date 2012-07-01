@@ -52,17 +52,22 @@ import matcher
 class PresenterGui(object):
 
 
-    def __init__(self, drone):
+    def __init__(self, drone=None):
             
         gobject.threads_init()
+        if drone is not None:
+            self.drone = drone
+        else:
+            import drone
+            self.drone = drone.main()
+            self.drone.gui = self
 
-        self.drone = drone
-        self.sensors = drone.get_sensors()
-	self.wifi_sensor = drone.get_wifi_sensor()
-	self.video_sensor = drone.get_video_sensor()
-	self.navdata_sensor = drone.get_navdata_sensor()
-        self.controller_manager = drone.get_controller_manager()
-
+        self.sensors = self.drone.get_sensors()
+	self.wifi_sensor = self.drone.get_wifi_sensor()
+	self.video_sensor = self.drone.get_video_sensor()
+	self.navdata_sensor = self.drone.get_navdata_sensor()
+        self.controller_manager = self.drone.get_controller_manager()
+        self.task_manager = self.drone.get_task_manager()
 	self.show_targets = False
 	self.show_significance = False
 
@@ -96,7 +101,7 @@ class PresenterGui(object):
 	self.radiobutton4.connect("toggled", self.handle_radiobuttons_pressed)
 
 	# The video window
-	self.video_window = VideoWindow(self.video_sensor, self.controller_manager.get_controller(settings.AUTOCONTROL))   	
+	self.video_window = VideoWindow(self.drone)   	
 	self.video_window.hide_on_delete()
 	self.video_window.connect('key_press_event', self.handle_key_pressed) 
 	self.video_window.connect("delete_event", self.toggle_video_window)
@@ -107,8 +112,8 @@ class PresenterGui(object):
 	       "btn3OnClick" : self.toggle_significance,
 	       "btn4OnClick" : self.take_sample,
 	       "btn5OnClick" : self.set_target,
-	       "btn6OnClick" : self.toggle_capture,
-               "btn7OnClick" : self.start_auto_track}
+	       "btn6OnClick" : self.toggle_capture}
+
 	
         self.wTree.signal_autoconnect(dic)
 	gtk.quit_add(0, self.drone.stop, True)
@@ -119,9 +124,7 @@ class PresenterGui(object):
         self.gc = gtk.gdk.GC(self.drawing.window)
         self.white_gc = self.drawing.get_style().white_gc
         self.black_gc = self.drawing.get_style().black_gc
-#        self.load_controllers(self.controller_manager.get_controllers())
         self.radiobutton3.set_active(True)
-        #gobject.timeout_add(200, self.update_navdata, None)
         gtk.main()
 	   
     def stop(self, widget, event=None):
@@ -181,14 +184,7 @@ class PresenterGui(object):
             self.button3.set_active(not self.button3.get_active())
             return True
         self.show_significance = not self.show_significance
-
-    def start_auto_track(self, widget):
-        auto_con = self.controller_manager.get_controller(settings.AUTOCONTROL)
-        if not auto_con is None:
-            auto_con.toggle_mark_search()
-        else:
-            print 'Auto controller not present!'
-
+       
     def handle_radiobuttons_pressed(self, radio):
         if radio.get_active():
             if radio.get_name() == "radiobutton1" and self.wifi_sensor is not None:
@@ -196,9 +192,6 @@ class PresenterGui(object):
             elif radio.get_name() == "radiobutton2" and self.wifi_sensor is not None:
                 gobject.timeout_add(200, self.update_samples, radio)
             elif radio.get_name() == "radiobutton3" and self.navdata_sensor is not None:
-                #print 'started timer\r'
-                #utils.PeriodicTimer(5, 10, self.time_psi).start()
-                #threading.Timer(20, self.time_psi).start()
                 gobject.timeout_add(200, self.update_navdata, radio)
             elif radio.get_name() == "radiobutton4" and self.navdata_sensor is not None and self.wifi_sensor is not None and self.video_sensor is not None:
                 gobject.timeout_add(200, self.update_matching, radio)
@@ -225,10 +218,6 @@ class PresenterGui(object):
         elif keyname == "m":
             self.wifi_sensor.match_current_wifi_sample()
    
-
-
-    def show_map(self, widget):
-        pass
 
     def update_matching(self, widget):
         match_val_video = self.video_sensor.match_target_sample()
@@ -470,6 +459,7 @@ class PresenterGui(object):
         return self.radiobutton1.get_active()
 
     def update_navdata(self, widget):
+        
         if self.navdata_sensor is None:
             print "Navdata sensor not present"
             return False
@@ -499,8 +489,6 @@ class PresenterGui(object):
             cutout  = "FAIL" if navdata.get('drone_state', dict()).get('cutout_mask') else "OK"
             motors  = "FAIL" if navdata.get('drone_state', dict()).get('motors_mask') else "OK"
             coms    = "FAIL" if navdata.get('drone_state', dict()).get('com_lost_mask') else "OK"
-            # navdata.get('drone_state', dict()).get('')
-            # navdata.get('drone_state', dict()).get('')
 
             gc = self.black_gc
             colormap = gtk.gdk.colormap_get_system()
@@ -560,22 +548,6 @@ class PresenterGui(object):
             pixmap.draw_layout(gc, 25, current_y, layout)
             current_y += 25
 
-            # layout.set_text('Ultra sound:\t' + str(us))
-            # pixmap.draw_layout(gc, 25, 150, layout)
-
-
-            # self.gc.set_foreground(color1)
-            # pixmap.draw_rectangle(self.gc, False, int(current_x), int(current_y), 50, 50)
-			
-            # self.gc.set_foreground(color3)
-            # pixmap.draw_rectangle(self.gc, True, int(current_x+1), int(current_y+1), 50, 50)
-			
-            # c = pixmap.cairo_create()
-            # c.set_source_rgba(1,1,1, 0.5)
-            # c.rectangle(int(current_x+1), int(current_y+10), 50, 50)
-            # c.fill()
-	        	
-
         self.drawing.queue_draw()
         return self.radiobutton3.get_active()
 
@@ -595,8 +567,6 @@ class PresenterGui(object):
                                     pixmap, x, y, x, y, width, height)
 	   
         return False
-	
-
 
 class VideoWindow(gtk.Window):
 
@@ -604,21 +574,27 @@ class VideoWindow(gtk.Window):
     video receiver reference in the constructor. The widget holds an image widget for 
     displaying video frames and a handfull of buttons for manipulation(graying, tracking and such)"""
 
-    def __init__(self, video_sensor, autocontrol, drone=None):
+    def __init__(self, drone=None):
         """
         Calls the Window super constructor, inits all the GTK gui elements and 
         hooks up all the signal callbacks"""
 
-        gobject.threads_init()
+       
+        if drone is not None:
+            self.drone = drone
+        else:
+            import drone
+            self.drone = drone.main()
+            self.drone.gui = self
 
-        self.video_sensor = video_sensor
-        self.autocontrol = autocontrol
-        self.drone = drone
+        self.video_sensor = self.drone.get_video_sensor()
+        self.task_manager = self.drone.get_task_manager()
+       
 
         gtk.Window.__init__(self)
         self.set_title("Video Source")
         self.set_position(gtk.WIN_POS_CENTER)
-        self.set_size_request(360, 500)
+#        self.set_size_request(360, 500)
        
         master_vbox = gtk.VBox(False, 5)
         master_vbox.set_border_width( 5 )
@@ -626,45 +602,32 @@ class VideoWindow(gtk.Window):
         
         self.video_image = gtk.Image()
         self.video_image.set_size_request(320, 240)
-        self.video_image.set_alignment(0,0)
+        self.video_image.set_alignment(1,0)
         self.video_eventbox = gtk.EventBox()
         self.video_eventbox.set_size_request(320, 240)
         self.video_eventbox.connect("motion_notify_event", self.motion_notify_event)
         self.video_eventbox.connect("button_press_event", self.button_press_event)
         self.video_eventbox.add(self.video_image)
 
-        self.video_play_button = gtk.ToggleButton("Play Video")
+        self.video_play_button = gtk.ToggleButton("Start/Stop Video")
         self.video_play_button.connect("clicked", self.toggle_video_play)
         self.video_play_button.set_active(True)
-        self.video_capture_button = gtk.ToggleButton("Capture Video")
-        self.video_capture_button.connect("clicked", self.toggle_video_capture)
-
-        self.crosshairs_button = gtk.ToggleButton("Toggle Crosshairs")
-        self.crosshairs_button.connect("clicked", self.toggle_crosshairs)
-
-        self.get_features_button = gtk.ToggleButton("Find Features")
-        self.get_features_button.connect("clicked", self.find_features)
-        
-        self.grayscale_button = gtk.ToggleButton("Toggle Grayscale")
-        self.grayscale_button.connect("clicked", self.toggle_grayscale)
-
-        self.move_button = gtk.ToggleButton("Start Move Task")
-        self.move_button.connect("clicked", self.autocontrol.start_task)
 
         self.photo_button = gtk.Button("Save picture")
         self.photo_button.connect("clicked", self.save_picture)
 
+        self.crosshairs_button = gtk.ToggleButton("Toggle Crosshairs")
+        self.crosshairs_button.connect("clicked", self.toggle_crosshairs)
+        
+        self.grayscale_button = gtk.ToggleButton("Toggle Grayscale")
+        self.grayscale_button.connect("clicked", self.toggle_grayscale)
 
         master_vbox.pack_start(self.video_eventbox, False, False)
         master_vbox.pack_start(self.video_play_button, False, False)
-        master_vbox.pack_start(self.video_capture_button, False, False)
-        master_vbox.pack_start(self.crosshairs_button, False, False)
-        master_vbox.pack_start(self.get_features_button, False, False)
-        master_vbox.pack_start(self.grayscale_button, False, False)
-        master_vbox.pack_start(self.move_button, False, False)
         master_vbox.pack_start(self.photo_button, False, False)
-        #self.video_play_button.show()
-
+        master_vbox.pack_start(self.crosshairs_button, False, False)
+        master_vbox.pack_start(self.grayscale_button, False, False)
+ 
         master_vbox.show_all()
 
         # run flags for showing crosshairs and extracting new features
@@ -675,15 +638,16 @@ class VideoWindow(gtk.Window):
         
         self.connect("destroy", self.stop)#gtk.main_quit)
         self.connect('key_press_event', self.handle_key_pressed) 
-        if not self.drone is None:
-            gtk.quit_add(0, self.drone.stop, True)
 
     def show(self):
         self.init_video()
-        gobject.timeout_add(750, self.run)
+        gobject.timeout_add(200, self.run)
         #gobject.idle_add(self.run)
         gtk.Window.show(self)
-        gtk.main()
+        if not gtk.main_level():
+            gtk.quit_add(0, self.drone.stop, True)
+            gobject.threads_init()
+            gtk.main()
 
     def stop(self, widget, event=None):
         print "Shutting down GUI\r"
@@ -719,9 +683,11 @@ class VideoWindow(gtk.Window):
         self.video_image.set_from_pixbuf(self.input_pixbuf)
         return True
 
-    def print_points(self, tasks):
+    def print_points(self, ptasks):
+        import tasks
         points = []
-        for t in tasks:
+        
+        for t in ptasks:
             if len(t.subtasks) == 0:
                 if isinstance(t, tasks.HoverTrackTask):
                     p = t.get_point()
@@ -738,12 +704,9 @@ class VideoWindow(gtk.Window):
         new image data from the video receiver. As a part of development the method 
         also carries out optical flow tracking of features in 'self.features'."""
 
-        # Get image from video sensor
-        # input_image = self.autocontrol.last_match_image
-        # if input_image is None:
         input_image = self.video_sensor.get_data()
         
-        #points = self.print_points(self.autocontrol.active_tasks)
+        points = self.print_points(self.task_manager.active_tasks)
 
         width = input_image.width if type(input_image).__name__== 'iplimage' else input_image.shape[1]
         height = input_image.height if type(input_image).__name__== 'iplimage' else input_image.shape[0]
@@ -753,8 +716,8 @@ class VideoWindow(gtk.Window):
             
         # If we want to display the grayscale image in gtk we must change back to 3-channels
         if self.show_grayscale:
-            input_image_gray = cv2.cvtColor(input_image, cv.CV_RGB2GRAY)
-            input_image = cv2.cvtColor(input_image_gray, cv.CV_GRAY2RGB)
+            input_image_gray = cv2.cvtColor(input_image, cv2.COLOR_RGB2GRAY)
+            input_image = cv2.cvtColor(input_image_gray, cv2.COLOR_GRAY2RGB)
 
         # Add the target lines if requested
         if self.show_targets:
@@ -770,8 +733,8 @@ class VideoWindow(gtk.Window):
             cv2.line(input_image, (middle_x, middle_y-10), (middle_x, middle_y+10), (255,0,0))
             cv2.line(input_image, (middle_x-10, middle_y), (middle_x+10, middle_y), (255,0,0))
         
-        # for p in points:
-        #     cv2.circle(input_image, (p[0], p[1]), 4, (0,255,0))
+        for p in points:
+            cv2.circle(input_image, (p[0], p[1]), 4, (0,255,0))
 
         incoming_pixbuf = gtk.gdk.pixbuf_new_from_data(
             input_image.tostring(), 
@@ -802,19 +765,8 @@ class VideoWindow(gtk.Window):
             self.stop(widget)
         #     self.toggle_video_window(None)
         elif keyname == "k":
-            self.autocontrol.kill_tasks()
+            self.self.task_manager.kill_tasks()
     
-    def get_features(self, frame):
-        """
-        Extracts features from 'frame' with the opencv SURF algorithm, the extracted
-        features are returned as a list of (x,y) tuples."""
-        print frame
-        (keypoints, descriptors) = cv.ExtractSURF(frame, None, cv.CreateMemStorage(), (0, 20, 3, 1))
-        new_features = []
-        for ((x, y), laplacian, size, dir, hessian) in keypoints:
-            new_features.append((x, y))
-        return new_features
-
     def button_press_event(self, widget, event):
         """
         Mouse callback method. On a left click the method adds the mouse coordinates to the 
@@ -822,10 +774,7 @@ class VideoWindow(gtk.Window):
         if event.button == 1:
             x = int(event.x)
             y = int(event.y)
-            #self.features.append((x,y))
             print "x: ", x, ", y: ", y, "\r"
-            self.autocontrol.kill_tasks()
-            self.autocontrol.start_auto_session((x,y))
         return True
 
     def motion_notify_event(self, widget, event):
@@ -849,14 +798,8 @@ class VideoWindow(gtk.Window):
         Button callback method. Starts or stops updating of the image widget with data 
         from the video feed"""
         if widget.get_active():
-            gobject.timeout_add(25000, self.run)
+            gobject.timeout_add(200, self.run)
             #gobject.idle_add( self.run )
-
-    def toggle_video_capture(self, widget):
-        """
-        Button callback method. Tells the video receiver to stop or start recording the requested frames
-        (only requested frames are recorded)"""
-        self.video_sensor.toggle_display_capture()
 
     def toggle_crosshairs(self, widget):
         """
@@ -873,46 +816,6 @@ class VideoWindow(gtk.Window):
         Button callback method. Toggles whether the run method should draw image as grayscale"""
         self.show_grayscale = not self.show_grayscale
 
-    def find_features(self, widget):
-        """
-        Sets the get_new_features flag so that the run method will extract new 
-        features from the current image and discard the old."""
-        self.get_new_features = True
-
-
-class ControllerWindow(gtk.Window):
-
-    def __init__(self, controllers):
-        gtk.Window.__init__(self)
-        self.set_title("Controllers")
-        self.set_position(gtk.WIN_POS_CENTER)
-        self.set_size_request(360, 500)
-
-        self.controllers = controllers
-       
-        master_vbox = gtk.VBox(False, 5)
-        master_vbox.set_border_width( 5 )
-        self.add( master_vbox )
-
-        for controller in self.controllers:
-            button = gtk.ToggleButton(controller.name)
-            controller.set_control_button(button)
-
-def cv2array(im): 
-  depth2dtype = { 
-        cv.IPL_DEPTH_8U: 'uint8', 
-        cv.IPL_DEPTH_8S: 'int8', 
-        cv.IPL_DEPTH_16U: 'uint16', 
-        cv.IPL_DEPTH_16S: 'int16', 
-        cv.IPL_DEPTH_32S: 'int32', 
-        cv.IPL_DEPTH_32F: 'float32', 
-        cv.IPL_DEPTH_64F: 'float64', 
-    } 
-
-  arrdtype=im.depth 
-  a = np.fromstring( 
-         im.tostring(), 
-         dtype=depth2dtype[im.depth], 
-         count=im.width*im.height*im.nChannels) 
-  a.shape = (im.height,im.width,im.nChannels) 
-  return a 
+if __name__ == '__main__':
+    presenter = PresenterGui()#VideoWindow()#PresenterGui()
+    presenter.show()

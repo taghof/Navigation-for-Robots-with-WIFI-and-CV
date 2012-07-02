@@ -19,7 +19,7 @@
 %\newcommand{\oversaet}[1]{(\textit{#1})}
 \newcommand{\uri}[1]{ #1 }
 \newcommand{\code}[1]{\texttt{#1}}
-\newcommand{\todo}[1]{\textbf{#1}}
+\newcommand{\todo}[1]{\textbf{todo:}(#1)}
 \newcommand{\dronen}[1]{#1}
 \newcommand{\drone}[0]{AR.\ $\!$Drone}
 
@@ -99,7 +99,7 @@ fra semiautonom og navigation er der noget, 1) bevægelse i forskellige miljøer, 
 at det er indendørs giver nogle begrænsninger, kan bestemme et bestemt miljø ala Hopper-gangene / Ada-gangene eller Zuse.
 
 Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
-
+Er det en del af opgaven at se om AR.Dronen er den rigtige platform at lave dette på? - er en konklusion at den er adequate, men at det ville være bedre havde man haft tiden til at lave sin egen, finde en anden???
 
 \subsection{Metode} % Thomas, Hvordan, skal den være en SUBsection eller section?
 \label{sec:metode}
@@ -132,20 +132,22 @@ Nogle bygninger på Katrinebjerg, indendørs...
 \paragraph{Indendørs}
 
 \paragraph{PC-linux}
+afvikling kommunikation, styring hvem er chef / sensor
+
 
 \paragraph{Python}
-
-
-
-%%%% Introduction - Metode
-\subsubsection{Hjælpeværktøjer} % Thomas & Morten
-Python ---
-
-\paragraph{vores Platform}
-selvstående afsnit om; Et værktøj udviklet til hjælp til os. Hvad kan det; hjælp til kontrolbeskeder til fjernstyring, indgang til at modtage datapakker fra AR.Dronen...
-
+platform skrevet i python med bibliotek / wrapper til opencv (ffmpeg), pygame, numpy...
 
 %%%% Introduction - Metode
+\subsubsection{Platform samt hjælpeværktøjer} % Thomas & Morten
+Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. For f.eks. at minimere den tid der går fra at en ide implementeres i kode til aftestning på quadrokopteren, er det muligt at lave scripts (Task) bestående af kun få liniers kode der nemt afvikles på systemet.
+%
+\paragraph{drone.py} -modulet / -klassen er konstrueret for at tage sig af al kommunikationen mellem PC og AR.Dronen. Kommunikationen består i at opretholde forbindelsen, samt modtage datapakker fra quadrokopterens sensor system og at afsende styrekommandoer fra brugeren til AR.Dronen.
+%
+\paragraph{Tasks} er måden at afvikle og teste selvstyrende/kørende opførsel. For at muliggøre manuel støttes, styring og afhjælpning under aftestning kan brugeren anvende PC tastatur og XBox joystick.
+%
+\paragraph{Joystick- og Keyboard-Controller} er den del af platformen som lytter efter bruger input events til manuel styring af AR.Dronen og som input til den grafiske brugergrænseflade (GUI).
+%
 \paragraph{GUI til datarepræsentation}
 
 
@@ -197,7 +199,7 @@ brugerens iPhone eller iPad. Det har siden
 fundet stor anvendelse, ikke blot som et avanceret stykke
 legetøj. Forskere, studerende og hobbyister har taget den fjernstyrede
 quadrokopter til sig som en færdig platform til at udvikle videre
-ovenpå\cite{electronic:ludep} og som platform til selv at
+ovenpå\cite{electronic:ludep, single_img_pespective_cues} og som platform til selv at
 ombygge.%\cite evt. flere som har brugt AR.Dronen i deres forsøg
         %forskning, bl.a. LUDEP. 
 
@@ -529,50 +531,46 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 
 
 \subsection{Vurdering af AR.Dronen som robotplatform} % Thomas,
-En elaboreret tekst omkring hvad man kan sige af pro et con omkring AR.Dronen som platform til udvikling af en flyvende robot.
-
+%En elaboreret tekst omkring hvad man kan sige af pro et con omkring AR.Dronen som platform til udvikling af en flyvende robot.
+\paragraph{Omkring hastighed og inerti}
 Selvom det synes at give mening at beskrive AR.Dronens bevægelser i 3
 dimensioner og deri nemmere at bruge accelerometer- og gyro-målinger
 fra sensorene om bord. Så kan man egentlig ikke sige noget udfra
 accelerometer og gyroer (de tilstedeværende sensore) omkring hvor
 langt AR.Dronen har fløjet eller med hvilken hastighed AR.Dronen
 bevæger sig.
- Man kan udlede estimater for hastigheder ved at integrere over
+ Dog kan der udledes estimater for hastigheder ved at integrere over
 accelerationen, men hastigheden i det horisontale plan er i praksis
 afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch
-værdierne kan være sat til 0 og AR.Dronen vil ligge horisontal, men
+værdierne kan være aflæst til 0 og AR.Dronen vil ligge horisontal, men
 kan stadig godt bevæge sig sideværts i luften\footnote{AR.Dronen siges
-  at være ``trimmet'' (med en konstant hastighed, evt. 0m/S) hvis den
+  at være ``trimmet'' (med en konstant hastighed, evt. 0m/S, men også forskellig fra 0m/S) hvis den
   ikke påvirkes af en resulterende kraft og acceleration dermed er 0}
 på grund af indebåren inerti eller f.eks. en stille konstant
 vind. Bevæger AR.Dronen sig med en konstant hastighed kan det ikke
-aflæses af accelerometeret, afstande AR.Dronen har flyttet sig kan
+aflæses af accelerometeret. Afstande AR.Dronen har flyttet sig kan
 således heller ikke aflæses af accelerometer og gyro alene.
  Dog har Parrot underbygget hastighedsestimatet med en optical-flow
 algoritme på billedstrømmen fra bundkameraet i firmwaren, således at
-denne er blevet noget mere troværdig\cite{velocity_estimation_inside_the_drone}. I dette speciale er der lavet eksperimenter
-med hastighedsudledningen. Eksperimenterne er beskrevet i
-afsnit~\ref{sec:distance-mesu}. Det viser sig at under de rette
-forhold er hastighedsudledningen udmærket brugbar.% todo
-                                % evt. målbar/udmærket? til hvilke formål?
+denne er blevet noget mere troværdig\cite{velocity_estimation_inside_the_drone}.
+Eksperimenter med hastighedsudledning er beskrevet i afsnit~\ref{sec:distance-mesu}. Det viser sig at under de rette
+forhold er hastighedsudledningen udmærket brugbar. Er det derimod ikke muligt for bundkameraet at opfange nok tydelige kendetegn i gulvet, vil hastighedudledningen være fejlbehæftet.
+\paragraph{Ultralydssensor}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.80\textwidth]{grafik/sonardzone2.png}
+  \caption{Udbredelsesområde for ultralydssensorsignal, man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://www.cs.brown.edu/people/tld/courses/cs148/02/sonar.html}).\todo{i referencer?}}
+  \label{fig:sonicbeam}
+%%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg} \uri{http://picaxe.hobbizine.com/srf05.html}) %men det er ikke det samme billede?
+\end{figure}
+Højdemåleren består som sagt en ultralyds sender og modtager, teknologien gør at %specielt i små rum/kontorlokaler, små kasser / borde + turbolens
+ højden ikke er udfra et specifikt punkt, men derimod returnerer den mindste højde indenfor et område som det på figur \ref{fig:sonicbeam2}. Dvs. højden er udledt af den tid der går fra en lydpuls afsendes til der modtages et ekko. Ekkoet behøver ikke komme fra en stor overflade som en væg eller et gulv, men kan være en kasse inde i sensorområdet som figur~\ref{fig:sonicbeam2}.
+Fordi teknologien netop er lyd vil der også være indeboende problemer med ekko på skrånende og bløde overflader. 
+%
+De nævnte problematikker kan have indflydelse ved udvikling med AR.Dronen. Bl.a. andet er det en god ide at have det sig for øje når quadrokopteren hælder meget, ie. ved flyvning i høj hastighed.
 
-%%  Det er værd at bemærke, at højdemåleren ikke måler
-%% højden på et specifikt punkt, men derimod returnerer den mindste højde
-%% i et område som det på figur \ref{fig:sonicbeam}, samt at ultrasoniske
-%% detektorer generelt har problemer med bløde og skrånende overflader%cite?.
-%% \begin{figure}[ht]
-%%   \centering
-%%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg}
-%%   \caption{Udbredelsesområde for ultralydssensorsignal, man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://picaxe.hobbizine.com/srf05.html}).}
-%%   \label{fig:sonicbeam}
-%% \end{figure}
+En kilde hvor det desværre ikke har været muligt at genfinde referencen menes skal have sagt at det operativsystem, styreprogram og de eksterne processer der kører på AR.Dronen tilsammen bruger op mod $80\%$ af CPU-tiden. -- Om det akurat er $80\%$ eller en anden sats vil have indvirkning hvis man vælger at afvikle yderligere processer på AR.Dronen, eg. USB-understøttelse under flyvning og Wifi-signalstyrke indsamling som beskrevet i afsnit~\ref{ssec:wikilokalisering}. Pointen er at man ikke kan bruge mere end de resterende f.eks. $20\%$ uden at det vil gå ud over kontrollen med flyvningen.
 
-%cite hvor
-% nogle siger at program.elf + motorstyring + radio tager op mod $80
-% \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
-
-% evt. +ultralydsting
-%Ifølge Wikipedia.org\cite{electronic:wiki_ar.drone} skal AR.Dronen være i stand til at flyve fremad med en maksimal hastighed på $5 m/sek$ svarende til $18 km/t$.
 
 tradeoff - Billedopløsning eksperiment f.eks. QR-koder kontra hurtig transmission
 %Sammenlignet med TCP opererer UDP med noget mindre
@@ -861,6 +859,7 @@ def receive_and_show_picture():
 \section{Eksperimenter} % Thomas & Morten
 
 \subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
+\label{ssec:wikilokalisering}
 %,skal disse have hver deres egen hovedsektion (istedet for SUBsection)?
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
@@ -892,8 +891,8 @@ perspektiver, hvad skal / kan vi bruge den nye viden til?
 Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
 
 
-\subsection{Optisk flow navigation} % tt
-\todo{fedt hvis det kan nåes at lave det...}
+%\subsection{Optisk flow navigation} % tt
+%\todo{fedt hvis det kan nåes at lave det...}
 
 %\subsection{Korridor vanishpoint}
 \subsection{Korridors forsvindingspunkt} % Thomas
@@ -951,7 +950,7 @@ Tager man alle pixelpositioner hvor den første afledte er over threshold kan man
 \begin{figure}
   \centering
   \includegraphics[width=0.90\textwidth]{grafik/derivatives.png}
-  \caption{Se $f(x)$ som lysintensitet per pixellokation $x$. $f'(x)$ og $f''(x)$ er den hhv. første- og anden- afledte. Når $f''(x)$ skærre med nul har $f(x)$ den største hældning.
+  \caption{Se $f(x)$ som lysintensitet per pixellokation $x$. $f'(x)$ og $f''(x)$ er den hhv. første-- og anden-- afledte. Når $f''(x)$ skærre med nul har $f(x)$ den største hældning.
 Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivatives.gif}}
   \label{fig:derivatives}
 \end{figure}
@@ -1002,7 +1001,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 \todo{avoid silhouet}, \todo{low battery}
 Task, silhuet, batteri, at skifte kamera forfra til underside - problematisk.
 
-\subsection{Erkendelse af miljø...}
+\subsection{Erkendelse af miljø/mode...}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1022,9 +1021,9 @@ Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi ka
 
 \section{Konklusion}
 
-\section{Perspektivering}
+\subsection{Perspektivering}
 
-\section{Fremtidig arbejde}
+\subsection{Fremtidig arbejde}
 \pagebreak
 
 

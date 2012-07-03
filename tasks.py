@@ -58,13 +58,36 @@ class TaskManager(object):
                 else:
                     t.de_suppress()
 
-    def suppress(self):
-        for t in self.active_tasks:
-            t.suppress()
+    def start(self):
+        threading.Thread(target=self.runner).start() 
 
-    def de_suppress(self):
+    def runner(self):
+        while not self.stopping:
+            self.activate()
+            time.sleep(1.01)
+
+    def activate(self, goal=None):
+        self.active = True
+        maximp = None
         for t in self.active_tasks:
-                t.de_suppress()
+            timp = t.get_importance(goal) 
+            print t, ' : ', timp, '\r'
+            if  maximp is None or timp > maximp[0]:
+                maximp = [timp, t]
+            elif t == maximp[0]:
+                if t.level > maximp[1].level:
+                    maximp = [timp, t]
+        if maximp is not None:    
+            maximp[1].activate()
+            for t in self.active_tasks:
+                if t != maximp[1] and t.active:
+                    t.de_activate()
+                
+    def de_activate(self):
+        self.active = False
+        for t in self.active_tasks:
+            t.de_activate()
+
 
     def kill_tasks(self):
         self.lock.acquire()
@@ -139,20 +162,23 @@ class Task(object):
         self.level = level
         self.interface = drone.get_interface()
         self.zaplock = self.interface.get_zaplock()
-        self.video_sensor = drone.get_video_sensor()
-        self.navdata_sensor = drone.get_navdata_sensor()
-        #self.wifi_sensor = drone.get_wifi_sensor()
-
+        self.video_sensor = self.drone.get_video_sensor()
+        self.navdata_sensor = self.drone.get_navdata_sensor()
+        self.wifi_sensor = self.drone.get_wifi_sensor()
+        self.detector = self.drone.get_detector_sensor()
         self.subtasks = []
         self.dep_subtasks = []
         
         self.loop_sleep = 0.1
         self.stopping = False
-        #self.tracker = None
+        
         self.state = settings.INIT
         
-        self.suppressed = False
+        self.active = False
         self.level = 0
+
+    def get_importance(self):
+        return self.level
 
     def depsub_callback(self, caller):
         """ The standard callback method for dependent subtasks """
@@ -240,13 +266,15 @@ class Task(object):
         else:
             self.callback(self)
 
-    def suppress(self):
-        print 'suppressing: ' , self, '\r'
-        self.suppressed = True
+    def de_activate(self):
+        if self.active:
+            print 'de_activating: ' , self, '\r'
+            self.active = False
     
-    def de_suppress(self):
-        print 'de_suppressing: ' , self, '\r'
-        self.suppressed = False
+    def activate(self):
+        if not self.active:
+            print 'activating: ' , self, '\r'
+            self.active = True
 
 class NoneTask(Task):
     """ NoneTask
@@ -393,6 +421,22 @@ class MoveTask(Task):
         else:
             self.direction = int(direction)        
 
+    def get_importance(self, goal=None):
+        val = 2
+        s = 0
+        g = 0
+        l = 0
+       
+        if self.detector.points is None:
+            s += 1
+        if goal is not None and goal=='move':
+            g += 1
+        
+        if not self.interface.get_landed():
+            l += 1
+
+        return (g+s)/val and l 
+
     def move(self):
         """ based on the value of self.direction and self.speed, use the command interface to move """
         if self.direction == 1:
@@ -422,11 +466,11 @@ class MoveTask(Task):
             self.timer = threading.Timer(self.time, self.stop)
             self.timer.start()
 
-
     def loop(self):
         """ Super override, checks if the given distance has been travelled. """
-        if not self.suppressed:
-            self.move() 
+        if self.active:
+            self.move()
+
         # should be fixed to use the euclidian distance
         if self.distance is not None and self.context[2] is not None and (math.fabs(self.context[2][0]) >= self.distance or math.fabs(self.context[2][1]) >= self.distance):
             print 'stopped by condition\r' 
@@ -451,9 +495,31 @@ class TakeoffTask(Task):
     def pre_loop(self):
         """ Super override, only the pre_loop is necessary for this task. We must remember to call self.stop(). """
         
-        self.interface.take_off()
-        time.sleep(self.wait)
-        self.stop()
+        pass
+    
+    def loop(self):
+        if self.active:
+            self.interface.take_off()
+            time.sleep(self.wait)
+            self.stop()
+
+    def get_importance(self, goal=None):
+        val = 3.0
+        s = 0
+        g = 0
+        l = 0
+       
+        if self.detector.points is None:
+            s += 1
+
+        if goal is not None and goal=='takeoff':
+            g += 1
+        
+        if self.interface.get_landed():
+            l += 1
+            
+        print 'l: ', l, '\r'
+        return (g+s+l)/val and l
 
 class LandTask(Task):
     """ LandTask
@@ -472,6 +538,23 @@ class LandTask(Task):
         self.interface.land()
         time.sleep(self.wait)
         self.stop()
+
+    def get_importance(self, goal=None):
+        val = 2
+        s = 0
+        g = 0
+        l = 0
+       
+        if self.detector.silhouets is not None:
+            s += 1
+        if goal is not None and goal=='land':
+            g += 1
+        
+        if not self.interface.get_landed():
+            l += 1
+
+        return (g+s)/val and l
+
 
 class SearchMarkTask(Task):
     """ SearchMarkTask
@@ -562,79 +645,6 @@ class SearchTask(Task):
             else:
                 self.blob = None
 
-class KeepDirTask(Task):
-    """ KeepDirTask
-
-    A more complicated task which implements a PID controller to keep a certain direction. The PID controller
-    uses the drone navdata as input and the calculated engine response is fed to the control interface.
-
-    """
-    def __init__(self, drone, callback, context, level=0):
-        """ The task constructor only takes the standard parameters """
-        Task.__init__(self, drone, callback, context, level)
-        self.verbose = False
-
-        # variables used in calculating the PID output
-        self.Kp = 0.125
-        self.Ki = 0.0
-        self.Kd = 0.05
-        self.Derivator_psi = 0
-        self.Integrator_psi = 0
-        self.Integrator_max = 500
-        self.Integrator_min = -500
-        self.max_error_psi = 180
-
-        self.loop_sleep = 0.05
-          
-    def pre_loop(self):
-        """ Super override, sets the PID controller set point """
-        self.set_point_psi = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
-
-    def loop(self):
-        """ Super override, updates the PID and moves the drone accordingly """
-        val = self.update()
-        self.interface.move(val[0], val[1], val[2], val[3])
-        
-    def post_loop(self):
-        """ Super override, stops the movement after task shutdown """
-        self.interface.move(None, None, None, 0.0,True)
-            
-    def update(self):
-        """ Calculate PID output using the psi value from the navdata and the set point """
-
-        # Get the current reading
-        psi   = (self.navdata_sensor.get_data()).get(0, dict()).get('psi', 0)
-        self.error_psi = (360 + self.set_point_psi - psi)%360
-        if self.error_psi > 180:
-            self.error_psi = self.error_psi - 360
-
-        # calculate the P term
-        self.P_value_psi = self.Kp * (self.error_psi/self.max_error_psi)
-
-        # calculate the I term, considering integrator max and min 
-        self.Integrator_psi = self.Integrator_psi + self.error_psi
-
-        if self.Integrator_psi > self.Integrator_max:
-            self.Integrator_psi = self.Integrator_max
-        elif self.Integrator_psi < self.Integrator_min:
-            self.Integrator_psi = self.Integrator_min
-
-        self.I_value_psi = self.Integrator_psi * self.Ki
-       
-        # calculate the D term
-        self.D_value_psi = self.Kd * ((self.error_psi - self.Derivator_psi)/self.max_error_psi)
-        self.Derivator_psi = self.error_psi
-
-        # Sum the term values into one PID value
-        PID_psi = self.P_value_psi + self.I_value_psi + self.D_value_psi
-        retval_psi = PID_psi
-
-        # print stuff for debugging purposes
-        if self.verbose:
-            print "Current psi: " + str(psi) + ", Error: " + str(self.error_psi) + ", Engine response: " + str(retval_psi)
-      
-        return (None, None, None, retval_psi)
-
 class HoverTrackTask(Task):
     """
     Discrete PID control
@@ -678,6 +688,26 @@ class HoverTrackTask(Task):
         self.point = None
         self.last_errors = utils.DiscardingQueue(20)
         self.target_position = None
+
+    def get_importance(self, goal=None):
+        val = 3
+        p = 0
+        s = 0
+        g = 0
+        l = 0
+
+        if self.detector.points is not None:
+            p += 1
+        if self.detector.silhouets is None:
+            s += 1
+        if goal is not None and goal=='hover':
+            g += 1
+        
+        if not self.interface.get_landed():
+            l += 1
+
+        return (g+s)/val and l
+
 
     def get_point(self):
         """ returns the positions of the point currently tracked, only relevant for some subtasks. """
@@ -735,7 +765,7 @@ class HoverTrackTask(Task):
             self.interface.zap(1)
             powers = self.update()
             
-            if powers is not None and not self.suppressed:
+            if powers is not None and self.active:
                 # check if we are within error limits
                 if self.error_psi is not None and -0.5 < self.error_psi < 0.5 and self.last_errors.get_avg() <= 20 and self.error_alt <= 20:
                     if not self.parent is None:
@@ -790,7 +820,7 @@ class HoverTrackTask(Task):
         self.interface.move(0.0, 0.0, 0.0, 0.0, True)
         time.sleep(1.0)
         self.interface.move(0.0, 0.0, 0.2, 0.0, True)
-        while not self.state == settings.STOPPING:
+        while not self.state == settings.STOPPING and self.active:
             print 'searching...\r'
             if self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0) >= 1500:
                 self.interface.move(0.0, 0.0, 0.0, 0.0, True)
@@ -1027,16 +1057,7 @@ class CompoundTask(Task):
 
         self.parent = None
         self.minimum_level = 0
-        self.suppressed = False
-
-    # def inhibit(self, caller, level):
-    #     if caller.level >= self.minimum_level:
-    #         self.minimum_level = level
-    #         for t in self.subtasks:
-    #             if t.level < level:
-    #                 t.suppress()
-    #             else:
-    #                 t.de_suppress()
+        self.active = False
 
     def set_required_runlevel(caller, level):
         if caller.level >= self.required_runlevel and level <= caller.level:
@@ -1048,16 +1069,11 @@ class CompoundTask(Task):
                     t.de_suppress()
         
     
-    def suppress(self):
-        self.suppressed = True
-        for t in self.subtasks:
-            t.suppress()
 
-    def de_suppress(self):
-        if self.level >= self.minimum_level:
-            self.suppressed = False
-            for t in self.subtasks:
-                t.de_suppress()
+    def de_activate(self):
+        self.activate = False
+        for t in self.subtasks:
+            t.de_activate()
 
     def add_subtask(self, task, index=None):
         task.parent = self
@@ -1133,6 +1149,7 @@ class SeqCompoundTask(CompoundTask):
     """
     def __init__(self, drone, callback, context, level=0):
         CompoundTask.__init__(self, drone, callback, context, level)
+        self.current_subtask = None
        
     def set_conf_1(self):
         """ Sets a specific list of subtasks """
@@ -1197,18 +1214,63 @@ class SeqCompoundTask(CompoundTask):
         """
         for t in self.subtasks:
             if not self.state == settings.STOPPING:
+                self.current_subtask = t
                 th = threading.Thread(target=t.run)
                 th.start()
                 th.join()
 
         self.state = settings.STOPPING
 
+    def get_importance(self, goal=None):
+        return self.current_subtask.get_importance(goal)
+
+    
+    def activate(self, goal=None):
+        self.active = True
+        self.current_subtask.activate()
+
+    def de_activate(self):
+        self.active = False
+        self.current_subtask.de_activate()
+   
 class ParCompoundTask(CompoundTask):
 
     def __init__(self, drone, callback, context, level=0):
         CompoundTask.__init__(self, drone, callback, context, level)
         self.subtasks = []
         self.threads = []
+
+    def get_importance(self, goal=None):
+        imp = o
+        for st in self.subtasks:
+            timp = st.get_importance(goal)
+            if timp > imp:
+                imp = timp
+
+        return imp
+
+    def activate(self, goal=None):
+        self.active = True
+        maximp = None
+        for t in self.subtasks:
+
+            timp = t.get_importance(goal) 
+            if  maximp is None or timp > maximp[0]:
+                maximp = [timp, t]
+            elif t == maximp[0]:
+                if t.level > maximp[1].level:
+                    maximp = [timp, t]
+            
+        if maximp is not None:
+            maximp[1].activate()
+            for t in self.subtasks:
+                if t != maximp[1]:
+                    t.de_activate()
+                
+    def de_activate(self):
+        self.active = False
+        for t in self.subtasks:
+            t.de_activate()
 
     def stop(self, ty=None):
         """ If the stop method is supplied with a type parameter all subtasks of this type will be terminated, else
@@ -1286,6 +1348,27 @@ class FollowTourTask(SeqCompoundTask):
         self.current_segment = 0
         # build subtasks
         self.add_subtasks(self.create_subtasks())
+        
+
+    def get_importance(self, goal=None):
+        val = 3.0
+        p = 0
+        s = 0
+        g = 0
+        l = 0
+
+        if self.detector.points is not None:
+            p += 2
+        if self.detector.silhouets is None:
+            s += 1
+        if goal is not None and goal=='followtour':
+            g += 1
+        
+        if not self.interface.get_landed():
+            l += 1
+
+        return (p+s+g+l)/val 
+
 
 
     def setup_next_segment(self, caller):
@@ -1399,6 +1482,24 @@ class AvoidTask(Task):
                 self.parent.set_required_runlevel(self, 0)
             self.interface.move(0.0, 0.0, 0.0, 0.0, False)
 
+    
+    def get_importance(self, goal=None):
+        val = 3.0
+        p = 0
+        s = 0
+        g = 0
+        l = 0
+
+        if self.detector.silhouets is not None :
+            s += 2
+        if goal is not None and goal=='avoid':
+            g += 1
+        
+        if not self.interface.get_landed():
+            l += 1
+
+        return (s+g+l)/val 
+
 def get_all_tasks():
     """ returns a list of all the subtasks extending Task """
     res = globals()['Task'].__subclasses__()
@@ -1406,3 +1507,4 @@ def get_all_tasks():
     res.extend(globals()['SeqCompoundTask'].__subclasses__())
     res.extend(globals()['ParCompoundTask'].__subclasses__())
     return res
+

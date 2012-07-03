@@ -636,11 +636,11 @@ class DiscardingQueue(object):
 
 class PointTracker(threading.Thread):
 
-    def __init__(self, videoreceiver, navdatareceiver, point=None):
+    def __init__(self, drone, point=None):
         threading.Thread.__init__(self)
-        
-        self.videoreceiver = videoreceiver
-        self.navdatareceiver = navdatareceiver
+        self.drone = drone
+        self.videoreceiver = self.drone.get_video_sensor()
+        self.detector = self.drone.get_detector_sensor()
         self.original_point = point
         if point is None:
             self.point = (88,72)
@@ -655,16 +655,7 @@ class PointTracker(threading.Thread):
         self.original_point = p
 
     def get_point(self):
-        p = self.point
-        navdata = self.navdatareceiver.get_data()
-        if not p is None and not navdata is None and self.running:
-            theta   = navdata.get(0, dict()).get('theta', 0)
-            phi     = navdata.get(0, dict()).get('phi', 0)
-            psi     = navdata.get(0, dict()).get('psi', 0)
-            alt     = navdata.get(0, dict()).get('altitude', 0)
-            return [p[0], p[1], phi, theta, psi, alt]
-        else:
-            return None
+        return self.point
 
     def stop(self):
         self.running = False
@@ -679,35 +670,34 @@ class PointTracker(threading.Thread):
     def init(self, p=None, image=None):
         # if image is None, get image from video sensor
         if image is None:
-            self.frame0 = self.videoreceiver.get_data()
+            self.frame0 = self.detector.last_small
         else:
             self.frame0 = image
-        self.org_width = self.frame0.width if type(self.frame0).__name__== 'iplimage' else self.frame0.shape[1]
-        self.org_height = self.frame0.height if type(self.frame0).__name__== 'iplimage' else self.frame0.shape[0]
 
         if p is None:
             self.point = self.original_point
         else:
             self.point = p
 
+
+        self.org_width = self.frame0.shape[1]
+        self.org_height = self.frame0.shape[0]
+
+       
         self.features = np.array([self.point], dtype=np.float32)
         self.lk_params = dict( winSize  = (29, 29), 
                               maxLevel = 2, 
                               criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 20, 0.03),
                               flags = 0)
-      
-        self.maxvx = 0
-        self.maxvy = 0
         self.track()
 
     def track(self):
 
             # Get image from video sensor
-            self.frame1 = self.videoreceiver.get_data()
-            navdata = self.navdatareceiver.get_data()
+            self.frame1 = self.detector.last_small
 
-            width = self.frame1.width if type(self.frame1).__name__== 'iplimage' else self.frame1.shape[1]
-            height = self.frame1.height if type(self.frame1).__name__== 'iplimage' else self.frame1.shape[0]
+            width = self.frame1.shape[1]
+            height = self.frame1.shape[0]
 
             if self.org_width != width or self.org_height != height:
                 return None
@@ -731,17 +721,5 @@ class PointTracker(threading.Thread):
                 self.point = self.features[0]
 
             self.frame0 = self.frame1.copy()
-            self.maxvx = max(self.maxvx, navdata.get(0, dict()).get('vx', 0))
-            self.maxvy = max(self.maxvy, navdata.get(0, dict()).get('vy', 0))
 
-            
-            if not self.point is None and not navdata is None:
-                theta   = navdata.get(0, dict()).get('theta', 0)
-                phi     = navdata.get(0, dict()).get('phi', 0)
-                psi     = navdata.get(0, dict()).get('psi', 0)
-                alt     = navdata.get(0, dict()).get('altitude', 0)
-                vx      = navdata.get(0, dict()).get('vx', 0)
-                vy      = navdata.get(0, dict()).get('vy', 0)
-                return [self.point[0], self.point[1], phi, theta, psi, alt, vx, vy]
-            else:
-                return [None, None, phi, theta, psi, alt, vx, vy]
+            return self.point

@@ -27,11 +27,12 @@ import threading
 
 import controllers
 import receivers
-import tasks
+import virtualsensors
+import newtasks as tasks
 import utils
 import settings
 import time
-
+import map
 
 class Drone(object):
 
@@ -46,8 +47,10 @@ class Drone(object):
 
         self.gui = None
 
+        self.map = map.PosMap()
+
         self.sensors = []
-        
+
         self.video_sensor = receivers.VideoReceiver(settings.VIDEO_PORT)
         self.sensors.append(self.video_sensor)
         
@@ -61,12 +64,15 @@ class Drone(object):
 
         self.task_manager = tasks.TaskManager(self)
         self.controller_manager = controllers.ControllerManager(self)
-
             
     def get_sensors(self):
-         return self.sensors
+        return self.sensors
 
     def start(self):
+        self.detector_sensor = virtualsensors.Detector(self) 
+        self.sensors.append(self.detector_sensor)
+
+
         if settings.TEST:
             self.testdevice.start()
        
@@ -78,10 +84,12 @@ class Drone(object):
         time.sleep(0.2)
         if self.gui is None:
             navdata = self.navdata_sensor.get_data()
-            bat   = navdata.get(0, dict()).get('battery', 0)
-            print 'Battery: ' + str(bat) + '\r'
+            if navdata is not None:
+                bat   = navdata.get(0, dict()).get('battery', 0)
+                print 'Battery: ' + str(bat) + '\r'
         
         self.interface.start()
+       # self.task_manager.start()
         self.controller_manager.start_controllers()
                
     def stop(self, gui_stop=False):
@@ -101,6 +109,12 @@ class Drone(object):
         
         self.controller_manager.stop()
         return 0
+
+    def get_map(self):
+        return self.map
+
+    def get_detector_sensor(self):
+        return self.detector_sensor
 
     def get_task_manager(self):
         return self.task_manager
@@ -123,13 +137,8 @@ class Drone(object):
     def get_gui(self):
         return self.gui
 
-    def sigint_handler(self, arg1, arg2):
-        print 'You pressed Ctrl+C!'
-        self.stop()
-        sys.exit(0)
-
 def main():
-    video, gui, test = False, False, False
+    video, gui, test, map = False, False, False, False
     arg_len = len(sys.argv)
     for i in range(arg_len):
         if sys.argv[i] == '-v':

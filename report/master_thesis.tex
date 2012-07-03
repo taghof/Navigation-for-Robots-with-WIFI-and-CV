@@ -12,7 +12,7 @@
 \usepackage{amssymb,amsmath}
 %\usepackage{url}
 
-\begin{document} 
+
 \newenvironment{nb}
    {\begin{framed}\begin{quotation}}
    {\end{framed}\end{quotation}}
@@ -23,6 +23,8 @@
 \newcommand{\dronen}[1]{#1}
 \newcommand{\drone}[0]{AR.\ $\!$Drone}
 
+
+\begin{document} 
 \title{Master Thesis}
 \author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
 \hline\\
@@ -77,6 +79,7 @@ definition af nøglebegreber
 
 
 \subsection{Motivation} % Thomas & Morten, Hvorfor
+
 \label{sec:motivation}
 -Hvem vil vores resultater komme til gode
 -hvorfor er det relevant
@@ -86,7 +89,6 @@ definition af nøglebegreber
 
 
 referencer til lignende arbejde, vores forskellig fordi..
-
 \subsection{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
 HVAD er det præcis vi vil vise eller afvise?!
@@ -592,30 +594,176 @@ tradeoff - Billedopløsning eksperiment f.eks. QR-koder kontra hurtig transmissio
 
 \pagebreak
 \section{Fasciliterende platform} % Morten,
-\subsection{Fjernstyring af AR.Dronen med Python}
-%        Introduktion til styring af AR.\ $\!$Drone med Python}
+Vi har udviklet den grundlæggende platform med det formål, at
+understøtte vores videre arbejde med AR.Dronen. Platformen skal sikre
+let og effektiv adgang til AR.Dronens sensor output, samt give
+mulighed for at styre AR.Dronen, både manuelt(uden brug af iPhone,
+iPad eller lignende) og ved hjælp af prædefinerede opgaver(tasks*).
 
-\subsubsection{AT-kommando Python interface}
+\subsection{Implementationsdetaljer}
+Vi har af flere grunde valgt at implementere vores platform i python,
+den vigtigste af disse er, at vi ønsker at stille en let anvendelig og
+let udbyggelig platform til rådighed for udviklermiljøet omkring
+AR.Dronen. Da Python er et fortolket højniveau sprog kan vi
+naturligvis ikke opnå samme afviklingshastighed sammenlignet med C
+eller andre maskinnære sprog.  I forbindelse med afkodningen af video
+fra AR.Dronen anvender vi biblioteket Psyco* til at øge
+afviklingshastigheden. Psyco er en form for JIT compiler der lader os
+afvikle umodificeret pythonkode hurtigere, ved afkodning af 100
+billeder er præcis den samme kode med Psyco mere end 5 gange hurtigere
+end koden uden(fra 39,569 sek. til 7.075 sek.) .Udviklingen af Psyco
+er desværre stoppet og der findes ingen 64-bit version af biblioteket.
+
+\subsection{Opbygning/overblik}
+Vores platform består af et antal klasser placeret i et antal
+moduler. Vi har udviklet tre forskellige receiverklasser(video,
+navdata og wifi i receiversmodulet), to forskellige
+controllerklasser(joystick og keyboard i controllersmodulet), en taskmanager og
+en kontrolinterface-klasse(controllersmodulet). Derudover har vi med
+inspiration fra ~\ref{derp} implementeret en virtuel sensor der bygger oven på videoreceiveren. 
+
+I standard situationen instantieres, startes og tilgåes disse klasser fra
+droneklassen(dronemodulet). På denne måde kan udviklere der ønsker at
+anvende vores platform blot importere drone modulet og instantiere
+droneklassen, hvorefter der er let adgang til diverse sensordata. Vi
+har desuden udviklet et testdevice modul, som anvendes i forbindelse
+med udvikling når det ikke er muligt at have en AR.Drone fysisk
+tilstede.  De enkelte klasser kan også anvendes hver for sig, se*.
+
+“klasse diagram eller lignende”
+
+\subsubsection{Receivers}
+
+Receivers
+implementeret som proces
+doublebuffered
+receiverlogikken er implementeret i en baseklasse
+\paragraph{Navdatareceiver}
+\paragraph{Videoreceiver}
+\paragraph{Wifireceiver}
+
+\paragraph{Virtuel sensor}
+
+
+\subsubsection{kontrolinterface, AT-kommando Python interface}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
 gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
-på en python-wrapper \cite{electronic:venthur}. Vi har implementeret
+på en python-wrapper \cite{electronic:venthur} til dette interface. Vi har implementeret
 interfacet som en Python tråd der løbende sender kommandoer med de
 aktuelle kontrolværdier til
 AR.Dronen. Dette betyder at vores system ikke afhænger af at alle
 kontrolpakker når deres destination, hvilket er praktisk da
 UDP-protokollen netop ikke garanterer at en pakke når sin destination. %think I understand but humor me and elaborate...
- Ved at sende al kontrolkommunikation
-gennem interfacet, behøves vi ikke heller ikke at tænke på detaljer som
-sekvensnumre og watchdog-beskeder, da disse håndteres transparent af
-systemet.  
+Ved at sende al kontrolkommunikation gennem interfacet, behøves vi
+ikke heller ikke at tænke på detaljer som sekvensnumre og
+watchdog-beskeder, da disse håndteres transparent af systemet.
+  
 Vores interface(\todo{REF TIL EGEN KODE}) definerer en række metoder til at
 kontrollere dronens opførsel og bevægelser. Interfacet kan i det
 simpleste tilfælde anvendes direkte fra Pythons interpreter, men
-fungerer også som en del af vores større system.
+fungerer også som en del af vores grundlæggende platform.
+
+\subsubsection{Controllers}
+Selvom det er muligt, er det ikke praktisk anvendeligt at brugeren skal
+afvikle scripts, der anvender kontrolinterfacet, for hver ønsket
+bevægelse(som det ses i figur~\ref{fig:pythonimpl1}), i stedet har vi
+implementeret to controllere til at tage mod input fra brugeren. Vi
+en keyboardcontroller der lytter efter input
+fra tastaturet og en joystickcontroller der er tilknyttet en fysisk
+Xbox360-controller (se figur~\ref{fig:xboxlayout}).
+
+Vi har mulighed for at starte systemet op med begge
+controllere på samme tid, eller undlade en eller flere. Under
+udviklingen af systemet har vi oftest anvendt begge controllere
+sideløbende, da de komplimenterer hinanden. Det er også muligt at
+anvende platformen helt uden controllere, og udelukkende anvende
+taskmanageren til at kontrollere AR.Dronen, men skulle der i det
+tilfælde ske noget uforudset under udførslen af en opgave, vil der
+ikke være nogen mulighed for at bringe AR.Dronen manuelt ned. 
+
+Begge controllerklasser nedarver fra en grundlæggende
+controllerklasse (Controller), denne er implementeret som en tråd der med et givent
+tidsinterval kalder en kontrolmetode(\code{process\_events()}). Den simple
+opbygning betyder, at hvis man ønsker at implementere en anden type
+controller, er det nok at nedarve Controller og implementere
+\code{process\_events()} metoden. Da python behandler metoder som
+førsteklasses objekter, er det let at lade en controller skifte mellem
+forskellige tilstande, dette gøres ved at kalde \code{set\_control\_method} med
+en ny kontrolmetode som argument. 
+
+\paragraph{Joystickcontroller}
+Joystickcontrolleren står i vores system istedet for en iPhone eller
+iPad og anvendes til at fjernstyre AR.Drone manuelt i forbindelse
+med testflyvninger. Der var flere praktiske grunde til at vi valgte at
+implementere en alternativ fjernstyring, blandt andet havde vi et
+behov for at kunne interagere både med vores eget system og AR.Dronen
+på samme tid, mens vi til stadighed måtte have øjne på AR.Dronen. Vi
+fandt desuden ikke iphonestyringen tilstrækkelig præcis eller særlig
+intuitiv, Xbox360 controlleren derimod omtales som en af de bedst
+designede controllere og har endda fundet anvendelse af militære
+styrker i USA og
+storbritannien\cite{electronic:zdnet}\cite{electronic:joystiq}\cite{electronic:youtube1}.
+Fjernstyringsdelen er meget simpel og fungerer ved at oversætte
+værdier fra Xbox360 controlleren(som vi får givet af pygames
+joystickmodul\cite{electronic:pygame}) og så sende disse til
+kontrolinterfacet.  Joystickcontrolleren kan udover simpel
+fjernstyring også anvendes til at starte prædefinerede opgaver(REF TIL
+TASK SECTION) ved hjælp af taskmanageren, således kan piloten manuelt bringe
+AR.Dronen i en ønsket position og så herefter at starte den automatiske
+afvikling af et forudbestemt bevægemønster. På
+figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
+controlleren.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/xbox360layout.png}
+  \caption{Standardopsætning af Xbox360 controlleren}
+  \label{fig:xboxlayout}
+\end{figure}
+
+\paragraph{Keyboardcontroller}
+Hvis vi ønsker at starte vores system uden grafisk brugerflade(og
+tilhørende GTK keyboardbindinger), er det
+praktisk stadig at kunne anvende tastaturet som input(evt i kombination med Xbox360
+controlleren). Vi har derfor implementeret en simpel
+keyboardcontroller der læser input fra terminalen. Vi anvender ikke
+keyboardcontrolleren til direkte styring af AR.Dronen(da det ikke er
+praktisk i forhold til Xbox360 controlleren), men til at få udskrevet
+nuværende batteriniveau('b'), til at skifte kamera('z'), til at få
+udskrevet aktive opgaver på autocontrolleren('c'), til at få udskrevet
+en oversigt over tråde i programmet('t'), samt til at starte opgaver
+på autocontrolleren('1', '2' og '3'). 
+
+\subsection{Taskmanager}
+Taskmanagerklassen startede ud som almindelig controller, men er endt
+som en mere selvstændig del af platformen. Taskmanageren skiller sig
+ud ved ikke, i modsætning til joystick- og keyboardcontrollerne, at
+arbejde direkte med kontrolinterfacet eller med output fra
+receiverne. Taskmanagerens opgave er udelukkende at starte
+forudspecificerede opgaver(tasks) og stoppe dem igen, samt at
+facilitere beslutningen om hvilken task der har lov til at bevæge AR.Dronen. 
+
+\subsubsection{Testdevice}
+Dette modul muliggør gennemførelsen af simple eksperimenter i et
+test miljø. Grundideen bag modulet er, at man skal kunne optage, ikke
+bare film, men alle sensoroutput fra en flyvning med AR.Dronen, for så
+senere at kunne afspille hele flyvningen igen. Selve afspilningen
+foregår næsten transparent for resten af platformen, receiverne skal
+stadig initiere kommunikationen(nu blot med testdevicet), forbindelsen
+skal stadig holdes i live og dataen der modtages skal stadig
+afkodes. De eneste synlige forskelle der er mellem test og
+live-sessions er timing og hastighed, den første fordi vi ikke har
+prioriteret at afsende testdataen i de intervaller de blev modtaget i
+og den sidste fordi samme computer nu står både for afsendelse,
+modtagelse og afkodning.  Testdevicemodulet har ikke noget at gøre med
+optagelsen af sensoroutputtet, denne foregår i receiverklasserne.
+
+
+\subsection{Praktisk anvendelse af Platformen}
+%        Introduktion til styring af AR.\ $\!$Drone med Python}
 
 %           Eksempel på anvendelse af Python interface til AR.Dronen
-\subsubsection{Python-eksempel nem fjenstyring af AR.Dronen}
+\subsubsection{Python-eksempel, nem fjenstyring af AR.Dronen}
 Et simpelt eksempel på anvendelse af vores kontrolinterface gives ved at
 starte pythons fortolker, importere examples-modulet og herefter
 afvikle en metode indeholdende kommandoer til
@@ -642,8 +790,6 @@ AT-kommandoer og sendes så som UDP-pakker til AR.Dronens
 kommandoport. Den konkrete implementation af \code{square()} ses i
 figur~\ref{fig:pythonimpl1}. Det bemærkes at kontrolinterfacetråden
 skal startes (kald af \code{c.start()}) før kommandoerne har nogen effekt.
-
-Beskrivelse af selve flyvningen...
 
 \begin{figure}[ht]
   \lstset{language=Python, frame=single}
@@ -680,90 +826,6 @@ def square():
 \label{fig:pythonimpl1}
 \end{figure}
 
-
-\pagebreak
-%        Vores systems kommunikation med AR.Dronen
-\subsection{Styring af AR.Dronen gennem den ny platform} %Brugerens interaktionsmuligheder med systemet}
-Som nævnt i sektion~\todo{\\ref{SEKTIONNOGET}}
- kanaliserer vores system al
-kontrolkommunikation med dronen gennem kontrolinterfacet, i praksis er
-det dog ikke anvendeligt at brugeren skal afvikle scripts, der anvender
-kontrolinterfacet, for hver ønsket bevægelse(som det ses i
-figur~\ref{fig:pythonimpl1}), i stedet har vi implementeret
-moduler (controllere) til at tage mod input fra brugeren. Vi 
-har tre inputmuligheder: En keyboardcontroller der lytter efter input
-fra tastaturet, en joystickcontroller der er tilknyttet en fysisk
-Xbox360-controller (se figur~\ref{fig:xboxlayout}) samt en autocontroller der kan initiere og afslutte
-givne opgaver. 
-
-Vi har mulighed for at starte systemet op med alle
-controllere på samme tid, eller undlade en eller flere. Under
-udviklingen af systemet har vi oftest anvendt alle tre controllere på
-samme tid, da de komplimenterer hinanden, for eksempel kan man godt
-anvende autocontrolleren for sig selv, men i det tilfælde at noget
-skulle ske noget uforudset under udførslen af en opgave, vil der ikke
-være nogen mulighed for at bringe AR.Dronen manuelt ned. 
-
-\subsubsection{Opbygningen af det grundlæggende controllermodul}%styringsmodul?
-Alle tre controllermoduler nedarver fra en grundlæggende
-controllerklasse (Controller), denne er implementeret som en tråd der med et givent
-tidsinterval kalder en kontrolmetode(\code{process\_events()}). Denne simple
-opbygning betyder, at hvis man ønsker at implementere en anden type
-controller, er det nok at nedarve Controller og implementere
-\code{process\_events()} metoden. Da python behandler metoder som
-førsteklasses objekter, er det let at lade en controller skifte mellem
-forskellige tilstande, dette gøres ved at kalde \code{set\_control\_method} med
-en ny kontrolmetode som argument. 
-
-\subsubsection{Joystickcontroller}
-Joystickcontrolleren står i vores system istedet for en iPhone eller
-iPad og anvendes til at fjernstyre AR.Drone manuelt i forbindelse
-med testflyvninger. Der var flere praktiske grunde til at vi valgte at
-implementere en alternativ fjernstyring, blandt andet havde vi et
-behov for at kunne interagere både med vores eget system og AR.Dronen
-på samme tid, mens vi til stadighed måtte have øjne på AR.Dronen. Vi
-fandt desuden ikke iphonestyringen tilstrækkelig præcis eller særlig
-intuitiv, Xbox360 controlleren derimod omtales som en af de bedst
-designede controllere og har endda fundet anvendelse af militære
-styrker i USA og
-storbritannien\cite{electronic:zdnet}\cite{electronic:joystiq}\cite{electronic:youtube1}.
-Fjernstyringsdelen er meget simpel og fungerer ved at oversætte
-værdier fra Xbox360 controlleren(som vi får givet af pygames
-joystickmodul\cite{electronic:pygame}) og så sende disse til
-kontrolinterfacet.  Joystickcontrolleren kan udover simpel
-fjernstyring også anvendes til at starte prædefinerede opgaver(REF TIL
-TASK SECTION) på autocontrolleren, således kan piloten manuelt bringe
-AR.Dronen i en ønsket position for herefter at starte den automatiske
-afvikling af et forudbestemt bevægemønster. På
-figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
-controlleren.
-\begin{figure}
-  \centering
-  \includegraphics[width=0.99\textwidth]{grafik/xbox360layout.png}
-  \caption{Standardopsætning af Xbox360 controlleren}
-  \label{fig:xboxlayout}
-\end{figure}
-
-\subsubsection{Keyboardcontroller}
-Hvis vi ønsker at starte vores system uden grafisk brugerflade(og
-tilhørende GTK keyboardbindinger), er det
-praktisk stadig at kunne anvende tastaturet som input(evt i kombination med Xbox360
-controlleren). Vi har derfor implementeret en simpel
-keyboardcontroller der læser input fra terminalen. Vi anvender ikke
-keyboardcontrolleren til direkte styring af AR.Dronen(da det ikke er
-praktisk i forhold til Xbox360 controlleren), men til at få udskrevet
-nuværende batteriniveau('b'), til at skifte kamera('z'), til at få
-udskrevet aktive opgaver på autocontrolleren('c'), til at få udskrevet
-en oversigt over tråde i programmet('t'), samt til at starte opgaver
-på autocontrolleren('1', '2' og '3'). 
-
-\subsection{Autocontroller}
-Autocontrolleren skiller sig ud fra de andre controllere, den nedarver
-stadig samme grundlæggende controllerklasse, men i modsætning til
-joystick- og keyboardcontrollerne arbejder autocontrolleren ikke
-direkte med kontrolinterfacet. Autocontrollerens opgave er at starte
-forudspecificerede opgaver(tasks) og stoppe dem igen hvis det er nødvendigt 
-
 \subsection{Modtagelse af ``sensor''-data fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
 I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og wifi-data fra AR.Dronen.
 For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
@@ -778,9 +840,7 @@ afkodning af pakken og den afkodede data deles med processen der
 startede receiveren. De tre receivere er ikke
 afhængige af hinanden og kan afvikles hver for sig, ligeledes kan vi
 vælge at afvikle vores samlede system med en eller flere receivere
-tilkoblet (hvilket dog vil resultere i begrænset
-funktionalitet). %Wut? begrænset?
- Sektion~\ref{subsection:receiver} giver et eksempel
+tilkoblet. Sektion~\ref{subsection:receiver} giver et eksempel
 på hvordan man lettest anvender videoreceiveren, til at modtage og vise
 et enkelt billede fra AR.Dronens videostrøm. Anvendelsen af de to
 andre receivere foregår på fuldstændig samme måde som videoreceiveren,
@@ -850,8 +910,6 @@ def receive_and_show_picture():
 \pagebreak
 
 \section{Tasks ``plugin''} % Morten
-
-
 
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

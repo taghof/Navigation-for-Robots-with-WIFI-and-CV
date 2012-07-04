@@ -35,6 +35,7 @@ import utils
 import tasks
 import settings
 import matcher
+import drone as drone_module
 
 class ControllerManager(object):
 
@@ -81,8 +82,11 @@ class Controller(threading.Thread):
     
     def __init__(self, drone):
         threading.Thread.__init__(self)
-        self.drone = drone
-        self.control_interface = drone.get_interface()
+        if isinstance(drone, drone_module.Drone):
+            self.drone = drone
+            self.control_interface = drone.get_interface()
+        elif isinstance(drone, ControllerInterface):
+            self.control_interface = drone
         self.control_button = None
         self.control_method = self.process_events
         self.id = None       
@@ -246,12 +250,16 @@ class JoystickControl(Controller):
 
 
     def __init__(self, drone):
+
         Controller.__init__(self, drone)
         pygame.joystick.init()
         
         self.id = settings.JOYCONTROL
         self.name = "Joystick Controller"
-        self.task_manager = self.drone.get_task_manager()
+        if isinstance(drone, drone_module.Drone):
+            self.task_manager = self.drone.get_task_manager()
+        else:
+            self.task_manager = None
         if pygame.joystick.get_count() > 0:
             pygame.display.init()
             self.js = pygame.joystick.Joystick(0)
@@ -304,13 +312,16 @@ class JoystickControl(Controller):
                             elif b==1:
                                 self.control_interface.reset() 
                             elif b==2:
-                                self.task_manager.kill_tasks()
+                                if self.task_manager is not None:
+                                    self.task_manager.kill_tasks()
                             elif b==3:
-                                self.task_manager.start_task_num(4)
+                                if self.task_manager is not None:
+                                    self.task_manager.start_task_num(4)
                             elif b==4:
                                 pass
                             elif b==5:
-                                self.task_manager.start_task_num(6)
+                                if self.task_manager is not None:
+                                    self.task_manager.start_task_num(6)
                             elif b==6:
                                 pass
                             elif b==8:

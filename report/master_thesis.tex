@@ -1,5 +1,6 @@
 %\documentclass[12pt,a4paper,twoside,openright,fleqn]{memoir}
-\documentclass[10pt]{article}
+%\documentclass[10pt]{article}
+\documentclass[12pt]{report}
 \usepackage[danish]{babel}
 \usepackage[ansinew]{inputenc}
 \usepackage{graphicx}
@@ -10,6 +11,8 @@
 \usepackage{titleref}
 \usepackage{bm}
 \usepackage{amssymb,amsmath}
+
+\usepackage{tocbibind}
 %\usepackage{url}
 
 
@@ -53,7 +56,8 @@ Indeholder og gennemgår i det følgende (på dansk).
 
 \pagebreak
 
-\section{Introduktion} %Thomas
+\chapter{Introduktion}
+%\section{Introduktion} %Thomas
 % på videnskabeligt grundlag identificere, afgrænse og formulere en faglig problemstilling, 
 % definere og opstille testbare hypoteser inden for fagets emneområde, 
 % selvstændigt planlægge og under anvendelse af fagets videnskabelige metode gennemføre et større fagligt projekt, 
@@ -78,8 +82,8 @@ definition af nøglebegreber
 %\titleref{sec:AR.Drone}
 
 
-\subsection{Motivation} % Thomas & Morten, Hvorfor
 
+\section{Motivation} % Thomas & Morten, Hvorfor
 \label{sec:motivation}
 -Hvem vil vores resultater komme til gode
 -hvorfor er det relevant
@@ -89,10 +93,14 @@ definition af nøglebegreber
 
 
 referencer til lignende arbejde, vores forskellig fordi..
-\subsection{Teseformulering/mål} % Thomas & Morten, Hvad
+
+\section{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
 HVAD er det præcis vi vil vise eller afvise?!
 nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen.
+
+er det en platform som andre kan arbejde videre på, undersøge hvad der
+evt. skal til for at lave en sådan...
 
 Det er noget med en [semi autonom] [navigation] [indendørs] [luftbåren]
 
@@ -103,7 +111,7 @@ at det er indendørs giver nogle begrænsninger, kan bestemme et bestemt miljø ala
 Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
 Er det en del af opgaven at se om AR.Dronen er den rigtige platform at lave dette på? - er en konklusion at den er adequate, men at det ville være bedre havde man haft tiden til at lave sin egen, finde en anden???
 
-\subsection{Metode} % Thomas, Hvordan, skal den være en SUBsection eller section?
+\section{Metode} % Thomas, Hvordan, skal den være en SUBsection eller section?
 \label{sec:metode}
 %% Antagelser, problemdomæne formuleret i introduktionen sektion \ref{sec:introduktion}.
 %% (Lavpraktisk:)
@@ -116,7 +124,7 @@ Er det en del af opgaven at se om AR.Dronen er den rigtige platform at lave dett
 hvordan teori
 
 %%%% Introduction - Metode
-\subsubsection{AR.Drone} % Thomas,
+\subsection{AR.Drone} % Thomas,
 Selvstændig selvstående paragraf omkring, valg af AR.Dronen. Hvorfor har vi valgt den, hvad tilfredstiller den, hvad tilfredstiller den ikke. Hvad skal den bruges til.
 generelle sensore på dronen; 2 kameraer, acceleration, rotation, hastighed, 
 wifi-kommunikation
@@ -127,10 +135,10 @@ wifi-kommunikation
 
 
 %%%% Introduction - Metode
-\subsubsection{Domæne/navigationsmiljø} % Thomas,
+\subsection{Domæne/navigationsmiljø} % Thomas,
 Nogle bygninger på Katrinebjerg, indendørs...
 
-\subsubsection{/Miljø} % Thomas,
+\subsection{/Miljø} % Thomas,
 \paragraph{Indendørs}
 
 \paragraph{PC-linux}
@@ -141,7 +149,7 @@ afvikling kommunikation, styring hvem er chef / sensor
 platform skrevet i python med bibliotek / wrapper til opencv (ffmpeg), pygame, numpy...
 
 %%%% Introduction - Metode
-\subsubsection{Platform samt hjælpeværktøjer} % Thomas & Morten
+\subsection{Platform samt hjælpeværktøjer} % Thomas & Morten
 Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. For f.eks. at minimere den tid der går fra at en ide implementeres i kode til aftestning på quadrokopteren, er det muligt at lave scripts (Task) bestående af kun få liniers kode der nemt afvikles på systemet.
 %
 \paragraph{drone.py} -modulet / -klassen er konstrueret for at tage sig af al kommunikationen mellem PC og AR.Dronen. Kommunikationen består i at opretholde forbindelsen, samt modtage datapakker fra quadrokopterens sensor system og at afsende styrekommandoer fra brugeren til AR.Dronen.
@@ -161,7 +169,7 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 \paragraph{Task manager plugin og tasks}
 
 
-\subsubsection{Eksperimenter} % Thomas,
+\subsection{Eksperimenter} % Thomas,
 
 \paragraph{Lokalisering via Wifi-fingerprinting}
 %\paragraph{Simpel-blob}
@@ -175,10 +183,10 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
  Korridor (Hopper) vs. Åbent område (Zuse)
 
 %%%% Introduction
-\subsection{Raport struktur} % Thomas, %/læsevejledning
+\section{Raport struktur} % Thomas, %/læsevejledning
 Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
 
-\subsection{Medfølgende CD}
+\section{Medfølgende CD}
 Dude its a CD
 \pagebreak
 
@@ -187,7 +195,7 @@ Dude its a CD
 %%%%     AR.Drone - section
 %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\chapter{Opsætning}
 \section{AR.Drone}
 \label{sec:AR.Drone}
 AR.Drone er en quadrokopter fremstillet og udviklet af det franske
@@ -239,17 +247,22 @@ AR.Drone er bygget op omkring et antal sensorer, et antal
 aktuatorer og en processorenhed.
 
 \subsubsection{Sensorer}
+\label{sssec:sensorer}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.50\textwidth]{grafik/frontcamera.jpg}
+  \caption{AR.Dronens frontkamera.}
+  \label{fig:frontkamera}
+\end{figure}
+AR.Drone er som sagt udstyret med to kameraer; et nedadrettet og et fremadrettet.
+Det fremadrettede er med en synsvinkel på $93 ^{\circ}$ og består af en CMOS\footnote{Complimentary-Symmetry Metal Oxide Semiconductor, på dansk: en sensor af komplimentær metaloxid halvleder teknologi.}-billedsensor som kan levere $640 \times 480$ billeder, AR.Dronen transmittere dog kun med en opløsning på Quarter Video Graphics Array (QVGA) $320 \times 240$ med en framerate på $15 FPS$.
+Det nedadrettede kamera er en CMOS sensor med $64 ^{\circ}$ vinkel, der tager billeder i Quarter Common Intermediate Format (QCIF) $176 \times 144$ opløsning, med en framerate på $60 FPS$.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/navboard.png}
   \caption{Over- og underside af Navigationsprint til undersiden af AR.Dronen. Navboardet indeholder bl.a. ultralydssensoren. Figurene er fra to internetbutikker \uri{droneparts.de} og \uri{aust-rc-tech.com.au} hvorfra der kan bestilles AR.Drone reservedele.}
   \label{fig:navboard}
 \end{figure}
-\label{sssec:sensorer}
-AR.Drone er som sagt udstyret med to kameraer; et nedadrettet og et fremadrettet.
-Det fremadrettede er med en synsvinkel på $93 ^{\circ}$ og består af en CMOS\footnote{Complimentary-Symmetry Metal Oxide Semiconductor, på dansk: en sensor af komplimentær metaloxid halvleder teknologi.}-billedsensor som kan levere $640 \times 480$ billeder, AR.Dronen transmittere dog kun med en opløsning på Quarter Video Graphics Array (QVGA) $320 \times 240$ med en framerate på $15 FPS$.
-Det nedadrettede kamera er en CMOS sensor med $64 ^{\circ}$ vinkel, der tager billeder i Quarter Common Intermediate Format (QCIF) $176 \times 144$ opløsning, med en framerate på $60 FPS$.
-
 Til at bestemme AR.Dronens afstand til jorden anvendes en ultrasonisk
 afstandsmåler. Denne opererer ved at udsende en ultralydspuls og herefter
 måle tidsintervallet der går før ekkoet måles. Ultralydsmåleren er angivet
@@ -264,6 +277,14 @@ løbende at give estimater af Euler-vinklerne; theta, phi og psi. Hvor phi og the
 
 \subsubsection{Aktuatorer}
 \label{sssec:aktuatorer}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.70\textwidth]{grafik/motor_gear.png}
+  \caption{a) Motorreservedel, b) samlet motor og gear på
+    kulfiberkryds og
+    c) gear-reservedel.}
+  \label{fig:motorgear}
+\end{figure}
 AR.Dronens aktuatorer er de fire børsteløse $15 Watt$ motorer. Motorerne
 arbejder i intervallet $10350$ til $41400$ omdrejninger per minut ($RPM$) og når AR.Dronen står stille i
 luften arbejder motorerne med $28000 RPM$. Dette svarer, grundet gearingen,
@@ -282,14 +303,13 @@ På undersiden af quadrokopteren er der et 7 benet molex-stik til ekstern serialk
 
 \subsubsection{Strømforsyning}
 \label{sssec:forsyning}
-Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri med en open-circuit\footnote{Open-circuit spændingen er den spænding der er over batteriet når det er uden belastning og ikke oplades.} spænding på $11,1 Volt$, med ladning på $1000$ milli-ampere-timer ($mAh$) og en afladnings hastighed på $10$ Coulomb ($C$). Opladning af batteriet kan foregå i løbet af 90 minutter. Efter sigende skulle batteriet give omking 12 minutters flyvetid\cite{electronic:ar.drone_parrot_technologies}\cite{electronic:wiki_ar.drone}.
-
-\begin{figure}
+\begin{figure}[ht]
   \centering
-  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
-  \caption{(a) vinkelhastigheden $\Omega$ øges med $\Delta_A$ på alle 4 propeller, quadrokopteren øger dermed løftekraften (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og mindskes på højre propel, quadrokopteren laver et ``roll'' til højre (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de med-uret-drejende propeller gør at torque bliver ulige og at quadrokopteren drejer mod venstre (acceleration i yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts ($V_y$). figuren er fra AR.Drone SDK Development guide\cite{techreport:ardroneDevGuide}}
-  \label{fig:drone_movements}
+  \includegraphics[width=0.60\textwidth]{grafik/batteries.jpg}
+  \caption{Batterier til AR.Dronen (Figuren er fra www.techpowerup.com/reviews/Parrot/AR\_Drone/images/batteries.jpg).}
+  \label{fig:batterier}
 \end{figure}
+Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri med en open-circuit\footnote{Open-circuit spændingen er den spænding der er over batteriet når det er uden belastning og ikke oplades.} spænding på $11,1 Volt$, med ladning på $1000$ milli-ampere-timer ($mAh$) og en afladnings hastighed på $10$ Coulomb ($C$). Opladning af batteriet kan foregå i løbet af 90 minutter. Efter sigende skulle batteriet give omking 12 minutters flyvetid\cite{electronic:ar.drone_parrot_technologies}\cite{electronic:wiki_ar.drone}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
@@ -325,6 +345,13 @@ Bernoullieffekt\cite{nla.cat-vn856146}%\cite{electronic:wiki_bernoulli}
 Denne egenskab bruges til at styre AR.Dronens flyvning og bevægelser i
 rummet, som kan beskrives med 3 bevægelsesakser; x, y og z (se
 figur~\ref{fig:drone_movements}) som er lokale for quadrokopteren. 
+
+\begin{figure}{ht}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
+  \caption{(a) vinkelhastigheden $\Omega$ øges med $\Delta_A$ på alle 4 propeller, quadrokopteren øger dermed løftekraften (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og mindskes på højre propel, quadrokopteren laver et ``roll'' til højre (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de med-uret-drejende propeller gør at torque bliver ulige og at quadrokopteren drejer mod venstre (acceleration i yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts ($V_y$). figuren er fra AR.Drone SDK Development guide\cite{techreport:ardroneDevGuide}}
+  \label{fig:drone_movements}
+\end{figure}
 
 AR.Dronens bevægelser styres ved at kontrollere dens vinkel i forhold
 til de 3 akser. Skal AR.Dronen f.eks. flyve fremad, sættes forenden
@@ -421,9 +448,7 @@ indeholder blandt andet
 \item en algoritme til at udlede AR.Dronens hastighed ved hjælp af
   bundkameraet (bekræftes også i en
   artikel\cite{velocity_estimation_inside_the_drone} af Parrot
-  selv.)%cite hvor
-% nogle siger at program.elf + motorstyring + radio tager op mod $80
-% \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
+  selv.)
 \item og en algoritme til at detektere tags i billeder i forbindelse
   med augmented reality spil.
 \end{itemize}
@@ -449,7 +474,7 @@ Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan k
       sektion \ref{sssec:atinterface}}) til det kørende firmware
     \uri{program.\ $\!$elf} på AR.\ $\!$Dronen.
   \item Ved at eksekvere et program der kører
-    og kommunikerer internt på AR.\ Dronen.
+    og kommunikerer internt på AR.Dronen.
     Programmet kommunikerer med
     AR.\ $\!$Dronens firmware \uri{program.\ $\!$elf} gennem de tre UDP-porte der
     også anvendes ved almindelig trådløs kommunikation.
@@ -460,7 +485,7 @@ Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan k
 Fra en klient-computer er det muligt at få adgang til AR.Dronens 
 installerede linuxinstallation ved at oprette en telnetforbindelse til AR.Dronens 
 faste IP-adresse (192.168.1.1). Efter at forbindelsen er etableret 
-får brugeren her adgang til en rodterminal. %root .. eller?
+får brugeren her adgang til en root-terminal. %telnet?
 
 Ved at oprette forbindelse gennem FTP, fra et FTP-program på en 
 ekstern klientcomputer til AR.Dronens FTP-server, kan man overføre 
@@ -478,7 +503,7 @@ Firmwaren \uri{program.elf} på AR.Dronen sender og modtager pakker på tre UDP-po
 \begin{itemize}
   \item På port 5556 (command port) lytter quadrokopteren efter brugerkommandoer, afsendt fra klientenheden e.g. ``takeoff'', flyv-frem, drej, land osv.
   \item på port 5555 (video port) sender AR.Dronen en videostream til klientenheden.
-  \item på port 5554 (video port) sender AR.Drone løbende statusinformation om f.eks. hastighed, eulervinkler, afstand til jorden osv. Pakkerne fra port 5554 kaldes \emph{navdata} fordi pakkerne indeholder information om navigationstilstanden.
+  \item på port 5554 (navdata port) sender AR.Drone løbende statusinformation om f.eks. hastighed, eulervinkler, afstand til jorden osv. Pakkerne fra port 5554 kaldes \emph{navdata} fordi pakkerne indeholder information om navigationstilstanden.
 \end{itemize}
 
 
@@ -532,7 +557,11 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \ref{tab:kommandoer} i appendiks \ref{sec:at}. 
 
 
-\subsection{Vurdering af AR.Dronen som robotplatform} % Thomas,
+\subsection{Vurdering af/begrænsninger i AR.Dronen som robotplatform} % Thomas,
+Under den indledende informationssøgning til dette speciale og gennem
+diverse forsøg og eksperimenter undervejs er der indsamlet en del erfaringer med
+AR.Dronen. Nogle af de mest markante / relevante observationer er
+listet herunder.
 %En elaboreret tekst omkring hvad man kan sige af pro et con omkring AR.Dronen som platform til udvikling af en flyvende robot.
 \paragraph{Omkring hastighed og inerti}
 Selvom det synes at give mening at beskrive AR.Dronens bevægelser i 3
@@ -546,7 +575,8 @@ accelerationen, men hastigheden i det horisontale plan er i praksis
 afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch
 værdierne kan være aflæst til 0 og AR.Dronen vil ligge horisontal, men
 kan stadig godt bevæge sig sideværts i luften\footnote{AR.Dronen siges
-  at være ``trimmet'' (med en konstant hastighed, evt. 0m/S, men også forskellig fra 0m/S) hvis den
+  at være ``trimmet'' (med en konstant hastighed, evt. $0 m/sek.$, men
+  også forskellig fra $0 m/sek.$) hvis den
   ikke påvirkes af en resulterende kraft og acceleration dermed er 0}
 på grund af indebåren inerti eller f.eks. en stille konstant
 vind. Bevæger AR.Dronen sig med en konstant hastighed kan det ikke
@@ -555,42 +585,75 @@ således heller ikke aflæses af accelerometer og gyro alene.
  Dog har Parrot underbygget hastighedsestimatet med en optical-flow
 algoritme på billedstrømmen fra bundkameraet i firmwaren, således at
 denne er blevet noget mere troværdig\cite{velocity_estimation_inside_the_drone}.
-Eksperimenter med hastighedsudledning er beskrevet i afsnit~\ref{sec:distance-mesu}. Det viser sig at under de rette
-forhold er hastighedsudledningen udmærket brugbar. Er det derimod ikke muligt for bundkameraet at opfange nok tydelige kendetegn i gulvet, vil hastighedudledningen være fejlbehæftet.
+Dette speciales egne eksperimenter med hastighedsudledning er beskrevet i
+afsnit~\ref{sec:distance-mesu}. Det viser sig at under de rette 
+forhold er hastighedsudledningen udmærket brugbar. U-rette forhold er
+hvis det ikke er muligt for bundkameraet at opfange tilpas mange
+tydelige kendetegn i gulvet, vil hastighedudledningen være
+fejlbehæftet.
+%
 \paragraph{Ultralydssensor}
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/sonarzone2.png}
-  \caption{Udbredelsesområde for ultralydssensorsignal, man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://www.cs.brown.edu/people/tld/courses/cs148/02/sonar.html}).\todo{i referencer?}}
+  \caption{a) Udbredelsesområde for ultralydssensorsignal, b) man ser at
+    afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan
+    forekomme ekko fra et større område under sensoren (figuren er fra
+    \uri{http://www.cs.brown.edu/people/tld/courses/cs148/02/sonar.html}).\todo{Skal
+      den i referencer?}} 
   \label{fig:sonicbeam2}
 %%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg} \uri{http://picaxe.hobbizine.com/srf05.html}) %men det er ikke det samme billede?
 \end{figure}
-Højdemåleren består som sagt en ultralyds sender og modtager, teknologien gør at %specielt i små rum/kontorlokaler, små kasser / borde + turbolens
- højden ikke er udfra et specifikt punkt, men derimod returnerer den mindste højde indenfor et område som det på figur \ref{fig:sonicbeam2}. Dvs. højden er udledt af den tid der går fra en lydpuls afsendes til der modtages et ekko. Ekkoet behøver ikke komme fra en stor overflade som en væg eller et gulv, men kan være en kasse inde i sensorområdet som figur~\ref{fig:sonicbeam2}.
-Fordi teknologien netop er lyd vil der også være indeboende problemer med ekko på skrånende og bløde overflader. 
+Højdemåleren består som sagt en ultralyds sender og modtager, teknologien gør at 
+ højden ikke er udfra et specifikt punkt, men derimod returnerer den
+ mindste højde indenfor et område som det på figur
+ \ref{fig:sonicbeam2}. Dvs. højden er udledt af den tid der går fra en
+ lydpuls afsendes til der modtages et ekko. Ekkoet behøver ikke komme
+ fra en stor overflade som en væg eller et gulv, men kan være en kasse
+ inde i sensorområdet som figur~\ref{fig:sonicbeam2}. Det kan specielt
+ være et problem hvis der flyves i et trangt lokale med kasser,
+ stole og borde på gulvet, hvor de mange legemer vil give en falsk
+ opfattelse af højden til gulvet.
+Fordi teknologien netop er lyd vil der også være indeboende problemer
+med ekko på skrånende og bløde overflader.
+% blæst lyd
+%specielt i små rum/kontorlokaler, små kasser / borde + turbolens
 %
 De nævnte problematikker kan have indflydelse ved udvikling med AR.Dronen. Bl.a. andet er det en god ide at have det sig for øje når quadrokopteren hælder meget, ie. ved flyvning i høj hastighed.
+%
+\paragraph{Realtidssystem} En kilde, hvor det desværre ikke har været muligt at genfinde referencen, menes at have sagt at det operativsystem, styreprogram og de eksterne processer der kører på AR.Dronen tilsammen bruger op mod $80\%$ af CPU-tiden. -- Om det akurat er $80\%$ eller en anden sats vil have indvirkning hvis man vælger at afvikle yderligere processer på AR.Dronen, eg. USB-understøttelse under flyvning og Wifi-signalstyrke indsamling som beskrevet i afsnit~\ref{ssec:wikilokalisering}. Pointen er at man ikke kan bruge mere end de resterende f.eks. $20\%$ uden at det vil gå ud over kontrollen med flyvningen.
+%
+\paragraph{Trådløs båndbredde} Der er ikke et stort overhead i User datagram protokollen pga. transmisionskontrol. Det gør at der i princippet kan sendes flere f.eks. videopakker end med en synkroniseret kommunikationsprotokol som TCP. Oveni at der kontinuerligt sendes friske datapakker så giver det mest mening at anvende en asynkron protokol i realtidskommunikationen med quadrokopteren idet det ikke kan betale sig at bruge resourcer på at generhverve det fåtal af billedframes der går tabt pga. fejl i transmissionen, det er bedre at indlæse den næste datapakke istedet. Information i den gamle datapakke vil alligevel være forældet og urelevant.
+%
+\paragraph{Billedkvalitet} AR.Drone er et produkt der er designet til mainstream og masserne. Kravende har været at den skulle være relativ billig i produktion og dermed let kunne erhverves af menigmand. I dette valg af design har Parrot lavet et afvejet valg i et tradeoff mellem kvalitet af billeder versus antal af billeder der bliver afsendt per sekund. Det betyder at opdateringshastigheden af billeder og data fra AR.Dronen er tilstrækkelig i de fleste tilfælde, men, som det fremgår af afsnit~\ref{sec:QRdecoding}, at til en simpel ting som afkodning af QR-koder (hvortil der findes færdige værktøjer) er billedkvaliteten ikke af tilstrækkelig kvalitet.
+%
+\paragraph{Zap imellem 2 kameraer}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.40\textwidth]{grafik/2frames.png}
+  \caption{Et billede fra AR.Dronens bundkamera (med opløsing på $88 \times 72$) i
+    øverste venstre hjørne af et billede fra frontkameraet ($320 \times 240$)}
+  \label{fig:2frames}
+\end{figure}
+I forbindelsen mellem klient og AR.Dronen kan man kun modtage en
+billedramme ad gangen. Dvs. at enten skal man få billeder fra
+frontkameraet eller fra bundkameraet. -- Skal man bruge billeder fra
+begge kameraer, må man skifte imellem dem (zappe) og skiftevis få et
+billede fra frontkamera hver anden gang og bundkameraet de andre gange.
+Det er ikke praktisk idet det nedsætter
+opdateringshastigheden. ydermere er der et lille delay forbundet med
+at skifte feed fra fra det ene til det andet kamera.
+Insisterer man alligevel på at få billeder fra begge kameraer
+samtidig, er det dog muligt. -- Billeder fra de to kameraer lægges
+ovenpå hinanden til eet billede (se
+figur~\ref{fig:2frames}), som så kan modtages af klienten.
+Det billede der er indeholdt i det andet er af noget mindre opløsning ($88 \times 72$)
+end hvis det havde været sendt alene ($320 \times 240$). Denne forskel
+i kvalitet har tydeligt en indflydelse på resultatet af diverse
+billedanalysealgoritmer.
 
-En kilde hvor det desværre ikke har været muligt at genfinde referencen menes skal have sagt at det operativsystem, styreprogram og de eksterne processer der kører på AR.Dronen tilsammen bruger op mod $80\%$ af CPU-tiden. -- Om det akurat er $80\%$ eller en anden sats vil have indvirkning hvis man vælger at afvikle yderligere processer på AR.Dronen, eg. USB-understøttelse under flyvning og Wifi-signalstyrke indsamling som beskrevet i afsnit~\ref{ssec:wikilokalisering}. Pointen er at man ikke kan bruge mere end de resterende f.eks. $20\%$ uden at det vil gå ud over kontrollen med flyvningen.
-
-
-tradeoff - Billedopløsning eksperiment f.eks. QR-koder kontra hurtig transmission
-%Sammenlignet med TCP opererer UDP med noget mindre
-%overhead per afsendt besked. Tilgengæld garanterer protokollen intet
-%om hvorvidt eller hvornår en pakke når frem til sin destination.
-% UDP
-%er oftest det første valg, når der skal streames video og lyd over et
-%netværk, da en enkelt mistet pakke sjældent har stor betydning i denne
-%kontekst. Når fokus er på at få sendt så meget
-%information (navigationsdata og video) som muligt til brugeren, giver
-%det god mening at anvende UDP og så implementere et minimum af
-%flowkontrol ovenpå protokollen, e.g.  
-
-%Til gengæld kan vi godt se fordele i
-%de garantier TCP kunne give når fokus er på at modtage kontrolpakker,
-%heldigvis er det forholdsvis simpelt, at kontrollere hvorvidt visse
-%kritiske beskeder(land, let etc.) er nået frem til AR.Dronen, eller om vi
-%skal sende pakken igen.
+\todo{afsluttende bemærkning... evt. reference yderligere
+  behandling/opsummering i Resultater/Konklusion...}
 
 \pagebreak
 \section{Fasciliterende platform} % Morten,
@@ -620,7 +683,7 @@ moduler. Vi har udviklet tre forskellige receiverklasser(video,
 navdata og wifi i receiversmodulet), to forskellige
 controllerklasser(joystick og keyboard i controllersmodulet), en taskmanager og
 en kontrolinterface-klasse(controllersmodulet). Derudover har vi med
-inspiration fra ~\ref{derp} implementeret en virtuel sensor der bygger oven på videoreceiveren. 
+inspiration fra \todo{\\cite{derp}} implementeret en virtuel sensor der bygger oven på videoreceiveren. 
 
 I standard situationen instantieres, startes og tilgåes disse klasser fra
 droneklassen(dronemodulet). På denne måde kan udviklere der ønsker at
@@ -632,20 +695,20 @@ tilstede.  De enkelte klasser kan også anvendes hver for sig, se*.
 
 “klasse diagram eller lignende”
 
-\subsubsection{Receivers}
+\subsection{Receivers}
 
 Receivers
 implementeret som proces
 doublebuffered
 receiverlogikken er implementeret i en baseklasse
-\paragraph{Navdatareceiver}
-\paragraph{Videoreceiver}
-\paragraph{Wifireceiver}
+\subsubsection{Navdatareceiver}
+\subsubsection{Videoreceiver}
+\subsubsection{Wifireceiver}
 
-\paragraph{Virtuel sensor}
+\subsubsection{Virtuel sensor}
 
 
-\subsubsection{kontrolinterface, AT-kommando Python interface}
+\subsubsection{Kontrolinterface, AT-kommando Python interface}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
 gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
@@ -664,7 +727,7 @@ kontrollere dronens opførsel og bevægelser. Interfacet kan i det
 simpleste tilfælde anvendes direkte fra Pythons interpreter, men
 fungerer også som en del af vores grundlæggende platform.
 
-\subsubsection{Controllers}
+\subsection{Controllers}
 Selvom det er muligt, er det ikke praktisk anvendeligt at brugeren skal
 afvikle scripts, der anvender kontrolinterfacet, for hver ønsket
 bevægelse(som det ses i figur~\ref{fig:pythonimpl1}), i stedet har vi
@@ -692,7 +755,7 @@ førsteklasses objekter, er det let at lade en controller skifte mellem
 forskellige tilstande, dette gøres ved at kalde \code{set\_control\_method} med
 en ny kontrolmetode som argument. 
 
-\paragraph{Joystickcontroller}
+\subsubsection{Joystickcontroller}
 Joystickcontrolleren står i vores system istedet for en iPhone eller
 iPad og anvendes til at fjernstyre AR.Drone manuelt i forbindelse
 med testflyvninger. Der var flere praktiske grunde til at vi valgte at
@@ -721,7 +784,7 @@ controlleren.
   \label{fig:xboxlayout}
 \end{figure}
 
-\paragraph{Keyboardcontroller}
+\subsubsection{Keyboardcontroller}
 Hvis vi ønsker at starte vores system uden grafisk brugerflade(og
 tilhørende GTK keyboardbindinger), er det
 praktisk stadig at kunne anvende tastaturet som input(evt i kombination med Xbox360
@@ -743,7 +806,7 @@ receiverne. Taskmanagerens opgave er udelukkende at starte
 forudspecificerede opgaver(tasks) og stoppe dem igen, samt at
 facilitere beslutningen om hvilken task der har lov til at bevæge AR.Dronen. 
 
-\subsubsection{Testdevice}
+\subsection{Testdevice}
 Dette modul muliggør gennemførelsen af simple eksperimenter i et
 test miljø. Grundideen bag modulet er, at man skal kunne optage, ikke
 bare film, men alle sensoroutput fra en flyvning med AR.Dronen, for så
@@ -909,14 +972,19 @@ def receive_and_show_picture():
 \subsection{Wifi-signalstyrkesample presenter}
 \pagebreak
 
+
 \section{Tasks ``plugin''} % Morten
 
 \pagebreak
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Eksperimenter - section
-\section{Eksperimenter} % Thomas & Morten
+\chapter{Eksperimenter} % Thomas & Morten
 
-\subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
+\section{Tasks ``plugin''} % Morten
+
+
+\section{Lokalisering via Wifi-fingerprinting} % Morten (1side)
 \label{ssec:wikilokalisering}
 %,skal disse have hver deres egen hovedsektion (istedet for SUBsection)?
 Hvad vil vi vise, afvise teste?
@@ -928,7 +996,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 
 Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
 
-\subsection{Lokalisering via blobs} % Thomas & Morten
+\section{Lokalisering via blobs} % Thomas & Morten
 %Blob-detection og PID styring} 
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
@@ -940,20 +1008,27 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 \todo{simpel blob}, og \todo{udbygget nested blob}
 
 
-\subsection{Lokalisering via QR-koder} % Morten
+\section{Lokalisering via QR-koder} % Morten
+\label{sec:QRdecoding}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
 Hvad var resultatet?
 perspektiver, hvad skal / kan vi bruge den nye viden til?
 Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
-
+\paragraph{Ultralydssensor}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.35\textwidth]{grafik/woah.png}
+  \caption{Teksten ``woah'' som QR-kode}
+  \label{fig:qr_woah}
+\end{figure}
 
 %\subsection{Optisk flow navigation} % tt
 %\todo{fedt hvis det kan nåes at lave det...}
 
 %\subsection{Korridor vanishpoint}
-\subsection{Korridors forsvindingspunkt} % Thomas
+\section{Korridors forsvindingspunkt} % Thomas
 %Hvad vil vi vise, afvise teste?
 %Hvad kan/skal resultatet bruges til?
 %Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -977,7 +1052,7 @@ finde edges -> finde houghlines -> sortere linier (diagonale)
 flest skæringspunkter
 +augmenter med phi
 
-\subsubsection{At finde kanter i et billede}
+\subsection{At finde kanter i et billede}
 
 \begin{figure}
   \centering
@@ -1019,7 +1094,7 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
 % second derivative = laplacian
 
 
-\subsubsection{Houghlinier}
+\subsection{Houghlinier}
 
 \begin{figure}
   \centering
@@ -1032,7 +1107,7 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
 
 
 
-\subsection{Distance-measurererererererere} % Thomas
+\section{Distance-measurererererererere} % Thomas
 \label{sec:distance-mesu}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
@@ -1048,7 +1123,7 @@ Algoritme integration over afstand
 Test, hvor virker det godt hvor er det problematisk
 reference til Parrots egen artikle herom; hastighed udledning bundkamera hvis muligt ellers udledning af accelerometer.
 
-\subsection{Inhibition/subsumtion} % Morten
+\section{Inhibition/subsumtion} % Morten
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1059,7 +1134,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 \todo{avoid silhouet}, \todo{low battery}
 Task, silhuet, batteri, at skifte kamera forfra til underside - problematisk.
 
-\subsection{Erkendelse af miljø/mode...}
+\section{Erkendelse af miljø/mode...}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1077,20 +1152,21 @@ Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi ka
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Konklusion - section
 
-\section{Konklusion}
+\chapter{Konklusion}
 
-\subsection{Perspektivering}
+\section{Perspektivering}
 
-\subsection{Fremtidig arbejde}
+\section{Fremtidig arbejde}
 \pagebreak
 
 
-\appendix
 
 \bibliographystyle{abbrv}
 \bibliography{referencer}
 
-\section{AT kommandoer}
+\appendix
+
+\chapter{AT kommandoer}
 \label{sec:at}
 Kort fortalt så må en AT-kommando ikke deles i flere pakker, men en UDP-pakke kan
 indeholde flere AT-kommandoer, kommandoerne skal blot være adskilt med
@@ -1127,7 +1203,7 @@ kontrollere AR.Dronen.
   \label{tab:kommandoer}
 \end{table} 
 
-\section{Medfølgende CD / internet}
+\chapter{Medfølgende CD / internet}
 \todo{Readme} Hvad skal læseren gøre, hvad er tilgængeligt
 
 

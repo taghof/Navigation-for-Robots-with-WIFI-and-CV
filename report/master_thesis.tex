@@ -63,7 +63,7 @@ Indeholder og gennemgår i det følgende (på dansk).
 
 \pagebreak
 
-\section{Introduktion} %Thomas
+\chapter{Introduktion} %Thomas
 % på videnskabeligt grundlag identificere, afgrænse og formulere en faglig problemstilling, 
 % definere og opstille testbare hypoteser inden for fagets emneområde, 
 % selvstændigt planlægge og under anvendelse af fagets videnskabelige metode gennemføre et større fagligt projekt, 
@@ -113,7 +113,7 @@ Discussion af AR.Dronen som tilfredstillende basis... Modelling and control of a
 Lave et framework/platform til at afhjælpe tiden mellem kodeimplementation til aftestning
 
 
-\subsection{Motivation} % Thomas & Morten, Hvorfor
+\section{Motivation} % Thomas & Morten, Hvorfor
 
 \label{sec:motivation}
 \paragraph{anvendelser}
@@ -127,7 +127,7 @@ redningsdrone\cite{electronic:redningsdronedk}
 
 
 referencer til lignende arbejde, vores forskellig fordi..
-\subsection{Teseformulering/mål} % Thomas & Morten, Hvad
+\section{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
 HVAD er det præcis vi vil vise eller afvise?!
 nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen.
@@ -142,7 +142,7 @@ Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
 
 Er det en del af opgaven at se om AR.Dronen er den rigtige platform at lave dette på? - er en konklusion at den er adequate, men at det ville være bedre havde man haft tiden til at lave sin egen, finde en anden???
 
-\subsection{Metode} % Thomas, Hvordan, skal den være en SUBsection eller section?
+\section{Metode} % Thomas, Hvordan, skal den være en SUBsection eller section?
 \label{sec:metode}
 %% Antagelser, problemdomæne formuleret i introduktionen sektion \ref{sec:introduktion}.
 %% (Lavpraktisk:)
@@ -159,7 +159,7 @@ Definition på en robot; kan udføre en opgave - en sekvens af operationer/handlin
 anden karakteriserende pind/punkt/egenskab; at den på baggrund af sensorinput (feedback kontrol) kan træffe beslutninger / beslutningstræ...
 Disse to egenskaber findes allerede i AR.Dronen, udfra det er den tilpas til at starte ud med når vi skal lege med robotter
 %%%% Introduction - Metode
-\subsubsection{AR.Drone} % Thomas,
+\subsection{AR.Drone} % Thomas,
 Selvstændig selvstående paragraf omkring, valg af AR.Dronen. Hvorfor har vi valgt den, hvad tilfredstiller den, hvad tilfredstiller den ikke. Hvad skal den bruges til.
 
 generelle sensore på dronen; 2 kameraer, acceleration, rotation, hastighed, 
@@ -172,10 +172,10 @@ wifi-kommunikation
 - samt undersøgt muligheden for at udvide AR.Dronens Hardwareplatform med yderligere sensore eg. usb / mere flashdrive
 
 %%%% Introduction - Metode
-\subsubsection{Domæne/navigationsmiljø} % Thomas,
+\subsection{Domæne/navigationsmiljø} % Thomas,
 Nogle bygninger på Katrinebjerg, indendørs...
 
-\subsubsection{/Miljø} % Thomas,
+\subsection{/Miljø} % Thomas,
 \paragraph{Indendørs}
 
 \paragraph{PC-linux}
@@ -186,7 +186,7 @@ afvikling kommunikation, styring hvem er chef / sensor
 platform skrevet i python med bibliotek / wrapper til opencv (ffmpeg), pygame, numpy...
 
 %%%% Introduction - Metode
-\subsubsection{Platform samt hjælpeværktøjer} % Thomas & Morten
+\subsection{Platform samt hjælpeværktøjer} % Thomas & Morten
 Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. For f.eks. at minimere den tid der går fra at en ide implementeres i kode til aftestning på quadrokopteren, er det muligt at lave scripts (Task) bestående af kun få liniers kode der nemt afvikles på systemet.
 %
 \paragraph{drone.py} -modulet / -klassen er konstrueret for at tage sig af al kommunikationen mellem PC og AR.Dronen. Kommunikationen består i at opretholde forbindelsen, samt modtage datapakker fra quadrokopterens sensor system og at afsende styrekommandoer fra brugeren til AR.Dronen.
@@ -206,7 +206,7 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 \paragraph{Task manager plugin og tasks}
 
 
-\subsubsection{Eksperimenter} % Thomas,
+\subsection{Eksperimenter} % Thomas,
 
 \paragraph{Lokalisering via Wifi-fingerprinting}
 %\paragraph{Simpel-blob}
@@ -220,10 +220,10 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
  Korridor (Hopper) vs. Åbent område (Zuse)
 
 %%%% Introduction
-\subsection{Raport struktur} % Thomas, %/læsevejledning
+\section{Raport struktur} % Thomas, %/læsevejledning
 Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
 
-\subsection{Medfølgende CD}
+\section{Medfølgende CD}
 Dude its a CD
 \pagebreak
 
@@ -232,7 +232,7 @@ Dude its a CD
 %%%%     AR.Drone - section
 %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\chapter{Opsætning}
 \section{AR.Drone}
 \label{sec:AR.Drone}
 AR.Drone er en quadrokopter fremstillet og udviklet af det franske
@@ -1124,9 +1124,9 @@ def receive_and_show_picture():
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Eksperimenter - section
-\section{Eksperimenter} % Thomas & Morten
+\chapter{Eksperimenter} % Thomas & Morten
 
-\subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
+\section{Lokalisering via Wifi-fingerprinting} % Morten (1side)
 \label{ssec:wikilokalisering}
 %,skal disse have hver deres egen hovedsektion (istedet for SUBsection)?
 Hvad vil vi vise, afvise teste?
@@ -1138,7 +1138,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 
 Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
 
-\subsection{Lokalisering via blobs} % Thomas & Morten
+\section{Lokalisering via blobs} % Thomas & Morten
 %Blob-detection og PID styring} 
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
@@ -1150,7 +1150,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 \todo{simpel blob}, og \todo{udbygget nested blob}
 
 
-\subsection{Lokalisering via QR-koder} % Morten
+\section{Lokalisering via QR-koder} % Morten
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1163,7 +1163,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 %\todo{fedt hvis det kan nåes at lave det...}
 
 %\subsection{Korridor vanishpoint}
-\subsection{Korridors forsvindingspunkt} % Thomas
+\section{Korridors forsvindingspunkt} % Thomas
 %Hvad vil vi vise, afvise teste?
 %Hvad kan/skal resultatet bruges til?
 %Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1187,7 +1187,7 @@ finde edges -> finde houghlines -> sortere linier (diagonale)
 flest skæringspunkter
 +augmenter med phi
 
-\subsubsection{At finde kanter i et billede}
+\subsection{At finde kanter i et billede}
 
 \begin{figure}
   \centering
@@ -1229,7 +1229,7 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
 % second derivative = laplacian
 
 
-\subsubsection{Houghlinier}
+\subsection{Houghlinier}
 
 \begin{figure}
   \centering
@@ -1242,7 +1242,7 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
 
 
 
-\subsection{Distance-measurererererererere} % Thomas
+\section{Distance-measurererererererere} % Thomas
 \label{sec:distance-mesu}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
@@ -1258,7 +1258,7 @@ Algoritme integration over afstand
 Test, hvor virker det godt hvor er det problematisk
 reference til Parrots egen artikle herom; hastighed udledning bundkamera hvis muligt ellers udledning af accelerometer.
 
-\subsection{Inhibition/subsumtion} % Morten
+\section{Tasks/Inhibition/subsumtion} % Morten
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1269,7 +1269,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 \todo{avoid silhouet}, \todo{low battery}
 Task, silhuet, batteri, at skifte kamera forfra til underside - problematisk.
 
-\subsection{Erkendelse af miljø/mode...}
+\section{Erkendelse af miljø/mode...}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1291,9 +1291,9 @@ Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi ka
 Evaluering: at det har været svært at finde videnskabelige datalogiske kilder af høj troværdighed omkring AR.Dronen ; in part privat virksomhed properitær firmware / arkitektur, meget information fra hacker, tinker, DIY fora.
 Tilgængel nogle videnskabelige artikler omkring hvordan man implementere en algoritme ovenpå en allerede antaget platform som AR.Dronen...
 
-\subsection{Perspektivering}
+\section{Perspektivering}
 
-\subsection{Fremtidig arbejde}
+\section{Fremtidig arbejde}
 \pagebreak
 
 

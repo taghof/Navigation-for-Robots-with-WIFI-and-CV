@@ -8,7 +8,7 @@
 \usepackage[ansinew]{inputenc}
 \usepackage{graphicx}
 \usepackage{framed}
-%\usepackage{subfig}
+\usepackage{subfigure}
 \usepackage{listings}
 
 \usepackage{natbib}
@@ -16,10 +16,7 @@
 \usepackage{bm}
 \usepackage{amssymb,amsmath}
 \usepackage{caption}
-\usepackage{subcaption}
-%\usepackage{url}
-%\usepackage{url}
-
+%\usepackage{subcaption}
 %\usepackage{url}
 
 %\newenvironment{nb}
@@ -38,7 +35,7 @@
 \title{Master Thesis}
 \author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
 \hline\\
-\vspace{4cm}\\'
+\vspace{4cm}\\
 \makeatletter
 \texttt{Semi Autonomous Indoor}\\ %Indoor? - nogle udendørs robotter heller ikke bruge gps, for dyrt i præcision...
 \texttt{Navigation for Arial Robots}\\
@@ -265,15 +262,11 @@ I det følgende gennemgåes i afsnit \emph{\titleref{ssec:hardware}} de fysiske en
 
 \begin{figure}[ht]
 \centering
-  \subfloat[Indendørsskjold]{
-    \label{fig:indendoersskjold}
-    \includegraphics[width=0.45\textwidth]{grafik/parrot-ardrone.jpg}
-  }
+  \subfigure[Indendørsskjold]{\includegraphics[width=0.45\textwidth]{grafik/parrot-ardrone.jpg}
+    \label{fig:indendoersskjold}}
   ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfloat[Udendørsskjold]{
-    \label{fig:udendoersskjold}
-    \includegraphics[width=0.45\textwidth]{grafik/parrot-ardrone-outdoor.jpg}
-  }
+  \subfigure[Udendørsskjold]{\includegraphics[width=0.45\textwidth]{grafik/parrot-ardrone-outdoor.jpg}
+    \label{fig:udendoersskjold}}
   \caption{AR.Drone med indendørs- og udendørsskjold. Figurene er fra AR.Drone Developer Guide\cite{techreport:ardroneDevGuide}}
   \label{fig:ardrone}
 \end{figure}
@@ -733,23 +726,19 @@ porten. Vores proof-of-concept var at få loadet en almindelig usbstick
 og skrive og læse fra denne(*ref til blog*), dette var forholdsvis
 simpelt, da driverne til dette formål er meget generiske.
 
-\begin{figure}[ht]
-%\centering
-  \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=1.0\textwidth]{grafik/usbdevices.png}
-    \caption{USB-kabel og de enheder vi har haft tilslutttet AR.Dronen.}
-    \label{fig:cableandusbdevices}
-  \end{subfigure}  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=1.0\textwidth]{grafik/usbattached.png}
-    \caption{AR.Dronen med usbstick tilsluttet.\\derp}
-    \label{fig:usbattached}
-  \end{subfigure}
+\begin{figure*}[htp]
+  \centering
+  \subfigure[USB-kabel og de enheder vi har haft tilslutttet AR.Dronen.]{
+    \includegraphics[width=0.4\textwidth]{grafik/usbdevices.png}
+    \label{fig:cableandusbdevices}}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfigure[AR.Dronen med usbstick tilsluttet.]{\includegraphics[width=0.4\textwidth]{grafik/usbattached.png}
+    \label{fig:usbattached}}
   \label{fig:usbdevices}
-\end{figure}
+\end{figure*}
 
 \subsection{Wifisensor}
-Efter vores indledende manøvrer med AR.Dronens USB-port, valgte vi at
+Efter vores indledende erfaringer med AR.Dronens USB-port, valgte vi at
 implementere en wifi-sensor for på sigt at kunne anvende denne som
 lokaliseringsredskab. Vores wifisensor består af en usb-wifi-adapter
 og et snifferprogram til at aflæse og videresende signalstyrker fra de
@@ -779,8 +768,8 @@ crosscompiling til AR.Drone arkitekturen og den anvendte toolchain.
 
 For at skrive et program der kan modtage pakker fra et
 netværksinterface anvender man ofte linux' pcap bibliotek, dette er
-dog ikke er installeret på AR.Dronen som standard og skal først
-kompileres til ARM-arkitekturen for at vi kan linke til det og senere
+dog ikke er installeret på AR.Dronen som standard og skulle først
+kompileres til ARM-arkitekturen før vi kunne linke til det og senere
 anvende programmet på AR.Dronen, se *blog ref*.
 
 Sniffer programmet har mulighed for at tage et interfacenavn som input
@@ -789,7 +778,11 @@ vælge at angive en kanal, at angive om man ønsker at anvende
 channelhopping til at modtage pakker fra forskellige kanaler og angive
 om man ønsker at få output til terminalen. Når programmet startes vil
 det vente på en UDP initieringspakke fra en klient før det begynder at
-modtage og behandle pakker. 
+modtage og behandle pakker. Sniffer programmet sender signalstyrker og
+mac-adresser videre til klienten ved hjælp af UDP kommunikation på
+port 5551, hvilket gør at det er transparent for klienten om hvorvidt
+den modtager data fra den originale AR.Drone software eller fra vores
+udvidelse. 
  
 \section{Fasciliterende klient platform} % Morten,
 Vi har udviklet den grundlæggende platform med det formål, at
@@ -818,7 +811,7 @@ moduler. Vi har udviklet tre forskellige receiverklasser(video,
 navdata og wifi i receiversmodulet), to forskellige
 controllerklasser(joystick og keyboard i controllersmodulet), en taskmanager og
 en kontrolinterface-klasse(controllersmodulet). Derudover har vi med
-inspiration fra ~\ref{derp} implementeret en virtuel sensor der bygger oven på videoreceiveren. 
+inspiration fra~\cite{lenser:behaviorbasedarchitecture} implementeret en virtuel sensor der bygger oven på videoreceiveren. 
 
 I standard situationen instantieres, startes og tilgåes disse klasser fra
 droneklassen(dronemodulet). På denne måde kan udviklere der ønsker at
@@ -841,22 +834,63 @@ den basale receiverfunktionalitet. For bedre at kunne udnytte en
 multicore processor er denne baseklasse er implementeret som en
 selvstændig proces ved hjælp af Pythons
 multiprocessing-modul. Receiverprocessen kommunikerer ved hjælp af en
-delt liste, som anvendes både til at overføre signaler og data.
+delt liste, som anvendes både til at overføre signaler og data.  For
+at tilpasse de enkelte receivere implementerer disse specifikke
+metoder(for eksempel til afkodning af den specifikke type data) der
+kaldes på bestemte tidspunkter under det generelle receiverloop.
  
-Receivers
-implementeret som proces
-doublebuffered
-receiverlogikken er implementeret i en baseklasse
 \paragraph{Navdatareceiver}
+Navdatareceiveren modtager navigationsdata(højde, hastighed mm.) fra
+AR.Dronen og decoder denne, i forhold til de strukturer der findes
+beskrevet i **filnavn** fra Parrots SDK  
+
 \paragraph{Videoreceiver}
+Videoreceiveren modtager og afkoder AR.Dronens videostrøm, afkodningen
+foregår på baggrund af den process der nævnes i **AR.Drone dev
+guide**. Formatet der sendes i minder meget om JPEG formatet og
+forfatteren til den algoritme vi har tilpasset, spekulerer
+i~\cite{electronic:parrotforum2} om det ville være muligt at anvende
+en decideret JPEG decoder til afkodningen. Dette kunne gøre det muligt
+at anvende et optimeret C bibliotek til formålet og dermed øge
+afkodningshastigheden og desuden eliminere vores afhængighed af Psyco Python til at speede denne
+afkodning op.
+
 \paragraph{Wifireceiver}
+Som de andre receivere modtager wifireceiveren en datastrøm fra
+AR.Dronen, wifistrømmen er dog en tilføjelse vi har lavet og formatet
+der skal afkodes er blot en tekststreng bestående af en mac-adresse og
+en signalstyrke. Wifireceiveren modtager en pakke for hver pakke
+snifferprogrammet opsnapper. Wifireceiveren skiller sig ud fra de
+andre receivere ved at placere de modtagne adresse/signal-par i en
+liste og holde denne liste opdateret med de nyeste signalværdier for
+hver adresse, for hver adresse gemmes desuden de sidste *X* modtagne værdier,
+deres gennemsnit, deres varians og deres middelværdi. Når
+wifireceiverens get\_data() metode kaldes, er det disse værdier der
+returneres, værdierne finder anvendelse når wifidata skal matches med hinanden.
 
 \paragraph{Virtuel sensor}
-Switching the camera mode is done immediately once the AT command is received and the current picture is finished processing. So it's theoretically possible to switch every 15th of a second. Nevertheless this mechanism was meant to be used manually by the iPhone user once in a while; doing it by software at high frequency will result in an unpredictable number of switches.
-If what you want to do is receiving pictures from both cameras at the same time by switching camera at every frame reception, there is a big chance it does not work reliably.
-
-Stéphane Piskorski
-https://projects.ardrone.org/boards/1/topics/show/560
+Den virtuelle sensor er en sen tilføjelse til vores platform og er som
+tidligere nævnt inspireret af sensorhierakiet beskrevet i
+\cite{lenser:behaviorbasedarchitecture}, hvor sensorer opererer på
+forskellige niveauer og derfor leverer sensor output på forskellige
+abstraktionsniveauer.  I modsætning til receiverne modtager den
+virtuelle sensor ikke data direkte fra AR.Dronen, men derimod netop
+fra receiverne. Den virtuelle sensor bearbejder kontinuerligt
+billeddata for at genkende henholdsvis markører på jorden og
+silhuetter umiddelbart foran AR.Dronen, sensoren leverer således
+målinger på et højere abstraktionsniveau end receiverne. For
+at kunne detektere både markører på gulvet og silhuetter er det
+nødvendigt for sensoren hele tiden at skifte mellem bund- og
+frontkamera, dette giver imidlertid problemer for AR.Dronens originale
+program der ved konstante kameraskift løbende øger sit
+hukommelsesforbrug indtil linuxkernen lukker programmet ned. Vores
+målinger viser, at AR.Dronens program kun kan køre mellem ti og tolv
+minutter, såfremt vi samtidig skifter kamera med circa 5
+millisekunders interval. Selvom om dette problem ikke beskrives
+direkte nogen steder, antydes det dog af en udvikler på Parrots forum,
+at denne funktionalitet ikke er ment anvendt til hurtige kameraskift ved
+hjælp af software og at der derfor er stor sandsynlighed for at metoden
+ikke virker pålideligt\cite{electronic:parrotforum1}.
 
 \subsubsection{kontrolinterface, AT-kommando Python interface}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
@@ -947,7 +981,7 @@ udskrevet aktive opgaver på autocontrolleren('c'), til at få udskrevet
 en oversigt over tråde i programmet('t'), samt til at starte opgaver
 på autocontrolleren('1', '2' og '3'). 
 
-\subsection{Taskmanager}
+\subsubsection{Taskmanager}
 Taskmanagerklassen startede ud som almindelig controller, men er endt
 som en mere selvstændig del af platformen. Taskmanageren skiller sig
 ud ved ikke, i modsætning til joystick- og keyboardcontrollerne, at

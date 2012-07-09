@@ -34,7 +34,7 @@
 \newcommand{\drone}[0]{AR.\ $\!$Drone}
 
 \title{Master Thesis}
-\author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{ tysse, taghof }@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
+\author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{\{tysse, taghof\}}@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
 \hline\\
 \vspace{4cm}\\
 \makeatletter
@@ -317,6 +317,12 @@ løbende at give estimater af Euler-vinklerne; theta, phi og psi. Hvor phi og the
 
 \subsubsection{Aktuatorer}
 \label{sssec:aktuatorer}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.60\textwidth]{grafik/motor_gear.png}
+  \caption{a) Motorreservedel, b) samlet motor og gear på kulfiberkryds og c) gear-reservedel.}
+  \label{fig:motor_gear}
+\end{figure}
 AR.Dronens aktuatorer er de fire børsteløse $15 Watt$ motorer. Motorerne
 arbejder i intervallet $10350$ til $41400$ omdrejninger per minut ($RPM$) og når AR.Dronen står stille i
 luften arbejder motorerne med $28000 RPM$. Dette svarer, grundet gearingen,
@@ -335,6 +341,12 @@ På undersiden af quadrokopteren er der et 7 benet molex-stik til ekstern serialk
 
 \subsubsection{Strømforsyning}
 \label{sssec:forsyning}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.60\textwidth]{grafik/batteries.jpg}
+  \caption{Batterier til AR.Dronen (Figuren er fra www.techpowerup.com/\-reviews/\-Parrot/\-AR Drone/\-images/\-batteries.jpg).}
+  \label{fig:batterier}
+\end{figure}
 Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri med en open-circuit\footnote{Open-circuit spændingen er den spænding der er over batteriet når det er uden belastning og ikke oplades.} spænding på $11,1 Volt$, med ladning på $1000$ milli-ampere-timer ($mAh$) og en afladnings hastighed på $10$ Coulomb ($C$). Opladning af batteriet kan foregå i løbet af 90 minutter. Efter sigende skulle batteriet give omking 12 minutters flyvetid\cite{electronic:ar.drone_parrot_technologies}\cite{electronic:wiki_ar.drone}.
 
 \begin{figure}
@@ -652,7 +664,7 @@ kasser, stole og borde på gulvet, hvor de mange legemer vil give en
 falsk opfattelse af højden til gulvet.  Fordi teknologien netop er lyd
 vil der også være indeboende problemer med ekko på skrånende og bløde
 overflader.  % blæst lyd %specielt i små rum/kontorlokaler, små kasser
-/ borde + turbolens
+%/ borde + turbolens
 %
 De ovennævnte problematikker kan have indflydelse ved udvikling med
 AR.Dronen. Specielt i de tilfælde quadrokopteren hælder meget, ie. ved
@@ -670,7 +682,6 @@ flyvning og Wifi-signalstyrke indsamling som beskrevet i
 afsnit~\ref{ssec:wikilokalisering}. Pointen er at man ikke kan bruge
 mere end de resterende f.eks. $20\%$ uden at det vil gå ud over
 kontrollen med flyvningen.
-
 %
 \paragraph{Trådløs båndbredde} Der er ikke et stort overhead i User
 datagram protokollen pga. transmissionskontrol. Det gør at der i
@@ -694,6 +705,13 @@ tilstrækkelig i de fleste tilfælde, men, som det fremgår af
 afsnit~\ref{sec:QRdecoding}, at til en simpel ting som afkodning af
 QR-koder (hvortil der findes færdige værktøjer) er billedkvaliteten
 ikke af tilstrækkelig kvalitet.
+%
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.60\textwidth]{grafik/2frames.png}
+  \caption{Et billede fra AR.Dronens bundkamera (med opløsing på $88\times72)$ i øverste venstre hjørne af et billede fra frontkameraet ($320 \times 240$).}
+  \label{fig:2frames}
+\end{figure}
 %
 \paragraph{Zap imellem 2 kameraer} I forbindelsen mellem klient og
 AR.Dronen kan man kun modtage en billedramme ad gangen. Dvs. at enten

@@ -9,6 +9,7 @@
 \usepackage{graphicx}
 \usepackage{framed}
 \usepackage{subfigure}
+\usepackage{float}
 \usepackage{listings}
 
 \usepackage{natbib}
@@ -729,10 +730,10 @@ simpelt, da driverne til dette formål er meget generiske.
 \begin{figure*}[htp]
   \centering
   \subfigure[USB-kabel og de enheder vi har haft tilslutttet AR.Dronen.]{
-    \includegraphics[width=0.4\textwidth]{grafik/usbdevices.png}
+    \includegraphics[width=0.47\textwidth]{grafik/usbdevices.png}
     \label{fig:cableandusbdevices}}
   ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[AR.Dronen med usbstick tilsluttet.]{\includegraphics[width=0.4\textwidth]{grafik/usbattached.png}
+  \subfigure[AR.Dronen med usbstick tilsluttet.]{\includegraphics[width=0.47\textwidth]{grafik/usbattached.png}
     \label{fig:usbattached}}
   \label{fig:usbdevices}
 \end{figure*}
@@ -751,8 +752,8 @@ oprindelige bootup-sekvens, i dette script loades også alle de
 nødvendige kernemoduler.
 
 \subsubsection{WIFI-adapter}  
-Vi har valgt at udstyre AR.Dronen med en Dlink DWL-G122*
-wifi-adapter. Denne specifikke adapter bygger på et Ralink* chipset og
+Vi har valgt at udstyre AR.Dronen med en Dlink DWL-G122~\cite{electronic:dwlg122}
+wifi-adapter. Denne specifikke adapter bygger på et Ralink~\cite{electronic:wikiralink} chipset og
 understøtter monitor mode. Ralink udgiver desuden linuxdrivere til
 deres chipsets. Efter længere tids søgen og eksperimenteren, fandt vi
 den korrekte driver og fik denne kompileret til ARM-arkitekturen og
@@ -789,7 +790,7 @@ Vi har udviklet den grundlæggende platform med det formål, at
 understøtte vores videre arbejde med AR.Dronen. Platformen skal sikre
 let og effektiv adgang til AR.Dronens sensor output, samt give
 mulighed for at styre AR.Dronen, både manuelt(uden brug af iPhone,
-iPad eller lignende) og ved hjælp af prædefinerede opgaver(tasks*).
+iPad eller lignende) og ved hjælp af prædefinerede opgaver~\ref{sec:tasks}.
 
 \subsection{Implementationsdetaljer}
 Vi har af flere grunde valgt at implementere vores platform i python,
@@ -798,7 +799,7 @@ let udbyggelig platform til rådighed for udviklermiljøet omkring
 AR.Dronen. Da Python er et fortolket højniveau sprog kan vi
 naturligvis ikke opnå samme afviklingshastighed som hvis vi havde anvendt C
 eller andre maskinnære sprog.  I forbindelse med afkodningen af video
-fra AR.Dronen anvender vi biblioteket Psyco* til at netop øge
+fra AR.Dronen anvender vi biblioteket Psyco~\cite{electronic:psyco} til at netop øge
 afviklingshastigheden. Psyco er en form for JIT compiler der lader os
 afvikle umodificeret pythonkode hurtigere, ved afkodning af 100
 billeder er præcis den samme kode med Psyco mere end 5 gange hurtigere
@@ -852,16 +853,16 @@ forfatteren til den algoritme vi har tilpasset, spekulerer
 i~\cite{electronic:parrotforum2} om det ville være muligt at anvende
 en decideret JPEG decoder til afkodningen. Dette kunne gøre det muligt
 at anvende et optimeret C bibliotek til formålet og dermed øge
-afkodningshastigheden og desuden eliminere vores afhængighed af Psyco Python til at speede denne
-afkodning op.
+afkodningshastigheden og desuden eliminere vores afhængighed af Psyco
+Python til at speede denne afkodning op.
 
 \paragraph{Wifireceiver}
 Som de andre receivere modtager wifireceiveren en datastrøm fra
 AR.Dronen, wifistrømmen er dog en tilføjelse vi har lavet og formatet
 der skal afkodes er blot en tekststreng bestående af en mac-adresse og
-en signalstyrke. Wifireceiveren modtager en pakke for hver pakke
+en signalstyrke, der modtages således en pakke for hver pakke
 snifferprogrammet opsnapper. Wifireceiveren skiller sig ud fra de
-andre receivere ved at placere de modtagne adresse/signal-par i en
+andre receivere, ved at placere de modtagne adresse/signal-par i en
 liste og holde denne liste opdateret med de nyeste signalværdier for
 hver adresse, for hver adresse gemmes desuden de sidste *X* modtagne værdier,
 deres gennemsnit, deres varians og deres middelværdi. Når
@@ -1038,7 +1039,7 @@ kommandoport. Den konkrete implementation af \code{square()} ses i
 figur~\ref{fig:pythonimpl1}. Det bemærkes at kontrolinterfacetråden
 skal startes (kald af \code{c.start()}) før kommandoerne har nogen effekt.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \lstset{language=Python, frame=single}
   \begin{lstlisting}
 def square():
@@ -1100,7 +1101,7 @@ eksempel på hvor få linier kode man behøver for at modtage og vise et
 billede fra AR.Dronens kamera. Eksemplet antager som tidligere, at der
 allerede er oprettet en virkende forbindelse med AR.Dronens trådløse
 netværk. Eksemplet startes fra Pythons kommandopromt.  
-\begin{figure}[ht]
+\begin{figure}[H]
   \begin{framed}   
     \begin{verbatim}
 >>> import examples as e
@@ -1116,7 +1117,7 @@ kode for at modtage et billede(og endnu fire for at vise det), vi
 mener at dette fint illustrerer, hvordan vi med dette abstraktionslag kan
 tilbyde et let anvendeligt interface til AR.Dronens forskellige
 sensoroutput.   
-\begin{figure}[ht]
+\begin{figure}[H]
   \lstset{language=Python, frame=single}
   \begin{lstlisting}
 def receive_and_show_picture():
@@ -1153,7 +1154,92 @@ def receive_and_show_picture():
 
 \pagebreak
 
-\section{Tasks ``plugin''} % Morten
+\section{Tasks} % Morten
+\label{sec:tasks}
+For at indkapsle forskellige bevægemønstre og for at kunne koordinere
+en parallel afvikling af disse, har vi implementeret et hierakisk
+opbygget tasksystem. Vi har valgt at anvende task-terminologien
+istedet for behaviors~\cite{lenser:behaviorbasedarchitecture}, grunden til dette er at flere af vores tasks er
+forholdsvis kortlivede(for eksempel take-off og landtasks) og derfor
+mere minder om en opgave der skal forberedes, udføres og afsluttes,
+dette ses i modsætning til en behavior som kan opfattes som en
+længerevarende opførsel. Vi har også implementeret højniveau bevægemønstre der
+minder mere om en traditionelle behaviors(for eksempel
+FollowTourTask), men vi mener også at det giver mening at kalde disse
+tasks, da de også implementeres efter vores generelle taskstruktur.
+
+Vores første udgaver af tasksystemet indbefattede tasks der indsamlede
+og behandlede data fra AR.Dronens sensorer, i den endelige udgave er
+disse tasks dog udskilt til den virtuelle sensor, så tasks ikke skal
+behandle sensordata, men kun reagere og formidle bevægelse på baggrund
+af højniveau-sensordata. 
+
+\subsection{Task typer} 
+Vi har to hovedtyper, simple og compoundtasks. Simple tasks nedarver
+fra vores basetaskklasse Task. De repræsenterer oftest en simpel
+bevægelse, men kan være vilkårligt komplekse, for eksempel har vi en
+task der blandt andet implementerer en PID-controller. Compoundtasks
+er tasks der indeholder en liste af undertasks og funktionalitet til
+at starte og stoppe de underliggende tasks. Vi anvender to typer
+compoundtasks, sekventielle og parallelle. Sekventielle compoundtasks
+starter deres undertasks en efter en, men venter med at starte en ny
+undertask før den forrige er afsluttet, en sekventiel compoundtask
+stopper når den sidste undertask er afsluttet. Parallelle compoundtask
+starter alle deres undertasks på en gang og stopper også når den
+sidste undertask har afsluttet. 
+
+\subsection{Task hieraki}
+Ved hjælp af de ovenfor beskrevne tasktyper, og specialiseringer af
+disse, kan vi danne en task træstruktur der minder om den beskrevet i
+\cite{lenser:behaviorbasedarchitecture}. Selvom om de basale
+træstrukturer minder om hinanden, er der dog adskillige forskelle på
+algoritmen der bestemmer hvilken task/behavior der skal
+aktiveres. 
+
+Tilgangen i \cite{lenser:behaviorbasedarchitecture} er at
+en aktiveret behavoir skal bestemme hvilke af sine underbehaviors der
+skal aktiveres, dette er praktisk, da det med deres robot er muligt at
+udføre forskellige bevægelser på samme tid og det bedste sæt af
+parallelle bahaviors skal beregnes. I vores tilgang operer vi ikke med
+flere aktive tasks samtidig(de bevægelser vi har til rådighed kan ikke udføres
+uden indflydelse på hinanden) og generelt bliver vores træer ikke
+ligeså dybe som \cite{lenser:behaviorbasedarchitecture}, da vores
+interface til AR.Dronen er på et højere abstraktions niveau. Vores
+tilgang indbefatter at alle tasks kører samtidig(alle tasks er
+implementeret som Python tråde), men at maksimalt en
+task har tilladelse til at flytte på AR.Dronen, hver gang en task
+ønsker at flytte AR.Dronen spørges op  i træet efter tilladelse. Alle
+tasks på samme niveau(med samme forælder) er ordnet i et fast hieraki
+og en højere rangeret task kan altid kræve kontrol og dermed
+undertrykke lavere rangerende tasks.
+
+På ~\ref{fig:taskhieraky} ses et eksempel på et taskhieraki
+konstrueret med vores taskcontructor, under antagelse at hver TestTask
+ønsker at udføre et antal bevægelser og ikke på noget tidspunkt ønsker
+frivilligt at opgive bevægekontrollen, vil TestTask med level 1 slutte
+først og TestTask med level 2 slutte sidst.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.80\textwidth]{grafik/taskhieraky.png}
+  \caption{Eksempel på et taskhieraki.}
+  \label{fig:taskhieraky}
+\end{figure}
+
+Et mere realistisk og komplekst eksempel er en FollowTourTask, se
+\ref{fig:followtour}, denne task nedarver fra en sekvensiel
+compoundtask og indeholder udover takeoff og land-tasks også en
+parallel compoundtask der kan veksle mellem bevægelse og fastholdelse
+af en position(ved hjælp af en PID-controller). Selve FollowTourTask
+enheden holder styr på den tour der skal følges, ved hjælp af et
+Map-objekt, og sørger for at opdatere HoverTrackTasken(PID) med en ny
+målposition når det er nødvendigt.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.80\textwidth]{grafik/followtourhieraki.png}
+  \caption{Opbygningen af en FollowTourTask.}
+  \label{fig:followtour}
+\end{figure}
+
 
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1185,6 +1271,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 
 
 \section{Lokalisering via QR-koder} % Morten
+\label{sec:QRdecoding}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1234,20 +1321,39 @@ flest skæringspunkter
   \label{fig:kanter1}
 \end{figure}
 
-Kanter i et billede defineres som abrupt skift i farveværdi eller lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt (se f.eks.\newline
-  \uri{http://en.wikipedia.org/wiki/Step\_detection\#Global}), men det
-  er en anden tilgang. I dette afsnit beskrives en metode der søger lokalt.} mellem
-naboer af pixels. Kanter er ofte en
-indikator for eksistensen af bl.a. ændringer i dybden af et billede og for
+Kanter i et billede defineres som abrupt skift i farveværdi eller
+lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt
+(se f.eks.\newline
+\uri{http://en.wikipedia.org/wiki/Step\_detection\#Global}), men det
+er en anden tilgang. I dette afsnit beskrives en metode der søger
+lokalt.} mellem naboer af pixels. Kanter er ofte en indikator for
+eksistensen af bl.a. ændringer i dybden af et billede og for
 overfladeændringer m.fl.
 
-Figur~\ref{fig:kanter1} illustrerer hvordan ændringerne i intensitet imellem tilstødende billedpunkter (pixel) kan ses som en graf af højder. De steder hvor der er stor højdemæssig afstand, altså hvor hældningen er stejl, er der som oftest en kant at finde. 
+Figur~\ref{fig:kanter1} illustrerer hvordan ændringerne i intensitet
+imellem tilstødende billedpunkter (pixel) kan ses som en graf af
+højder. De steder hvor der er stor højdemæssig afstand, altså hvor
+hældningen er stejl, er der som oftest en kant at finde.
 
-Til at finde kanter (edges) kan cannyfilteret\cite{Canny1986} anvendes. Det tager et billede og returnere et binært billede (sort/hvid). Hvide billedpunkter indikere at der er en kant i det oprindellige billede, mens sort betyder at der ikke er ændringer. 
+Til at finde kanter (edges) kan cannyfilteret\cite{Canny1986}
+anvendes. Det tager et billede og returnere et binært billede
+(sort/hvid). Hvide billedpunkter indikere at der er en kant i det
+oprindellige billede, mens sort betyder at der ikke er ændringer.
 
-Fordi AR.Dronens kamera er med lille opløsning og det billeder af så tilpas ringe kvalitet vil det forbedre slutresultatet at bruge et båndpasfilter til at lave en ``udglatning'' af billedet. Udglatningsoperationen udføres med et gaussisk filter\footnote{Fra billedbehandlingsprogrammer som Photoshop og GIMP hedder det ``Gaussian blur'' filter.} en klokkegraf\cite{electronic:wiki_gaussklokke}.
+Fordi AR.Dronens kamera er med lille opløsning og det billeder af så
+tilpas ringe kvalitet vil det forbedre slutresultatet at bruge et
+båndpasfilter til at lave en ``udglatning'' af
+billedet. Udglatningsoperationen udføres med et gaussisk
+filter\footnote{Fra billedbehandlingsprogrammer som Photoshop og GIMP
+hedder det ``Gaussian blur'' filter.} en
+klokkegraf\cite{electronic:wiki_gaussklokke}.
 
-Tager man alle pixelpositioner hvor den første afledte er over threshold kan man ende op med mange tykke kanter, for at præcisere placeringen kan man udtynde dem, ved at søge i retningen af den lokale gradient og istedet finde maximum/minimum. Videreudbygninger af Cannyfilteret efter 1986 bruger bl.a. endnu en retningsbestemt afledt af gradienten og finder maximum ved dens skærring med 0.
+Tager man alle pixelpositioner hvor den første afledte er over
+threshold kan man ende op med mange tykke kanter, for at præcisere
+placeringen kan man udtynde dem, ved at søge i retningen af den lokale
+gradient og istedet finde maximum/minimum. Videreudbygninger af
+Cannyfilteret efter 1986 bruger bl.a. endnu en retningsbestemt afledt
+af gradienten og finder maximum ved dens skærring med 0.
 
 \begin{figure}
   \centering

@@ -15,8 +15,9 @@
 \usepackage{natbib}
 \usepackage{titleref}
 \usepackage{bm}
-\usepackage{amssymb,amsmath}
-\usepackage{caption}
+\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{caption}
 %\usepackage{subcaption}
 %\usepackage{url}
 
@@ -25,16 +26,16 @@
 %   {\end{framed}\end{quotation}}
 %\newcommand{\oversaet}[1]{(\textit{#1})}
 
-\begin{document}
 
 \newcommand{\uri}[1]{ #1 }
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\todo}[1]{\textbf{todo:}(#1)}
 \newcommand{\dronen}[1]{#1}
-\newcommand{\drone}[0]{AR.\ $\!$Drone}
+\newcommand{\drone}[0]{AR.Drone} %AR.\ $\!$Drone
 
+\begin{document}
 \title{Master Thesis}
-\author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{\{tysse, taghof\}}@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
+\author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{tysse, taghof}@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
 \hline\\
 \vspace{4cm}\\
 \makeatletter
@@ -129,7 +130,7 @@ referencer til lignende arbejde, vores forskellig fordi..
 \label{sec:tese}
 HVAD er det præcis vi vil vise eller afvise?!
 nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen.
-
+er det en platform som andre kan arbejde videre på, undersøge hvad der evt. skal til for at lave en sådan
 Det er noget med en [semi autonom] [navigation] [indendørs] [luftbåren]
 
 fra semiautonom og navigation er der noget, 1) bevægelse i forskellige miljøer, og 2) avoid opførsel, møde med silhuet eller lavt batteri.
@@ -321,7 +322,7 @@ løbende at give estimater af Euler-vinklerne; theta, phi og psi. Hvor phi og the
   \centering
   \includegraphics[width=0.60\textwidth]{grafik/motor_gear.png}
   \caption{a) Motorreservedel, b) samlet motor og gear på kulfiberkryds og c) gear-reservedel.}
-  \label{fig:motor_gear}
+  \label{fig:motorgear}
 \end{figure}
 AR.Dronens aktuatorer er de fire børsteløse $15 Watt$ motorer. Motorerne
 arbejder i intervallet $10350$ til $41400$ omdrejninger per minut ($RPM$) og når AR.Dronen står stille i
@@ -348,13 +349,6 @@ På undersiden af quadrokopteren er der et 7 benet molex-stik til ekstern serialk
   \label{fig:batterier}
 \end{figure}
 Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri med en open-circuit\footnote{Open-circuit spændingen er den spænding der er over batteriet når det er uden belastning og ikke oplades.} spænding på $11,1 Volt$, med ladning på $1000$ milli-ampere-timer ($mAh$) og en afladnings hastighed på $10$ Coulomb ($C$). Opladning af batteriet kan foregå i løbet af 90 minutter. Efter sigende skulle batteriet give omking 12 minutters flyvetid\cite{electronic:ar.drone_parrot_technologies}\cite{electronic:wiki_ar.drone}.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
-  \caption{(a) vinkelhastigheden $\Omega$ øges med $\Delta_A$ på alle 4 propeller, quadrokopteren øger dermed løftekraften (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og mindskes på højre propel, quadrokopteren laver et ``roll'' til højre (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de med-uret-drejende propeller gør at torque bliver ulige og at quadrokopteren drejer mod venstre (acceleration i yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts ($V_y$). figuren er fra AR.Drone SDK Development guide\cite{techreport:ardroneDevGuide}}
-  \label{fig:drone_movements}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
@@ -401,6 +395,13 @@ på den bageste propel. Det resulterer i at AR.Dronen hælder lidt
 fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig
 gældende når AR.Dronen skal flytte sig sideværts som på figur
 \ref{fig:drone_movements}b.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
+  \caption{(a) vinkelhastigheden $\Omega$ øges med $\Delta_A$ på alle 4 propeller, quadrokopteren øger dermed løftekraften (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og mindskes på højre propel, quadrokopteren laver et ``roll'' til højre (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de med-uret-drejende propeller gør at torque bliver ulige og at quadrokopteren drejer mod venstre (acceleration i yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts ($V_y$). figuren er fra AR.Drone SDK Development guide\cite{techreport:ardroneDevGuide}}
+  \label{fig:drone_movements}
+\end{figure}
 
 Hvis AR.Dronen skal dreje om sin egen akse for at kigge længere til
 venstre bruges samme egenskab som før; det moment som tilføres af de 2
@@ -486,9 +487,7 @@ indeholder blandt andet
 \item en algoritme til at udlede AR.Dronens hastighed ved hjælp af
   bundkameraet (bekræftes også i en
   artikel\cite{velocity_estimation_inside_the_drone} af Parrot
-  selv.)%cite hvor
-% nogle siger at program.elf + motorstyring + radio tager op mod $80
-% \%$ af processorkraften, passe på med ikke at overforbruge de sidtse 20\%
+  selv.)
 \item og en algoritme til at detektere tags i billeder i forbindelse
   med augmented reality spil.
 \end{itemize}
@@ -520,7 +519,7 @@ Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan k
       sektion \ref{sssec:atinterface}}) til det kørende firmware
     \uri{program.\ $\!$elf} på AR.\ $\!$Dronen.
   \item Ved at eksekvere et program der kører
-    og kommunikerer internt på AR.\ Dronen.
+    og kommunikerer internt på AR.Dronen.
     Programmet kommunikerer med
     AR.\ $\!$Dronens firmware \uri{program.\ $\!$elf} gennem de tre UDP-porte der
     også anvendes ved almindelig trådløs kommunikation.
@@ -556,7 +555,7 @@ Firmwaren \uri{program.elf} på AR.Dronen sender og modtager pakker på tre UDP-po
 \begin{itemize}
   \item På port 5556 (command port) lytter quadrokopteren efter brugerkommandoer, afsendt fra klientenheden e.g. ``takeoff'', flyv-frem, drej, land osv.
   \item på port 5555 (video port) sender AR.Dronen en videostream til klientenheden.
-  \item på port 5554 (video port) sender AR.Drone løbende statusinformation om f.eks. hastighed, eulervinkler, afstand til jorden osv. Pakkerne fra port 5554 kaldes \emph{navdata} fordi pakkerne indeholder information om navigationstilstanden.
+  \item på port 5554 (navdata port) sender AR.Drone løbende statusinformation om f.eks. hastighed, eulervinkler, afstand til jorden osv. Pakkerne fra port 5554 kaldes \emph{navdata} fordi pakkerne indeholder information om navigationstilstanden.
 \end{itemize}
 
 
@@ -628,7 +627,7 @@ accelerationen, men hastigheden i det horisontale plan er i praksis
 afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch
 værdierne kan være aflæst til 0 og AR.Dronen vil ligge horisontal, men
 kan stadig godt bevæge sig sideværts i luften\footnote{AR.Dronen siges
-  at være ``trimmet'' (med en konstant hastighed, evt. 0m/S, men også forskellig fra 0m/S) hvis den
+  at være ``trimmet'' (med en konstant hastighed, evt. $0m/S$, men også forskellig fra $0m/S$) hvis den
   ikke påvirkes af en resulterende kraft og acceleration dermed er 0}
 på grund af indebåren inerti eller f.eks. en stille konstant
 vind. Bevæger AR.Dronen sig med en konstant hastighed kan det ikke
@@ -646,11 +645,10 @@ forhold er hastighedsudledningen udmærket brugbar. Udledningen af hastighed besv
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/sonarzone2.png}
-  \caption{Udbredelsesområde for ultralydssensorsignal, man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://www.cs.brown.edu/people/tld/courses/cs148/02/sonar.html}).\todo{i referencer?}}
+  \caption{a) Udbredelsesområde for ultralydssensorsignal, b) man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://www.cs.brown.edu/\-people/\-tld/\-courses/\-cs148/\-02/\-sonar.html}). \todo{Skal den i referencer?}}
   \label{fig:sonicbeam2}
 %%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg} \uri{http://picaxe.hobbizine.com/srf05.html}) %men det er ikke det samme billede?
 \end{figure}
-
 Højdemåleren består som nævnt af en ultralyds-sender og
 -modtager. Teknologien gør at højden man får ud ikke nødvendigvis er
 fra det vinkelrette punkt udfor sensoren, men derimod returnerer den
@@ -658,7 +656,7 @@ mindste højde indenfor et område som det på figur
 \ref{fig:sonicbeam2}. Det vil sige højden er udledt af den tid der går
 fra en lydpuls afsendes, til der modtages et ekko. Ekkoet behøver ikke
 komme fra en stor overflade som en væg eller et gulv, men kan være en
-kasse inde i sensorområdet som figur~\ref{fig:sonicbeam2}. Det kan
+kasse inde i sensorområdet som figur~\ref{fig:sonicbeam2}a. Det kan
 specielt være et problem hvis der flyves i et trangt lokale med
 kasser, stole og borde på gulvet, hvor de mange legemer vil give en
 falsk opfattelse af højden til gulvet.  Fordi teknologien netop er lyd
@@ -1170,6 +1168,8 @@ def receive_and_show_picture():
 
 \subsection{Mapdrawer / turplanlægger}
 
+\subsection{Wifi-signalstyrkesample presenter}
+
 \pagebreak
 
 \section{Tasks} % Morten
@@ -1290,6 +1290,12 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 
 \section{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}
+ \begin{figure}[ht]
+   \centering
+   \includegraphics[width=0.35\textwidth]{grafik/woah.png}
+   \caption{Teksten ``woah'' som QR-kode}
+   \label{fig:qr_woah}
+ \end{figure}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1318,7 +1324,9 @@ frontkameraet.
 I ``Minerva'' og ``opticalflow corridor vanishing point'' har robotterne fået
 forskellige handleprocedure afhængigt af hvilket miljø de befinder sig i.
 
-Målet for dette eksperiment er at 
+Målet for dette eksperiment er at : 2 ting
+1) finde ss. for at man er i en korridor, og
+2) hvor er enden af korridoren (forsvindingspunktet)
 
 Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra der er kommet inspiration.
 finde edges -> finde houghlines -> sortere linier (diagonale)
@@ -1392,8 +1400,7 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
 \begin{figure}
   \centering
   \includegraphics[width=0.40\textwidth]{grafik/polar2cartesian.png}
-  \caption{En linie beskrevet ved det velkendte almindelige cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i polar koordinatsystem ved en vinkel $\Theta$ og en afstand $\rho$.
-}
+  \caption{En linie beskrevet ved det velkendte almindelige cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i polar koordinatsystem ved en vinkel $\Theta$ og en afstand $\rho$.}
   \label{fig:polar2cartesian}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
@@ -1460,7 +1467,7 @@ Tilgængel nogle videnskabelige artikler omkring hvordan man implementere en algo
 \bibliographystyle{abbrv}
 \bibliography{referencer}
 
-\section{AT kommandoer}
+\chapter{AT kommandoer}
 \label{sec:at}
 Kort fortalt så må en AT-kommando ikke deles i flere pakker, men en UDP-pakke kan
 indeholde flere AT-kommandoer, kommandoerne skal blot være adskilt med
@@ -1497,7 +1504,7 @@ kontrollere AR.Dronen.
   \label{tab:kommandoer}
 \end{table} 
 
-\section{Medfølgende CD / internet}
+\chapter{Medfølgende CD / internet}
 \todo{Readme} Hvad skal læseren gøre, hvad er tilgængeligt
 
 

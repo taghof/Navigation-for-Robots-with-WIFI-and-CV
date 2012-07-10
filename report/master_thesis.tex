@@ -72,36 +72,46 @@ Indeholder og gennemgår i det følgende (på dansk).
 % analysere, kritisk diskutere og perspektivere en faglig problemstilling, 
 % vurdere, kritisk analysere og sammenfatte den videnskabelige litteratur inden for et afgrænset emneområde, 
 % formidle videnskabelige resultater objektivt og koncist til et videnskabeligt forum
-
 \label{sec:introduktion}
 %\subsection{området, teknologi}
-emne generelt, related work, hvad har andre lavet?
-problem specifik
-definition af nøglebegreber
+%emne generelt, related work, hvad har andre lavet?
+%problem specifik
+%definition af nøglebegreber
 
--Kort intro hvad vil vi gøre...
+%-Kort intro hvad vil vi gøre...
+Dette speciale handler om at klarlægge muligheder for at gøre en
+quadrotor\cite{electronic:wiki_quadrotor} delvis selvflyvende i et
+indendørsmiljø. Mere specifikt handler det i første omgang om at
+kontruere en base i software som der kan bygges videre på ved at
+udnytte en AR.Drones\cite{electronic:ardrone} indbyggede sensorapparat
+og kontrolinterface. I anden omgang handler det om at undersøge
+hvorledes sensorapparatet ombord på AR.Dronen kan udnyttes til at
+udlede mere abstrakt information ud af som igen kan anvendes til at
+abtrahere en indforstået model som AR.Dronen kan navigere i til støtte
+for en menneskelig bruger.
 
--problem domæne,
--introduktion til andres arbejde / resultater, 
--hvad bygger vi videre på (hvis arbejde), 
--hvad er vores antagelser til at starte med
-
+%-problem domæne,
+Præmissen for specialet har under foløbet ofte rykket sig, men er hele
+tiden flyttet tilbage til ``at der skal være et underholdende
+indhold''. Underholdningfaktoren skinner også tydeligt igennem hvis
+man kigger på hjemmesiden for Parrots AR.Drone
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.50\textwidth]{grafik/flyingvideogame.png}
   \caption{AR.Dronens logo med slagordene \emph{the Flying Video Game} april 2011 http://web.archive.org/web/20110715044741/http://ardrone.parrot.com/parrot-ar-drone/en/.}
   \label{fig:devisen}
 \end{figure}
-
-%flyttet op fra AR.Drone afsnittet
 AR.Drone blev introduceret i 2010 som ``the Flying Video Game'' og
 promoveres stadig af producenten som et stykke legetøj, der fjernstyres fra
-brugerens iPhone eller iPad\cite{electronic:ardrone}. Det har siden
-fundet stor anvendelse, ikke blot som et avanceret stykke
-legetøj. 
+brugerens iPhone eller iPad%\cite{electronic:ardrone}. 
+Det har siden fundet stor anvendelse, ikke blot som et avanceret
+stykke legetøj. 
 Forskere, studerende og hobbyister har taget den fjernstyrede
 quadrokopter til sig som en færdig platform til at udvikle videre
 ovenpå og som platform til selv at ombygge.
+
+
+<- underholdning minerva museumsrobot
 
 \paragraph{Lignende arbejde - forskning}
 %\cite evt. flere som har brugt AR.Dronen i deres forsøg
@@ -109,12 +119,27 @@ ovenpå og som platform til selv at ombygge.
 %\titleref{sec:AR.Drone}
 Minerva museums tourguide robot\cite{Thrun99minerva:a}
 
+-introduktion til andres arbejde / resultater, 
+-hvad bygger vi videre på (hvis arbejde), 
+-hvad er vores antagelser til at starte med
+
+Forskningen i quadrotere er gået fra at forstå og optimere mekanikkens / den fysiske interaktion/påvirkning med luften - bygge gode kontruktioner\cite{quteprints33767} refererer til 
+Derefter finde ud af at jo mindre des mindre inerti kan være indeholdt, mere agile agil/adræt
+\cite{turpin:swarm}
+
+
+gå fra centraliseret styring til fosøg med decentraliseret, swarm anonymitet, største proble er sanse apparatet, førhen flere ekserne kameraer til observation og feedback af position til flokken, nu forsøg med lokal dataindsamling fra bl.a. Kinect {http://www.ros.org/wiki/kinect}, {pelican quadrotor}
+
+forskellige frameworks til sensordata opsamling og udledning/abstraktioner
+
 Discussion af AR.Dronen som tilfredstillende basis... Modelling and control of a quad-rotor robot, Pounds et al\cite{quteprints33767} bygge en ny mekanisk forsimplet udgave af en quadrocopter, mere robust => færre reperationer...
 
 
 \paragraph{Anvendelser}%eller under motivation...
 Sousveillance vs. surveillance, noget multimedieæstetik, 
 occupy movement thing http://www.alternet.org/occupywallst/153542/ows\_fights\_back\_against\_police\_surveillance\_by\_launching\_\%22occucopter\%22\_citizen\_drone/
+
+redningsdrone\cite{electronic:redningsdronedk}
 
 future SLAM
 
@@ -125,8 +150,8 @@ Lave et framework/platform til at afhjælpe tiden mellem kodeimplementation til a
 \section{Motivation} % Thomas & Morten, Hvorfor
 
 \label{sec:motivation}
-\paragraph{Anvendelser}
-redningsdrone\cite{electronic:redningsdronedk}
+\paragraph{Anvendelser}%anvendelser fra dette speciales emner
+Minerva museums tourguide robot\cite{Thrun99minerva:a}
 
 -Hvem vil vores resultater komme til gode
 -hvorfor er det relevant
@@ -632,6 +657,7 @@ fra sensorene om bord. En observeret egenskab er at man ikke kan sige noget udfr
 accelerometer og gyroer (de tilstedeværende sensore) omkring hvor
 langt AR.Dronen har fløjet eller med hvilken hastighed AR.Dronen
 bevæger sig.
+%jo mindre des mindre inerti kan være indeholdt, mere agile agil/adræt
  Dog kan der udledes estimater for hastigheder ved at integrere over
 accelerationen, men hastigheden i det horisontale plan er i praksis
 afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch
@@ -649,7 +675,10 @@ denne er blevet noget mere troværdig\cite{velocity_estimation_inside_the_drone}.
 
 Dette speciales egne eksperimenter med hastighedsudledning er beskrevet i
 afsnit~\ref{sec:distance-mesu}. Det viser sig at under de rette 
-forhold er hastighedsudledningen udmærket brugbar. Udledningen af hastighed besværliggøres ved forhold hvor det ikke er muligt for bundkameraet at opfange tilpas mange.
+forhold er hastighedsudledningen udmærket brugbar. Udledningen af
+hastighed besværliggøres ved forhold med dårlig belysning og ved
+jordoverflader uden forskelligartet tekstur, hvor det ikke er muligt for
+bundkameraet at opfange tilpas mange gode features at følge.
 
 \paragraph{Ultralydssensor}
 \begin{figure}[ht]
@@ -1316,6 +1345,8 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 
 %\subsection{Optisk flow navigation} % tt
 %\todo{fedt hvis det kan nåes at lave det...}
+%problematik at flyve fremad; for smalle trekanter, måske bedre at flyve sidelæns eller op og ned
+% evt afhjælpe med fiskeøje, så flow af featurepoints kan trackes længere langs siden af kopteren når man flyver forbi...
 
 %\subsection{Korridor vanishpoint}
 \section{Korridors forsvindingspunkt} % Thomas
@@ -1425,6 +1456,9 @@ Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
 Hvad var resultatet?
 perspektiver, hvad skal / kan vi bruge den nye viden til?
 Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+
+jo mindre quadrokopter des mindre inerti kan være indeholdt, og jo
+mere agile agil/adræt vil den være, måske en pointe i futureworks...
 
 Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
 

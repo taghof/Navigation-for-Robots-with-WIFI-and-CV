@@ -62,12 +62,14 @@ class PresenterGui(object):
             self.drone = drone.main()
             self.drone.gui = self
 
+        self.detector = self.drone.get_detector_sensor()
         self.sensors = self.drone.get_sensors()
 	self.wifi_sensor = self.drone.get_wifi_sensor()
 	self.video_sensor = self.drone.get_video_sensor()
 	self.navdata_sensor = self.drone.get_navdata_sensor()
         self.controller_manager = self.drone.get_controller_manager()
         self.task_manager = self.drone.get_task_manager()
+
 	self.show_targets = False
 	self.show_significance = False
 
@@ -90,6 +92,8 @@ class PresenterGui(object):
 	self.radiobutton3 = self.wTree.get_widget("radiobutton3")
 	self.radiobutton4 = self.wTree.get_widget("radiobutton4")
 
+        self.wifi_buttons = self.wTree.get_widget("hbox2")
+
 	self.button1 = self.wTree.get_widget("button1")
 	self.button2 = self.wTree.get_widget("button2")
 	self.button3 = self.wTree.get_widget("button3")
@@ -100,15 +104,8 @@ class PresenterGui(object):
 	self.radiobutton3.connect("toggled", self.handle_radiobuttons_pressed)
 	self.radiobutton4.connect("toggled", self.handle_radiobuttons_pressed)
 
-	# The video window
-	self.video_window = VideoWindow(self.drone)   	
-	self.video_window.hide_on_delete()
-	self.video_window.connect('key_press_event', self.handle_key_pressed) 
-	self.video_window.connect("delete_event", self.toggle_video_window)
-
 	# Create our dictionary and connect it
-        dic = {"btn1OnClick" : self.toggle_video_window,
-	       "btn2OnClick" : self.toggle_targets,
+        dic = {"btn2OnClick" : self.toggle_targets,
 	       "btn3OnClick" : self.toggle_significance,
 	       "btn4OnClick" : self.take_sample,
 	       "btn5OnClick" : self.set_target,
@@ -124,19 +121,15 @@ class PresenterGui(object):
         self.gc = gtk.gdk.GC(self.drawing.window)
         self.white_gc = self.drawing.get_style().white_gc
         self.black_gc = self.drawing.get_style().black_gc
+        
         self.radiobutton3.set_active(True)
+        gobject.timeout_add(200, self.update_navdata, None)
         gtk.main()
 	   
     def stop(self, widget, event=None):
         print "Shutting down GUI\r"
         gtk.main_quit()
         return True
-
-    def load_controllers(self, controllers):
-        for con in controllers:
-            if con.get_control_method() is not None:
-                meth = con.get_control_method()
-                gobject.idle_add(meth)
                
     def take_sample(self, widget):
         for sensor in self.sensors:
@@ -152,25 +145,6 @@ class PresenterGui(object):
             return True
         for sensor in self.sensors:
             sensor.toggle_capture()
-       
-    def toggle_video_window(self, widget, event=None):
-        if widget is None:
-            self.button1.set_active(not self.button1.get_active())
-            return True
-        if event is not None:
-            self.button1.set_active(not self.button1.get_active())
-            self.video_window.hide()
-            return True
-
-        if self.video_window.get_visible():
-            self.video_window.video_play_button.set_active(False)	
-            self.video_window.hide()
-            return True
-        else:
-            self.video_window.init_video()
-            self.video_window.show_all()
-            self.video_window.video_play_button.set_active(True)	
-            return True
 
     def toggle_targets(self, widget): 
         if widget is None:
@@ -188,14 +162,19 @@ class PresenterGui(object):
     def handle_radiobuttons_pressed(self, radio):
         if radio.get_active():
             if radio.get_name() == "radiobutton1" and self.wifi_sensor is not None:
+                self.wifi_buttons.show()
                 gobject.timeout_add(200, self.update_wifi, radio)
             elif radio.get_name() == "radiobutton2" and self.wifi_sensor is not None:
+                self.wifi_buttons.show()
                 gobject.timeout_add(200, self.update_samples, radio)
             elif radio.get_name() == "radiobutton3" and self.navdata_sensor is not None:
+                self.wifi_buttons.hide()
                 gobject.timeout_add(200, self.update_navdata, radio)
             elif radio.get_name() == "radiobutton4" and self.navdata_sensor is not None and self.wifi_sensor is not None and self.video_sensor is not None:
-                gobject.timeout_add(200, self.update_matching, radio)
-
+                self.wifi_buttons.hide()
+                gobject.idle_add(self.update_matching, radio)
+                # gobject.timeout_add(100, self.update_matching, radio)
+ 
     def handle_key_pressed(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
         
@@ -220,39 +199,90 @@ class PresenterGui(object):
    
 
     def update_matching(self, widget):
-        match_val_video = self.video_sensor.match_target_sample()
-        match_val_wifi = self.wifi_sensor.match_target_sample()
-        match_val_navdata = 1
+        # match_val_video = self.video_sensor.match_target_sample()
+        # match_val_wifi = self.wifi_sensor.match_target_sample()
+        # match_val_navdata = 1
 
-        x, y, width, height = self.drawing.get_allocation()
-	pixmap.draw_rectangle(self.drawing.get_style().white_gc,
-			      True, 0, 0, width, height)
-
-        match_string = ""
-        if match_val_video is not None:
-            match_string += "Video Match:\t\t" + str(match_val_video*100) + "\r\r"
-        if match_val_wifi is not None:
-            match_string += "Wifi Match:\t\t" + str(match_val_wifi) + "\r\r"
-        if match_val_navdata is not None:
-            match_string += "Navdata Match:\t" + str(match_val_navdata) + "\r\r"
-          
-        colormap = gtk.gdk.colormap_get_system()
-        color_black = colormap.alloc_color(gtk.gdk.Color(0, 0, 0))
-        color_white = colormap.alloc_color(gtk.gdk.Color(65535, 65535, 65535))
-        color_red = colormap.alloc_color(gtk.gdk.Color(65535, 0, 0))
-        color_green = colormap.alloc_color(gtk.gdk.Color(0, 65535, 0))
-        color_yellow = colormap.alloc_color(gtk.gdk.Color(65535, 65535, 0))
-        margin = 25
-        current_x = margin
-        current_y = margin
-
-        font_desc = pango.FontDescription('Serif 12')
-        layout = self.drawing.create_pango_layout(match_string)
+        input_image_small = self.detector.last_small
+        if input_image_small is not None:
             
-        # layout = self.drawing.create_pango_layout("derpa")
-        layout.set_font_description(font_desc)
-        # draw text below rectangle
-        pixmap.draw_layout(self.gc, current_x, current_y, layout)
+            for p in self.detector.points:
+                cv2.circle(input_image_small, (int(p[0]), int(p[1])), 2, (255, 255, 255), 10)
+     
+            small_input = gtk.gdk.pixbuf_new_from_data(
+            input_image_small.tostring(), 
+            gtk.gdk.COLORSPACE_RGB,
+            False,
+            8,
+            176,
+            144,
+            176*3)
+        else:
+            small_input = None
+
+        input_image_large = self.detector.last_large # self.video_sensor.get_data()
+        if input_image_large is not None:
+            for x,y,w,h in self.detector.silhouets:
+                pad_w, pad_h = int(0.15*w), int(0.05*h)
+                cv2.rectangle(input_image_large, (x+pad_w, y+pad_h), (x+w-pad_w, y+h-pad_h), (0, 255, 0), 2)
+
+            large_input = gtk.gdk.pixbuf_new_from_data(
+            input_image_large.tostring(), 
+            gtk.gdk.COLORSPACE_RGB,
+            False,
+            8,
+            320,
+            240,
+            320*3)
+        else:
+            large_input = None
+
+        x, y, dwidth, dheight = self.drawing.get_allocation()
+        rightx = (dwidth - 511)/2
+
+	pixmap.draw_rectangle(self.drawing.get_style().white_gc,
+			      True, 0, 0, dwidth, dheight)
+
+        if small_input is not None:
+            pixmap.draw_pixbuf(widget.get_style().fg_gc[gtk.STATE_NORMAL],
+                               small_input, 0, 0, rightx, 50)
+        else:
+            
+            pixmap.draw_rectangle(self.drawing.get_style().black_gc,
+                                  True, rightx, 50, 176, 144)
+
+        if large_input is not None:
+            pixmap.draw_pixbuf(widget.get_style().fg_gc[gtk.STATE_NORMAL],
+                               large_input, 0, 0, rightx+191, 50)
+        else:
+            pixmap.draw_rectangle(widget.get_style().fg_gc[gtk.STATE_NORMAL],
+                                  True, rightx+191, 50, 320, 240)
+
+        # match_string = ""
+        # if match_val_video is not None:
+        #     match_string += "Video Match:\t\t" + str(match_val_video*100) + "\r\r"
+        # if match_val_wifi is not None:
+        #     match_string += "Wifi Match:\t\t" + str(match_val_wifi) + "\r\r"
+        # if match_val_navdata is not None:
+        #     match_string += "Navdata Match:\t" + str(match_val_navdata) + "\r\r"
+          
+        # colormap = gtk.gdk.colormap_get_system()
+        # color_black = colormap.alloc_color(gtk.gdk.Color(0, 0, 0))
+        # color_white = colormap.alloc_color(gtk.gdk.Color(65535, 65535, 65535))
+        # color_red = colormap.alloc_color(gtk.gdk.Color(65535, 0, 0))
+        # color_green = colormap.alloc_color(gtk.gdk.Color(0, 65535, 0))
+        # color_yellow = colormap.alloc_color(gtk.gdk.Color(65535, 65535, 0))
+        # margin = 25
+        # current_x = margin
+        # current_y = margin
+
+        # font_desc = pango.FontDescription('Serif 12')
+        # layout = self.drawing.create_pango_layout(match_string)
+            
+        # # layout = self.drawing.create_pango_layout("derpa")
+        # layout.set_font_description(font_desc)
+        # # draw text below rectangle
+        # pixmap.draw_layout(self.gc, current_x, current_y, layout)
 
 	self.drawing.queue_draw()
 	return self.radiobutton4.get_active()

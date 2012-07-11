@@ -7,7 +7,7 @@ class PosMap(object):
 
     def __init__(self):
 
-        self.verbose = True
+        self.verbose = False
         
         saved_map = self.load_map()
         if saved_map is None:
@@ -30,7 +30,6 @@ class PosMap(object):
         while not stop:
             exist = False
             try_name = 'pos' + str(i)
-            print try_name
             for pos in self.positions:
                 if pos.name == try_name:
                     exist = True
@@ -40,8 +39,11 @@ class PosMap(object):
                 self.positions.append(p)
                 stop = True
             i += 1
-                   
-        print self.positions
+        self.distances = self.calc_distances()
+
+        if self.verbose:
+            print 'Positions:\r'
+            print self.positions, '\r'
 
     def remove_pos(self, p):
         print 'remove called'
@@ -55,8 +57,10 @@ class PosMap(object):
         if first_seg is not None:
             i = self.tour.index(first_seg)
             self.tour = self.tour[:i]
-           
-        print self.positions
+        
+        if self.verbose:
+            print 'Positions:\r'
+            print self.positions, '\r'
 
     def remove_tour_segment(self, ts):
         if ts in self.tour:

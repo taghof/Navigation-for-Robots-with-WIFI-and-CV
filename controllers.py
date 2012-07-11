@@ -27,7 +27,9 @@ import struct
 import threading
 import pygame
 import time
-
+import termios
+import select
+import tty
 import cv2.cv as cv
 import cv2
 
@@ -82,11 +84,12 @@ class Controller(threading.Thread):
     
     def __init__(self, drone):
         threading.Thread.__init__(self)
-        if isinstance(drone, drone_module.Drone):
-            self.drone = drone
-            self.control_interface = drone.get_interface()
-        elif isinstance(drone, ControllerInterface):
-            self.control_interface = drone
+        
+        # if issubclass(drone.__class__, drone_module.Drone):
+        self.drone = drone
+        self.control_interface = drone.get_interface()
+        # elif isinstance(drone, ControllerInterface):
+        #     self.control_interface = drone
         self.control_button = None
         self.control_method = self.process_events
         self.id = None       
@@ -200,6 +203,7 @@ class AutoControl(Controller):
         else:
             return
 
+
 class KeyboardControl(Controller):
     
     def __init__(self, drone):
@@ -208,24 +212,41 @@ class KeyboardControl(Controller):
         self.navdata_sensor = drone.get_navdata_sensor()
         self.id = settings.KEYCONTROL
         self.name = "Keyboard Controller"
-        self.update_time = 0.05
+        self.update_time = 0.2
+
+        self.fd = sys.stdin.fileno()
+        self.old_settings = termios.tcgetattr(self.fd)
+        tty.setraw(self.fd)
+        self.poll = select.poll()
+        self.poll.register(self.fd, select.POLLIN)
+        sys.stdout = utils.RedirectedStdout(sys.__stdout__)
+
+    def stop(self):
+        print "Shutting down " + str(self) + "\r"
+        self.stopping = True
+        self.poll= None#.unregister(self.fd)
+        termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_settings)
 
     def process_events(self):
-        #self.auto_control = self.drone.get_controller_manager().get_controller(settings.AUTOCONTROL)
-        ch = utils.get_char_with_break()
+        if self.poll.poll(100):
+            ch = sys.stdin.read(1)
+        else:
+            ch = ''
+
         if ch == 'q':
             self.drone.stop()
-        if ch == 'z':
+
+        elif ch == 'z':
             print 'Zapping\r'
             self.drone.get_interface().zap()
-        if ch == 'f':
+        elif ch == 'f':
             print 'Flat trimming\r'
             self.drone.get_interface().flat_trim()
-        if ch == 'b':
+        elif ch == 'b':
             navdata = self.navdata_sensor.get_data()
             bat   = navdata.get(0, dict()).get('battery', 0)
             print 'Battery: ' + str(bat) + '\r'
-        if ch == 'c':
+        elif ch == 'c':
             print 'Active tasks:\r'
             if len (self.task_manager.active_tasks) > 0:
                 for t in self.task_manager.active_tasks: 
@@ -233,17 +254,16 @@ class KeyboardControl(Controller):
             else:
                 print 'No active Tasks\r'
 
-        if ch == 't':
+        elif ch == 't':
             print 'Current threads:\r'
             for t in threading.enumerate(): 
                 print t, '\r'
 
-
-        if ch == '1':
+        elif ch == '1':
             self.task_manager.start_task_num(6)
-        if ch == '2':
+        elif ch == '2':
             self.task_manager.start_task_num(3)
-        if ch == '3':
+        elif ch == '3':
             self.task_manager.start_task_num(3)
 
 class JoystickControl(Controller):    
@@ -253,13 +273,11 @@ class JoystickControl(Controller):
 
         Controller.__init__(self, drone)
         pygame.joystick.init()
-        
+        self.update_time = 0.2
         self.id = settings.JOYCONTROL
         self.name = "Joystick Controller"
-        if isinstance(drone, drone_module.Drone):
-            self.task_manager = self.drone.get_task_manager()
-        else:
-            self.task_manager = None
+        self.task_manager = self.drone.get_task_manager()
+
         if pygame.joystick.get_count() > 0:
             pygame.display.init()
             self.js = pygame.joystick.Joystick(0)
@@ -306,7 +324,7 @@ class JoystickControl(Controller):
                     for b in xrange(self.js.get_numbuttons()):
                                                 
                         if self.js.get_button(b) > 0:
-                            #print 'number of button pushed: ' + str(b)
+                            print 'number of button pushed: ' + str(b)
                             if b==0:
                                 self.control_interface.zap()
                             elif b==1:
@@ -316,9 +334,10 @@ class JoystickControl(Controller):
                                     self.task_manager.kill_tasks()
                             elif b==3:
                                 if self.task_manager is not None:
-                                    self.task_manager.start_task_num(4)
+                                    self.task_manager.start_task_num(1)
                             elif b==4:
-                                pass
+                                if self.task_manager is not None:
+                                    self.task_manager.start_task_num(1)
                             elif b==5:
                                 if self.task_manager is not None:
                                     self.task_manager.start_task_num(6)
@@ -396,6 +415,7 @@ class ControllerInterface(threading.Thread):
     def run(self):
         while not self.stopping:
             self.__commwdg()
+            # print 'vals:', self.roll, self.pitch, self.gaz, self.yaw, self.auto
             self.__update(self.roll, self.pitch, self.gaz, self.yaw, self.auto)
             time.sleep(self.sleep_time)
     
@@ -420,7 +440,7 @@ class ControllerInterface(threading.Thread):
         self.at(at_ftrim)
         self.at(at_ftrim)
         self.at(at_ftrim)
-        self.sleep_time = 0.05
+        self.sleep_time = 0.02
         self.at(at_config, "control:altitude_max", "40000")
         self.at(at_ref, True)
         # TODO: implement check for takeoff
@@ -646,4 +666,13 @@ def f2i(f):
 
 #======================================================================================
 
-
+def callback(screen):
+    curses.noecho() 
+    #curses.curs_set(0) 
+    #screen.keypad(1)
+    #screen.noutrefresh()
+    screen.nodelay(1)
+    k = screen.getch()
+    screen.nodelay(0)
+    #curses.doupdate()
+    return k

@@ -40,6 +40,38 @@ def ensure_dir(f):
     if not os.path.exists(d):
         os.makedirs(d)
 
+
+class Getch:
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+class Redir(object):
+    def __init__(self, ifh, buf):
+        self.ifh, self.buf = ifh, buf
+
+    def readline(self):
+        line = self.ifh.readline()
+        if line:
+            self.buf.append(line)
+
+    def read(self, int):
+        c = self.ifh.read(int)
+        print 'redirected ', c
+
+    def close(self):
+        self.ifh.close()
+
 def get_char():
     import sys, tty, termios
     fd = sys.stdin.fileno()
@@ -51,6 +83,17 @@ def get_char():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
+class RedirectedStdout(object):
+    def __init__(self, f):
+        self.f = f
+
+    def write(self, s):
+        s = s.replace("\n", "\n\r")
+        self.f.write(s)
+   
+    def flush(self):
+        self.f.flush()
+
 def get_char_with_break():
     import sys, tty, termios, select
     fd = sys.stdin.fileno()
@@ -58,14 +101,13 @@ def get_char_with_break():
     s = ''
     try:
         tty.setraw(sys.stdin.fileno())
-        #while not self.stopping:
-        rlist, _, _ = select.select([sys.stdin], [], [], 1)
-        if rlist:
+        if select.select([sys.stdin,], [], [], 0.0)[0]:
             s = sys.stdin.read(1)
+            print 's: ', s
 
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        
+
     return s
 
 def get_random_num(self):
@@ -702,11 +744,14 @@ class PointTracker(threading.Thread):
             if self.org_width != width or self.org_height != height:
                 return None
 
-            (self.features, status, error) = cv2.calcOpticalFlowPyrLK(
-                self.frame0, self.frame1, 
-                self.features, None, **self.lk_params
-                )
-           
+            if self.features is not None and len(self.features) > 0:
+                (self.features, status, error) = cv2.calcOpticalFlowPyrLK(
+                    self.frame0, self.frame1, 
+                    self.features, None, **self.lk_params
+                    )
+            else:
+                return None
+
             if self.features is not None and len(self.features) > 0:
                 self.features = np.hstack([self.features, status])
                 self.features = (self.features[~(self.features == 0).any(1)])[:,:2]

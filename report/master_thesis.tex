@@ -1037,7 +1037,7 @@ en oversigt over tråde i programmet('t'), samt til at starte opgaver
 på autocontrolleren('1', '2' og '3'). 
 
 \subsubsection{Taskmanager}
-Taskmanagerklassen startede ud som almindelig controller, men er endt
+Taskmanagerklassen startede ud som en almindelig controller, men er endt
 som en mere selvstændig del af platformen. Taskmanageren skiller sig
 ud ved ikke, i modsætning til joystick- og keyboardcontrollerne, at
 arbejde direkte med kontrolinterfacet eller med output fra
@@ -1281,6 +1281,8 @@ først og TestTask med level 2 slutte sidst.
   \label{fig:taskhieraky}
 \end{figure}
 
+\subsubsection{FollowTourTask}
+\label{sssec:followtourtask}
 Et mere realistisk og komplekst eksempel er en FollowTourTask, se
 \ref{fig:followtour}, denne task nedarver fra en sekvensiel
 compoundtask og indeholder udover takeoff og land-tasks også en
@@ -1288,7 +1290,15 @@ parallel compoundtask der kan veksle mellem bevægelse og fastholdelse
 af en position(ved hjælp af en PID-controller). Selve FollowTourTask
 enheden holder styr på den tour der skal følges, ved hjælp af et
 Map-objekt, og sørger for at opdatere HoverTrackTasken(PID) med en ny
-målposition når det er nødvendigt.
+målposition når det er nødvendigt. 
+Hvis man anskuer vores Map som en relationel graph hvor alle knuder er
+forbundne, minder vores tilgang meget om Kuipers og Byuns metode der beskrives i
+\cite{murphy2000introduction}. Specielt lægges mærke til at der i
+begge systemer udføres fejlkorrigering hver gang en ny position
+detekteres, i vores system sker dette ved at HoverTrackTasken bringer
+robotten indenfor en specifik afstand af den præcise position før
+Ar.Dronen sendes videre. 
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/followtourhieraki.png}
@@ -1301,8 +1311,23 @@ målposition når det er nødvendigt.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Eksperimenter - section
 \chapter{Eksperimenter} % Thomas & Morten
+\section{Navigation}
+En vigtig forudsætning for at en robot kan navigere i et miljø er, at
+den er i stand til at lokalisere sig selv i dette miljø. Vi har derfor
+ekperimenteret med forskellige former for lokalisering, mere specifikt
+har vi arbejdet med lokalisering ved hjælp af WIFI-signalstyrker og
+lokalisering ved hjælp af visuelle markører. Vi har i vores
+eksperimenter gjort brug af et kort med beskrivelser af
+lokationer(WIFI, farvebeskrivelse og koordinater) og en
+rutebeskrivelse bestående af en liste med lokationer, kortet
+indeholder desuden en fortegnelse over vinkelretninger mellem alle
+lokationspar. Kort og rutebeskrivelser oprettes let ved hjælp af*ref
+taskcreator*. For at teste forskellige lokaliseringsmetoder har vi
+anvendt en FollowTourTask\ref{sssec:followtourtask}, denne anvender førnævnte kort til at bevæge
+sig mellem lokationerne i kortets rutebeskrivelse. 
 
-\section{Lokalisering via Wifi-fingerprinting} % Morten (1side)
+
+\subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
 \label{ssec:wikilokalisering}
 %,skal disse have hver deres egen hovedsektion (istedet for SUBsection)?
 Hvad vil vi vise, afvise teste?
@@ -1313,8 +1338,73 @@ perspektiver, hvad skal / kan vi bruge den nye viden til?
 Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
 
 Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
+\subsection{Visuel lokalisering}
 
-\section{Lokalisering via blobs} % Thomas & Morten
+\subsubsection{Lokalisering via simple markører} % Thomas & Morten
+Vores første forsøg med visuel lokalisering anvendte simple røde
+markører i A5 størrelse. Fire af disse markører blev placeret på
+gulvet jævnfør det på kortet beskrevne mønster\ref{fig:kort}. 
+Vores første forsøg viste os, at vi i højder fra 0.5 til 2.5 meter altid var i stand
+til at genkende disse markører med AR.Dronens bundkamera. 
+Vi havde til formålet implementeret en blobdetectionalgoritme i Python, som for
+hver pixel vurderer om den er rød nok til at være en del af markøren. Algoritmen antager at der i
+billedet kun findes et rødt objekt og er på grund af Pythons
+afviklingshastighed ikke videre hurtig, men til dette simple
+eksperiment var den passende.
+Vores næste skridt var at anvende ovennævnte lokaliseringsmetode i
+forbindelse med afviklingen af en HoverTrackTask~\ref{sec:hovertrack}
+for at få en idé om metodens anvendelighed i en
+realtidskontekst. Forsøget afvikledes ved at AR.Dronen blev fløjet i 
+position over en markør, hvorefter HoverTrackTasken blev
+aktiveret. Her viste det sig tydeligt at pythonblobdetectoren ikke var
+effektiv nok, vi var ikke i stand til at opdatere hurtigt nok og som
+resultat nåede AR.Dronen ofte at bevæge sig væk fra markøren. Dette
+resultat fik os til at reimplementere HoverTrackTasken således at den
+anvendte vores blobdetector til at opdage markøren og herefter
+anvendte OpenCVs opticalflow-algoritme(optflowpyrlk) til at
+tracke den. Afviklingen af opticalflow-algoritmen er omtrent 10 gange
+hurtigere end vores blobdetector. Da vi gentog forsøget med denne
+tilføjelse var AR.Dronen meget mere responsiv og efter at have
+fintunet HoverTrackTaskens PID-parametre var AR.Dronen i stand til at
+forblive over markøren. På fig~\ref{fig:simplehover} ses
+error-værdierne i x og y-retningen over en periode på mere end 2
+minutter hvor AR.Dronen befinder sig over en markør, det bemærkes at
+der er et udsving omtrent midt i forløbet, dette er ikke usædvanligt,
+da AR.Dronen er meget påvirkelig af turbulens og dette let forekommer
+i, især, mindre lokaler.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\textwidth]{grafik/simpledronehover.png}
+  \caption{HoverTrackTask error-værdier over en længere periode}
+  \label{fig:simplehover}
+\end{figure}
+
+Sidste eksperiment med de simple markører anvendte en FollowTourTask
+der fulgte en rute mellem de fire markører. Eksperimenterne startede
+denne gang fra jorden, da en FollowTourTask selv letter og lander.
+
+Vi forventede her at udfordringen ville være at opdage markøren tidsnok til at stoppe
+AR.Dronen før den var fløjet forbi. Dette problem kan dog løses ved at
+lade AR.Dronen flyve i en passende højde, vi fandt at en
+højdesetting på 1800 mm var passende til dette formål. Til gengæld
+fandt vi to andre problemer. Det første problem var relateret til at
+alle vores markører var ens, dette betød at der var tilfælde hvor
+AR.Dronen fandt samme lokation to gange i træk, men antog at den
+fundne lokation var den næste i rutebeskrivelsen, problemet lagde
+grund til tanken om at anvende mere avancerede lokationsmarkører. Det andet problem
+var at, hvis vi først mistede en markør fra AR.Dronens synsfelt, så
+var det umuligt at fortsætte, dette problem løstes ved at tilføje en
+recovermode til HoverTrackTasken, således at denne kunne bevæge
+AR.Dronen opad indtil enten markøren igen kunne genkendes eller en højdegrænse
+blev nået hvorefter experimentet alligevel måtte afsluttes.   
+
+De overordnede resultater af vores eksperimenter med de simple
+lokationsmarkører var, vi fik bekræftet AR.Dronens evne til at
+genkende simple markører og at vi fik udviklet både HoverTrackTasken
+og FollowTourTasken. Vi fandt desuden ud af at vores markørsetup var
+for simpelt til at være praktisk anvendeligt og at vi måtte udvikle
+mere avancerede markører for bedre at understøtte vores FollowTourTask.
+
 %Blob-detection og PID styring} 
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
@@ -1325,15 +1415,16 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 
 \todo{simpel blob}, og \todo{udbygget nested blob}
 
+\subsubsection{Lokalisering via avancerede markører} % Thomas & Morten
 
-\section{Lokalisering via QR-koder} % Morten
+\subsubsection{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}
- \begin{figure}[ht]
-   \centering
-   \includegraphics[width=0.35\textwidth]{grafik/woah.png}
-   \caption{Teksten ``woah'' som QR-kode}
-   \label{fig:qr_woah}
- \end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.35\textwidth]{grafik/woah.png}
+  \caption{Teksten ``woah'' som QR-kode}
+  \label{fig:qr_woah}
+\end{figure}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?

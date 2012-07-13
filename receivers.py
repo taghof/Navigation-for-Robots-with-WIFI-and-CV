@@ -158,7 +158,7 @@ class Receiver(multiprocessing.Process):
         return self.on_request_data(data)
     
     def record_sample(self):
-        print str(self.PORT), 'sample recorded at:', datetime.datetime.now(), "\r"
+        #print str(self.PORT), 'sample recorded at:', datetime.datetime.now(), "\r"
         sample = self.get_data()
         processed_sample = self.on_record_sample(sample)
         self.samples[datetime.datetime.now()] = processed_sample

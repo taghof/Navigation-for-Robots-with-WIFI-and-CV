@@ -89,7 +89,7 @@ class Drone(object):
                 print 'Battery: ' + str(bat) + '\r'
         
         self.interface.start()
-       # self.task_manager.start()
+        #self.task_manager.start()
         self.controller_manager.start_controllers()
                
     def stop(self, gui_stop=False):

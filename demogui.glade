@@ -6,22 +6,33 @@
     <property name="width_request">640</property>
     <property name="height_request">480</property>
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Sensor Display</property>
+    <property name="window_position">center</property>
     <child>
       <widget class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="resize_mode">immediate</property>
         <child>
-          <placeholder/>
+          <widget class="GtkHSeparator" id="hseparator2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <widget class="GtkHBox" id="hbox1">
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
             <child>
-              <widget class="GtkRadioButton" id="radiobutton1">
-                <property name="label" translatable="yes">Current Wifi</property>
+              <widget class="GtkRadioButton" id="radiobutton3">
+                <property name="label" translatable="yes">Navdata</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -32,8 +43,41 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="padding">9</property>
+                <property name="padding">5</property>
                 <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkRadioButton" id="radiobutton4">
+                <property name="label" translatable="yes">Video</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="draw_indicator">True</property>
+                <property name="group">radiobutton3</property>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkRadioButton" id="radiobutton1">
+                <property name="label" translatable="yes">Wifi</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="draw_indicator">True</property>
+                <property name="group">radiobutton3</property>
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="padding">9</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -44,46 +88,12 @@
                 <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="draw_indicator">True</property>
-                <property name="group">radiobutton1</property>
+                <property name="group">radiobutton3</property>
               </widget>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="padding">5</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkRadioButton" id="radiobutton3">
-                <property name="label" translatable="yes">Navdata</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="draw_indicator">True</property>
-                <property name="group">radiobutton1</property>
-              </widget>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="padding">5</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkRadioButton" id="radiobutton4">
-                <property name="label" translatable="yes">Matching</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="active">True</property>
-                <property name="draw_indicator">True</property>
-                <property name="group">radiobutton1</property>
-              </widget>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
                 <property name="position">3</property>
               </packing>
             </child>
@@ -95,59 +105,13 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkHBox" id="hbox2">
+          <widget class="GtkHSeparator" id="hseparator1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="homogeneous">True</property>
-            <child>
-              <widget class="GtkToggleButton" id="button1">
-                <property name="label" translatable="yes">Show Video</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn1OnClick" swapped="no"/>
-              </widget>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkToggleButton" id="button2">
-                <property name="label" translatable="yes">Show Targets</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn2OnClick" swapped="no"/>
-              </widget>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkToggleButton" id="button3">
-                <property name="label" translatable="yes">Show Significance</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn3OnClick" swapped="no"/>
-              </widget>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="fill">False</property>
+            <property name="fill">True</property>
             <property name="position">2</property>
           </packing>
         </child>
@@ -163,18 +127,18 @@
           </packing>
         </child>
         <child>
-          <widget class="GtkHBox" id="hbox3">
+          <widget class="GtkHBox" id="hbox2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="homogeneous">True</property>
             <child>
-              <widget class="GtkButton" id="button4">
-                <property name="label" translatable="yes">Take Sample</property>
+              <widget class="GtkToggleButton" id="button2">
+                <property name="label" translatable="yes">Show Targets</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="btn4OnClick" swapped="no"/>
+                <signal name="toggled" handler="btn2OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -183,13 +147,13 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkToggleButton" id="button6">
-                <property name="label" translatable="yes">Capture Sensor Data</property>
+              <widget class="GtkToggleButton" id="button3">
+                <property name="label" translatable="yes">Show Significance</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="toggled" handler="btn6OnClick" swapped="no"/>
+                <signal name="toggled" handler="btn3OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -204,7 +168,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="btn5OnClick" swapped="no"/>
+                <signal name="clicked" handler="btn5OnClick" />
               </widget>
               <packing>
                 <property name="expand">True</property>
@@ -212,11 +176,53 @@
                 <property name="position">2</property>
               </packing>
             </child>
+            <child>
+              <widget class="GtkButton" id="button4">
+                <property name="label" translatable="yes">Take Sample</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="btn4OnClick" />
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
             <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkHBox" id="hbox3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <widget class="GtkToggleButton" id="button6">
+                <property name="label" translatable="yes">Capture Sensor Data</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="toggled" handler="btn6OnClick" />
+              </widget>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">5</property>
           </packing>
         </child>
       </widget>

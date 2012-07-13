@@ -166,7 +166,7 @@ class Task(object):
         self.detector = self.drone.get_detector_sensor()
         self.subtasks = []
         self.dep_subtasks = []
-        
+        self.start_time = None
         self.loop_sleep = 0.5
         self.stopping = False
         
@@ -231,7 +231,7 @@ class Task(object):
             for t in self.dep_subtasks:
                 threading.Thread(target=t.run).start()
 
-        t1 = time.time()
+        self.start_time = time.time()
         print 'Starting ', self.__class__.__name__, '\r'
         self.pre_loop()
 
@@ -241,7 +241,7 @@ class Task(object):
             time.sleep(self.loop_sleep)
         
         self.post_loop()
-        print 'Ending ', self.__class__.__name__, ', ran for ', time.time() - t1, ' seconds \r'
+        print 'Ending ', self.__class__.__name__, ', ran for ', time.time() - self.start_time, ' seconds \r'
         if not self.parent is None and self.control:
             self.parent.release_control(self)
         self.done()
@@ -549,7 +549,7 @@ class HoverTrackTask(Task):
 
         # variables used in calculating the PID output
         self.Kp=2.0
-        self.Ki=0.0
+        self.Ki=0.1
         self.Kd=0.75
 
         self.Derivator_x = 0
@@ -562,8 +562,8 @@ class HoverTrackTask(Task):
         self.Integrator_psi = 0
         self.Integrator_alt = 0
         
-        self.Integrator_max= 500
-        self.Integrator_min= -500
+        self.Integrator_max= 0.5
+        self.Integrator_min= -0.5
 
         self.center = (88, 72)
 
@@ -594,7 +594,8 @@ class HoverTrackTask(Task):
         
         psi = self.navdata_sensor.get_data().get(0, dict()).get('psi', 0)
         self.set_point_psi = psi + self.psi_offset
-        self.set_point_alt = 1400.0
+        self.set_point_alt = 1550.0
+        self.recover_alt = 1800
 
     def loop(self):
         
@@ -651,7 +652,7 @@ class HoverTrackTask(Task):
 
         elif self.mode == 'recover':
             print 'searching' 
-            if self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0) >= 1500:
+            if self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0) >= self.recover_alt:
                 self.move(0.0, 0.0, 0.0, 0.0)
             else:
                 self.move(0.0, 0.0, 0.2, 0.0)
@@ -683,21 +684,21 @@ class HoverTrackTask(Task):
         self.context[0] = None
         self.interface.move(0, 0, 0, 0, False)
 
-        # if len(self.data_points[0]) > 0:
-        #     xrange = (self.data_points[0][0], self.data_points[0][len(self.data_points[0])-1])
-        #     g = Gnuplot.Gnuplot(persist=1)
-        #     g('set terminal gif')
-        #     g('set output "test.gif"')
-        #     g.title('Error measurements')
-        #     g.set_range('xrange', xrange)
-        #     g.set_range('yrange', (-100, 100))
-        #     g.xlabel('Time')
-        #     g.ylabel('Error Distances')
-        #     d1 = Gnuplot.Data(self.data_points[0], self.data_points[1], title='error x')
-        #     d2 = Gnuplot.Data(self.data_points[0], self.data_points[2], title='error y')
-        #     d3 = Gnuplot.Data(self.data_points[0], self.data_points[4], title='engine x', with_='lines')
-        #     d4 = Gnuplot.Data(self.data_points[0], self.data_points[5], title='engine y', with_='lines')
-        #     g.plot(d1, d2, d3, d4)
+        if len(self.data_points[0]) > 0:
+            xrange = (self.data_points[0][0], self.data_points[0][len(self.data_points[0])-1])
+            g = Gnuplot.Gnuplot(persist=1)
+            g('set terminal gif')
+            g('set output "test.gif"')
+            g.title('Error measurements')
+            g.set_range('xrange', xrange)
+            g.set_range('yrange', (-100, 100))
+            g.xlabel('Time')
+            g.ylabel('Error Distances')
+            d1 = Gnuplot.Data(self.data_points[0], self.data_points[1], title='error x')
+            d2 = Gnuplot.Data(self.data_points[0], self.data_points[2], title='error y')
+            d3 = Gnuplot.Data(self.data_points[0], self.data_points[4], title='engine x', with_='lines')
+            d4 = Gnuplot.Data(self.data_points[0], self.data_points[5], title='engine y', with_='lines')
+            g.plot(d1, d2, d3, d4)
             #raw_input('Please press return to continue...\n')
        
     def update(self):
@@ -753,16 +754,16 @@ class HoverTrackTask(Task):
             if self.error_psi > 180:
                 self.error_psi = self.error_psi - 360
         else:
-            self.error_psi = None
+            self.error_psi = 0
                     
         self.error_alt = self.set_point_alt - alt
         
-        self.data_points[0].append(time.time() - 1338000000.00)
-        self.data_points[1].append(self.error_x)
-        self.data_points[2].append(self.error_y)
-        self.data_points[3].append(error_dist)
-        self.data_points[4].append(0)
-        self.data_points[5].append(0)
+        # self.data_points[0].append(time.time() - 1338000000.00)
+        # self.data_points[1].append(self.error_x)
+        # self.data_points[2].append(self.error_y)
+        # self.data_points[3].append(error_dist)
+        # self.data_points[4].append(0)
+        # self.data_points[5].append(0)
 
         if error_dist < 10:
             return (0.0,0.0,0.0,0.0)
@@ -780,10 +781,11 @@ class HoverTrackTask(Task):
        
         # calculate the I term, considering integrator max and min 
         if self.Ki > 0:
-            self.Integrator_x = self.Integrator_x + self.error_x
-            self.Integrator_y = self.Integrator_y + self.error_y
-            self.Integrator_psi = self.Integrator_psi + self.error_psi
-            self.Integrator_alt = self.Integrator_alt + self.error_alt
+            self.Integrator_x = self.Integrator_x + (self.error_x/self.max_error_x)#+ self.error_x
+            self.Integrator_y = self.Integrator_y + (self.error_y/self.max_error_y)#+ self.error_y
+            
+            self.Integrator_psi = self.Integrator_psi + (self.error_psi/self.max_error_psi)#+self.error_psi
+            self.Integrator_alt = self.Integrator_alt + (self.error_alt/self.max_error_alt)#+self.error_alt
 
             if self.Integrator_x > self.Integrator_max:
                 self.Integrator_x = self.Integrator_max
@@ -840,12 +842,12 @@ class HoverTrackTask(Task):
 
         PID_alt = self.P_value_alt + self.I_value_alt + self.D_value_alt
 
-        if PID_y < 0 and vx < 0:
-            PID_y = PID_y - (vx/5000)/4
-            print 'added: ', (vx/5000), ' to y-power\r'
-        if PID_y > 0 and vx > 0:
-            PID_y = PID_y + (vx/5000)
-            print 'added: ', (vx/5000), ' to y-power\r'
+        # if PID_y < 0 and vx < 0:
+        #     PID_y = PID_y - (vx/5000)/4
+        #     print 'added: ', (vx/5000), ' to y-power\r'
+        # if PID_y > 0 and vx > 0:
+        #     PID_y = PID_y + (vx/5000)
+        #     print 'added: ', (vx/5000), ' to y-power\r'
 
         # if PID_x < 0 and vy < 0:
         #     PID_x = PID_x - (vy/5000)/1.5
@@ -861,19 +863,20 @@ class HoverTrackTask(Task):
             print "Error_combined: " + str(error_dist) + "\r"
             print "Altitude:\t", alt, "\r"
 
-        time_spend = (time.time() - self.t1)
-        # self.data_points[0].append(time_spend)
-        # self.data_points[1].append(self.error_x)
-        # self.data_points[2].append(self.error_y)
-        # self.data_points[3].append(error_dist)
-        # self.data_points[4].append(PID_x*100)
-        # self.data_points[5].append(PID_y*100)
+        t = (time.time() - self.start_time)
+        print 't: ', t
+        self.data_points[0].append(t)
+        self.data_points[1].append(self.error_x)
+        self.data_points[2].append(self.error_y)
+        self.data_points[3].append(error_dist)
+        self.data_points[4].append(PID_x*100)
+        self.data_points[5].append(PID_y*100)
        
         time_spend = (time.time() - self.t1)
-        if (not time_spend > 2.0) or not error_dist <= 50:
+        if (not time_spend > 2.0) or not error_dist <= 30:
             PID_psi = 0
 
-        return (PID_x, PID_y, PID_alt, PID_psi)
+        return (PID_x, PID_y, PID_alt, PID_psi*0.5)
 
     def set_turn(self, degrees):
         self.set_point_psi = (360+(self.set_point_psi + degrees))%360
@@ -1229,11 +1232,6 @@ class FollowTourTask(SeqCompoundTask):
             self.modifiers.append(self.tour[i][2])
            
         return res
-
-    # def hover_callback(self, caller):
-    #     """ Sets the blob/mark coordinate to None after each hover task """
-    #     self.context[0] = None
-    #     self.context[2] = None
 
 class AvoidTask(Task):
     """ AvoidTask

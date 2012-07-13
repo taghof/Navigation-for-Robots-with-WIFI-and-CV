@@ -1527,6 +1527,7 @@ turbulens og dette let forekommer i, især, mindre lokaler.
 \end{figure}
 
 \paragraph{Tredje eksperiment}
+\label{p:simple3}
 Sidste eksperiment med de simple markører anvendte en FollowTourTask
 der fulgte en rute mellem fire markører på gulvet. Eksperimenterne startede
 denne gang fra jorden, da en FollowTourTask selv letter og lander.
@@ -1548,6 +1549,9 @@ recovermode til HoverTrackTasken, således at denne kunne bevæge
 AR.Dronen opad indtil enten markøren igen kunne genkendes eller en højdegrænse
 blev nået, hvorefter experimentet alligevel måtte afsluttes. Denne
 simple tilføjelse gjorde vores FollowTourTask meget mere robust.   
+\cite{}(youtube link) viser en video hvor vores AR.Drone flyver frem
+og tilbage mellem to simple markører og demonstrerer at lokaliseringen
+oftest fungerer. 
 
 \paragraph{Resultater}
 De overordnede resultater af vores eksperimenter med de simple
@@ -1559,10 +1563,10 @@ mere avancerede markører for bedre at understøtte vores FollowTourTask.
 
 \subsubsection{Lokalisering via avancerede markører} % Thomas & Morten
 Vi valgte efter de indledende eksperimenter at designe og anvende en
-mere avanceret form for markører. Vores første design var markøren der
+mere avanceret form for markører. Vores første redesign var markøren der
 ses på figur~\ref{fig:semiadvancedmarker}. 
 
-\paragraph{detekteringsalgoritme}
+\paragraph{Detekteringsalgoritme}
 Grundideen er at man først detekterer den røde firkant, hvorefter det
 indkransede område afsøges for en farvet blob der relaterer markøren
 til en specifik lokation. For at sikre en hurtig detektering(og dermed
@@ -1580,7 +1584,7 @@ areal til at være interessante, dette gøres med OpenCVs contourArea
 algoritme.
 Fjerde skridt er at undersøge områderne der dækkes af de udvalgte
 konturer for at finde en farvet blob, denne undersøgelse anvender igen
-OpenCVs inRange algoritmre. Hvis en sådan farvet blob findes
+OpenCVs inRange algoritme. Hvis en sådan farvet blob findes,
 kan vi sammenligne farven med beskrivelsen af de forskellige
 lokationer vi finder i vores kort og dermed lokalisere AR.Dronen
 præcist.
@@ -1619,8 +1623,31 @@ den avancerede markør.
 
 \paragraph{Tredje eksperiment}
 Dette eksperiment varierede fra det ovenstående ved at den virtuelle
-sensor her løbende skiftede kamerafeed, vi ønskede at se om
-HoverTrackTasken stadig var i stand til at operere med 
+sensor her løbende skiftede kamerafeed. Vi ønskede at undersøge om
+HoverTrackTasken stadig var i stand til at stabilisere AR.Dronen over
+en erkendt lokation når bundkameraets framerate faldt. Forsøget viste
+AR.Dronen stadig forblev stabil over lokationen, til gengæld stoppede
+den pludseligt da AR.Dronens originale styringssoftware lukkede ned efter omtrent ti
+minutter. Nærmere undersøgelser viser at AR.Dronens software muligvis
+har en memoryleak, dette viser sig ved at softwarens hukommelses forbrug
+stiger kraftigt så snart vi iværksætter hurtige kameraskift ved brug
+af AR-kommandoen set\_config.*double info beskrives også i virtuel* 
+
+\paragraph{Fjerde eksperiment}
+Ligesom \ref{p:simple3} anvendte vi til dette formål en opsætning med
+fire markører, formålet var at bekræfte at vi stadig med de nye
+markører og den ændrede HoverTrackTask var i stand til navigere mellem
+de fire punkter med vores FollowTourTask. Opstillingen kan ses på
+figur ~\ref{fig:advancedsetup}. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{grafik/advancedsetup.png}
+  \caption{Billede af opstilling med avancerede markører til brug for
+    det fjerde eksperiment med disse markører}
+  \label{fig:advancedsetup}
+\end{figure}
+
 \subsubsection{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}
 \begin{figure}[ht]
@@ -1795,8 +1822,12 @@ Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi ka
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
-Evaluering: at det har været svært at finde videnskabelige datalogiske kilder af høj troværdighed omkring AR.Dronen ; in part privat virksomhed properitær firmware / arkitektur, meget information fra hacker, tinker, DIY fora.
-Tilgængel nogle videnskabelige artikler omkring hvordan man implementere en algoritme ovenpå en allerede antaget platform som AR.Dronen...
+Evaluering: at det har været svært at finde videnskabelige datalogiske
+kilder af høj troværdighed omkring AR.Dronen ; in part privat
+virksomhed properitær firmware / arkitektur, meget information fra
+hacker, tinker, DIY fora.  Tilgængel nogle videnskabelige artikler
+omkring hvordan man implementere en algoritme ovenpå en allerede
+antaget platform som AR.Dronen...
 
 \section{Perspektivering}
 

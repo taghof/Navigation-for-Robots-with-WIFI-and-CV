@@ -41,7 +41,8 @@ class Detector(object):
 
     def runner(self):
         if self.show:
-            win1 = cv2.namedWindow('win')
+            win1 = cv2.namedWindow('win1')
+            win2 = cv2.namedWindow('win2')
         # win2 = cv2.namedWindow('pic')
         # win2 = cv2.namedWindow('mini')
 
@@ -116,7 +117,7 @@ class Detector(object):
         thresh = cv2.add(thresh_l, thresh_h)
         #thresh = cv2.inRange(org, np.asarray((200, 200, 200)), np.asarray((255, 255, 255)))
         if self.show:
-            cv2.imshow('win' , thresh)
+            cv2.imshow('win1' , thresh)
             cv2.waitKey(10)
         # cv2.imshow('win' , thresh)
         # cv2.waitKey(10)
@@ -133,11 +134,19 @@ class Detector(object):
                 #if  h > 20 and w > 20:
                 mini_pic = hsv[(y):(y+h),(x):(x+w)]
                 res = self.detect_color(mini_pic)
+                pad_w, pad_h = int(0.15*w), int(0.05*h)
+                cv2.rectangle(org, (x+pad_w, y+pad_h), (x+w-pad_w, y+h-pad_h), (0, 255, 0), 2)
+
                 if res is not None:
                     x = x + res[0]
                     y = y + res[1]
                     color = res[3]
                     result.append( (x, y, color, org) )
+                    
+                if self.show:
+                    cv2.imshow('win2' , org)
+                    cv2.waitKey(10)
+
         return result
         
     def detect_silhouets(self, img):
@@ -166,7 +175,7 @@ class Detector(object):
             #print 'green'
             return (x, y, pic, settings.GREEN)
 
-        pic = cv2.inRange(img, np.asarray((97, 10, 40)), np.asarray((116, 255, 255)))
+        pic = cv2.inRange(img, np.asarray((97, 10, 40)), np.asarray((125, 255, 255)))
     
         moments = cv2.moments(pic, 0)
         area = moments.get('m00')
@@ -175,6 +184,17 @@ class Detector(object):
             y = moments.get('m01')/area 
             #print 'blue'
             return (x, y, pic, settings.BLUE)
+
+        pic = cv2.inRange(img, np.asarray((25, 20, 40)), np.asarray((50, 255, 255)))
+    
+        moments = cv2.moments(pic, 0)
+        area = moments.get('m00')
+        if(area > 10000):
+            x = moments.get('m10')/area 
+            y = moments.get('m01')/area 
+            #print 'blue'
+            return (x, y, pic, settings.YELLOW)
+
 
         return None
 

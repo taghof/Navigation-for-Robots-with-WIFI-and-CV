@@ -338,17 +338,21 @@ Det nedadrettede kamera er en CMOS sensor med $64 ^{\circ}$ vinkel, der tager bi
   \label{fig:navboard}
 \end{figure}
 
-\paragraph{Højdemåler}
-Til at bestemme AR.Dronens afstand til jorden anvendes en ultrasonisk
-afstandsmåler. Denne opererer ved at udsende en ultralydspuls og herefter
-måle tidsintervallet der går før ekkoet måles. Ultralydsmåleren er angivet
-til at virke op til 6 meter og er rent fysisk placeret på navboardet (se figur \ref{fig:navboard}) på AR.Dronens underside.
-\paragraph{Acceleration og inerti}
-AR.Drone er udstyret med to gyroskoper, et 2-akses gyroskop til at
-måle hældningsraten om x- og y-aksen (pitch og roll) samt et 1-akses piezoelektrisk gyroskop
-til at måle rotationen om z-aksen (yaw). Gyroskoperne kombineres med et
-3-akses accelerometer i en samlet enhed til at måle inerti (IMU)\footnote{Inertial Measurement Unit}, denne anvendes til
-løbende at give estimater af Euler-vinklerne; theta, phi og psi. Hvor phi og theta er henholdsvis pitch og roll, mens at psi er yaw. For en grafisk repræsentation se evt figur \ref{fig:drone_movements}.
+\paragraph{Højdemåler} Til at bestemme AR.Dronens afstand til jorden
+anvendes en ultrasonisk afstandsmåler. Denne opererer ved at udsende
+en ultralydspuls og herefter måle tidsintervallet der går før ekkoet
+måles. Ultralydsmåleren er angivet til at virke op til 6 meter og er
+rent fysisk placeret på navboardet (se figur \ref{fig:navboard}) på
+AR.Dronens underside.
+\paragraph{Acceleration og inerti} AR.Drone er udstyret med to
+gyroskoper, et 2-akses gyroskop til at måle hældningsraten om x- og
+y-aksen (pitch og roll) samt et 1-akses piezoelektrisk gyroskop til at
+måle rotationen om z-aksen (yaw). Gyroskoperne kombineres med et
+3-akses accelerometer i en samlet enhed til at måle inerti
+(IMU)\footnote{Inertial Measurement Unit}, denne anvendes til løbende
+at give estimater af Euler-vinklerne; theta, phi og psi. Hvor phi og
+theta er henholdsvis pitch og roll, mens at psi er yaw. For en grafisk
+repræsentation se evt figur \ref{fig:drone_movements}.
 
 \subsubsection{Aktuatorer}
 \label{sssec:aktuatorer}
@@ -685,7 +689,6 @@ bundkameraet at opfange tilpas mange gode features at følge.
   \includegraphics[width=0.80\textwidth]{grafik/sonarzone2.png}
   \caption{a) Udbredelsesområde for ultralydssensorsignal, b) man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://www.cs.brown.edu/\-people/\-tld/\-courses/\-cs148/\-02/\-sonar.html}). \todo{Skal den i referencer?}}
   \label{fig:sonicbeam2}
-%%   \includegraphics[width=0.80\textwidth]{grafik/sonardzone.jpg} \uri{http://picaxe.hobbizine.com/srf05.html}) %men det er ikke det samme billede?
 \end{figure}
 Højdemåleren består som nævnt af en ultralyds-sender og
 -modtager. Teknologien gør at højden man får ud ikke nødvendigvis er
@@ -1281,6 +1284,9 @@ først og TestTask med level 2 slutte sidst.
   \label{fig:taskhieraky}
 \end{figure}
 
+\subsubsection{HoverTrackTask}
+\label{sssec:hovertrack}
+
 \subsubsection{FollowTourTask}
 \label{sssec:followtourtask}
 Et mere realistisk og komplekst eksempel er en FollowTourTask, se
@@ -1297,7 +1303,9 @@ forbundne, minder vores tilgang meget om Kuipers og Byuns metode der beskrives i
 begge systemer udføres fejlkorrigering hver gang en ny position
 detekteres, i vores system sker dette ved at HoverTrackTasken bringer
 robotten indenfor en specifik afstand af den præcise position før
-Ar.Dronen sendes videre. 
+Ar.Dronen sendes videre. Det ville desuden være let at lade vores
+*DistanceMeasurer* algoritme tilføje metrisk data til kortet, hver gang
+AR.Dronen har bevæget sig mellem to positioner.
 
 \begin{figure}[H]
   \centering
@@ -1318,14 +1326,12 @@ ekperimenteret med forskellige former for lokalisering, mere specifikt
 har vi arbejdet med lokalisering ved hjælp af WIFI-signalstyrker og
 lokalisering ved hjælp af visuelle markører. Vi har i vores
 eksperimenter gjort brug af et kort med beskrivelser af
-lokationer(WIFI, farvebeskrivelse og koordinater) og en
+lokationer(WIFI, markørbeskrivelse og koordinater) og en
 rutebeskrivelse bestående af en liste med lokationer, kortet
 indeholder desuden en fortegnelse over vinkelretninger mellem alle
 lokationspar. Kort og rutebeskrivelser oprettes let ved hjælp af*ref
 taskcreator*. For at teste forskellige lokaliseringsmetoder har vi
-anvendt en FollowTourTask\ref{sssec:followtourtask}, denne anvender førnævnte kort til at bevæge
-sig mellem lokationerne i kortets rutebeskrivelse. 
-
+anvendt HoverTrackTasks og FollowTourTasks\ref{sssec:followtourtask}.
 
 \subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
 \label{ssec:wikilokalisering}
@@ -1340,38 +1346,58 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
 \subsection{Visuel lokalisering}
 
+\begin{figure}[H]
+  \centering
+  \subfigure[Simpel markør]{
+    \includegraphics[width=0.20\textwidth]{grafik/simplemarker.png}
+    \label{fig:simplemarker}}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfigure[semiavanceret markør]{\includegraphics[width=0.35\textwidth]{grafik/semiadvancedmarker.png}
+    \label{fig:semiadvancedmarker}}
+  ~
+  \subfigure[avanceret markør]{\includegraphics[width=0.35\textwidth]{grafik/advancedmarker.png}
+    \label{fig:advancedmarker}}
+
+  \label{fig:markers}
+\end{figure}
 \subsubsection{Lokalisering via simple markører} % Thomas & Morten
-Vores første forsøg med visuel lokalisering anvendte simple røde
-markører i A5 størrelse. Fire af disse markører blev placeret på
-gulvet jævnfør det på kortet beskrevne mønster\ref{fig:kort}. 
-Vores første forsøg viste os, at vi i højder fra 0.5 til 2.5 meter altid var i stand
-til at genkende disse markører med AR.Dronens bundkamera. 
-Vi havde til formålet implementeret en blobdetectionalgoritme i Python, som for
+\paragraph{Første eksperiment}
+Vores første forsøg med visuel lokalisering anvendte en simpel rød
+markør i A5 størrelse, se figur~\ref{fig:markers}, vi havde til
+formålet implementeret en blobdetectionalgoritme i Python, som for
 hver pixel vurderer om den er rød nok til at være en del af markøren. Algoritmen antager at der i
 billedet kun findes et rødt objekt og er på grund af Pythons
 afviklingshastighed ikke videre hurtig, men til dette simple
 eksperiment var den passende.
+Eksperimentet udførtes ved at markøren blev placeret på
+gulvet og AR.Dronen fløjet i position over markøren, hvorefter
+blobdetectionalgoritmen blev startet. 
+Vores første forsøg viste os, at vi i højder fra 0.5 til 2.5 meter altid var i stand
+til at genkende markøren med AR.Dronens bundkamera.
+
+\paragraph{Andet eksperiment} 
 Vores næste skridt var at anvende ovennævnte lokaliseringsmetode i
-forbindelse med afviklingen af en HoverTrackTask~\ref{sec:hovertrack}
+forbindelse med afviklingen af en HoverTrackTask~\ref{sssec:hovertrack}
 for at få en idé om metodens anvendelighed i en
-realtidskontekst. Forsøget afvikledes ved at AR.Dronen blev fløjet i 
-position over en markør, hvorefter HoverTrackTasken blev
-aktiveret. Her viste det sig tydeligt at pythonblobdetectoren ikke var
-effektiv nok, vi var ikke i stand til at opdatere hurtigt nok og som
-resultat nåede AR.Dronen ofte at bevæge sig væk fra markøren. Dette
-resultat fik os til at reimplementere HoverTrackTasken således at den
-anvendte vores blobdetector til at opdage markøren og herefter
-anvendte OpenCVs opticalflow-algoritme(optflowpyrlk) til at
-tracke den. Afviklingen af opticalflow-algoritmen er omtrent 10 gange
-hurtigere end vores blobdetector. Da vi gentog forsøget med denne
-tilføjelse var AR.Dronen meget mere responsiv og efter at have
-fintunet HoverTrackTaskens PID-parametre var AR.Dronen i stand til at
-forblive over markøren. På fig~\ref{fig:simplehover} ses
-error-værdierne i x og y-retningen over en periode på mere end 2
-minutter hvor AR.Dronen befinder sig over en markør, det bemærkes at
-der er et udsving omtrent midt i forløbet, dette er ikke usædvanligt,
-da AR.Dronen er meget påvirkelig af turbulens og dette let forekommer
-i, især, mindre lokaler.
+realtidskontekst. 
+Vi anvendte til dette forsøg også kun en enkelt markør og forsøget
+afvikledes ved at AR.Dronen blev fløjet i position over denne,
+hvorefter HoverTrackTasken blev aktiveret. Her viste det sig tydeligt
+at pythonblobdetectoren ikke var effektiv nok, vi var ikke i stand til
+at opdatere hurtigt nok og som resultat nåede AR.Dronen ofte at bevæge
+sig væk fra markøren. Dette resultat fik os til at reimplementere
+HoverTrackTasken således at den anvendte vores blobdetector til at
+opdage markøren og herefter anvendte OpenCVs
+opticalflow-algoritme (optflowpyrlk) til at tracke den i videostrømmen. Afviklingen af
+opticalflow-algoritmen er omtrent 10 gange hurtigere end vores
+blobdetector. Da vi gentog forsøget med denne tilføjelse var AR.Dronen
+meget mere responsiv og efter at have fintunet HoverTrackTaskens
+PID-parametre var AR.Dronen i stand til at forblive over markøren. På
+fig~\ref{fig:simplehover} ses error-værdierne i x og y-retningen over
+en periode på mere end 2 minutter hvor AR.Dronen befinder sig over en
+markør, det bemærkes at der er et udsving omtrent midt i forløbet,
+dette er ikke usædvanligt, da AR.Dronen er meget påvirkelig af
+turbulens og dette let forekommer i, især, mindre lokaler.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/simpledronehover.png}
@@ -1379,44 +1405,101 @@ i, især, mindre lokaler.
   \label{fig:simplehover}
 \end{figure}
 
+\paragraph{Tredje eksperiment}
 Sidste eksperiment med de simple markører anvendte en FollowTourTask
-der fulgte en rute mellem de fire markører. Eksperimenterne startede
+der fulgte en rute mellem fire markører på gulvet. Eksperimenterne startede
 denne gang fra jorden, da en FollowTourTask selv letter og lander.
 
 Vi forventede her at udfordringen ville være at opdage markøren tidsnok til at stoppe
 AR.Dronen før den var fløjet forbi. Dette problem kan dog løses ved at
 lade AR.Dronen flyve i en passende højde, vi fandt at en
 højdesetting på 1800 mm var passende til dette formål. Til gengæld
-fandt vi to andre problemer. Det første problem var relateret til at
+afdækkede vi to andre problemer. 
+Det første problem var relateret til at
 alle vores markører var ens, dette betød at der var tilfælde hvor
 AR.Dronen fandt samme lokation to gange i træk, men antog at den
 fundne lokation var den næste i rutebeskrivelsen, problemet lagde
-grund til tanken om at anvende mere avancerede lokationsmarkører. Det andet problem
-var at, hvis vi først mistede en markør fra AR.Dronens synsfelt, så
+grund til tanken om at anvende mere avancerede lokationsmarkører for
+at opnå en mere præcis lokalisering. Det andet problem
+var at hvis vi først mistede en markør fra AR.Dronens synsfelt, så
 var det umuligt at fortsætte, dette problem løstes ved at tilføje en
 recovermode til HoverTrackTasken, således at denne kunne bevæge
 AR.Dronen opad indtil enten markøren igen kunne genkendes eller en højdegrænse
-blev nået hvorefter experimentet alligevel måtte afsluttes.   
+blev nået, hvorefter experimentet alligevel måtte afsluttes. Denne
+simple tilføjelse gjorde vores FollowTourTask meget mere robust.   
 
+\paragraph{Resultater}
 De overordnede resultater af vores eksperimenter med de simple
-lokationsmarkører var, vi fik bekræftet AR.Dronens evne til at
+lokationsmarkører var, at vi fik bekræftet AR.Dronens evne til at
 genkende simple markører og at vi fik udviklet både HoverTrackTasken
 og FollowTourTasken. Vi fandt desuden ud af at vores markørsetup var
 for simpelt til at være praktisk anvendeligt og at vi måtte udvikle
 mere avancerede markører for bedre at understøtte vores FollowTourTask.
 
-%Blob-detection og PID styring} 
-Hvad vil vi vise, afvise teste?
-Hvad kan/skal resultatet bruges til?
-Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
-Hvad var resultatet?
-perspektiver, hvad skal / kan vi bruge den nye viden til?
-Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
-
-\todo{simpel blob}, og \todo{udbygget nested blob}
-
 \subsubsection{Lokalisering via avancerede markører} % Thomas & Morten
+Vi valgte efter de indledende eksperimenter at designe og anvende en
+mere avanceret form for markører. Vores første design var markøren der
+ses på figur~\ref{fig:semiadvancedmarker}. 
 
+\paragraph{detekteringsalgoritme}
+Grundideen er at man først detekterer den røde firkant, hvorefter det
+indkransede område afsøges for en farvet blob der relaterer markøren
+til en specifik lokation. For at sikre en hurtig detektering(og dermed
+lokalisering) anvender gør vores algoritme omfattende brug af OpenCVs
+optimerede billedbehandlingsalgoritmer. Vores detekterings algoritme
+er implementeret i vores virtuelle sensor og afvikles således konstant
+for at give et så nøjagtigt billede af miljøet som muligt. 
+Første skridt i algoritmen er at udføre thresholding ved hjælp af
+Opencvs inRange algoritme, dette giver os et billede hvor alle de
+oprindelige røde pixels nu er hvide og resten er sorte.
+Andet skridt er at finde konturer i det binære billede dette gøres med
+OpenCVs findContours algoritme.
+Tredje skridt indbefatter at udvælge de konturer der har et stort nok
+areal til at være interessante, dette gøres med OpenCVs contourArea
+algoritme.
+Fjerde skridt er at undersøge områderne der dækkes af de udvalgte
+konturer for at finde en farvet blob, denne undersøgelse anvender igen
+OpenCVs inRange algoritmre. Hvis en sådan farvet blob findes
+kan vi sammenligne farven med beskrivelsen af de forskellige
+lokationer vi finder i vores kort og dermed lokalisere AR.Dronen
+præcist.
+
+\paragraph{Første eksperiment}
+Vores indledende eksperiment udførtes på samme måde som det første
+eksperiment med de simple markører, blot var den simple markør skiftet
+ud med en semiavanceret markør, vist på figur
+~\ref{fig:semiadvancedmarker}. Vores forventninger var fra start, at vi
+ville få svært ved at identificere markøren over en hvis højde, da den
+røde markering ikke er lige så koncentreret som på den simple
+markør. Efter at have tilpasset vores thresholdværdier og udført
+eksperimentet i højder fra 1 til 2.5 meter, kunne vi bekræfte vores
+formodning. Vi kunne med sikkerhed genkende den semiadvancerede markør
+op til 1.5 meters højde, men herefter faldt detektionsraten
+betydeligt. En detektionshøjde på 1.5 ligger lidt under de 1.8 meter
+vi tidligere havde bestemt som en passende flyvehøjde. Vi valgte
+derfor at udvikle en markør med en større rød overflade, se
+figur~\ref{fig:advancedmarker}, for at sikre bedre detektion. En
+gentagelse af eksperimentet med den avancerede markør bekræftede at
+denne nu kunne detekteres i op til 2 meters højde. Den avancerede
+markør er desuden designet sådan at den på sigt kan bruges til at
+udlede AR.Dronens præcise retning, hvilket ville gøre os mindre
+afhængige af de upræcise psi-målinger fra Ar.Dronens piezo-sensor. 
+
+\paragraph{Andet eksperiment}
+Vores andet eksperiment er næsten identisk med det der blev udført for
+de simple markører, Det skal dog nævnes at vores HoverTrackTask i
+mellemtiden blev redigeret til at anvende den virtuelle sensors
+detekteringsresultater, istedet for selv at udføre en
+detekteringsalgoritme som det var tilfældet under de tidligere
+eksperimenter. Under dette eksperiment var den virtuelle sensor
+indstillet til ikke at skifte mellem de to kamerafeeds. 
+Som forventet var AR.Dronen også i stand til at holde positionen over
+den avancerede markør.
+
+\paragraph{Tredje eksperiment}
+Dette eksperiment varierede fra det ovenstående ved at den virtuelle
+sensor her løbende skiftede kamerafeed, vi ønskede at se om
+HoverTrackTasken stadig var i stand til at operere med 
 \subsubsection{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}
 \begin{figure}[ht]

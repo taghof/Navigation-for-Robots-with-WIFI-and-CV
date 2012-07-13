@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Video Demonstrating Our Navigation Task
-public: False
+public: True
 ---
 
 This video shows our AR.Drone moving between two ground markers, no human interaction needed for this task.

@@ -72,7 +72,6 @@ class Drone(object):
         self.detector_sensor = virtualsensors.Detector(self) 
         self.sensors.append(self.detector_sensor)
 
-
         if settings.TEST:
             self.testdevice.start()
        
@@ -89,7 +88,6 @@ class Drone(object):
                 print 'Battery: ' + str(bat) + '\r'
         
         self.interface.start()
-        #self.task_manager.start()
         self.controller_manager.start_controllers()
                
     def stop(self, gui_stop=False):

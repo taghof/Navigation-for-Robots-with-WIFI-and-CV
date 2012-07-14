@@ -1051,7 +1051,7 @@ silhuetter umiddelbart foran AR.Dronen, sensoren leverer således
 målinger på et højere abstraktionsniveau end receiverne. For
 at kunne detektere både markører på gulvet og silhuetter er det
 nødvendigt for sensoren hele tiden at skifte mellem bund- og
-frontkamera, dette giver imidlertid problemer for AR.Dronens originale
+frontkamera**, dette giver imidlertid problemer for AR.Dronens originale
 program der ved konstante kameraskift løbende øger sit
 hukommelsesforbrug indtil linuxkernen lukker programmet ned. Vores
 målinger viser, at AR.Dronens program kun kan køre mellem ti og tolv
@@ -1329,8 +1329,8 @@ def receive_and_show_picture():
 \label{sec:tasks}
 For at indkapsle forskellige bevægemønstre og for at kunne koordinere
 en parallel afvikling af disse, har vi implementeret et hierakisk
-opbygget tasksystem. Vi har valgt at anvende task-terminologien
-istedet for behaviors~\cite{lenser:behaviorbasedarchitecture}, grunden til dette er at flere af vores tasks er
+opbygget tasksystem. Vi har valgt at kalde vores enheder for tasks
+istedet for behaviors ellers bruges i ~\cite{lenser:behaviorbasedarchitecture}, grunden til dette er at flere af vores tasks er
 forholdsvis kortlivede(for eksempel take-off og landtasks) og derfor
 mere minder om en opgave der skal forberedes, udføres og afsluttes,
 dette ses i modsætning til en behavior som kan opfattes som en
@@ -1474,6 +1474,7 @@ Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
 \end{figure}
 \subsubsection{Lokalisering via simple markører} % Thomas & Morten
 \paragraph{Første eksperiment}
+\label{p:simple1}
 Vores første forsøg med visuel lokalisering anvendte en simpel rød
 markør i A5 størrelse, se figur~\ref{fig:markers}, vi havde til
 formålet implementeret en blobdetectionalgoritme i Python, som for
@@ -1482,10 +1483,15 @@ billedet kun findes et rødt objekt og er på grund af Pythons
 afviklingshastighed ikke videre hurtig, men til dette simple
 eksperiment var den passende.
 Eksperimentet udførtes ved at markøren blev placeret på
-gulvet og AR.Dronen fløjet i position over markøren, hvorefter
-blobdetectionalgoritmen blev startet. 
-Vores første forsøg viste os, at vi i højder fra 0.5 til 2.5 meter altid var i stand
-til at genkende markøren med AR.Dronens bundkamera.
+gulvet og AR.Dronen placeret i position over markøren, hvorefter
+blobdetectionalgoritmen blev startet. Vi definerer detektionsraten som
+antal succesfulde detektioner delt med antal gentagelser af
+algoritmen. Vi kørte algoritmen 200 gange i henholdsvis 0.5, 1.0, 1.5
+og 2.0 meters højde og resultaterne kan ses på figur
+~\ref{fig:detection}, sammen med resultaterne for de andre markører.
+ 
+Vores første forsøg viste os, at vi i højder fra 0.5 til 2.0 meter altid var i stand
+til at genkende den simple markør med AR.Dronens bundkamera.
 
 \paragraph{Andet eksperiment} 
 Vores næste skridt var at anvende ovennævnte lokaliseringsmetode i
@@ -1522,6 +1528,14 @@ turbulens og dette let forekommer i, især, mindre lokaler.
 Sidste eksperiment med de simple markører anvendte en FollowTourTask
 der fulgte en rute mellem fire markører på gulvet. Eksperimenterne startede
 denne gang fra jorden, da en FollowTourTask selv letter og lander.
+Vores setup, både det konstruerede kort og den fysiske opstilling ses
+på figur ~\ref{fig:simplesetup}.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{grafik/simplesetup.png}
+  \caption{HoverTrackTask error-værdier over en længere periode}
+  \label{fig:simplesetup}
+\end{figure}
 
 Vi forventede her at udfordringen ville være at opdage markøren tidsnok til at stoppe
 AR.Dronen før den var fløjet forbi. Dette problem kan dog løses ved at
@@ -1540,9 +1554,9 @@ recovermode til HoverTrackTasken, således at denne kunne bevæge
 AR.Dronen opad indtil enten markøren igen kunne genkendes eller en højdegrænse
 blev nået, hvorefter experimentet alligevel måtte afsluttes. Denne
 simple tilføjelse gjorde vores FollowTourTask meget mere robust.   
-\cite{}(youtube link) viser en video hvor vores AR.Drone flyver frem
-og tilbage mellem to simple markører og demonstrerer at lokaliseringen
-oftest fungerer. 
+\cite{electronic:youtube2}(youtube link) viser en video hvor vores AR.Drone flyver frem
+og tilbage mellem to simple markører og demonstrerer at lokaliseringen,
+på trods af de to nævnte problemer, oftest fungerer. 
 
 \paragraph{Resultater}
 De overordnede resultater af vores eksperimenter med de simple
@@ -1551,6 +1565,9 @@ genkende simple markører og at vi fik udviklet både HoverTrackTasken
 og FollowTourTasken. Vi fandt desuden ud af at vores markørsetup var
 for simpelt til at være praktisk anvendeligt og at vi måtte udvikle
 mere avancerede markører for bedre at understøtte vores FollowTourTask.
+\cite{electronic:youtube2}(youtube link) viser en video hvor vores AR.Drone flyver frem
+og tilbage mellem to simple markører og demonstrerer at lokaliseringen,
+på trods af de to nævnte problemer, oftest fungerer. 
 
 \subsubsection{Lokalisering via avancerede markører} % Thomas & Morten
 Vi valgte efter de indledende eksperimenter at designe og anvende en
@@ -1561,10 +1578,10 @@ ses på figur~\ref{fig:semiadvancedmarker}.
 Grundideen er at man først detekterer den røde firkant, hvorefter det
 indkransede område afsøges for en farvet blob der relaterer markøren
 til en specifik lokation. For at sikre en hurtig detektering(og dermed
-lokalisering) anvender gør vores algoritme omfattende brug af OpenCVs
+lokalisering) gør vores algoritme omfattende brug af OpenCVs
 optimerede billedbehandlingsalgoritmer. Vores detekterings algoritme
 er implementeret i vores virtuelle sensor og afvikles således konstant
-for at give et så nøjagtigt billede af miljøet som muligt. 
+for at give et så nøjagtigt billede af det øjeblikkelige miljø som muligt. 
 Første skridt i algoritmen er at udføre thresholding ved hjælp af
 Opencvs inRange algoritme, dette giver os et billede hvor alle de
 oprindelige røde pixels nu er hvide og resten er sorte.
@@ -1581,6 +1598,7 @@ lokationer vi finder i vores kort og dermed lokalisere AR.Dronen
 præcist.
 
 \paragraph{Første eksperiment}
+\label{p:advanced1}
 Vores indledende eksperiment udførtes på samme måde som det første
 eksperiment med de simple markører, blot var den simple markør skiftet
 ud med en semiavanceret markør, vist på figur
@@ -1589,7 +1607,7 @@ ville få svært ved at identificere markøren over en hvis højde, da den
 røde markering ikke er lige så koncentreret som på den simple
 markør. Efter at have tilpasset vores thresholdværdier og udført
 eksperimentet i højder fra 1 til 2.5 meter, kunne vi bekræfte vores
-formodning. Vi kunne med sikkerhed genkende den semiadvancerede markør
+formodning. Vi kunne med med en hvis sikkerhed genkende den semiavancerede markør
 op til 1.5 meters højde, men herefter faldt detektionsraten
 betydeligt. En detektionshøjde på 1.5 ligger lidt under de 1.8 meter
 vi tidligere havde bestemt som en passende flyvehøjde. Vi valgte
@@ -1600,6 +1618,7 @@ denne nu kunne detekteres i op til 2 meters højde. Den avancerede
 markør er desuden designet sådan at den på sigt kan bruges til at
 udlede AR.Dronens præcise retning, hvilket ville gøre os mindre
 afhængige af de upræcise psi-målinger fra Ar.Dronens piezo-sensor. 
+Resultaterne kan ses på figur \ref{fig:detection}
 
 \paragraph{Andet eksperiment}
 Vores andet eksperiment er næsten identisk med det der blev udført for
@@ -1613,6 +1632,7 @@ Som forventet var AR.Dronen også i stand til at holde positionen over
 den avancerede markør.
 
 \paragraph{Tredje eksperiment}
+\label{p:advanced3}
 Dette eksperiment varierede fra det ovenstående ved at den virtuelle
 sensor her løbende skiftede kamerafeed. Vi ønskede at undersøge om
 HoverTrackTasken stadig var i stand til at stabilisere AR.Dronen over
@@ -1629,8 +1649,10 @@ Ligesom \ref{p:simple3} anvendte vi til dette formål en opsætning med
 fire markører, formålet var at bekræfte at vi stadig med de nye
 markører og den ændrede HoverTrackTask var i stand til navigere mellem
 de fire punkter med vores FollowTourTask. Opstillingen kan ses på
-figur ~\ref{fig:advancedsetup}. 
+figur ~\ref{fig:advancedsetup}.
 
+Eksperimentet bekræftede at AR.Dronen konstistent kunne lokalisere sig
+selv. 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/advancedsetup.png}
@@ -1638,6 +1660,34 @@ figur ~\ref{fig:advancedsetup}.
     det fjerde eksperiment med disse markører}
   \label{fig:advancedsetup}
 \end{figure}
+
+\subsubsection{Detektering af markører på små billeder}
+I de ovenstående eksperimenter har vi anvendt AR.Dronens bundkamera,
+dette har en opløsning på 176x144. Der er dog andre tasks der skal
+bruge data fra frontkameraet, dette gør at vi er nødt til kontinuerligt at zappe mellem
+de to kameraer og dette fungererer som nævnt i \ref{p:advanced3} ikke særligt
+godt. Vi har derfor undersøgt mulighederne for at anvende det
+kamerafeed hvor bundkameraets billeder er lagt oven på
+frontkameraets(se \ref{fig:2frames}), når vi udvinder bundkameraets billeder fra
+denne kilde får vi billeder i en opløsning på 88x72.
+Eksperimenterne er fuldstændig magen til dem vi udførte i \ref{p:simple1} og
+\ref{p:advanced1}. De er ligeledes udført i højderne 0.5, 1.0, 1.5 og 2.0 og er
+udført både med de simple, semiavancerede og avancerede
+markører. Resultaterne ses på figur \ref{fig:detection}, de viser tydeligt at
+det ikke er muligt at anvende de små billeder, da de selv for de
+simple markører kun giver et pålideligt resultat op til 1.5 meter,
+hvorefter detektionsraten falder betydeligt. 
+
+\begin{figure}[H]
+  \centering
+  % \includegraphics[width=0.95\textwidth]{grafik/advancedsetup.png}
+  \caption{Detektionsrater for de forskellige markører i højder op til
+    2.0 meter, desuden detektionsrater for de forskellige markører ved
+    88x72 billeder}
+  \label{fig:detection}
+\end{figure}
+
+
 
 \subsubsection{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}

@@ -10,6 +10,8 @@
 \usepackage{framed}
 \usepackage{subfigure}
 \usepackage{float}
+% \floatstyle{boxed} 
+% \restylefloat{figure}
 \usepackage{listings}
 
 \usepackage{natbib}
@@ -23,9 +25,9 @@
 %\usepackage{subcaption}
 \usepackage{hyperref}
 
-%\newenvironment{nb}
-%   {\begin{framed}\begin{quotation}}
-%   {\end{framed}\end{quotation}}
+\newenvironment{framefig}
+   {\begin{figure}[H]\begin{framed}}
+   {\end{framed}\end{figure}}
 %\newcommand{\oversaet}[1]{(\textit{#1})}
 
 
@@ -133,12 +135,12 @@ Grundmotivationen bag specialet har langt af vejen været at ``der skal være et u
 indhold''. Kigger man på hjemmesiden til promovering af Parrots
 AR.Drone\cite{electronic:ardrone} skinner underholdningfaktoren også
 tydeligt igennem (se figur~\ref{fig:devisen}).
-\begin{figure}[ht]
+\begin{framefig}
   \centering
   \includegraphics[width=0.50\textwidth]{grafik/flyingvideogame.png}
   \caption{AR.Dronens logo med slagordene \emph{the Flying Video Game} april 2011 http://web.archive.org/web/20110715044741/http://ardrone.parrot.com/parrot-ar-drone/en/.}
   \label{fig:devisen}
-\end{figure}
+\end{framefig}
 AR.Drone blev introduceret i 2010 som ``the~Flying~Video~Game'' og
 promoveres stadig af producenten som et stykke legetøj, der fjernstyres fra
 brugerens iPhone eller iPad. Siden har AR.Dronen dog fundet stor
@@ -384,28 +386,37 @@ Dude its a CD
 %%%%     AR.Drone - section
 %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Opsætning}
-\section{AR.Drone}
+\chapter{Quadrokopter AR.Drone}
 \label{sec:AR.Drone}
 AR.Drone er en quadrokopter fremstillet og udviklet af det franske
-firma Parrot \cite{electronic:parrot}\cite{electronic:wiki_parrot}.
+firma Parrot, \cite{electronic:parrot}, \cite{electronic:wiki_parrot}.
  En quadrokopter benytter fire faste rotorer til at
-generere opdrift, samt til at styre sin bevægelse i rummet.%\\
+generere opdrift, samt til at styre sin bevægelse i rummet.
+Parrots quadrokopter kommer med et sæt sensorer bestående af: To
+kameraer, et vertikalt nedadrettet og et horisontalt fremadrettet, en
+nedadrettet afstandssensor, et gyroskop, samt et accelerometer. I 2012
+ventes en opdateret udgave af AR.Dronen. Den nye version 
+tilføjer yderligere et kamera i høj opløsning (HD), en trykmåler
+(digitalt barometer) og et kompas til platformen,
+\ref{electronic:ar2}.AR.Drone er opbygget som en letvægtskonstruktion
+af kulfiber, plast og skummateriale og kommer med to forskellige
+skumskjold til henholdsvis indendørs
+(figur~\ref{fig:indendoersskjold}) og udendørs flyvning
+(figur~\ref{fig:udendoersskjold}).
 
-Parrots quadrokopter kommer med et sæt sensorer bestående af to kameraer; et vertikalt 
-nedadrettet og et horisontalt fremadrettet, en højdemåler, et gyroskop %(til at måle hældning, krængning og drejning)<- senere detalje, her kun intro
-, samt et accelerometer. 
+I det følgende gennemgåes i afsnit \emph{\titleref{ssec:hardware}} de
+fysiske enheder som quadrokopteren består af, i afsnittet
+\emph{\titleref{ssec:fysik}} gives en introduktion til hvorledes
+quadrokopteren bruger rotorerne til at skabe opdrift og bevægelse i
+luften, i afsnittet \titleref{ssec:software} og afsnittet
+\emph{\titleref{ssec:kommunikation}} beskrives kommunikationen mellem
+AR.Dronens styreprogram og forskeliige typer klienter, mens afsnittet
+\emph{\titleref{ssec:dronerecap}} opregner de observationer der er gjort
+under specialearbejdet og som kan hjælpe andre med at træffe en
+beslutning om hvorvidt AR.Dronen er den rigtige platform at bygge
+videre på.
 
-I 2012 ventes en opdateret udgave af AR.Dronen. Den nye version tilføjer yderligere et kamera i høj opløsning (HD),
-en trykmåler (digitalt barometer) og et kompas til platformen.
-
-AR.Drone er opbygget som en letvægtskonstruktion af kulfiber, plast og
-skummateriale og kommer med to forskellige skumskjold til henholdsvis
-indendørs (figur~\ref{fig:indendoersskjold}) og udendørs flyvning (figur~\ref{fig:udendoersskjold}).
-
-I det følgende gennemgåes i afsnit \emph{\titleref{ssec:hardware}} de fysiske enheder som quadrokopteren består af, i afsnit \emph{\titleref{ssec:fysik}} gives en introduktion til hvorledes quadrokopteren bruger roterne til at skabe opdrift og bevægelse i luften, i afsnit \titleref{ssec:software} og afsnit \emph{\titleref{ssec:kommunikation}} beskrives den software der ligger på AR.Dronen til at afhjælpe brugerinteraktion og kommunikation immelem AR.Dronen og en klientenhed, mens afsnittet \emph{\titleref{ssec:dronerecap}} lister de obdervationer der er gjort under specialearbejdet og som måske kan hjælpe med at træffe en beslutning om AR.Dronen er det rigtige valg til platform at bygge videre på.
-
-\begin{figure}[ht]
+\begin{framefig}
 \centering
   \subfigure[Indendørsskjold]{\includegraphics[width=0.45\textwidth]{grafik/parrot-ardrone.jpg}
     \label{fig:indendoersskjold}}
@@ -414,63 +425,83 @@ I det følgende gennemgåes i afsnit \emph{\titleref{ssec:hardware}} de fysiske en
     \label{fig:udendoersskjold}}
   \caption{AR.Drone med indendørs- og udendørsskjold. Figurene er fra AR.Drone Developer Guide\cite{techreport:ardroneDevGuide}}
   \label{fig:ardrone}
-\end{figure}
+\end{framefig}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     AR.Drone - section
 %%%%      + Hardware - subsection
  
-\subsection{Hardware}
+\section{AR.Dronens Hardware}
 \label{ssec:hardware}
-Det er nærmest umuligt for et menneske at styre en helikopter ved direkte kontrol med mindre man har trænet i mange år (hvilket er det profesionelle piloter gør). Brugerens styring af AR.Dronen er således ikke direkte men støttet op af en feedback kontrol løkke hvortil der er sensorinput fra omverdenen. Sensorene, de aktuatore der gør det muligt at interagere med omverdenen, strømforsyningen og computeren ombord beskrives herunder.
+Det er nærmest umuligt for et menneske at styre en helikopter ved
+direkte kontrol med mindre man har trænet i mange år (hvilket er det
+profesionelle piloter gør,\cite{electronic:heli}). Brugerens styring af AR.Dronen er således
+ikke direkte men støttet af en feedback kontrol hvortil der
+er sensorinput fra omverdenen. Sensorerne, aktuatorerne der gør det
+muligt at kontrollere rotorerne, strømforsyningen og computeren
+ombord beskrives herunder.
 
 %og må siges at være en af de grundlæggende egenskaber for en robot. At der så er mulighed for at udbygge en stillingstagen iforhold til 
 %
 %og en processorenhed. Herunder beskrives sensorene og aktuatore samt den ombordværende computer og trømforsyningen.
 
-\subsubsection{Sensorer}
+\subsection{Sensorer}
 \label{sssec:sensorer}
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=0.50\textwidth]{grafik/frontcamera.jpg}
-  \caption{AR.Dronens frontkamera.}
-  \label{fig:frontkamera}
-\end{figure}
-\paragraph{Optik}
-AR.Drone er som sagt udstyret med to kameraer; et nedadrettet og et fremadrettet.
-Det fremadrettede er med en synsvinkel på $93 ^{\circ}$ og består af en CMOS\footnote{Complimentary-Symmetry Metal Oxide Semiconductor, på dansk: en sensor af komplimentær metaloxid halvleder teknologi.}-billedsensor som kan levere $640 \times 480$ billeder, AR.Dronen transmittere dog kun med en opløsning på Quarter Video Graphics Array (QVGA) $320 \times 240$ med en framerate på $15 FPS$.
-Det nedadrettede kamera er en CMOS sensor med $64 ^{\circ}$ vinkel, der tager billeder i Quarter Common Intermediate Format (QCIF) $176 \times 144$ opløsning, med en framerate på $60 FPS$.
-\begin{figure}[ht]
+\begin{framefig}
+  \subfigure[AR.Dronens frontkamera]{\includegraphics[width=0.45\textwidth]{grafik/frontcamera.jpg}
+    \label{fig:frontkamera}}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfigure[AR.Dronens bundkamera]{\includegraphics[width=0.45\textwidth]{grafik/bundkamera2.png}
+    \label{fig:bundkamera}}
+
+  \label{fig:kameraer}
+  \caption{AR.Dronens to kameraer}
+\end{framefig}
+
+\paragraph{Kameraer}
+AR.Drone er som sagt udstyret med to kameraer: Et
+bundkamera(nedadrettet) og et frontkamera(fremadrettet). Frontkameraet
+har en synsvinkel på $93 ^{\circ}$ og består af en
+CMOS\footnote{Complimentary-Symmetry Metal Oxide Semiconductor, på
+dansk: en sensor af komplimentær metaloxid halvleder
+teknologi.}-billedsensor som kan levere $640 \times 480$ pixel billeder.
+AR.Dronen transmitterer dog kun med en opløsning på $320 \times 240$, pixels Quarter Video
+Graphics Array (QVGA)  med en framerate på 15 FPS.
+Bundkameraet er en CMOS sensor med $64 ^{\circ}$ synsvinkel,
+der tager billeder i $176 \times 144$ pixels opløsning, Quarter Common
+Intermediate Format (QCIF), med en framerate på 60 FPS. 
+\begin{framefig}
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/navboard.png}
-  \caption{Over- og underside af Navigationsprint til undersiden af AR.Dronen. Navboardet indeholder bl.a. ultralydssensoren. Figurene er fra to internetbutikker \uri{droneparts.de} og \uri{aust-rc-tech.com.au} hvorfra der kan bestilles AR.Drone reservedele.}
+  \caption{Over- og undersidebilleder af AR.Dronens
+    navboard. Navboardet indeholder bl.a. den nedadrettede
+    afstandssensor. Figurerne er fra to internetbutikker,
+    \cite{electronic:arct} og \cite{electronic:dparts},  hvorfra der kan bestilles AR.Drone reservedele.}
   \label{fig:navboard}
-\end{figure}
+\end{framefig}
 
-\paragraph{Højdemåler} Til at bestemme AR.Dronens afstand til jorden
-anvendes en ultrasonisk afstandsmåler. Denne opererer ved at udsende
+\subsubsection{Afstandssensor} Til at bestemme AR.Dronens afstand til gulvet
+anvendes en ultrasonisk afstandssensor. Denne opererer ved at udsende
 en ultralydspuls og herefter måle tidsintervallet der går før ekkoet
 måles. Ultralydsmåleren er angivet til at virke op til 6 meter og er
 rent fysisk placeret på navboardet (se figur \ref{fig:navboard}) på
 AR.Dronens underside.
-\paragraph{Acceleration og inerti} AR.Drone er udstyret med to
-gyroskoper, et 2-akses gyroskop til at måle hældningsraten om x- og
-y-aksen (pitch og roll) samt et 1-akses piezoelektrisk gyroskop til at
-måle rotationen om z-aksen (yaw). Gyroskoperne kombineres med et
+\subsubsection{Acceleration og inerti} AR.Drone er udstyret med to
+gyroskoper, et 2-akses gyroskop til at måle rotationsvinklerne
+$\theta$ og $\phi$ (pitch og roll) samt et 1-akses piezoelektrisk gyroskop til at
+måle rotationsvinklen $\psi$ (yaw). Gyroskoperne kombineres med et
 3-akses accelerometer i en samlet enhed til at måle inerti
-(IMU)\footnote{Inertial Measurement Unit}, denne anvendes til løbende
-at give estimater af Euler-vinklerne; theta, phi og psi. Hvor phi og
-theta er henholdsvis pitch og roll, mens at psi er yaw. For en grafisk
-repræsentation se evt figur \ref{fig:drone_movements}.
+(IMU)\footnote{Inertial Measurement Unit}. For en grafisk
+repræsentation se figur \ref{fig:drone_akser}.
 
-\subsubsection{Aktuatorer}
+\subsection{Aktuatorer}
 \label{sssec:aktuatorer}
-\begin{figure}[ht]
+\begin{framefig}
   \centering
   \includegraphics[width=0.60\textwidth]{grafik/motor_gear.png}
   \caption{a) Motorreservedel, b) samlet motor og gear på kulfiberkryds og c) gear-reservedel.}
   \label{fig:motorgear}
-\end{figure}
+\end{framefig}
 AR.Dronens aktuatorer er de fire børsteløse $15 Watt$ motorer. Motorerne
 arbejder i intervallet $10350$ til $41400$ omdrejninger per minut ($RPM$) og når AR.Dronen står stille i
 luften arbejder motorerne med $28000 RPM$. Dette svarer, grundet gearingen,
@@ -487,14 +518,14 @@ Til den embeddede computer er der et integreret trådløst netværkskort (Atheros A
 
 På undersiden af quadrokopteren er der et 7 benet molex-stik til ekstern serialkommunikation. Porten virker bl.a. som en On-The-Go USB-port, der primært anvendes ved opdateringer.
 
-\subsubsection{Strømforsyning}
+\subsection{Strømforsyning}
 \label{sssec:forsyning}
-\begin{figure}[ht]
+\begin{framefig}
   \centering
   \includegraphics[width=0.60\textwidth]{grafik/batteries.jpg}
   \caption{Batterier til AR.Dronen (Figuren er fra www.techpowerup.com/\-reviews/\-Parrot/\-AR Drone/\-images/\-batteries.jpg).}
   \label{fig:batterier}
-\end{figure}
+\end{framefig}
 Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri med en open-circuit\footnote{Open-circuit spændingen er den spænding der er over batteriet når det er uden belastning og ikke oplades.} spænding på $11,1 Volt$, med ladning på $1000$ milli-ampere-timer ($mAh$) og en afladnings hastighed på $10$ Coulomb ($C$). Opladning af batteriet kan foregå i løbet af 90 minutter. Efter sigende skulle batteriet give omking 12 minutters flyvetid\cite{electronic:ar.drone_parrot_technologies}\cite{electronic:wiki_ar.drone}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -505,7 +536,7 @@ Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer batteri me
 %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Quadrokopter fysik}
+\section{AR.Dronens fysik}
 \label{ssec:fysik}
 AR.Dronen fåes som nævnt med 2 skrog eller skjold
 (figur~\ref{fig:indendoersskjold}), og vejer 420 gram med det
@@ -543,12 +574,12 @@ fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig
 gældende når AR.Dronen skal flytte sig sideværts som på figur
 \ref{fig:drone_movements}b.
 
-\begin{figure}
+\begin{framefig}
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
   \caption{(a) vinkelhastigheden $\Omega$ øges med $\Delta_A$ på alle 4 propeller, quadrokopteren øger dermed løftekraften (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og mindskes på højre propel, quadrokopteren laver et ``roll'' til højre (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de med-uret-drejende propeller gør at torque bliver ulige og at quadrokopteren drejer mod venstre (acceleration i yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts ($V_y$). figuren er fra AR.Drone SDK Development guide\cite{techreport:ardroneDevGuide}}
   \label{fig:drone_movements}
-\end{figure}
+\end{framefig}
 
 Hvis AR.Dronen skal dreje om sin egen akse for at kigge længere til
 venstre bruges samme egenskab som før; det moment som tilføres af de 2
@@ -566,19 +597,18 @@ hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$)
 ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan
 sættes til f.eks. 0.25 radianer via AT-kommandoen i figur
 \ref{fig:ateulerangle}.
-\begin{figure}
-  \begin{framed}
+\begin{framefig}
 \begin{verbatim}
  AT*CONFIG=605,"control:euler_angle_max","0.25"
 \end{verbatim}
-  \end{framed}
+
   \caption{Eksempel på indholdet af en AT-kommandobesked. Beskeden
     overføres fra klient-enheden til AR.Dronen på UDP-port 5556. Lige
     netop denne besked sætter en softwarekonstant i AR.Dronens
     firmware, der bestemmer den maksimalt tilladte hældning på $\Phi$
     og $\Theta$.}   
   \label{fig:ateulerangle}
-\end{figure}
+\end{framefig}
 
 I styreprogrammet på AR.Dronens computer kan man sætte en konstant (se
 figur~\ref{fig:ateulerangle}) til at styre den øvre grænse for hvor
@@ -594,14 +624,14 @@ kraften til rotorene klippes og AR.Dronen lader sig falde til jorden.
 %%%%     AR.Drone - section
 %%%%      + Software - subsection
 
-\subsection{Software på AR.Dronen}
+\section{AR.Dronens Software}
 \label{ssec:software}
 AR.Dronens microcomputer kommer med en Linux 2.6.27 kerne
 installeret. Det bemærkes at 2.6.27 er den første kerne med indbygget
 support for UBIFS\cite{electronic:wiki_ubifs} som er det filsystem der
 anvendes på AR.Dronens NAND flashhukommelse.
 
-\subsubsection{Busybox linux platformen på AR.Dronen}
+\subsection{Busybox linux platformen på AR.Dronen}
 \label{sssec:busybox}
 Udover Linux kernen leveres AR.Drone også med
 Busybox\cite{electronic:busybox} installeret.  Busybox giver adgang
@@ -620,7 +650,7 @@ telnet\cite{rfc854}-server der giver adgang til AR.Dronens terminal
 %telnet cite?  og en texteditor %(Vi) der gør det muligt at redigere
 filer direkte på AR.Dronen.
 
-\subsubsection{Program.elf -- AR.Dronens styreprogram}
+\subsection{AR.Dronens styreprogram}
 \label{sssec:program.elf}
 Den firmware der står for selve styringen, transmitteringen af data og
 bearbejdning af sensordata i forbindelse med flyvning er implementeret
@@ -643,18 +673,18 @@ Datagram Protocol\cite{rfc768} (UDP) port. Kommunikationsinterfacet
 mellem bruger og quadro\-kopteren beskrives i
 afsnit~\ref{ssec:kommunikation}.
 
-\begin{figure}[ht]
+\begin{framefig}
   \centering
   \includegraphics[width=0.70\textwidth]{grafik/telnetscreenshot.png}
   \caption{Forbindelse til AR.Dronens telnetserver på IP addresse $192.186.1.1$.}
   \label{fig:telnetterminal}
-\end{figure}
+\end{framefig}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     AR.Drone - section
 %%%%      + Klient/server kommunikation - subsection
 
 
-\subsection{Kommunikation mellem AR.Dronen og klient} %mellem AR.Dronen og en klient-enhed
+\section{Kommunikation mellem AR.Dronen og en klient} %mellem AR.Dronen og en klient-enhed
 \label{ssec:kommunikation}
 Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan kategoriseres i 3 grupper:
 \begin{itemize}
@@ -672,14 +702,14 @@ Interaktion med de programmer der kører på AR.\ $\!$Dronens linux-platform kan k
     også anvendes ved almindelig trådløs kommunikation.
 \end{itemize}
 
-\begin{figure}[ht]
+\begin{framefig}
   \centering
   \includegraphics[width=0.70\textwidth]{grafik/ar_drone_nokia900.png}
   \caption{Fjernstyring af AR.Dronen med en Smartphone, her en Nokia-telefon. Figuren er oprindeligt fra http://www.nokiawp.net/wp-content/uploads//2010/12/ar-drone-n900.jpg.}
   \label{fig:nokiastyring}
-\end{figure}
+\end{framefig}
 
-\subsubsection{TCP baseret kommunikation}
+\subsection{TCP baseret kommunikation}
 \label{sssec:tcp}
 Fra en klient-computer er det muligt at få adgang til AR.Dronens 
 installerede linuxinstallation ved at oprette en telnetforbindelse til AR.Dronens 
@@ -692,7 +722,7 @@ filer imellem AR.Dronen og klientcomputeren med FTP-protokollens
 PUT og GET kommandoer. Hvis klienten ikke angiver en sti lægges 
 overførte filer som standard i \uri{~/data/video} mappen på AR.Dronen.
 
-\subsubsection{UDP baseret kommunikation}
+\subsection{UDP baseret kommunikation}
 \label{sssec:udp}
 I modsætning til FTP- og Telnet-klienterne, som er TCP baserede, anvendes
 UDP-protokollen til den kommunikation der sker mellem \uri{program.elf} og
@@ -706,7 +736,7 @@ Firmwaren \uri{program.elf} på AR.Dronen sender og modtager pakker på tre UDP-po
 \end{itemize}
 
 
-\subsubsection{AT kommando interface}
+\subsection{AT kommando interface}
 \label{sssec:atinterface}
 En klientenheden som skal kommunikerer med AR.Dronens \uri{program.elf}, gør dette ved hjælp af
 såkaldte attention-kommandoer (AT command). En AT-kommando er basalt set blot en
@@ -714,12 +744,10 @@ tekststreng encodet som 8 bits karakterer. AT-kommandoer sendes til AR.Dronens
 kommando\-port (5556) som UDP-pakker. Formatet for AT-kommandoer ses på
 figur \ref{fig:atsyntaks}.
 
-\begin{figure}
-  \begin{framed}   
+\begin{framefig}
 \begin{verbatim}
  AT*[kommandonavn]=[sekvensnummer],[arg1, arg2 ... argN]<LF>
 \end{verbatim}
-  \end{framed}
 \caption{Syntaksen for en AT-kommando; [kommandonavn] kan f.eks. være
   \code{PCMD}. [sekvensnummer]-heltallet skal være stigende for hver
   ny afsendt AT-besked. Listen med argumenter; [arg1, arg2 ... argN],
@@ -727,22 +755,20 @@ figur \ref{fig:atsyntaks}.
   \code{PCMD}-kommando skal der medsendes 5 talværdier for hhv. flag,
   roll, pitch, gas og yaw.} 
 \label{fig:atsyntaks}
-\end{figure}
+\end{framefig}
 
 Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer
 man hvorledes AR.\ $\!$Dronen skal bevæge sig ved translation og rotation,
 som beskrevet i \titleref{ssec:fysik} sektion \ref{ssec:fysik}. 
 
-\begin{figure}
-  \begin{framed}   
+\begin{framefig}
 \begin{verbatim}
  AT*PCMD=21625,1,0,0,0,0<LF>
 \end{verbatim}
-  \end{framed}
 \caption{Eksempel på en \code{PCMD} AT-kommando. Denne specifikke
   kommando bringer AR.Dronen i hovertilstand. [sekvensnummer]'et er 21625. Listen med argumenter er hhv. flag=1, roll=0, pitch=0, gas=0 og yaw=0.}
 \label{fig:ateksempel}   
-\end{figure}
+\end{framefig}
 %    [kommandonavn] er navnet på den ønskede kommando
 %    [sekvensnummer] er et globalt, altid stigende sekvensnummer
 %    [arg1, ... argN] er et variende antal parametre
@@ -755,14 +781,86 @@ periodisk for at AR.Dronen ikke skal tolke forbindelsen til
 klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \ref{tab:kommandoer} i appendiks \ref{sec:at}. 
 
-\subsection{Vurdering af/begrænsninger i AR.Dronen som robotplatform} % Thomas,
+\section{Udvidelse af AR.Dronen}
+\label{sec:udvidelse}
+En robotplatform der kan udvides med nye sensorer efter behov, er
+klart mere anvendelig end en helt lukket platform. Vi har derfor
+undersøgt mulighederne for at anvende AR.Dronens OTG-USB \ref{electronic:otg} port til
+andet end at udføre opdateringer, dette har blandt indbefattet at
+kompilere kernemoduler til AR.Dronens linuxkerne,
+samt at omgå AR.Dronens software for ikke at miste strømmen til
+porten. Vores proof-of-concept var at få loadet en almindelig usbstick
+og skrive og læse fra denne, dette var forholdsvis
+simpelt, da driverne til dette formål er meget generiske. Proceduren
+for at aktivere AR.Dronens USB-port og læse fra en USB-stick kan læses
+i vores blogpost "Enabling the Drone USB Port",\ref{blog_usb}. 
+\begin{framefig}
+  \centering
+  \subfigure[USB-kabel og de enheder vi har haft tilslutttet AR.Dronen.]{
+    \includegraphics[width=0.45\textwidth]{grafik/usbdevices.png}
+    \label{fig:cableandusbdevices}}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfigure[AR.Dronen med usbstick tilsluttet.]{\includegraphics[width=0.45\textwidth]{grafik/usbattached.png}
+    \label{fig:usbattached}}
+  \label{fig:usbdevices}
+\end{framefig}
+
+\subsection{Wifisensor}
+Efter vores indledende erfaringer med AR.Dronens USB-port, valgte vi at
+implementere en wifi-sensor for på sigt at kunne anvende denne som
+lokaliseringsredskab. Vores wifisensor består af en usb-wifi-adapter
+og et snifferprogram til at aflæse og videresende signalstyrker fra de
+omkringliggende accesspoints og andre wifi-kilder. Snifferprogrammet
+antager at det trådløse interface der anvendes er sat op i monitor og
+promiscous mode så det modtager alle pakker der sendes fra de
+omkringliggende kilder, dette opnåes ved at kalde vores eget
+startup-script(*ref til annoteret startup*) til sidst i dronens
+oprindelige bootup-sekvens, i dette script loades også alle de
+nødvendige kernemoduler.
+
+\subsubsection{WIFIsensor hardware}  
+Vi har valgt at udstyre AR.Dronen med en Dlink DWL-G122~\cite{electronic:dwlg122}
+wifi-adapter. Denne specifikke adapter bygger på et Ralink~\cite{electronic:wikiralink} chipset og
+understøtter monitor mode. Ralink udgiver desuden linuxdrivere til
+deres chipsets. Efter længere tids søgen og eksperimenteren, fandt vi
+den korrekte driver og fik denne kompileret til ARM-arkitekturen og
+kompileret til at være kompatibel med linuxkernen anvendt på
+AR.Dronen. Efter at have loadet driveren, genkendes vores adapter og
+interfacet ra0 oprettes i \code{/sys/class/net/}. 
+
+\subsubsection{WIFIsensor software}
+Vores første eksperimenter med hensyn til at kompilere og afvikle kode
+på AR.Dronen kan ses i vores blogpost "Compiling code for the
+AR.Drone",\ref{blog:compiling}, dette var simple 'hello 
+world' eksempler, men gav os indsigt i proceduren omkring
+crosscompiling til AR.Drone arkitekturen og den anvendte toolchain. 
+
+For at skrive et program der kan modtage pakker fra et
+netværksinterface anvender man ofte linux' pcap bibliotek, dette er
+dog ikke er installeret på AR.Dronen som standard og skulle først
+kompileres til ARM-arkitekturen før vi kunne linke til det og senere
+anvende programmet på AR.Dronen, \ref{blog:compiling}.
+
+WIFIsensor-programmet har mulighed for at tage et interfacenavn som input
+når det startes, men som standard anvendes 'ra0' interfacet. Man kan desuden
+vælge at angive en kanal, at angive om man ønsker at anvende
+channelhopping til at modtage pakker fra forskellige kanaler og angive
+om man ønsker at få output til terminalen. Når programmet startes vil
+det vente på en UDP initieringspakke fra en klient før det begynder at
+modtage og behandle pakker. WIFIsensor-programmet sender signalstyrker og
+mac-adresser videre til klienten ved hjælp af UDP kommunikation på
+port 5551, hvilket gør at det er transparent for klienten om hvorvidt
+den modtager data fra den originale AR.Drone software eller fra vores
+udvidelse. 
+
+\section{Vurdering af AR.Dronen som robotplatform} % Thomas,
 \label{ssec:dronerecap}
 Under den indledende informationssøgning til dette speciale og gennem
 diverse forsøg og eksperimenter undervejs, er der indsamlet en del erfaringer med
 AR.Dronen. Nogle af de mest markante observationer er
 listet herunder.
 
-\paragraph{Omkring hastighed og inerti}
+\subsection{Omkring hastighed og inerti}
 Det giver mening at beskrive AR.Dronens bevægelser i 3
 dimensioner for derved nemmere direkte at kunne bruge accelerometer- og gyro-målinger
 fra sensorene om bord. En observeret egenskab er at man ikke kan sige noget udfra
@@ -792,13 +890,13 @@ hastighed besværliggøres ved forhold med dårlig belysning og ved
 jordoverflader uden forskelligartet tekstur, hvor det ikke er muligt for
 bundkameraet at opfange tilpas mange gode features at følge.
 
-\paragraph{Ultralydssensor}
-\begin{figure}[ht]
+\subsection{Ultralydssensor}
+\begin{framefig}
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/sonarzone2.png}
   \caption{a) Udbredelsesområde for ultralydssensorsignal, b) man ser at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan forekomme ekko fra et større område under sensoren (figuren er fra \uri{http://www.cs.brown.edu/\-people/\-tld/\-courses/\-cs148/\-02/\-sonar.html}). \todo{Skal den i referencer?}}
   \label{fig:sonicbeam2}
-\end{figure}
+\end{framefig}
 Højdemåleren består som nævnt af en ultralyds-sender og
 -modtager. Teknologien gør at højden man får ud ikke nødvendigvis er
 fra det vinkelrette punkt udfor sensoren, men derimod returnerer den
@@ -819,7 +917,7 @@ AR.Dronen. Specielt i de tilfælde quadrokopteren hælder meget, ie. ved
 flyvning i høj hastighed kan vinklen til gulvet indføre fejl i
 højdemålingen.
 %
-\paragraph{Realtidssystem} På forummet AR Drone
+\subsection{Realtidssystem} På forummet AR Drone
 Flyers\cite{electronic:ardroneflyers80} er en bruger der har skrevet,
 at operativsystem, styreprogram og de eksterne processer der kører på
 AR.Dronen tilsammen bruger op mod $80\%$ af CPU-kraften.  Om det lige
@@ -831,7 +929,7 @@ afsnit~\ref{ssec:wikilokalisering}. Pointen er at man ikke kan bruge
 mere end de resterende f.eks. $20\%$ uden at det vil gå ud over
 kontrollen med flyvningen.
 %
-\paragraph{Trådløs båndbredde} Der er ikke et stort overhead i User
+\subsection{Trådløs båndbredde} Der er ikke et stort overhead i User
 datagram protokollen pga. transmissionskontrol. Det gør at der i
 princippet kan sendes flere f.eks. videopakker end med en
 synkroniseret kommunikationsprotokol som TCP. Oveni at der
@@ -843,7 +941,7 @@ transmissionen. Det er bedre at indlæse den næste datapakke
 istedet. Information i den gamle datapakke vil alligevel være forældet
 og irrelevant.
 %
-\paragraph{Billedkvalitet} AR.Drone er et produkt der er designet til
+\subsection{Billedkvalitet} AR.Drone er et produkt der er designet til
 mainstream og masserne. Kravende har været, at den skulle være relativ
 billig i produktion for dermed let at kunne erhverves af menigmand. I
 dette valg af design har Parrot afvejet et tradeoff mellem kvalitet af
@@ -854,14 +952,14 @@ afsnit~\ref{sec:QRdecoding}, at til en simpel ting som afkodning af
 QR-koder (hvortil der findes færdige værktøjer) er billedkvaliteten
 ikke af tilstrækkelig kvalitet.
 %
-\begin{figure}[ht]
+\begin{framefig}
   \centering
   \includegraphics[width=0.60\textwidth]{grafik/2frames.png}
   \caption{Et billede fra AR.Dronens bundkamera (med opløsing på $88\times72)$ i øverste venstre hjørne af et billede fra frontkameraet ($320 \times 240$).}
   \label{fig:2frames}
-\end{figure}
+\end{framefig}
 %
-\paragraph{Zap imellem 2 kameraer} I forbindelsen mellem klient og
+\subsection{Zap imellem 2 kameraer} I forbindelsen mellem klient og
 AR.Dronen kan man kun modtage en billedramme ad gangen. Dvs. at enten
 skal man få billeder fra frontkameraet eller fra bundkameraet. -- Skal
 man bruge billeder fra begge kameraer, må man skifte imellem dem
@@ -885,76 +983,8 @@ resultatet af diverse billedanalysealgoritmer.
   behandling/opsummering i Resultater/Konklusion...}
 
 \pagebreak
-\section{Udvidelse af AR.Dronen}
-En robotplatform der kan udvides med nye sensorer efter behov, er
-klart mere anvendelig end en helt lukket platform. Vi har derfor
-undersøgt mulighederne for at anvende AR.Dronens OTG-USB* port til
-andet end at udføre opdateringer, dette har blandt indbefattet at
-kompilere kernemoduler(*) til AR.Dronens linuxkerne(*ref til blog*),
-samt at omgå AR.Dronens software for ikke at miste strømmen til
-porten. Vores proof-of-concept var at få loadet en almindelig usbstick
-og skrive og læse fra denne(*ref til blog*), dette var forholdsvis
-simpelt, da driverne til dette formål er meget generiske.
-
-\begin{figure*}[htp]
-  \centering
-  \subfigure[USB-kabel og de enheder vi har haft tilslutttet AR.Dronen.]{
-    \includegraphics[width=0.47\textwidth]{grafik/usbdevices.png}
-    \label{fig:cableandusbdevices}}
-  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[AR.Dronen med usbstick tilsluttet.]{\includegraphics[width=0.47\textwidth]{grafik/usbattached.png}
-    \label{fig:usbattached}}
-  \label{fig:usbdevices}
-\end{figure*}
-
-\subsection{Wifisensor}
-Efter vores indledende erfaringer med AR.Dronens USB-port, valgte vi at
-implementere en wifi-sensor for på sigt at kunne anvende denne som
-lokaliseringsredskab. Vores wifisensor består af en usb-wifi-adapter
-og et snifferprogram til at aflæse og videresende signalstyrker fra de
-omkringliggende accesspoints og andre wifi-kilder. Snifferprogrammet
-antager at det trådløse interface der anvendes er sat op i monitor og
-promiscous mode så det modtager alle pakker der sendes fra de
-omkringliggende kilder, dette opnåes ved at kalde vores eget
-startup-script(*ref til annoteret startup*) til sidst i dronens
-oprindelige bootup-sekvens, i dette script loades også alle de
-nødvendige kernemoduler.
-
-\subsubsection{WIFI-adapter}  
-Vi har valgt at udstyre AR.Dronen med en Dlink DWL-G122~\cite{electronic:dwlg122}
-wifi-adapter. Denne specifikke adapter bygger på et Ralink~\cite{electronic:wikiralink} chipset og
-understøtter monitor mode. Ralink udgiver desuden linuxdrivere til
-deres chipsets. Efter længere tids søgen og eksperimenteren, fandt vi
-den korrekte driver og fik denne kompileret til ARM-arkitekturen og
-kompileret til at være kompatibel med linuxkernen anvendt på
-AR.Dronen. Efter at have loadet driveren, genkendes vores adapter og
-interfacet ra0 oprettes i \code{/sys/class/net/}. 
-
-\subsubsection{Sniffer}
-Vores første eksperimenter med hensyn til at kompilere og afvikle kode
-på AR.Dronen kan ses på *link til blog*, dette var simple 'hello
-world' eksempler, men gav os indsigt i proceduren omkring
-crosscompiling til AR.Drone arkitekturen og den anvendte toolchain. 
-
-For at skrive et program der kan modtage pakker fra et
-netværksinterface anvender man ofte linux' pcap bibliotek, dette er
-dog ikke er installeret på AR.Dronen som standard og skulle først
-kompileres til ARM-arkitekturen før vi kunne linke til det og senere
-anvende programmet på AR.Dronen, se *blog ref*.
-
-Sniffer programmet har mulighed for at tage et interfacenavn som input
-når det startes, men som standard anvendes 'ra0' interfacet. Man kan desuden
-vælge at angive en kanal, at angive om man ønsker at anvende
-channelhopping til at modtage pakker fra forskellige kanaler og angive
-om man ønsker at få output til terminalen. Når programmet startes vil
-det vente på en UDP initieringspakke fra en klient før det begynder at
-modtage og behandle pakker. Sniffer programmet sender signalstyrker og
-mac-adresser videre til klienten ved hjælp af UDP kommunikation på
-port 5551, hvilket gør at det er transparent for klienten om hvorvidt
-den modtager data fra den originale AR.Drone software eller fra vores
-udvidelse. 
  
-\section{Fasciliterende klient platform} % Morten,
+\section{Klient platform} % Morten,
 Vi har udviklet den grundlæggende platform med det formål, at
 understøtte vores videre arbejde med AR.Dronen. Platformen skal sikre
 let og effektiv adgang til AR.Dronens sensor output, samt give
@@ -1131,12 +1161,12 @@ AR.Dronen i en ønsket position og så herefter at starte den automatiske
 afvikling af et forudbestemt bevægemønster. På
 figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
 controlleren.
-\begin{figure}
+\begin{framefig}
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/xbox360layout.png}
   \caption{Standardopsætning af Xbox360 controlleren}
   \label{fig:xboxlayout}
-\end{figure}
+\end{framefig}
 
 \paragraph{Keyboardcontroller}
 Hvis vi ønsker at starte vores system uden grafisk brugerflade(og
@@ -1186,16 +1216,14 @@ starte pythons fortolker, importere examples-modulet og herefter
 afvikle en metode indeholdende kommandoer til
 AR.Dronen. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex1}.
 
-\begin{figure}[ht]
-  \begin{framed}   
+\begin{framefig}
     \begin{verbatim}
 >>> import examples as e
 >>> e.square()
     \end{verbatim}
-  \end{framed}
 \caption{Import og afvikling af simpelt kontrolinterface-eksempel i pythonfortolkeren}
 \label{fig:pythoninterpex1}
-\end{figure}
+\end{framefig}
 
 Metoden \code{square()} der kaldes i eksemplet i figur~\ref{fig:pythoninterpex1},
 lader AR.Dronen lette, flyve rundt i en firkant og for herefter at
@@ -1208,7 +1236,7 @@ kommandoport. Den konkrete implementation af \code{square()} ses i
 figur~\ref{fig:pythonimpl1}. Det bemærkes at kontrolinterfacetråden
 skal startes (kald af \code{c.start()}) før kommandoerne har nogen effekt.
 
-\begin{figure}[H]
+\begin{framefig}[H]
   \lstset{language=Python, frame=single}
   \begin{lstlisting}
 def square():
@@ -1241,9 +1269,9 @@ def square():
 \caption{Python implementation der importerer og anvender vores kontrolinterface til en
   simpel flyvning}
 \label{fig:pythonimpl1}
-\end{figure}
+\end{framefig}
 
-\subsection{Modtagelse af ``sensor''-data fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
+\subsection{Modtagelse af sensordata fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
 I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og wifi-data fra AR.Dronen.
 For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
 indsamle data fra de ombordværende sensorer, samt at kunne stille
@@ -1263,30 +1291,28 @@ et enkelt billede fra AR.Dronens videostrøm. Anvendelsen af de to
 andre receivere foregår på fuldstændig samme måde som videoreceiveren,
 den eneste forskel er typen af data der returneres. 
 
-\subsubsection{Eksempel på anvendelse af videoreceiveren}
+\subsubsection{Eksempel på modtagelse af videostream}
 \label{subsection:receiver}
 Eftersom vores videoreceiver kan anvendes for sig selv, vises her et
 eksempel på hvor få linier kode man behøver for at modtage og vise et
-billede fra AR.Dronens kamera. Eksemplet antager som tidligere, at der
+billede fra AR.Dronens kamera. Eksemplet antager at der
 allerede er oprettet en virkende forbindelse med AR.Dronens trådløse
 netværk. Eksemplet startes fra Pythons kommandopromt.  
-\begin{figure}[H]
-  \begin{framed}   
-    \begin{verbatim}
+\begin{framefig}[H]
+\begin{verbatim}
 >>> import examples as e
 >>> e.receive_and_show_picture()
-    \end{verbatim}
-  \end{framed}
+\end{verbatim}
 \caption{Import og afvikling af simpelt videoreceiver-eksempel i pythonfortolkeren}
 \label{fig:pythoninterpex2}
-\end{figure}
+\end{framefig}
 
 Som det ses på figur~\ref{fig:pythonimpl2} kræver det tre liniers reel
 kode for at modtage et billede(og endnu fire for at vise det), vi
 mener at dette fint illustrerer, hvordan vi med dette abstraktionslag kan
 tilbyde et let anvendeligt interface til AR.Dronens forskellige
 sensoroutput.   
-\begin{figure}[H]
+\begin{framefig}[H]
   \lstset{language=Python, frame=single}
   \begin{lstlisting}
 def receive_and_show_picture():
@@ -1310,7 +1336,7 @@ def receive_and_show_picture():
   \caption{Python implementation der importerer og anvender
     videoreceiver til at modtage og vise et billede}
 \label{fig:pythonimpl2}
-\end{figure}
+\end{framefig}
 
 \pagebreak
 
@@ -1389,12 +1415,12 @@ konstrueret med vores taskcontructor, under antagelse at hver TestTask
 ønsker at udføre et antal bevægelser og ikke på noget tidspunkt ønsker
 frivilligt at opgive bevægekontrollen, vil TestTask med level 1 slutte
 først og TestTask med level 2 slutte sidst.
-\begin{figure}[H]
+\begin{framefig}[H]
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/taskhieraky.png}
   \caption{Eksempel på et taskhieraki.}
   \label{fig:taskhieraky}
-\end{figure}
+\end{framefig}
 
 \subsubsection{HoverTrackTask}
 \label{sssec:hovertrack}
@@ -1419,12 +1445,12 @@ Ar.Dronen sendes videre. Det ville desuden være let at lade vores
 *DistanceMeasurer* algoritme tilføje metrisk data til kortet, hver gang
 AR.Dronen har bevæget sig mellem to positioner.
 
-\begin{figure}[H]
+\begin{framefig}[H]
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/followtourhieraki.png}
   \caption{Opbygningen af en FollowTourTask.}
   \label{fig:followtour}
-\end{figure}
+\end{framefig}
 
 
 \pagebreak
@@ -1447,7 +1473,44 @@ anvendt HoverTrackTasks og FollowTourTasks\ref{sssec:followtourtask}.
 
 \subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
 \label{ssec:wikilokalisering}
-%,skal disse have hver deres egen hovedsektion (istedet for SUBsection)?
+Som nævnt i \ref{}
+\begin{table}[H]
+  \begin{center}
+  \begin{tabular}{ l | p{2,5cm} | p{3,0cm}| p{3,0cm}}
+    Position & 1. gentagelse & 2. gentagelse & 3. gentagelse \\
+    \hline
+    1        & 0.55          & 0.26          & 0.685         \\
+    \hline
+    2        & 0.67          & 0.81          & 0.735         \\
+    \hline 
+    3        & 0.925         & 0.915         & 0.93          \\
+    \hline
+  \end{tabular}
+  \end{center}
+  \caption{Detektionsrater for wifi-fingerprinting, 3 positioner
+    med 3.0 meters afstand}
+  \label{fig:wifidetection1}
+\end{table} 
+
+\begin{table}[H]
+  \begin{center}
+  \begin{tabular}{ l | p{2,5cm} | p{3,0cm}| p{3,0cm}}
+    Position & 1. gentagelse & 2. gentagelse & 3. gentagelse \\
+    \hline
+    1        & 1.0           & 1.0           & 0.995         \\
+    \hline
+    2        & 0.725         & 0.9           & 0.855         \\
+    \hline 
+    3        & 1.0           & 0.97          & 0.955         \\
+    \hline
+  \end{tabular}
+  \end{center}
+  \caption{Detektionsrater for wifi-fingerprinting, 3 positioner
+    med 6.0 meters afstand}
+  \label{fig:wifidetection2}
+\end{table} 
+
+
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?
 Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
@@ -1458,7 +1521,7 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
 \subsection{Visuel lokalisering}
 
-\begin{figure}[H]
+\begin{framefig}[H]
   \centering
   \subfigure[Simpel markør]{
     \includegraphics[width=0.20\textwidth]{grafik/simplemarker.png}
@@ -1471,12 +1534,13 @@ Take Sample, indsamling, sortering, alder, sammenlign/ sammenhold
     \label{fig:advancedmarker}}
 
   \label{fig:markers}
-\end{figure}
+  \caption{Markører vi har testet i forbindelse med lokalisering af AR.Dronen}
+\end{framefig}
 \subsubsection{Lokalisering via simple markører} % Thomas & Morten
 \paragraph{Første eksperiment}
 \label{p:simple1}
 Vores første forsøg med visuel lokalisering anvendte en simpel rød
-markør i A5 størrelse, se figur~\ref{fig:markers}, vi havde til
+markør i A5 størrelse, se figur~\ref{fig:simplemarker}, vi havde til
 formålet implementeret en blobdetectionalgoritme i Python, som for
 hver pixel vurderer om den er rød nok til at være en del af markøren. Algoritmen antager at der i
 billedet kun findes et rødt objekt og er på grund af Pythons
@@ -1488,7 +1552,7 @@ blobdetectionalgoritmen blev startet. Vi definerer detektionsraten som
 antal succesfulde detektioner delt med antal gentagelser af
 algoritmen. Vi kørte algoritmen 200 gange i henholdsvis 0.5, 1.0, 1.5
 og 2.0 meters højde og resultaterne kan ses på figur
-~\ref{fig:detection}, sammen med resultaterne for de andre markører.
+~\ref{fig:detection1}, sammen med resultaterne for de andre markører.
  
 Vores første forsøg viste os, at vi i højder fra 0.5 til 2.0 meter altid var i stand
 til at genkende den simple markør med AR.Dronens bundkamera.
@@ -1516,12 +1580,12 @@ en periode på mere end 2 minutter hvor AR.Dronen befinder sig over en
 markør, det bemærkes at der er et udsving omtrent midt i forløbet,
 dette er ikke usædvanligt, da AR.Dronen er meget påvirkelig af
 turbulens og dette let forekommer i, især, mindre lokaler.
-\begin{figure}[ht]
+\begin{framefig}
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/simpledronehover.png}
   \caption{HoverTrackTask error-værdier over en længere periode}
   \label{fig:simplehover}
-\end{figure}
+\end{framefig}
 
 \paragraph{Tredje eksperiment}
 \label{p:simple3}
@@ -1530,12 +1594,12 @@ der fulgte en rute mellem fire markører på gulvet. Eksperimenterne startede
 denne gang fra jorden, da en FollowTourTask selv letter og lander.
 Vores setup, både det konstruerede kort og den fysiske opstilling ses
 på figur ~\ref{fig:simplesetup}.
-\begin{figure}[H]
+\begin{framefig}[H]
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/simplesetup.png}
   \caption{HoverTrackTask error-værdier over en længere periode}
   \label{fig:simplesetup}
-\end{figure}
+\end{framefig}
 
 Vi forventede her at udfordringen ville være at opdage markøren tidsnok til at stoppe
 AR.Dronen før den var fløjet forbi. Dette problem kan dog løses ved at
@@ -1571,7 +1635,7 @@ på trods af de to nævnte problemer, oftest fungerer.
 
 \subsubsection{Lokalisering via avancerede markører} % Thomas & Morten
 Vi valgte efter de indledende eksperimenter at designe og anvende en
-mere avanceret form for markører. Vores første redesign var markøren der
+mere avanceret form for markør. Vores første redesign var markøren der
 ses på figur~\ref{fig:semiadvancedmarker}. 
 
 \paragraph{Detekteringsalgoritme}
@@ -1599,8 +1663,8 @@ præcist.
 
 \paragraph{Første eksperiment}
 \label{p:advanced1}
-Vores indledende eksperiment udførtes på samme måde som det første
-eksperiment med de simple markører, blot var den simple markør skiftet
+Vores indledende eksperiment udførtes på samme måde som
+\ref{p:simple1}, blot var den simple markør skiftet 
 ud med en semiavanceret markør, vist på figur
 ~\ref{fig:semiadvancedmarker}. Vores forventninger var fra start, at vi
 ville få svært ved at identificere markøren over en hvis højde, da den
@@ -1609,7 +1673,8 @@ markør. Efter at have tilpasset vores thresholdværdier og udført
 eksperimentet i højder fra 1 til 2.5 meter, kunne vi bekræfte vores
 formodning. Vi kunne med med en hvis sikkerhed genkende den semiavancerede markør
 op til 1.5 meters højde, men herefter faldt detektionsraten
-betydeligt. En detektionshøjde på 1.5 ligger lidt under de 1.8 meter
+betydeligt, resultaterne kan ses i tabel \ref{fig:detection1}. En
+detektionshøjde på 1.5 ligger lidt under de 1.8 meter 
 vi tidligere havde bestemt som en passende flyvehøjde. Vi valgte
 derfor at udvikle en markør med en større rød overflade, se
 figur~\ref{fig:advancedmarker}, for at sikre bedre detektion. En
@@ -1618,7 +1683,6 @@ denne nu kunne detekteres i op til 2 meters højde. Den avancerede
 markør er desuden designet sådan at den på sigt kan bruges til at
 udlede AR.Dronens præcise retning, hvilket ville gøre os mindre
 afhængige af de upræcise psi-målinger fra Ar.Dronens piezo-sensor. 
-Resultaterne kan ses på figur \ref{fig:detection}
 
 \paragraph{Andet eksperiment}
 Vores andet eksperiment er næsten identisk med det der blev udført for
@@ -1653,57 +1717,111 @@ figur ~\ref{fig:advancedsetup}.
 
 Eksperimentet bekræftede at AR.Dronen konstistent kunne lokalisere sig
 selv. 
-\begin{figure}[H]
+\begin{framefig}[H]
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/advancedsetup.png}
   \caption{Billede af opstilling med avancerede markører til brug for
     det fjerde eksperiment med disse markører}
   \label{fig:advancedsetup}
-\end{figure}
+\end{framefig}
 
 \subsubsection{Detektering af markører på små billeder}
 I de ovenstående eksperimenter har vi anvendt AR.Dronens bundkamera,
 dette har en opløsning på 176x144. Der er dog andre tasks der skal
 bruge data fra frontkameraet, dette gør at vi er nødt til kontinuerligt at zappe mellem
 de to kameraer og dette fungererer som nævnt i \ref{p:advanced3} ikke særligt
-godt. Vi har derfor undersøgt mulighederne for at anvende det
-kamerafeed hvor bundkameraets billeder er lagt oven på
+godt. Vi har derfor undersøgt mulighederne for at anvende detk
+amerafeed hvor bundkameraets billeder er lagt oven på
 frontkameraets(se \ref{fig:2frames}), når vi udvinder bundkameraets billeder fra
 denne kilde får vi billeder i en opløsning på 88x72.
 Eksperimenterne er fuldstændig magen til dem vi udførte i \ref{p:simple1} og
 \ref{p:advanced1}. De er ligeledes udført i højderne 0.5, 1.0, 1.5 og 2.0 og er
 udført både med de simple, semiavancerede og avancerede
-markører. Resultaterne ses på figur \ref{fig:detection}, de viser tydeligt at
+markører. Resultaterne ses på figur \ref{fig:detection2}, de viser tydeligt at
 det ikke er muligt at anvende de små billeder, da de selv for de
 simple markører kun giver et pålideligt resultat op til 1.5 meter,
 hvorefter detektionsraten falder betydeligt. 
 
-\begin{figure}[H]
-  \centering
-  % \includegraphics[width=0.95\textwidth]{grafik/advancedsetup.png}
+\begin{table}[H]
+  \begin{center}
+  \begin{tabular}{ l | p{2,5cm} | p{3,0cm}| p{3,0cm}}
+    Højde & Simpel & Semiavanceret & avanceret \\
+    \hline
+    0.5   &  1.0   & 1.0           & 1.0       \\
+    \hline
+    1.0   & 1.0    & 1.0           & 1.0       \\
+    \hline 
+    1.5   & 1.0    & 0.805         & 1.0       \\
+    \hline
+    2.0   & 1.0    & 0.045         & 1.0       \\
+    \hline
+  \end{tabular}
+  \end{center}
   \caption{Detektionsrater for de forskellige markører i højder op til
-    2.0 meter, desuden detektionsrater for de forskellige markører ved
-    88x72 billeder}
-  \label{fig:detection}
-\end{figure}
+    2.0 meter}
+  \label{fig:detection1}
+\end{table} 
 
+\begin{table}[H]
+  \begin{center}
+  \begin{tabular}{ l | p{2,5cm} | p{4,0cm}| p{3,0cm} }
+    Højde & Simpel(88x72) & Semiavanceret(88x72)  & Avanceret(88x72)\\
+    \hline
+    0.5   & 1.0           & 0.615                 & 1.0 \\
+    \hline
+    1.0   & 1.0           & 0.065                 & 0.935 \\
+    \hline 
+    1.5   & 1.0           & 0.0                   & 0.015 \\
+    \hline
+    2.0   & 0.17          & 0.0                   & 0.015 \\
+    \hline
+  \end{tabular}
+  \end{center}
+  \caption{Detektionsrater for de forskellige markører i højder op til
+    2.0 meter når der anvendes 88x72 billeder}
+  \label{fig:detection2}
+\end{table} 
 
 
 \subsubsection{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}
-\begin{figure}[ht]
+Vi har undersøgt muligheden for at anvende QR-koder til
+lokalisering. Man er begyndt at se QR-koder mange steder i det
+offentlige rum, hvor de ofte bruges i forbindelse med
+reklamekampagner. QR-koder bruges ofte til at indkode en webadresse,
+men kan i princippet anvendes til at indkode en arbitrær
+streng. QR-koder er blevet mere populære i takt med at opløsningen på
+mobiltelefonkameraer er steget, således har de fleste moderne
+mobiltelefonerkameraer en opløsning flere gange højere end AR.Dronens
+kamera. 
+
+Til dette eksperiment anvendte vi bibliotekerne pyqrcode\ref{**} og Zbar
+\ref{http://zbar.sourceforge.net/index.html}, til henholdsvis
+indkodning og afkodning af QR-koder. Zbar har pythonbindinger og anvendes også på
+Iphone-platformen. Dette betød at vi kunne teste vores genererede
+QR-kode ved at scanne den med en Iphone.
+
+\begin{framefig}
   \centering
   \includegraphics[width=0.35\textwidth]{grafik/woah.png}
   \caption{Teksten ``woah'' som QR-kode}
   \label{fig:qr_woah}
-\end{figure}
-Hvad vil vi vise, afvise teste?
-Hvad kan/skal resultatet bruges til?
-Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
-Hvad var resultatet?
-perspektiver, hvad skal / kan vi bruge den nye viden til?
-Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+\end{framefig}
 
+Formålet med eksperimentet var primært at undersøge om AR.Dronens
+kameras opløsning er god nok til at vi kan afkode QR-koder. Til
+formålet fremstillede vi QR-koden der ses på figur \ref{fig:qr_woah},
+printede den ud på et A4 ark og sikrede os at den kunne afkodes ved hjælp af en Iphone. Herefter
+skrev vi et lille testprogram der henter billeder fra AR.Dronens
+frontkamera(320x240) og scanner disse for QR-koder ved hjælp af Zbar.
+
+Afviklingen af eksperimentet foregik ved at vi placerede QR-koden på
+en væg og herefter placerede AR.Dronen i skiftende afstande til
+væggen. Vi forsøgte at afkode QR-koden i afstande op til en meter, men
+fik på intet tidpunkt en succesfuld afkodning. Iphonen kunne samtidig
+afkode QR-koden på alle afstande op til en meter. Resultatet viser med
+al tydelighed at vi ikke kan anvende QR-koder med AR.Dronens kamera og
+at vi derfor må anvende andre algoritmer til lokalisering i vores system.
 
 %\subsection{Optisk flow navigation} % tt
 %\todo{fedt hvis det kan nåes at lave det...}
@@ -1743,7 +1861,7 @@ flest skæringspunkter
 
 \subsection{At finde kanter i et billede}
 
-\begin{figure}
+\begin{framefig}
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/kant_detektering1a.png}
   \caption{Graf over rød-, grøn-, blå-farveværdier for en linie i
@@ -1752,7 +1870,7 @@ flest skæringspunkter
     $j$. Der hvor grafens hældning er stejl er der stor sandsynlighed for en
     kant i billedet.}
   \label{fig:kanter1}
-\end{figure}
+\end{framefig}
 
 Kanter i et billede defineres som abrupt skift i farveværdi eller
 lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt
@@ -1788,13 +1906,13 @@ gradient og istedet finde maximum/minimum. Videreudbygninger af
 Cannyfilteret efter 1986 bruger bl.a. endnu en retningsbestemt afledt
 af gradienten og finder maximum ved dens skærring med 0.
 
-\begin{figure}
+\begin{framefig}
   \centering
   \includegraphics[width=0.90\textwidth]{grafik/derivatives.png}
   \caption{Se $f(x)$ som lysintensitet per pixellokation $x$. $f'(x)$ og $f''(x)$ er den hhv. første-- og anden-- afledte. Når $f''(x)$ skærre med nul har $f(x)$ den største hældning.
 Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivatives.gif}}
   \label{fig:derivatives}
-\end{figure}
+\end{framefig}
 
 % \bigtriangledown^2G_{\sigma}(\bm{x})=\frac{1}{\sigma^3}\left(2-\frac{x^2+y^2}{2\sigma^2}\right)\exp\left(-\frac{x^2+y^2}{2\sigma^2}\right) 
 
@@ -1804,12 +1922,12 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
 
 \subsection{Houghlinier}
 
-\begin{figure}
+\begin{framefig}
   \centering
   \includegraphics[width=0.40\textwidth]{grafik/polar2cartesian.png}
   \caption{En linie beskrevet ved det velkendte almindelige cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i polar koordinatsystem ved en vinkel $\Theta$ og en afstand $\rho$.}
   \label{fig:polar2cartesian}
-\end{figure}
+\end{framefig}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
 
@@ -1894,7 +2012,7 @@ Tabel \ref{tab:kommandoer} viser hvilke kommandoer der
 jf. \cite{techreport:ardroneDevGuide} kan bruges til at
 kontrollere AR.Dronen.
 
-\begin{table}[ht]
+\begin{table}
   \begin{center}
   \begin{tabular}{ l | p{3,5cm} | p{5,5cm} }
     Navn & Argumenter & beskrivelse\\

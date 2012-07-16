@@ -7,6 +7,7 @@ import numpy as np
 import time
 import datetime
 import math
+import blobdetect as bd
 from collections import OrderedDict
 
 class Detector(object):
@@ -18,9 +19,9 @@ class Detector(object):
         self.navdata_sensor = self.drone.get_navdata_sensor()
         self.interface = self.drone.get_interface()
         self.map = self.drone.get_map()
-        #self.show = True
-        self.show = False
-
+        self.show = True
+        #self.show = False
+        self.mode = 'normal'
         self.silhouets = []
         self.points = []
         self.last_small = None
@@ -40,9 +41,11 @@ class Detector(object):
         self.channel = alternate()
 
     def runner(self):
+
         if self.show:
             win1 = cv2.namedWindow('win1')
             win2 = cv2.namedWindow('win2')
+            win3 = cv2.namedWindow('win3')
         # win2 = cv2.namedWindow('pic')
         # win2 = cv2.namedWindow('mini')
 
@@ -51,29 +54,43 @@ class Detector(object):
         pf = 0
         sf = 0
         
+        if self.mode == 'combo' or self.mode == 'combosimple':
+            self.interface.zap(2)
+            time.sleep(2)
+        else:
+            self.interface.zap(1)
+            time.sleep(2)
+
         while not self.status == settings.STOPPING:
             # wifi_pos = self.detect_position_wifi()
             # if wifi_pos is not None:
             #     print wifi_pos.name, '\r'
-
-            self.interface.zap(self.channel.next())
-            img = self.video_sensor.get_data()
+            if frames >= 199:
+                self.drone.stop()
             frames += 1
-            if img is not None:
+            #print 'frames: ',frames
+            img = self.video_sensor.get_data()
+                      
+            if img is None:
+                frames -= 1
+                pass
+                       
+            elif self.mode == 'normal':
+                #self.interface.zap(self.channel.next())
                 if img.shape[1] == 176:
-                    self.last_small = img
-                    self.points = self.detect_position_img(img)
-                    if self.points is not None:
-                        pf += 1
-                        
-                        for p in self.points:
+                        self.last_small = img
+                        self.points = self.detect_position_img(img)
+                        if len(self.points) > 0:
+                            p = self.points[0]
+                        #for p in self.points:
                             if self.show:
                                 cv2.circle(img, (int(p[0]), int(p[1])), 2, (255, 255, 255), 10)
                                
                             if p[2] == settings.GREEN:
-                                print 'green\r'
-                            elif p[2] == settings.BLUE:
-                                print 'blue\r'
+                                pf += 1
+                                print 'green'
+                            # elif p[2] == settings.BLUE:
+                            #     print 'blue\r'
                    
                 elif img.shape[1] == 320:
                     # minipic = img[0:88, 0:72]
@@ -87,10 +104,40 @@ class Detector(object):
                     if len(self.silhouets) > 0:
                         sf += 1
                         print 'sil: ' , len(self.silhouets) , '\r'
-            if self.show:
-                pass
-            time.sleep(0.03)
+                   
+            elif self.mode == 'simple':
+                 blob = bd.detect_red_blob(img)
+                 if blob is not None:
+                     (xpos, ypos), (width, height) = position, size = blob
+                     if width*height > 15:
+                         pf += 1
 
+            elif self.mode == 'combo':
+                 if img.shape[1] == 320:
+                    minipic = img[0:72, 0:88]
+                    self.points = self.detect_position_img(minipic)
+                    if len(self.points) >= 1:
+                        p = self.points[0]
+                        if p[2] == settings.GREEN:
+                            pf += 1
+                            #print 'green'
+
+            elif self.mode == 'combosimple':
+                 if img.shape[1] == 320:
+                    minipic = img[0:88, 0:72]
+                    blob = bd.detect_red_blob(minipic)
+                    if blob is not None:
+                        (xpos, ypos), (width, height) = position, size = blob
+                        if width*height > 15:
+                            pf += 1
+
+            if self.show and img is not None:
+
+                cv2.imshow(win1 ,img)
+
+            time.sleep(0.03)
+        
+        print frames
         print 'pointrate: ', pf/float(frames), '\r'
         print 'silrate: ', sf/float(frames), '\r'
 
@@ -113,11 +160,11 @@ class Detector(object):
         pic = cv2.cvtColor(org, cv2.COLOR_BGR2RGB)
         hsv = cv2.cvtColor(org, cv2.COLOR_RGB2HSV)
         thresh_l = cv2.inRange(hsv, np.asarray((0, 30, 30)), np.asarray((30, 150, 255)))
-        thresh_h = cv2.inRange(hsv, np.asarray((172, 50, 50)), np.asarray((179, 150, 255)))
+        thresh_h = cv2.inRange(hsv, np.asarray((169, 50, 50)), np.asarray((179, 150, 255)))
         thresh = cv2.add(thresh_l, thresh_h)
         #thresh = cv2.inRange(org, np.asarray((200, 200, 200)), np.asarray((255, 255, 255)))
         if self.show:
-            cv2.imshow('win1' , thresh)
+            cv2.imshow('win3' , thresh)
             cv2.waitKey(10)
         # cv2.imshow('win' , thresh)
         # cv2.waitKey(10)

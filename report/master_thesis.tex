@@ -552,12 +552,12 @@ ekstern serialkommunikation, \cite{electronic:molex}. Porten virker bl.a. som en
 \end{framefig}
 Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer
 batteri med en open-circuit\footnote{Open-circuit spændingen er den
-spænding der er over batteriet når det er uden belastning og ikke
-oplades.} spænding på $11,1 Volt$, med ladning på $1000$
-milli-ampere-timer ($mAh$) og en afladnings hastighed på $10$ Coulomb
-($C$), \cite{electronic:ar.drone_parrot_technologies}. Opladning af batteriet kan foregå i løbet af 90 minutter. Efter
-sigende skulle batteriet give omking 12 minutters
-flyvetid, \cite{electronic:wiki_ar.drone}.
+spænding, der er over batteriet, når det er uden belastning og ikke
+oplades.} spænding på 11,1 Volt, med ladning på 1000
+milli-ampere-timer(mAh) og en afladnings hastighed på 10 Coulomb(C),
+\cite{electronic:ar.drone_parrot_technologies}. Opladning af batteriet
+kan foregå i løbet af 90 minutter. Efter sigende skulle batteriet give
+omking 12 minutters flyvetid, \cite{electronic:wiki_ar.drone}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
@@ -571,63 +571,81 @@ flyvetid, \cite{electronic:wiki_ar.drone}.
 \label{ssec:fysik}
 AR.Dronen fåes som nævnt med 2 skrog eller skjold
 (figur~\ref{fig:indendoersskjold}), og vejer 420 gram med det
-indendørs skrog monteret. Et pund er en relativ lille vægt, andre
-quadrokoptere\cite{quteprints33767} har f.eks. 4-5 kg som de skal
-løfte rundt på. 
+indendørs skrog monteret. 420 gram er en relativ lille vægt i forhold til andre
+quadrokoptere, \cite{quteprints33767}, som har 4-5 kg de skal
+løfte. 
 
-De 4 propeller sidder i hver sit hjørne af et kulfiberkryds på
-AR.Dronen. Når en propel på AR.Dronen rotere om sin akse flytter den
+På en AR.Drone sidder de 4 propeller i hver sit hjørne af en kulfiberkryds
+. Når en propel roterer om sin akse flytter den
 luften i et areal rundt om propellen. Lufttrykket på undersiden af
 propellen bliver herved større end lufttrykket på oversiden af
 propellen. Hvis AR.Dronen ligger vandret vil forskellen i lufttryk
-giver en
-Bernoullieffekt\cite{nla.cat-vn856146}%\cite{electronic:wiki_bernoulli} 
- som påvirker AR.Dronen med en kraft modsat tyngdekraften
- (thrust)\cite{electronic:wiki_quadrotor}. Udover thrust påvirker den
- roterende bevægelse også propellens base med et moment (torque)
- modsat propellens retning. Eksempelvis vil en helikopter uden haleror
- dreje ukontrolerbart rundt om sig selv, men fordi AR.Drone har et par
- rotore som drejer een vej (med uret), mens et andet par drejer modsat
- (imod uret)\cite{techreport:ardroneDevGuide}, bliver summen af
- momentpåvirkning nul, hvis de 4 rotere drejer med samme hastighed. 
-Denne egenskab bruges til at styre AR.Dronens flyvning og bevægelser i
-rummet, som kan beskrives med 3 bevægelsesakser; x, y og z (se
-figur~\ref{fig:drone_movements}) som er lokale for quadrokopteren. 
+giver en Bernoullieffekt,\cite{nla.cat-vn856146},%\cite{electronic:wiki_bernoulli} 
+som påvirker AR.Dronen med en kraft modsat tyngdekraften (thrust),
+\cite{electronic:wiki_quadrotor}. Udover thrust påvirker den 
+roterende bevægelse også propellens base med et moment(torque)
+modsat propellens retning. Eksempelvis vil en helikopter uden haleror
+dreje ukontrollerbart rundt om sig selv, men fordi AR.Dronen har et par
+rotorer som drejer med uret og et andet par som drejer modsat mod
+uret, \cite{techreport:ardroneDevGuide}, bliver summen af
+momentpåvirkningen nul, såfremt de 4 rotorer drejer med samme hastighed. 
+Denne egenskab bruges også til at styre AR.Dronens flyvning og bevægelser i
+rummet, som kan beskrives med 3 bevægelsesakser: X, y og z, hvor
+henholdsvis $\theta$, $\phi$ og $psi$ er den tilhørende
+rotationsvinkel. På figur~\ref{fig:drone_movements} vises hvordan en generel
+quadrokopter kan bevæges omkring de tre akser, det bemærkes at x og y-akserne på
+denne figur er forskudt 45$\deg$ så de flugter med motorerne, hvorimod
+AR.Dronens akser er afstemt med dennes frontkamera, se figur~\ref{fig:drone_akser}.   
 
 AR.Dronens bevægelser styres ved at kontrollere dens vinkel i forhold
-til de 3 akser. Skal AR.Dronen f.eks. flyve fremad, sættes forenden
-til at være lidt under bagenden i forhold til det vandrette plan. I
-praksis sker det ved at sænke vinkelhastigheden på den forreste propel
-samtidig med at omdrejningsantallet øges %spørgsmålet er hvad er
-moment påvirkningen af $(2*omega_H + delta_A - delta_B) - (2*omega_H)$ 
-på den bageste propel. Det resulterer i at AR.Dronen hælder lidt 
-fremad som på figur \ref{fig:drone_movements}c. Samme princip gør sig
-gældende når AR.Dronen skal flytte sig sideværts som på figur
-\ref{fig:drone_movements}b.
+til de 3 akser, ligesom på figur~\ref{fig:drone_movements}. Skal
+AR.Dronen f.eks. flyve fremad, ændres $\theta$ ved at sænke
+omdrejningshastigheden på de to forreste propeller, samtidig med at
+omdrejningshastigheden på de to bagerste propeller øges. 
+%spørgsmålet er, hvad er moment påvirkningen af $(2*omega_H + delta_A - delta_B) - (2*omega_H)$ 
+Dette resulterer i at AR.Dronen hælder lidt fremad. Samme princip gør sig
+gældende når AR.Dronen skal flytte sig sideværts. Når AR.Dronen skal
+bevæges om z-aksen foregår som på figur~\ref{fig:drone_movements}d,
+det vil sige, at man enten øger eller sænker omdrejningshastigheden på
+de propelpar som drejer samme vej, således at det ene pars
+momentpåvirkning overstiger det andets og dermed får AR.Dronen til at
+rotere. 
 
 \begin{framefig}
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
-  \caption{(a) vinkelhastigheden $\Omega$ øges med $\Delta_A$ på alle 4 propeller, quadrokopteren øger dermed løftekraften (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og mindskes på højre propel, quadrokopteren laver et ``roll'' til højre (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de med-uret-drejende propeller gør at torque bliver ulige og at quadrokopteren drejer mod venstre (acceleration i yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts ($V_y$). figuren er fra AR.Drone SDK Development guide\cite{techreport:ardroneDevGuide}}
+  \caption{(a) vinkelhastigheden $\Omega_H$ øges med $\Delta_A$ på
+    alle 4 propeller, quadrokopteren øger dermed løftekraften
+    (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og
+    mindskes på højre propel, quadrokopteren laver et ``roll'' til højre
+    (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch
+    (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de
+    med-uret-drejende propeller gør at torque bliver ulige og at
+    quadrokopteren drejer mod venstre (acceleration i
+    yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv
+    eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts
+    ($V_y$). figuren er fra ~\cite{techreport:ardroneDevGuide}.
+guide\cite{techreport:ardroneDevGuide}}
   \label{fig:drone_movements}
 \end{framefig}
 
-Hvis AR.Dronen skal dreje om sin egen akse for at kigge længere til
-venstre bruges samme egenskab som før; det moment som tilføres af de 2
-propeller der drejer med uret skal overstige det moment som tilføres
-af de 2 propeller der drejer modsat. Det gøres ved at øge
-vinkelhastigheden på de to førstnævnte og sænke hastigheden på de
-propeller der drejer modsat uret.
-
 Når AR.Dronen går fra at ligge vandret til istedet at hælde, så
 flyttes noget af thrust fra at virke lodret imod tyngdekraften til
-også virke sideværts. Det betyder at propellernes samlede
-vinkelhastighed skal øges for at opretholde den samme afstand til
-jorden. Ifølge SDK DevGuide\cite{techreport:ardroneDevGuide} bør
-hældningen på phi og theta ikke overstige $0.52 rad$ ($30 ^{\circ}$)
-ellers kan flyvehøjden ikke opretholdes. Den maximale hældning kan
-sættes til f.eks. 0.25 radianer via AT-kommandoen i figur
+også at virke sideværts. Det betyder at propellernes samlede
+omdrejningshastighed skal øges for at opretholde den samme afstand til
+gulvet. Ifølge SDK DevGuide\cite{techreport:ardroneDevGuide} bør $\theta$ og $\phi$ ikke overstige 0.52 rad(30$^{\circ}$)
+ellers kan flyvehøjden ikke opretholdes. 
+
+AR.Dronens styreprogram har en parameter der beskriver den øvre grænse for hvor
+meget quadrokopteren maximalt må krænge. Denne parameter,
+\emph{Euler\_angle\_max }, virker som en cut-offvinkel, dvs. at
+AR.Dronen under flyvning løbende tester at hverken pitch ($\Phi$)- eller roll
+($\Theta$)-vinklen overskrider grænsen. Sker dette lukkes systemet ned,
+kraften til rotorene stoppes og AR.Dronen falder til jorden. 
+
+Den maximale hældning kan sættes til f.eks. 0.25 rad via AT-kommandoen i figur
 \ref{fig:ateulerangle}.
+
 \begin{framefig}
 \begin{verbatim}
  AT*CONFIG=605,"control:euler_angle_max","0.25"
@@ -640,16 +658,6 @@ sættes til f.eks. 0.25 radianer via AT-kommandoen i figur
     og $\Theta$.}   
   \label{fig:ateulerangle}
 \end{framefig}
-
-I styreprogrammet på AR.Dronens computer kan man sætte en konstant (se
-figur~\ref{fig:ateulerangle}) til at styre den øvre grænse for hvor
-meget quadrokopteren maximalt kan krænge. Konstanten \emph{
-  Euler\_angle\_max } virker som en cut-offvinkel, dvs. under flyvning
-tester AR.Dronen løbende at hverken pitch ($\Phi$)- eller roll
-($\Theta$)-vinklen overskrider grænsen. Sker det lukkes systemet ned;
-kraften til rotorene klippes og AR.Dronen lader sig falde til jorden. 
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     AR.Drone - section

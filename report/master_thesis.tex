@@ -21,6 +21,7 @@
 
 %\usepackage{caption}
 %\usepackage{subcaption}
+\usepackage{url}
 \usepackage{hyperref}
 
 %\newenvironment{nb}
@@ -186,7 +187,7 @@ små agile Mikro Arial Vehicle (MAV) i flok\cite{turpin:swarm} er der
 fastmonteret kameraer i lokalet omkring MAV til udregning og feedback
 af absolut position.
 
-\paragraph{Nyeste forsøg} %nyeste forskning
+\paragraph{Quadrokopter styring gennem Kinect} %nyeste forskning
 Idag er der, igen gennem ny nøgleteknologi, lavet
 forsøg med ``Simultaneous localization and mapping''
 (SLAM)\cite{shen2011kinect}, hvor quadrokopteren er påmonteret en
@@ -199,7 +200,7 @@ robotplatform omkring for at undersøge hvilke krav der nødvendigvis
 skal opfyldes for at konstruere en modulopbygget kontrolplatform til
 styring af en quadrokopter.
 
-\paragraph{Domæne}
+\paragraph{Domæne afgrænsning}
 AR.Dronen siges at kunne flyve både indendørs og udendørs. Dette
 specialet er afgrænset til at behandle navigation indendørs. For at
 skabe en god basis at arbejde videre udfra, defineres afgrænsningen
@@ -344,7 +345,7 @@ platform skrevet i python med bibliotek / wrapper til opencv (ffmpeg), pygame, n
 \subsection{Platform samt hjælpeværktøjer} % Thomas & Morten
 %arkitektur perspektivering analyse?
 forskellige frameworks til sensordata opsamling og
-udledning/abstraktioner Dey's toolkit / JCAF m.fl.
+udledning/abstraktioner Dey's toolkit / JCAF, Lenser m.fl.
 - vi forestiller os en platform med understøttelse af virtuelle
 sensore 
 
@@ -372,7 +373,7 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 \paragraph{Lokalisering via Wifi-fingerprinting}
 %\paragraph{Simpel-blob}
 \paragraph{Blob-detection og PID styring} simpel blob, og udbygget nested blob
-\paragraph{Korridor vanishpoint}
+\paragraph{Korridor detektering}
 \paragraph{distance-measurererere}
 
 \paragraph{avoid silhouet}
@@ -383,9 +384,14 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 %%%% Introduction
 \section{Raport struktur} % Thomas, %/læsevejledning
 Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
+intro til medfølgende CD og blogpost, med kode på Github
 
 \section{Medfølgende CD}
 Dude its a CD
+
+\section{Projekt Blog på Github}
+\label{sec:blog}
+Beskrivelse af indholdet på bloggen, versionshåndtering, tilgængelighed for comunity
 \pagebreak
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -898,20 +904,20 @@ resultatet af diverse billedanalysealgoritmer.
 En robotplatform der kan udvides med nye sensorer efter behov, er
 klart mere anvendelig end en helt lukket platform. Vi har derfor
 undersøgt mulighederne for at anvende AR.Dronens OTG-USB* port til
-andet end at udføre opdateringer, dette har blandt indbefattet at
-kompilere kernemoduler(*) til AR.Dronens linuxkerne(*ref til blog*),
+andet end at udføre softwareopdateringer. Dette har blandt indbefattet at
+kompilere kernemoduler(*) til AR.Dronens Linuxkerne(*ref til blog*),%som beskrevet i indledende sektion~\ref{sec:blog}
 samt at omgå AR.Dronens software for ikke at miste strømmen til
-porten. Vores proof-of-concept var at få loadet en almindelig usbstick
-og skrive og læse fra denne(*ref til blog*), dette var forholdsvis
-simpelt, da driverne til dette formål er meget generiske.
+porten. Vores proof-of-concept var at mounte en almindelig USB memorystick
+og at skrive og læse fra denne(*ref til blog*), dette var forholdsvis
+simpelt, da Linuxdriverne til dette formål er meget generiske.
 
 \begin{figure*}[htp]
   \centering
-  \subfigure[USB-kabel og de enheder vi har haft tilslutttet AR.Dronen.]{
+  \subfigure[Hjemmelavet USB-kabel, en USB memorystick og en WIFI USB-dongle til tilslutning på AR.Dronen.]{
     \includegraphics[width=0.47\textwidth]{grafik/usbdevices.png}
     \label{fig:cableandusbdevices}}
   ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[AR.Dronen med usbstick tilsluttet.]{\includegraphics[width=0.47\textwidth]{grafik/usbattached.png}
+  \subfigure[AR.Dronen med USB-memorystick tilsluttet.]{\includegraphics[width=0.47\textwidth]{grafik/usbattached.png}
     \label{fig:usbattached}}
   \label{fig:usbdevices}
 \end{figure*}
@@ -1048,6 +1054,8 @@ wifireceiverens get\_data() metode kaldes, er det disse værdier der
 returneres, værdierne finder anvendelse når wifidata skal matches med hinanden.
 
 \paragraph{Virtuel sensor}
+\label{sec:sub:virtuel}
+%\cite{Dey01:ctoolkit}\cite{lenser:behaviorbasedarchitecture} #Bardram jcaf?
 Den virtuelle sensor er en sen tilføjelse til vores platform og er som
 tidligere nævnt inspireret af sensorhierakiet beskrevet i
 \cite{lenser:behaviorbasedarchitecture}, hvor sensorer opererer på
@@ -1732,7 +1740,18 @@ Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges alle
 %perspektiver, hvad skal / kan vi bruge den nye viden til?
 %Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
+%intro
+Eksperimenterne herover har ind til videre omhandlet tilgange til det
+at genkende abstraktioner på konkrete absolute lokationer. Denne
+sektion beskæftiger sig istedet med udledningen af til relativ viden\todo{andet ord}
+fra rå sensordata.
 
+i form af udledning af højere abstrakt viden fra rå data, eller viden
+af lavere abstraktionsniveau ifølge Dey01 et al.,\cite{Dey01:ctoolkit}.
+context-widget). 
+Et eksempel på
+relativ viden er hastigheden $v_x$ og $v_y$ som er tilgængelige gennem interfacet til
+AR.Dronen. Hastigheden er udledt af 
 En tilgang er at bruge bundkameraet og få quadrokopteren til at finde et punkt på gulvet og
 svæve over det. En anden tilgang er at teste om quadrokopteren kan orientere sig i forhold
 frontkameraet.
@@ -1740,15 +1759,29 @@ frontkameraet.
 I ``Minerva'' og ``opticalflow corridor vanishing point'' har robotterne fået
 forskellige handleprocedure afhængigt af hvilket miljø de befinder sig i.
 
+%mål
 Målet for dette eksperiment er at : 2 ting
 1) finde ss. for at man er i en korridor, og
 2) hvor er enden af korridoren (forsvindingspunktet)
 
+For senere at implementere det som en virtuel sensor som i sektion~\ref{sec:sub:virtuel}.
+
+\
 Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra der er kommet inspiration.
 finde edges -> finde houghlines -> sortere linier (diagonale)
 -> finde skæringspunkter blandt diagonale linier, tælle område med
 flest skæringspunkter
 +augmenter med phi
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/vanish_operation1.png}
+  \caption{(a) Et billede af en gang påført gauss-sløring (b) Billede a efter kantdetektering (her et sobel-filter) (c) Hough-linier udregnes udfra kantpunkterne i billede b (d) Vandrette og lodrette hough-linier sorteres fra billede c.}
+  \label{fig:kanter1}
+\end{figure}
+
+
+
 
 \subsection{At finde kanter i et billede}
 

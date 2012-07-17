@@ -328,7 +328,7 @@ Disse to egenskaber findes allerede i AR.Dronen, udfra det er den tilpas til at 
 
 \paragraph{Nu med USB-driver}% Thomas & Morten
 - udvide features / muligheder / operationer / operationsområder, 
-- samt undersøgt muligheden for at udvide AR.Dronens Hardwareplatform med yderligere sensore eg. usb / mere flashdrive
+- samt undersøgt muligheden for at udvide AR.Dronens Hardwareplatform med yderligere sensore eg. USB / mere flashdrive
 
 %%%% Introduction - Metode
 \subsection{Domæne/navigationsmiljø} % Thomas,
@@ -540,7 +540,7 @@ arbejdshukommelse og 128 MB NAND flash til persistent (vedvarende) hukommelse.
 Tilkoblet den indlejrede computer er der et integreret trådløst netværkskort (Atheros AR6102G-BM2D) til WIFI. 
 
 På undersiden af quadrokopteren er der et 7 benet molex-stik til
-ekstern serialkommunikation, \cite{electronic:molex}. Porten virker bl.a. som en On-The-Go USB-port,\cite{electronic:otg}, der primært anvendes ved opdateringer.
+ekstern serialkommunikation, \cite{electronic:molex}. Porten virker bl.a. som en On-The-Go USB-port,\cite{electronic:otg}, der primært anvendes ved softwareopdateringer.
 
 \subsection{Strømforsyning}
 \label{sssec:forsyning}
@@ -815,12 +815,12 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \section{Udvidelse af AR.Dronen}
 \label{sec:udvidelse}
 En robotplatform der kan udvides med nye sensorer efter behov, er
-klart mere anvendelig end en helt lukket platform. Vi har derfor
-undersøgt mulighederne for at anvende AR.Dronens OTG-USB \cite{electronic:otg} port til
-andet end at udføre opdateringer, dette har blandt indbefattet at
-kompilere kernemoduler til AR.Dronens linuxkerne,
+klart mere anvendelig end en helt lukket platform. Derfor er det
+undersøgt om det er muligt at anvende AR.Dronens OTG-USB
+\cite{electronic:otg} port til andet end at lave softwareopdateringer.
+Dette har blandt andet indbefattet at kompilere kernemoduler til AR.Dronens linuxkerne,
 samt at omgå AR.Dronens software for ikke at miste strømmen til
-porten. Vores proof-of-concept var at få loadet en almindelig usbstick
+porten. Vores proof-of-concept var at få mounted en almindelig USB memorystick
 og skrive og læse fra denne, dette var forholdsvis
 simpelt, da driverne til dette formål er meget generiske. Proceduren
 for at aktivere AR.Dronens USB-port og læse fra en USB-stick kan læses
@@ -1014,76 +1014,8 @@ resultatet af diverse billedanalysealgoritmer.
   behandling/opsummering i Resultater/Konklusion...}
 
 \pagebreak
-\section{Udvidelse af AR.Dronen}
-En robotplatform der kan udvides med nye sensorer efter behov, er
-klart mere anvendelig end en helt lukket platform. Vi har derfor
-undersøgt mulighederne for at anvende AR.Dronens OTG-USB* port til
-andet end at udføre softwareopdateringer. Dette har blandt indbefattet at
-kompilere kernemoduler(*) til AR.Dronens Linuxkerne(*ref til blog*),%som beskrevet i indledende sektion~\ref{sec:blog}
-samt at omgå AR.Dronens software for ikke at miste strømmen til
-porten. Vores proof-of-concept var at mounte en almindelig USB memorystick
-og at skrive og læse fra denne(*ref til blog*), dette var forholdsvis
-simpelt, da Linuxdriverne til dette formål er meget generiske.
-
-\begin{figure*}[htp]
-  \centering
-  \subfigure[Hjemmelavet USB-kabel, en USB memorystick og en WIFI USB-dongle til tilslutning på AR.Dronen.]{
-    \includegraphics[width=0.47\textwidth]{grafik/usbdevices.png}
-    \label{fig:cableandusbdevices}}
-  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[AR.Dronen med USB-memorystick tilsluttet.]{\includegraphics[width=0.47\textwidth]{grafik/usbattached.png}
-    \label{fig:usbattached}}
-  \label{fig:usbdevices}
-\end{figure*}
-
-\subsection{Wifisensor}
-Efter vores indledende erfaringer med AR.Dronens USB-port, valgte vi at
-implementere en wifi-sensor for på sigt at kunne anvende denne som
-lokaliseringsredskab. Vores wifisensor består af en usb-wifi-adapter
-og et snifferprogram til at aflæse og videresende signalstyrker fra de
-omkringliggende accesspoints og andre wifi-kilder. Snifferprogrammet
-antager at det trådløse interface der anvendes er sat op i monitor og
-promiscous mode så det modtager alle pakker der sendes fra de
-omkringliggende kilder, dette opnåes ved at kalde vores eget
-startup-script(*ref til annoteret startup*) til sidst i dronens
-oprindelige bootup-sekvens, i dette script loades også alle de
-nødvendige kernemoduler.
-
-\subsubsection{WIFI-adapter}  
-Vi har valgt at udstyre AR.Dronen med en Dlink DWL-G122~\cite{electronic:dwlg122}
-wifi-adapter. Denne specifikke adapter bygger på et Ralink~\cite{electronic:wikiralink} chipset og
-understøtter monitor mode. Ralink udgiver desuden linuxdrivere til
-deres chipsets. Efter længere tids søgen og eksperimenteren, fandt vi
-den korrekte driver og fik denne kompileret til ARM-arkitekturen og
-kompileret til at være kompatibel med linuxkernen anvendt på
-AR.Dronen. Efter at have loadet driveren, genkendes vores adapter og
-interfacet ra0 oprettes i \code{/sys/class/net/}. 
-
-\subsubsection{Sniffer}
-Vores første eksperimenter med hensyn til at kompilere og afvikle kode
-på AR.Dronen kan ses på *link til blog*, dette var simple 'hello
-world' eksempler, men gav os indsigt i proceduren omkring
-crosscompiling til AR.Drone arkitekturen og den anvendte toolchain. 
-
-For at skrive et program der kan modtage pakker fra et
-netværksinterface anvender man ofte linux' pcap bibliotek, dette er
-dog ikke er installeret på AR.Dronen som standard og skulle først
-kompileres til ARM-arkitekturen før vi kunne linke til det og senere
-anvende programmet på AR.Dronen, se *blog ref*.
-
-Sniffer programmet har mulighed for at tage et interfacenavn som input
-når det startes, men som standard anvendes 'ra0' interfacet. Man kan desuden
-vælge at angive en kanal, at angive om man ønsker at anvende
-channelhopping til at modtage pakker fra forskellige kanaler og angive
-om man ønsker at få output til terminalen. Når programmet startes vil
-det vente på en UDP initieringspakke fra en klient før det begynder at
-modtage og behandle pakker. Sniffer programmet sender signalstyrker og
-mac-adresser videre til klienten ved hjælp af UDP kommunikation på
-port 5551, hvilket gør at det er transparent for klienten om hvorvidt
-den modtager data fra den originale AR.Drone software eller fra vores
-udvidelse. 
  
-\section{Klient platform} % Morten,
+\chapter{Klient platform} % Morten,
 Vi har udviklet den grundlæggende platform med det formål, at
 understøtte vores videre arbejde med AR.Dronen. Platformen skal sikre
 let og effektiv adgang til AR.Dronens sensor output, samt give
@@ -1979,7 +1911,7 @@ flest skæringspunkter
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/vanish_operation1.png}
   \caption{(a) Et billede af en gang påført gauss-sløring (b) Billede a efter kantdetektering (her et sobel-filter) (c) Hough-linier udregnes udfra kantpunkterne i billede b (d) Vandrette og lodrette hough-linier sorteres fra billede c.}
-  \label{fig:kanter1}
+  \label{fig:houghprocess}
 \end{figure}
 
 
@@ -2213,3 +2145,74 @@ kontrollere AR.Dronen.
 %% der i
 
 %1997 lavet en rengøringsrobot Robosanitan\cite{electronic:robosanitan1997}.
+
+
+%%%%%%
+%% \section{Udvidelse af AR.Dronen}
+%% En robotplatform der kan udvides med nye sensorer efter behov, er
+%% klart mere anvendelig end en helt lukket platform. Vi har derfor
+%% undersøgt mulighederne for at anvende AR.Dronens OTG-USB* port til
+%% andet end at udføre softwareopdateringer. Dette har blandt indbefattet at
+%% kompilere kernemoduler(*) til AR.Dronens Linuxkerne(*ref til blog*),%som beskrevet i indledende sektion~\ref{sec:blog}
+%% samt at omgå AR.Dronens software for ikke at miste strømmen til
+%% porten. Vores proof-of-concept var at mounte en almindelig USB memorystick
+%% og at skrive og læse fra denne(*ref til blog*), dette var forholdsvis
+%% simpelt, da Linuxdriverne til dette formål er meget generiske.
+
+%% \begin{figure*}[htp]
+%%   \centering
+%%   \subfigure[Hjemmelavet USB-kabel, en USB memorystick og en WIFI USB-dongle til tilslutning på AR.Dronen.]{
+%%     \includegraphics[width=0.47\textwidth]{grafik/usbdevices.png}
+%%     \label{fig:cableandusbdevices}}
+%%   ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+%%   \subfigure[AR.Dronen med USB-memorystick tilsluttet.]{\includegraphics[width=0.47\textwidth]{grafik/usbattached.png}
+%%     \label{fig:usbattached}}
+%%   \label{fig:usbdevices}
+%% \end{figure*}
+
+%% \subsection{Wifisensor}
+%% Efter vores indledende erfaringer med AR.Dronens USB-port, valgte vi at
+%% implementere en wifi-sensor for på sigt at kunne anvende denne som
+%% lokaliseringsredskab. Vores wifisensor består af en USB-wifi-adapter
+%% og et snifferprogram til at aflæse og videresende signalstyrker fra de
+%% omkringliggende accesspoints og andre wifi-kilder. Snifferprogrammet
+%% antager at det trådløse interface der anvendes er sat op i monitor og
+%% promiscous mode så det modtager alle pakker der sendes fra de
+%% omkringliggende kilder, dette opnåes ved at kalde vores eget
+%% startup-script(*ref til annoteret startup*) til sidst i dronens
+%% oprindelige bootup-sekvens, i dette script loades også alle de
+%% nødvendige kernemoduler.
+
+%% \subsubsection{WIFI-adapter}  
+%% Vi har valgt at udstyre AR.Dronen med en Dlink DWL-G122~\cite{electronic:dwlg122}
+%% wifi-adapter. Denne specifikke adapter bygger på et Ralink~\cite{electronic:wikiralink} chipset og
+%% understøtter monitor mode. Ralink udgiver desuden linuxdrivere til
+%% deres chipsets. Efter længere tids søgen og eksperimenteren, fandt vi
+%% den korrekte driver og fik denne kompileret til ARM-arkitekturen og
+%% kompileret til at være kompatibel med linuxkernen anvendt på
+%% AR.Dronen. Efter at have loadet driveren, genkendes vores adapter og
+%% interfacet ra0 oprettes i \code{/sys/class/net/}. 
+
+%% \subsubsection{Sniffer}
+%% Vores første eksperimenter med hensyn til at kompilere og afvikle kode
+%% på AR.Dronen kan ses på *link til blog*, dette var simple 'hello
+%% world' eksempler, men gav os indsigt i proceduren omkring
+%% crosscompiling til AR.Drone arkitekturen og den anvendte toolchain. 
+
+%% For at skrive et program der kan modtage pakker fra et
+%% netværksinterface anvender man ofte linux' pcap bibliotek, dette er
+%% dog ikke er installeret på AR.Dronen som standard og skulle først
+%% kompileres til ARM-arkitekturen før vi kunne linke til det og senere
+%% anvende programmet på AR.Dronen, se *blog ref*.
+
+%% Sniffer programmet har mulighed for at tage et interfacenavn som input
+%% når det startes, men som standard anvendes 'ra0' interfacet. Man kan desuden
+%% vælge at angive en kanal, at angive om man ønsker at anvende
+%% channelhopping til at modtage pakker fra forskellige kanaler og angive
+%% om man ønsker at få output til terminalen. Når programmet startes vil
+%% det vente på en UDP initieringspakke fra en klient før det begynder at
+%% modtage og behandle pakker. Sniffer programmet sender signalstyrker og
+%% mac-adresser videre til klienten ved hjælp af UDP kommunikation på
+%% port 5551, hvilket gør at det er transparent for klienten om hvorvidt
+%% den modtager data fra den originale AR.Drone software eller fra vores
+%% udvidelse. 

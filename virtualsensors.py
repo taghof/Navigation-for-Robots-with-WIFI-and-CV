@@ -19,9 +19,9 @@ class Detector(object):
         self.navdata_sensor = self.drone.get_navdata_sensor()
         self.interface = self.drone.get_interface()
         self.map = self.drone.get_map()
-        self.show = True
-        #self.show = False
-        self.mode = 'normal'
+        #self.show = True
+        self.show = False
+        self.mode = 'wifi'
         self.silhouets = []
         self.points = []
         self.last_small = None
@@ -46,8 +46,6 @@ class Detector(object):
             win1 = cv2.namedWindow('win1')
             win2 = cv2.namedWindow('win2')
             win3 = cv2.namedWindow('win3')
-        # win2 = cv2.namedWindow('pic')
-        # win2 = cv2.namedWindow('mini')
 
         self.status = settings.RUNNING
         frames = 0
@@ -62,10 +60,9 @@ class Detector(object):
             time.sleep(2)
 
         while not self.status == settings.STOPPING:
-            # wifi_pos = self.detect_position_wifi()
-            # if wifi_pos is not None:
-            #     print wifi_pos.name, '\r'
+            
             if frames >= 199:
+                #pass
                 self.drone.stop()
             frames += 1
             #print 'frames: ',frames
@@ -130,6 +127,14 @@ class Detector(object):
                         (xpos, ypos), (width, height) = position, size = blob
                         if width*height > 15:
                             pf += 1
+
+            elif self.mode == 'wifi':
+                wifi_pos = self.detect_position_wifi()
+                if wifi_pos is not None:
+                    print wifi_pos.name 
+                    if wifi_pos.name == 'pos3':
+                        pf += 1
+           
 
             if self.show and img is not None:
 
@@ -246,36 +251,38 @@ class Detector(object):
         return None
 
     def detect_position_wifi(self):
-        maxmval = 0
+        maxmval = 100
         closest_pos = None
-
+        val = 0
         #p2 = self.wifi_sensor.record_sample()
         #if p2 is not None and len(p2) > 0:
+        #print '**********************'
         for p1 in self.map.positions:
             for i in range(1):
                 p2 = self.wifi_sensor.record_sample()
                 if len(p2) > 0:
+                    
                     mval = self.match_wifi_sample(1, p1.wifi, p2)
-                    # mval2 = self.wifi_sensor.match_wifi_sample(1, p1.wifi, p2)
-                    # print 'mval: ', mval, '\r'
-                    # print 'mval2: ', mval2, '\r'
-                   
-                    if mval > maxmval:
+         #           print p1.name, ' mval: ', mval, '\r'
+                                       
+                    if mval < maxmval:
                         maxmval = mval
                         closest_pos = p1
+                        val = mval
 
         return closest_pos
                     
     def match_wifi_sample(self, min_match_len, p1, p2):
         if p1 is None or p2 is None:
-            return 0
+
+            return 1000
 
         if len(p1) < min_match_len:
-            print "Not enough entries in target sample to match"
-            return 0
+
+            return 1000
 
         match_set = OrderedDict()
-        threshold = 5
+        threshold = 5.0
         current_time = datetime.datetime.now()
         for key, val in p2.iteritems():
             signal_time_stamp = val[1]
@@ -290,23 +297,26 @@ class Detector(object):
                 else:
                     significance = 1
                     match_set[key] = (val[5], significance)
+    
         mval = 0
         mval2 = 0
         maxmval = 0
         maxmval2 = 0
         watt_val = 0
+        diffs = 0
 
         for k, v in match_set.iteritems():
             sig = v[1]
             val0 = v[0]
             val1 = p1.get(k)[5]
          
-            dif = math.sqrt((val0 - val1)**2)
+            dif = math.sqrt((float(val0) - float(val1))**2)
             
-            watt_val = (10**(val1/10))*10
+            watt_val = (10**(val1/10.0))*10
 
             # mval += ((val1+100-dif)*watt_val*sig)
             # maxmval += ((val1+100)*watt_val)
+            diffs += (dif/sig)
 
             mval2 +=  ((val1-dif)*watt_val)/sig
             maxmval2 += (val1*watt_val)
@@ -315,13 +325,15 @@ class Detector(object):
             # print 'dif: ', dif, '\r' 
             # print 'mval2: ', mval2, '\r'
 
-            
-
+        if len(match_set) > 0:
+            difavg = diffs/len(match_set)
+        else:
+            difavg = 100
 
         #print 'wat_val: ', watt_val , '\r'
         #print "mval: ", mval, "maxmval: ", maxmval, "\r"
         if not maxmval2:
-            return 0
+            return 1000
         else:
             pval2 = (maxmval2/mval2) * 100
             #pval1 = (mval / maxmval) * 100
@@ -329,6 +341,10 @@ class Detector(object):
             # print 'pval1: ', pval1, '\r'
             #print 'pval2: ', pval2, '\r'
             # print 'rel:', pval1/pval2 , '\r'
-            return pval2
+            #return pval2
+            return difavg
         #     self.last_matches.put(pval)
         # return self.last_matches.get_avg()
+
+    def record_target_sample(self):
+        pass

@@ -357,7 +357,7 @@ class WifiReceiver(Receiver):
 
         for  key, (val, date_time, avg_time, num_avg, last10, avg_val) in sample.iteritems():
             sig_val = avg_time + last10.get_std_dev()
-            if last10.get_std_dev() < 10 and avg_time < 40 and num_avg > 1:# and (date_time - time).total_seconds() < 10:
+            if last10.get_std_dev() < 10 and avg_time < 10 and num_avg > 1 and (date_time - time).total_seconds() < 5:
                 temp_sample.append((key, sig_val, (val, date_time, avg_time, num_avg, last10, avg_val)))
 
         temp_sample.sort(key=lambda entry: entry[1], reverse=False)
@@ -365,6 +365,10 @@ class WifiReceiver(Receiver):
             processed_sample[entry[0]] = entry[2]
 
         return processed_sample
+
+    def on_record_sample(self, sample):
+        return self.on_record_target_sample(sample)
+
 
 class NavdataReceiver(Receiver):
 

@@ -150,7 +150,6 @@ class PresenterGui(object):
         if widget is None:
             self.button2.set_active(not self.button2.get_active())
             return True
-        self.video_window.toggle_targets(None)
         self.show_targets = not self.show_targets
 
     def toggle_significance(self, widget): 

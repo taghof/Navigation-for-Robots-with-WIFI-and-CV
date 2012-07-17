@@ -55,6 +55,56 @@ def test_decode():
     t2 = time.time()
     print 'time: ', t2-t1
 
+
+def qrscan():
+    import testdevice, settings, receivers, zbar, Image
+    
+    settings.TEST = True
+    testdevice = testdevice.TestDevice(False)
+    testdevice.start()
+    
+    video_sensor = receivers.VideoReceiver(settings.VIDEO_PORT)
+    video_sensor.start()
+    
+    scanner = zbar.ImageScanner()  
+    scanner.parse_config('enable')
+
+    reps = 100
+    while reps > 0:
+        
+        # obtain image data
+        org = video_sensor.get_data()
+        if org is not None:
+            pil = Image.fromarray(org)#open('test-decode.png').convert('L')
+            width, height = pil.size
+            raw = pil.tostring()
+
+            # wrap image data
+            image = zbar.Image(width, height, 'Y800', raw)
+
+            # scan the image for barcodes
+            scanner.scan(image)
+
+            # extract results
+            for symbol in image:
+                # do something useful with results
+                print 'decoded', symbol.type, 'symbol', '"%s"' % symbol.data
+
+            # clean up
+            del(image)
+            reps -= 1
+
+    testdevice.stop()
+    video_sensor.stop()
+   
+def qrencode():
+    import sys, qrcode
+
+    e = qrcode.Encoder()
+    image = e.encode('woah', version=1, mode=e.mode.ALNUM, eclevel=e.eclevel.Q)
+    image.save('./testdata/out.png')
+
+
 if __name__ == '__main__':
     receive_and_show_picture()
     # show_imgs()

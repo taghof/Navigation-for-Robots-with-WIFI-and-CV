@@ -550,13 +550,17 @@ language={English}
   year = {2012},
  }
 
+@string{otgURL="\htmladdnormallink
+{www.usb.org/developers/onthego/}{http://www.usb.org/developers/onthego/}"}
+
 @electronic{electronic:otg,
-  author = {Wikipedia},
-  organization = {Wikipedia},
+  author = {USB Implementers Forum},
+  organization = {USB Implementers Forum},
   title = {USB on-the-go},
-  url = {http://en.wikipedia.org/wiki/USB_On-The-Go},
+  url = {http://www.usb.org/developers/onthego/},
   month = {juli},
   year = {2012},
+  note = "Online information om On-The-Go USB er tilgaengelig paa " # otgURL
 }
 
 @electronic{electronic:molex,
@@ -568,15 +572,21 @@ language={English}
   year = {2012},
 }
 
+@string{blogusbURL="\htmladdnormallink
+{taghof.github.com/Navi...12/Enabling-The-Drone-USB-Port/}{http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/}"}
 
-@electronic{blog:usb,
-  author = {Morten Daugaard and Thomas Thyregod},
+@misc{blog:usb,
+  author = {Daugaard, Morten and Thyregod, Thomas},
   organization = {},
   title = {Enabling the Drone USB Port},
   url = {http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/12/Enabling-The-Drone-USB-Port/},
   month = {juli},
   year = {2012},
+  note = "" # blogusbURL
 }
+
+@string{blogcompilingURL="\htmladdnormallink
+{taghof.github.com/Navi.../13/Compiling-Code-For-The-ARDrone/}{http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/}"}
 
 @electronic{blog:compiling,
   author = {Morten Daugaard and Thomas Thyregod},
@@ -585,6 +595,7 @@ language={English}
   url = {http://taghof.github.com/Navigation-for-Robots-with-WIFI-and-CV/blog/2012/01/13/Compiling-Code-For-The-ARDrone/},
   month = {juli},
   year = {2012},
+  note = "" # blogcompilingURL
 }
 
 @electronic{electronic:ar2,

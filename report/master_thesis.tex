@@ -540,7 +540,9 @@ arbejdshukommelse og 128 MB NAND flash til persistent (vedvarende) hukommelse.
 Tilkoblet den indlejrede computer er der et integreret trådløst netværkskort (Atheros AR6102G-BM2D) til WIFI. 
 
 På undersiden af quadrokopteren er der et 7 benet molex-stik til
-ekstern serialkommunikation, \cite{electronic:molex}. Porten virker bl.a. som en On-The-Go USB-port,\cite{electronic:otg}, der primært anvendes ved softwareopdateringer.
+ekstern serialkommunikation, \cite{electronic:molex}. Porten virker
+bl.a. som en On-The-Go USB-port,\cite{electronic:otg}, der primært
+anvendes ved softwareopdateringer.%otg beskrives nærmere i \ref{sec:udvidelse}
 
 \subsection{Strømforsyning}
 \label{sssec:forsyning}
@@ -812,40 +814,42 @@ periodisk for at AR.Dronen ikke skal tolke forbindelsen til
 klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \ref{tab:kommandoer} i appendiks \ref{sec:at}. 
 
-\section{Udvidelse af AR.Dronen}
+\section{Udvidelse af AR.Dronen med USB-moduler}
 \label{sec:udvidelse}
 En robotplatform der kan udvides med nye sensorer efter behov, er
-klart mere anvendelig end en helt lukket platform. Derfor er det
-undersøgt om det er muligt at anvende AR.Dronens OTG-USB
+klart mere anvendelig end en helt lukket platform. Derfor blev det
+undersøgt om det er muligt at anvende AR.Dronens OTG-USB, 
 \cite{electronic:otg} port til andet end at lave softwareopdateringer.
 Dette har blandt andet indbefattet at kompilere kernemoduler til AR.Dronens linuxkerne,
 samt at omgå AR.Dronens software for ikke at miste strømmen til
-porten. Vores proof-of-concept var at få mounted en almindelig USB memorystick
-og skrive og læse fra denne, dette var forholdsvis
-simpelt, da driverne til dette formål er meget generiske. Proceduren
-for at aktivere AR.Dronens USB-port og læse fra en USB-stick kan læses
-i vores blogpost "Enabling the Drone USB Port",\cite{blog:usb}. 
+porten\cite{blog:usb}. Den indledende proof-of-concept test var at få mounted en almindelig USB-memorystick
+og skrive til og læse fra den. Indstallationsprocesuren er forholdsvis
+simpel, idet Linuxdriverne til dette formål er meget generiske. Proceduren
+til at aktivere AR.Dronens USB-port og læse fra en USB-memorystick kan læses
+i en af specialets tilhørende blogpost: "Enabling the Drone USB Port",\cite{blog:usb}. 
 \begin{framefig}
   \centering
-  \subfigure[USB-kabel og de enheder vi har haft tilslutttet AR.Dronen.]{
+  \subfigure[Hjemmelavet USB-kabel, en USB memorystick og en WIFI USB-dongle til tilslutning på AR.Dronen.]{
     \includegraphics[width=0.45\textwidth]{grafik/usbdevices.png}
     \label{fig:cableandusbdevices}}
   ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[AR.Dronen med usbstick tilsluttet.]{\includegraphics[width=0.45\textwidth]{grafik/usbattached.png}
+  \subfigure[AR.Dronen med USB memorystick tilsluttet.]{\includegraphics[width=0.45\textwidth]{grafik/usbattached.png}
     \label{fig:usbattached}}
   \label{fig:usbdevices}
 \end{framefig}
 
-\subsection{Wifisensor}
-Efter vores indledende erfaringer med AR.Dronens USB-port, valgte vi at
-implementere en wifi-sensor for på sigt at kunne anvende denne som
-lokaliseringsredskab. Vores wifisensor består af en usb-wifi-adapter
-og et snifferprogram til at aflæse og videresende signalstyrker fra de
-omkringliggende accesspoints og andre wifi-kilder. Snifferprogrammet
+\subsection{WIFI-sensor}
+Efter de første erfaringer med AR.Dronens USB-port, blev det valgt at
+implementere en WIFI-sensor for på sigt at kunne anvende denne som
+lokaliseringsenhed. WIFI-sensoren består af en USB-WIFI-adapter
+og et snifferprogram til at aflæse og videresende signalstyrkerne fra de
+omkringliggende accesspoints og andre WIFI-kilder. Snifferprogrammet
 antager at det trådløse interface der anvendes er sat op i monitor og
-promiscous mode så det modtager alle pakker der sendes fra de
-omkringliggende kilder, dette opnåes ved at kalde vores eget
-startup-script(*ref til annoteret startup*) til sidst i dronens
+promiscous\footnote{Normalt vil et netværksinterface frasortere og
+  ikke videresende datapakker der ikke er adresseret til processoren,
+  men i promiscous mode sendes al trafik videre.} mode så det modtager alle pakker der sendes fra de
+omkringliggende kilder. Netværksinterfacet mode opsættes
+gennem et script (*ref til annoteret startup*) som kaldes til sidst i AR.Dronens
 oprindelige bootup-sekvens, i dette script loades også alle de
 nødvendige kernemoduler.
 

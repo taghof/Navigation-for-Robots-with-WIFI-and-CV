@@ -419,14 +419,14 @@ skumskjold til henholdsvis indendørs
 (figur~\ref{fig:indendoersskjold}) og udendørs flyvning
 (figur~\ref{fig:udendoersskjold}).
 
-I det følgende gennemgåes i afsnit \emph{\titleref{ssec:hardware}} de
+I det følgende gennemgåes i afsnit \emph{\nameref{ssec:hardware}} de
 fysiske enheder som quadrokopteren består af, i afsnittet
-\emph{\titleref{ssec:fysik}} gives en introduktion til hvorledes
+\emph{\nameref{ssec:fysik}} gives en introduktion til hvorledes
 quadrokopteren bruger rotorerne til at skabe opdrift og bevægelse i
-luften, i afsnittet \titleref{ssec:software} og afsnittet
-\emph{\titleref{ssec:kommunikation}} beskrives kommunikationen mellem
+luften, i afsnittet \nameref{ssec:software} og afsnittet
+\emph{\nameref{ssec:kommunikation}} beskrives kommunikationen mellem
 AR.Dronens styreprogram og forskeliige typer klienter, mens afsnittet
-\emph{\titleref{ssec:dronerecap}} opregner de observationer der er gjort
+\emph{\nameref{ssec:dronerecap}} opregner de observationer der er gjort
 under specialearbejdet og som kan hjælpe andre med at træffe en
 beslutning om hvorvidt AR.Dronen er den rigtige platform at bygge
 videre på.
@@ -803,7 +803,7 @@ figur \ref{fig:atsyntaks}.
 
 Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer
 man hvorledes AR.\ $\!$Dronen skal bevæge sig ved translation og rotation,
-som beskrevet i \titleref{ssec:fysik} sektion \ref{ssec:fysik}. 
+som beskrevet i \nameref{ssec:fysik} sektion \ref{ssec:fysik}. 
 
 \begin{framefig}
 \begin{verbatim}
@@ -897,6 +897,7 @@ indlæst, genkendes adapteren og interfacet \emph{ra0} oprettes i
 \code{/sys/class/net/}. 
 
 \subsubsection{WIFI-sensor software}
+\label{sec:sub:sub:wifisensor}
 De første eksperimenter med hensyn til at kompilere og afvikle kode
 på AR.Dronen kan ses i specialets blogpost "Compiling code for the
 AR.Drone", \cite{blog:compiling}. Det var simple 'hello 
@@ -914,8 +915,8 @@ Arbejdet med at installere et yderligere netværk på AR.Dronen
 resulterede i et \emph{WIFI-sensor}-program der køre på AR.Dronen. Det
 ny program henter WIFI-pakker som det indstallerede
 netværksinterface henter fra luften. De opsnappede WIFI-pakker skilles
-ad så IDet på pakkens afsender samt signalstyrken kan puttes i en ny
-datagram og afsendes fra AR.Dronen som del af en sensorstrøm der
+ad og MAC\fotnote{Media Access Control}-adressen på pakkens afsender samt signalstyrken puttes i en ny
+besked, som afsendes fra AR.Dronen. De afsendte pakker er del af en sensorstrøm der
 ligner det der ellers kommer fra AR.Dronen, ie. navdata og video.
 
 Det konstruerede WIFI-sensor-program kan opstartes med et interfacenavn som
@@ -925,10 +926,10 @@ channelhopping til at modtage pakker fra forskellige
 kanaler. Derudover er det muligt at få tekstuel output til terminalen. 
 WIFI-sensor-programmet er lavet så det kan startes automatisk når AR.Dronen booter op.
 For ikke unødigt at spilde processorkrafter med at modtage og behandle
-pakker så venter WIFI-sensor-programmet efter opstart på et start-signal fra
+pakker, hvis de alligevel ikke skal bruges, så venter WIFI-sensor-programmet efter opstart på et start-signal fra
 klienten via en UDP-initialiseringspakke. Modtages startsignalet
 begynder WIFI-sensor-programmet at sender signalstyrker og
-mac-adresser videre til klienten. UDP strømmen fra WIFI-sensoren går
+MAC-adresser videre til klienten. UDP strømmen fra WIFI-sensoren går
 over UDP-port 5551. Kommunikationen er valgt til at gå over UDP-port nummer 5551 for at klientens
 interface til AR.Dronen forbliver nogenlunde konsistent.
 
@@ -1074,7 +1075,7 @@ mulighed for at styre AR.Dronen, både manuelt med joystick og tastatur
 gennem en PC (altså ikke iPhone, iPad el. lign.) og ved hjælp af
 prædefinerede opgaver som beskrives nærmere i sektion~\ref{sec:tasks}.
 
-\section{Platform implementation i Python}
+\section{Platformsadgang via Python}
 Python sproget blev i første omgang valgt for lette tilgængelighed for
 brugeren. Et af specialet mål er at stille en let anvendelig og
 let udbyggelig platform til rådighed for udviklermiljøet omkring
@@ -1230,64 +1231,101 @@ maskiner. Det vil være spændende at se om ikke det vil give en endnu
 hurtigere afviklingstid.
 %%%
 
-\section{Platformens opbygning}
-Platformen består af et antal klasser placeret i et antal
-Python-moduler. Vi har udviklet tre forskellige receiverklasser (video,
-navdata og WIFI i receiversmodulet), to forskellige
-controllerklasser (joystick og keyboard i controllersmodulet), en taskmanager og
-en kontrolinterface-klasse (controllersmodulet). Derudover har vi med
-inspiration fra~\cite{lenser:behaviorbasedarchitecture} implementeret en virtuel sensor der bygger oven på videoreceiveren. 
-
-I standard situationen instantieres, startes og tilgåes disse klasser fra
-droneklassen(dronemodulet). På denne måde kan udviklere der ønsker at
-anvende vores platform blot importere drone modulet og instantiere
-droneklassen, hvorefter der er let adgang til diverse sensordata. Vi
-har desuden udviklet et testdevice modul, som anvendes i forbindelse
-med udvikling når det ikke er muligt at have en AR.Drone fysisk
-tilstede. De enkelte klasser kan også anvendes hver for sig, se*.
-
-“klasse diagram eller lignende”
-
 \pagebreak
 
+\section{Platformens opbygning}
+Platformen består af et antal klasser placeret i et antal
+Python-moduler som beskrives nærmere i det følgende. Her er
+indledningsvis en kort introduktione for overblikket skyld. Der er
+udviklet tre forskellige receiverklasser til at modtage henholdvis video, 
+navdata og WIFI-målinger disse beskrives under
+\nameref{subsec:receivers}, sektion \ref{subsec:receivers}. Der er udviklet to forskellige
+controllerklasser til joystick og keyboard som beskrives i sektion
+\nameref{subsec:controller} \ref{subsec:controller}). Der er
+kontrueret en taskmanager (sektion~\ref{subsec:taskmanager}) med ansvar for at opstarte autonome
+delopgaver heri kaldet task(tasks beskrives i
+sektion~\ref{sec:tasks}). For at styre AR.Dronen skal
+kontrolinterface-klassen bruges. Et simpelt eksempel herpå er allerede
+vist i figur~\ref{fig:pythonimpl1}. Controllerinterface-klassen
+gennemgåes i sektion~\ref{sec:sub:controlinterface}).
+ Med inspiration fra~\cite{lenser:behaviorbasedarchitecture} og
+ \cite{Dey01:ctoolkit} er der udover de allerede nævnte grundreceivere
+ implementeret en virtuel sensor (sektion~\ref{sec:sub:virtuel}) som
+ bruges til at fortolke basedataen fra de almindelige receivere.
+
+Platformens klasser instantieres, startes og tilgåes som udgangspunkt
+gennem droneklassen (dronemodulet). På denne måde kan udviklere der ønsker at
+anvende platformen blot importere drone modulet og instantiere
+droneklassen, hvorefter der er let adgang til diverse sensordata, se
+sekvensdiagrammet i figur~\ref{fig:initialiseringssekvens}.
+\begin{framefig}
+  \centering
+  \includegraphics[width=1.0\textwidth]{grafik/initialisering.png}
+  \caption{Klientapplikationens entrypoint til platformen, er gennem
+    instantiering af drone-klassen, som sørger for at instantiere
+    resten af objekterne og processerne i platformen.}
+  \label{fig:initialiseringssekvens}
+\end{framefig}
+Udover ovenstående er der lavet et testdevice modul, som anvendes i forbindelse
+med udvikling, når det ikke er muligt at have en AR.Drone fysisk
+tilstede. Sektion~\ref{sec:sub:testdevice} beskriver muligheden for at
+simulere output fra AR.Dronen gennem testmodulet.
+% De enkelte klasser kan også anvendes hver for sig, se*.
+
+%“klasse diagram eller lignende”
+
+
 \subsection{Receivers}
+\label{subsec:receivers}
 Vores receivers er abstraktioner over de fysiske hardwaresensorer på
 AR.Dronen. Receivernes opgaver er at initialisere UDP-kommunikationen
 med AR.Dronen ved at sende en startbesked og herefter modtage de
-datapakker AR.Dronen sender, desuden skal datastrømmen holdes i live
+datapakker AR.Dronen sender. Desuden skal datastrømmen holdes i live
 ved at sende startbeskeden i faste intervaller. 
-Alle vores receiverklasser nedarver fra en baseklasse der indkapsler
+\begin{framefig}
+  \centering
+  \includegraphics[width=1.0\textwidth]{grafik/receiveruml.png}
+  \caption{Klassehierakiet for receiverklasser. Nedarvende klasser kan
+    specialisere sig ved at override de to metoder
+    \code{on\_receive\_data} og \code{on\_request\_data}.
+  \label{fig:receiveruml}
+\end{framefig}
+Receiverklasser nedarver fra en baseklasse: Receiver (se figur \ref{fig:receiveruml}), der indkapsler
 den basale receiverfunktionalitet. For bedre at kunne udnytte en
-multicore processor er denne baseklasse er implementeret som en
+multicore processor er denne baseklasse implementeret som en
 selvstændig proces ved hjælp af Pythons
 multiprocessing-modul. Receiverprocessen kommunikerer ved hjælp af en
 delt liste, som anvendes både til at overføre signaler og data.  For
 at tilpasse de enkelte receivere implementerer disse specifikke
-metoder(for eksempel til afkodning af den specifikke type data) der
+metoder (for eksempel til afkodning af den specifikke type data) der
 kaldes på bestemte tidspunkter under det generelle receiverloop.
  
 \subsubsection{Navdatareceiver}
-Navdatareceiveren modtager navigationsdata(højde, hastighed mm.) fra
+Navdatareceiveren modtager navdatastrøm(højde, hastighed m.m.) via UDP fra
 AR.Dronen og decoder denne, i forhold til de strukturer der findes
-beskrevet i **filnavn** fra Parrots SDK  
+beskrevet i \todo{**filnavn**} fra Parrots SDK \todo{reference cite}
+navdata\_common.h
+%https://projects.ardrone.org/embedded/ardrone-api/d9/d3d/navdata__common_8h-source.html
 
 \subsubsection{Videoreceiver}
-Videoreceiveren modtager og afkoder AR.Dronens videostrøm, afkodningen
-foregår på baggrund af den process der nævnes i **AR.Drone dev
-guide**. Formatet der sendes i minder meget om JPEG formatet og
+Videoreceiveren modtager og afkoder AR.Dronens videostrøm. Afkodningen
+foregår på baggrund af den process der nævnes i \todo{ **AR.Drone dev
+guide** sektion 7.2 side 43}. Formatet der sendes i minder meget om JPEG formatet og
 forfatteren til den algoritme vi har tilpasset, spekulerer
 i~\cite{electronic:parrotforum2} om det ville være muligt at anvende
 en decideret JPEG decoder til afkodningen. Dette kunne gøre det muligt
-at anvende et optimeret C bibliotek til formålet og dermed øge
-afkodningshastigheden og desuden eliminere vores afhængighed af Psyco
-Python til at speede denne afkodning op.
+at anvende et optimeret C bibliotek til formålet for derved at øge
+afkodningshastigheden og samtidig eliminere afhængigheden af Psyco som
+kun giver effektivitet på 32-bit platformen.
 
-\subsubsection{WIFIreceiver}
-Som de andre receivere modtager wifireceiveren en datastrøm fra
-AR.Dronen, wifistrømmen er dog en tilføjelse vi har lavet og formatet
-der skal afkodes er blot en tekststreng bestående af en mac-adresse og
+\subsubsection{WIFI-receiver}
+Som de andre receivere modtager WIFI-receiveren en datastrøm fra
+AR.Dronen. WIFI-strømmen er dog en tilføjelse vi har lavet og formatet
+der skal afkodes er blot en tekststreng bestående af en MAC-adresse og
 en signalstyrke, der modtages således en pakke for hver pakke
-snifferprogrammet opsnapper. Wifireceiveren skiller sig ud fra de
+det indlejrede WIFI-sensor-program(beskrevet i
+sektion~\ref{sec:sub:sub:wifisensor}) opsnapper. WIFI-receiveren
+skiller sig ud fra de 
 andre receivere, ved at placere de modtagne adresse/signal-par i en
 liste og holde denne liste opdateret med de nyeste signalværdier for
 hver adresse, for hver adresse gemmes desuden de sidste *X* modtagne værdier,
@@ -1322,6 +1360,10 @@ hjælp af software og at der derfor er stor sandsynlighed for at metoden
 ikke virker pålideligt\cite{electronic:parrotforum1}.
 
 \subsection{Kontrolinterface, AT-kommando Python interface}
+\label{sec:sub:controlinterface}
+\todo{Uddybes en del, med referencer til eksempler med AT-kommando
+  beskeder. Scratch that, reference til det simple ekempel med python
+  fjernstyring i firkant figur~\ref{fig:pythonimpl1}}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
 gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
@@ -1335,37 +1377,47 @@ Ved at sende al kontrolkommunikation gennem interfacet, behøves vi
 ikke heller ikke at tænke på detaljer som sekvensnumre og
 watchdog-beskeder, da disse håndteres transparent af systemet.
   
-Vores interface(\todo{REF TIL EGEN KODE}) definerer en række metoder til at
+Vores interface(\todo{REF TIL EGEN KODE controllers.py}) definerer en række metoder til at
 kontrollere dronens opførsel og bevægelser. Interfacet kan i det
 simpleste tilfælde anvendes direkte fra Pythons interpreter, men
 fungerer også som en del af vores grundlæggende platform.
 
 \subsection{Controllers}
+\label{subsec:controller}
 Selvom det er muligt, er det ikke praktisk anvendeligt at brugeren skal
 afvikle scripts, der anvender kontrolinterfacet, for hver ønsket
-bevægelse(som det ses i figur~\ref{fig:pythonimpl1}), i stedet har vi
-implementeret to controllere til at tage mod input fra brugeren. Vi
+bevægelse (som det der er beskrevet i eksemplet i
+figur~\ref{fig:pythonimpl1}), i stedet er der implementeret to
+controllere til at tage mod input fra brugeren. Via
 en keyboardcontroller der lytter efter input
 fra tastaturet og en joystickcontroller der er tilknyttet en fysisk
 Xbox360-controller (se figur~\ref{fig:xboxlayout}).
 
-Vi har mulighed for at starte systemet op med begge
-controllere på samme tid, eller undlade en eller flere. Under
-udviklingen af systemet har vi oftest anvendt begge controllere
-sideløbende, da de komplimenterer hinanden. Det er også muligt at
-anvende platformen helt uden controllere, og udelukkende anvende
+Man kan starte systemet op med begge controllere på samme tid, eller
+undlade en eller begge. Under udviklingen af systemet har vi oftest
+anvendt begge controllere sideløbende, da de komplimenterer hinanden.
+Man kan som sagt anvende platformen helt uden controllere, og udelukkende anvende
 taskmanageren til at kontrollere AR.Dronen, men skulle der i det
 tilfælde ske noget uforudset under udførslen af en opgave, vil der
-ikke være nogen mulighed for at bringe AR.Dronen manuelt ned. 
+ikke være nogen mulighed for at bringe AR.Dronen manuelt (og sikkert) ned. 
+
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.6\textwidth]{grafik/controlleruml.png}
+  \caption{Klassehieraki for klasser der nedarver fra
+    Controller-klassen. Underklasser af Controller er kendetegnet ved
+    at have adgang til styring af AR.Dronen gennem controlinterfacet.}
+  \label{fig:controlleruml}
+\end{framefig}
 
 Begge controllerklasser nedarver fra en grundlæggende
-controllerklasse (Controller), denne er implementeret som en tråd der med et givent
-tidsinterval kalder en kontrolmetode(\code{process\_events()}). Den simple
+controllerklasse: Controller (se figur~\ref{fig:controlleruml}). Denne er implementeret som en tråd der med et givent
+tidsinterval kalder en kontrolmetode (\code{process\_events()}). Den simple
 opbygning betyder, at hvis man ønsker at implementere en anden type
 controller, er det nok at nedarve Controller og implementere
-\code{process\_events()} metoden. Da python behandler metoder som
+\code{process\_events()} metoden. Da Python behandler metoder som
 førsteklasses objekter, er det let at lade en controller skifte mellem
-forskellige tilstande, dette gøres ved at kalde \code{set\_control\_method} med
+forskellige tilstande. Dette gøres ved at kalde \code{set\_control\_method} med
 en ny kontrolmetode som argument. 
 
 \subsubsection{Joystickcontroller}
@@ -1411,6 +1463,7 @@ en oversigt over tråde i programmet('t'), samt til at starte opgaver
 på autocontrolleren('1', '2' og '3'). 
 
 \subsection{Taskmanager}
+\label{subsec:taskmanager}
 Taskmanagerklassen startede ud som en almindelig controller, men er endt
 som en mere selvstændig del af platformen. Taskmanageren skiller sig
 ud ved ikke, i modsætning til joystick- og keyboardcontrollerne, at
@@ -1420,12 +1473,14 @@ forudspecificerede opgaver(tasks) og stoppe dem igen, samt at
 facilitere beslutningen om hvilken task der har lov til at bevæge AR.Dronen. 
 
 \subsection{Testdevice}
-Dette modul muliggør gennemførelsen af simple eksperimenter i et
+\label{sec:sub:testdevice}
+Dette modul muliggør gennemførelsen af simple simuleringseksperimenter i et
 test miljø. Grundideen bag modulet er, at man skal kunne optage, ikke
 bare film, men alle sensoroutput fra en flyvning med AR.Dronen, for så
 senere at kunne afspille hele flyvningen igen. Selve afspilningen
 foregår næsten transparent for resten af platformen, receiverne skal
-stadig initiere kommunikationen(nu blot med testdevicet), forbindelsen
+stadig initiere kommunikationen (nu blot med testdevicet og ikke den
+reelle AR.Drone), forbindelsen
 skal stadig holdes i live og dataen der modtages skal stadig
 afkodes. De eneste synlige forskelle der er mellem test og
 live-sessions er timing og hastighed, den første fordi vi ikke har

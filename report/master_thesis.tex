@@ -1118,7 +1118,7 @@ gennem en PC (altså ikke iPhone, iPad el. lign.) og ved hjælp af
 prædefinerede opgaver som beskrives nærmere i sektion~\ref{sec:tasks}.
 
 \section{Platformsadgang via Python}
-Python sproget blev i første omgang valgt for lette tilgængelighed for
+Python sproget blev i første omgang valgt for lette tilgængeligheden for
 brugeren. Et af målene med specialet er, at stille en let anvendelig og
 let udbyggelig platform til rådighed for udviklermiljøet omkring
 AR.Dronen. 
@@ -1654,10 +1654,6 @@ et program til at bygge de kort der anvendes af vores FollowTourTask(Mapcreator)
 og et program til at instantiere, kombinere og afvikle Tasks(Taskcreator).
 
 \section{Sensor display}
-startes ved...
-har 4 forskellige modes
-kan optage rå datapakker
-
 \begin{framefig}
   \subfigure[Navdata display]{\includegraphics[width=0.49\textwidth]{grafik/guinav.png}
     \label{fig:navdatadisplay}}
@@ -1669,16 +1665,65 @@ kan optage rå datapakker
     \label{fig:wifidisplay}}
  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
   \subfigure[WIFI samples display]{\includegraphics[width=0.49\textwidth]{grafik/guisamples.png}
-    \label{fig:videodisplay}}
+    \label{fig:sampledisplay}}
  
   \label{fig:sensordisplay}
   \caption{derp}
 \end{framefig}
 
+Sensordisplay-programmet er implementeret i
+sensordisplay.py,~\cite{github:sensordisplay}. Programmet anvender et
+drone-objekt til at få adgang til AR.Dronens
+sensorstrømme. Brugeren vælger hvilken sensorstrøm der ønskes
+præsenteret ved at trykke på en af de fire radio buttons(Navdata,
+Video, WIFI eller WIFI samples), som aktiverer hver deres
+præsentationstilstand. Hvis brugeren ønsker at indsamle datapakker til
+anvendelse i testtilstand, kan dette gøres ved at trykke på knappen
+'Capture Sensor Data'. De rå datapakker vil så blive gemt ved
+programmets afslutning og kan herefter bruges af det implementerede
+testdevice, se sektion~\ref{sec:sub:testdevice}.
+
+Når navdatastrømmen er aktiv præsenteres brugeren for et billede som
+det på figur~\ref{fig:navdatadisplay}. På dette billede findes
+oplysninger såsom højde, hastighed, samt vinklerne $\theta$, $\phi$ og
+$\psi$. Desuden vises oplysninger om AR.Dronens umiddelbare tilstand,
+såsom motortilstand, ultralydstilstand og om hvorvidt førnævnte vinkler er
+indenfor de tilladte grænser.
+
+Når videostrømmen er aktiv vises et billede som det på
+figur~\ref{fig:videodisplay}. Afhængig af hvilken videostrøm der
+modtages eller om der løbende skiftes videostrøm, vil en af billedrammerne
+der vises muligvis være sort. Hvis der løbende skiftes videostrøm,
+vises det nyeste billede fra hver videostrøm i de to billedrammer.
+
+Hvis WIFI-sensorprogrammet(beskrevet i sektion~\ref{sec:sub:sub:wifisensor}), er startet på AR.Dronen og
+brugeren har valgt at vise WIFI-strømmen, vil brugeren blive
+præsenteret for et billede som det på figur~\ref{fig:wifidisplay}. Her
+ses en søjle der repræsenterer den sidst kendte signalstyrke for hver
+erkendt WIFI-kilde. I denne præsentationstilstand er der desuden mulighed for
+at indsamle signalstyrkesamples og sætte en mål-signalstyrkesample. 
+
+Disse indsamlede signalstyrkesamples kan sammenlignes, både med hinanden og
+mål-signalstyrkesamplen, dette gøres i den fjerde og sidste 
+præsentationstilstand. I denne tilstand, vises en søjle for hver
+WIFI-kilde og i denne søjle indikeres kildens signalstyrke for hver
+indsamlet sample, se figur~\ref{fig:sampledisplay}.
+
+Sensordisplay programmet startes fra en linuxkommandolinie, som vist
+på figur~\ref{fig:sensordisplayrun}
+\begin{framefig}
+\begin{verbatim}
+$ ./sensordisplay.py
+  
+  eller hvis programmet ønskes anvendt i testtilstand
+
+$ ./sensordisplay.py -t
+\end{verbatim}
+\caption{Afvikling af sensordisplay programmet fra en linuxkommandolinie.}
+\label{fig:sensordisplayrun}
+\end{framefig}
+
 \section{Mapcreator}
-startes ved
-har to modes
-gemmer output som
 \label{sec:mapcreator}
 \begin{framefig}
   \centering
@@ -1688,7 +1733,56 @@ gemmer output som
   \subfigure[Tour editor]{\includegraphics[width=0.47\textwidth]{grafik/maptour.png}
     \label{fig:maptour}}
     \label{fig:mapcreator}
-  \caption{herp}
+  \caption{Mapcreator-værktøjets to redigeringstilstande, world og tour.}
+\end{framefig}
+Mapcreator er et værktøj til at oprette og redigere map-objekter,
+map-objekter bruges af FollowTourTasks til at navigere
+efter. Mapcreator har to redigeringstilstande, world og tour, som kan
+vælges ved at trykke på det tilsvarende faneblad øverst i billedet. De
+to tilstande ses på figur~\ref{fig:mapcreator}
+
+I world-redigeringstilstanden kan brugeren tilføje, flytte eller fjerne
+punkter fra kortet. Meningen med punkterne er, at de skal matche en
+visuel markør i den fysiske opstilling, som på
+figur~\ref{fig:simplesetup}. Internt i map-objektet vedligeholdes en
+liste med vinklerne mellem alle punkter, når punkter tilføjes, flyttes
+og slettes opdateres denne liste også automatisk. Udover punkternes
+fysiske position i forhold til hinanden, kan man også tilføje
+WIFI-signalstyrkemålinger(fingerprint) til punkterne ved at trykke på
+'Add/update WIFI sample'-knappen og herefter trykke med musen på det
+punkt der ønskes markeret. Hvis WIFI-signalstyrkemålingen
+ønskes slettet, trykkes først på 'clear WIFI sample' og derefter på
+punktet. World-skærmbilledet kan ses på figur~\ref{fig:mapworld}.
+
+I tour-redigeringstilstanden kan brugeren ikke længere redigere
+punkterne, til gengæld kan disse forbindes til en tour. Dette gøres
+ved at holde 'ctrl' nede og så trække en linie med musen mellem to punkter. Det
+er kun muligt at forbinde til enten det første eller sidste punkt i en
+eksisterende tour. Det er muligt at fjerne liniesegmenter fra en tour
+ved at markere segmentet med musen og herfter trykke på knappen
+'Delete Segment'. Ved at markere et liniesegment og trykke enten
+'Add/remove A' eller 'Add/remove B' kan man markere, at dette
+liniesegment tilhører en specifik type. På sigt er det meningen at
+FollowTourTask skal kunne vælge en bevæge-algoritme på baggrund af
+denne information. Tour-skærmbilledet kan ses på figur~\ref{fig:maptour}.
+
+Når programmet sluttes, gemmes map-objektet i filen
+./testdata/map.data ved hjælp af Pythons pickle-modul. I map klassens
+constructor søges efter denne fil og hvis den findes, indlæses
+map-objektets state fra denne.
+
+Som sensordisplay-værktøjet, startes mapcreator-værktøjet fra en linuxkommandolinie, som vist
+på figur~\ref{fig:mapcreatorrun}.
+\begin{framefig}
+\begin{verbatim}
+$ ./mapcreator.py
+  
+  eller hvis programmet ønskes anvendt i testtilstand
+
+$ ./mapcreator.py -t
+\end{verbatim}
+\caption{Afvikling af mapcreator programmet fra en linuxkommandolinie.}
+\label{fig:mapcreatorrun}
 \end{framefig}
 
 \section{Taskcreator}

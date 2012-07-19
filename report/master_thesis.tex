@@ -62,11 +62,11 @@ In english...
 %Indeholder og gennemgår i det følgende (på dansk).
 %-Kort intro hvad vil vi gøre...
 Dette speciale handler om at klarlægge muligheder for at gøre en
-quadrotor%\cite{electronic:wiki_quadrotor}
+quadrotor %\cite{electronic:wiki_quadrotor}
  delvis selvflyvende i et
 indendørsmiljø. Mere specifikt handler det i første omgang om at
 kontruere en base i software som der kan bygges videre på senere ved at
-udnytte en AR.Drones%\cite{electronic:ardrone}
+udnytte en AR.Drones %\cite{electronic:ardrone}
  indbyggede sensorapparat
 og kontrolinterface. I anden omgang handler det om at undersøge
 hvorledes sensorapparatet ombord på AR.Dronen kan udnyttes til at
@@ -698,7 +698,7 @@ og en texteditor(Vi) der gør det muligt at redigere filer direkte på
 AR.Dronen. 
 
 
-\subsection{AR.Dronens styreprogram}
+\subsection{AR.Dronens styreprogram fra Parrot}
 \label{sssec:program.elf}
 Det styreprogram der står for selve motorkontrollen, transmitteringen af data og
 bearbejdning af sensordata i forbindelse med flyvning er implementeret
@@ -937,7 +937,7 @@ Arbejdet med at installere et yderligere netværk på AR.Dronen
 resulterede i et \emph{WIFI-sensor}-program der køre på AR.Dronen. Det
 ny program henter WIFI-pakker som det indstallerede
 netværksinterface henter fra luften. De opsnappede WIFI-pakker skilles
-ad og MAC\fotnote{Media Access Control}-adressen på pakkens afsender samt signalstyrken puttes i en ny
+ad og MAC\footnote{Media Access Control}-adressen på pakkens afsender samt signalstyrken puttes i en ny
 besked, som afsendes fra AR.Dronen. De afsendte pakker er del af en sensorstrøm der
 ligner det der ellers kommer fra AR.Dronen, ie. navdata og video.
 
@@ -1330,7 +1330,7 @@ ved at sende startbeskeden i faste intervaller.
   \includegraphics[width=1.0\textwidth]{grafik/receiveruml.png}
   \caption{Klassehierakiet for receiverklasser. Nedarvende klasser kan
     specialisere sig ved at override de to metoder
-    \code{on\_receive\_data} og \code{on\_request\_data}.
+    \code{on\_receive\_data} og \code{on\_request\_data}.}
   \label{fig:receiveruml}
 \end{framefig}
 Receiverklasser nedarver fra en baseklasse: Receiver (se figur \ref{fig:receiveruml}), der indkapsler
@@ -1676,8 +1676,8 @@ lokationer(bestående af indsamlede WIFI-signalstyrker, markørbeskrivelse og koor
 rutebeskrivelse bestående af en liste med lokationer. Kortet
 indeholder desuden en fortegnelse over vinkelretninger mellem alle
 lokationspar. Kort og rutebeskrivelser oprettes let ved hjælp af
-Mapcreator-værktøjet beskrevet i \ref{}. For at teste forskellige de lokaliseringsmetoder har vi
-anvendt HoverTrackTasks(se section \ref{sssec:hovertracktask}) og
+Mapcreator-værktøjet beskrevet i \todo{\\ref{}}. For at teste forskellige de lokaliseringsmetoder har vi
+anvendt HoverTrackTasks(se section \ref{sssec:hovertrack}) og
 FollowTourTasks(se section \ref{sssec:followtourtask}).
 
 \subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
@@ -1687,7 +1687,7 @@ Som nævnt i \ref{sec:udvidelse}
 \subsubsection{WIFI-fingerprinting algoritme}
 \label{sssec:wifialgo}
 
-http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=1381942&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D1381942
+%http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=1381942&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D1381942
 
 \begin{table}[H]
   \begin{center}
@@ -2226,11 +2226,15 @@ Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi ka
 Evaluering: at det har været svært at finde videnskabelige datalogiske
 kilder af høj troværdighed omkring AR.Dronen ; in part privat
 virksomhed properitær firmware / arkitektur, meget information fra
-hacker, tinker, DIY fora.  Tilgængel nogle videnskabelige artikler
+hacker, tinker, DIY fora.  Til gengæld nogle videnskabelige artikler
 omkring hvordan man implementere en algoritme ovenpå en allerede
 antaget platform som AR.Dronen...
 
 \section{Perspektivering}
+til prisen er ar.droen ok, men virker måske ikke så godt til indendørs / præcision / turbulens ift lokationskrav, men så et andet brugsscenarie, noget turis-happening som flyv en tur på stævnsklint for 100 kroner, se andres optagede videoer *billede*,
+reference til fårehyrde-robot?
+
+eksempel argumentation på hvorfor AR.Dronen ikke virker som videnskabelig platform, for stor og klumpet, ny forskning i quadrokopter viser det også, eg. swarms med mikrokopter.
 
 \section{Fremtidig arbejde}
 

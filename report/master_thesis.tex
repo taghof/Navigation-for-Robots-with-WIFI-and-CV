@@ -2329,7 +2329,7 @@ omgivelser til pathplanning. Videnen om omgivelserne bruge til at
 indsnævre de optiske strukture (perspective cues) der skal søges og
 orienteres efter.
 
-\paragraph{Vanishing-point, et kendetegn for korridor}
+\paragraph{Vanishing-point, et kendetegn for korridor}\newline
 Algortimen virker ved at lede efter et billedes
 fælles-forsvindingspunkt.
 
@@ -2340,7 +2340,7 @@ at der hvor de diagonale liner skærer hinanden er der ofte et
 sammenfald med enden af korridoren i billedet.
 
 %metode
-\paragraph{Filtrering-processen}
+\paragraph{Filtrering-processen}\newline
 Første skridt når man står med et rå billede og vil undersøge om der er
 en korridor er først at filtrere det for at finde de lige
 linier. Hernæst at frasortere de vandrette og lodrette, men fordi
@@ -2356,28 +2356,88 @@ gemmes for hvert gitterpunkt i et 2 dimensionelt array af form $n
 Den celle i det 2 dimensionelle array med størst værdi stemmer ofte
 overens med cellekoordinatet for billedets forsvindingspunkt.
 Processen gennemgåes nærmere i det følgende.
-%hvad er der i de følgende uddybbende sektioner herunder?
 
-\subsektion{At finde lige linier}
-Det at finde linier foregår i to skridt, gennem to forskellige
-algoritmer. I specialet er der gjort stort brug af open source
-computer vision biblioteket opencv, \cite{},
-kanter . Det
-foregår gennem to skridt
+%hvad er der i de følgende uddybbende sektioner herunder?
+%(+metode) sub?
+%+-at finde lige linier, , subsub?
+%+-Augmentering med $\phi$
+%+-Celle med flest linie-skæringspunkter
+%+-troværdighed / trustworthyness
+
+%+At finde kanter i et billede
+%+Houghlinier
+
+%+resultater
+%+erfaringsudbytte
+
+
+\subsection{At finde lige linier}
+Det at finde linier foregår i to skridt via 2 forskellige
+algoritmer. Til eksperimentet er open source computer vision bibliotekets, opencv,
+\cite{opencv:main} implentation af et Canny-filter, \cite{Canny1986}, brugt til at finde
+kanter med. Udfra kanterne er der brugt en OpenCV implementation af
+Hough-transforms, \cite{duda1972houghline}, til at finde linier med polar-koordinater.
+
+Figur~\ref{fig:houghprocess} viser de forskellige trin i
+filtreringsprocessen fra rå billede til en samling af diagonale linier
+på polær form. Kantdetekteringen i figuren \ref{fig:houghprocess}b er
+lavet med en Sobelfunktion, men i Python-implementationen er der brugt
+et Canny-filter.
 \begin{framefig}
   \centering
-  \includegraphics[width=0.99\textwidth]{grafik/vanish_operation.png}
-  \caption{(a) Et billede af en gang påført gauss-sløring (b) Billede a efter kantdetektering (her et sobel-filter) (c) Hough-linier, udregnes udfra kantpunkterne i billede b (d) Vandrette og lodrette hough-linier sorteres fra billede c.}
+  \subfigure[Et billede af en gang påført gauss-sløring]{
+    \includegraphics[width=0.22\textwidth]{grafik/vanish_operation_a.png}
+    \label{fig:vanishopa}}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfigure[Billede a efter kantdetektering (her et sobel-filter)]{
+    \includegraphics[width=0.22\textwidth]{grafik/vanish_operation_b.png}
+    \label{fig:vanishopb}}
+  ~ 
+  \subfigure[Hough-linier, udregnes udfra kantpunkterne i billede b]{
+    \includegraphics[width=0.22\textwidth]{grafik/vanish_operation_c.png}
+    \label{fig:vanishopc}}
+  ~ 
+  \subfigure[Vandrette og lodrette hough-linier sorteres fra billede c]{
+    \includegraphics[width=0.22\textwidth]{grafik/vanish_operation_d.png}
+    \label{fig:vanishopd}}
+  ~ 
   \label{fig:houghprocess}
+  %\caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
 \end{framefig}
 
-% merge: For senere at implementere det som en virtuel sensor som i sektion~\ref{sec:sub:virtuel}.
-% merge: Lidt omkring hvordan man kan detektere at man er i en lang korridor. Plus nogle referencer til andre hvorfra der er kommet inspiration.
+\subsection{Augmentering med $\phi$}
+Hver af de fundne linier har en hældning som herefter sammenlignes med
+grænseværdier opsat omkring variabelværdien $\phi$. Frasorteringen
+gennem grænseværdierne gør at problemet der søges løst kan neddeles
+til kun at omhandle det at finde området med flest
+linie-skæringspunkter blandt de diagonale linier i
+billedet. På figur~\ref{fig:phiaugmentet} kan man se $\phi$-vinklen
+augmenteret på billedet. Den tykke blå-farvede linie indikere det
+vandrette plan i billedet og er en funktione af $\phi$.
 
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/out_put_2jpg.png}
+  \caption{Billedet er opdelt i $11 \times 11$ celler. I hver celle
+    gemmes antallet af linier som skære hinanden. I dette tilfælde er
+    cellen med flest skærringer godt overensstemmende med korridorens
+    forsvindingspunkt i billedet.}
+  \label{fig:phiaugmentet}
+\end{framefig}
+
+\subsection{Celle med flest linie-skæringspunkter}
+to billeder
 finde edges -> finde houghlines -> sortere linier (diagonale)
 -> finde skæringspunkter blandt diagonale linier, tælle område med
 flest skæringspunkter
 
+
+\subsection{troværdighed / trustworthyness}
+observationer har vist at, antallet af skæringspunter skal være over 85, og der skal være 
+
+simplificeret løsning der virker, anden tilgang end
+\cite{single_img_pespective_cues} hvor der bruges mere
+resourcekrævende bayesian post pre knowledge / viterby-algoritme.
 
 ? udledningen af højere abstraktionslag virtuel sensor
 Dey01 et al., \cite{Dey01:ctoolkit} context-widget
@@ -2386,20 +2446,16 @@ sammenlign med anden viden - hastigheden $v_x$ og $v_y$
 
 ? senere at implementere det som en virtuel sensor som i sektion~\ref{sec:sub:virtuel}.
 
-? referencer til andre hvorfra der er kommet inspiration.
 
 
 %implementation !how did we solve it!
 introtext
 
-næste skridt
-+augmenter med phi
-*ny figur med phi AUgmentet*
-
 
 
 \subsection{At finde kanter i et billede}
-
+Vi valgte canny fordi kantmarkeringerne af et Sobelfilter er bredere end
+med Canny. simpel forklaring med kantdetektering nøjes med 1 dimension.
 \begin{framefig}
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/kant_detektering1a.png}
@@ -2460,7 +2516,15 @@ af gradienten og finder maximum ved den anden afledtes skærring med 0.
   \label{fig:polar2cartesian}
 \end{framefig}
 
+
+\subsection{Resultater}
+Testmålinger forsøg viser at den nuværende implementation har en
+virkningsgrad på ...
+lavet en opstilling hvor resultatet gav at den fandt xxx ud af yyy tilfældende.
+
+
 %konklusion af korridor detektor
+\subsection{Erfaringsudbytte}
 
 \paragraph{virtuelle sensore} kan, som nævnt i beskrivelsen i
 sektion~\ref{sec:sub:virtuel}, bruges til at udlede højere niveau

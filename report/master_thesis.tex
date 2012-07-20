@@ -66,7 +66,7 @@ quadrotor %\cite{electronic:wiki_quadrotor}
  delvis selvflyvende i et
 indendørsmiljø. Mere specifikt handler det i første omgang om at
 kontruere en base i software som der kan bygges videre på senere ved at
-udnytte en AR.Drones %\cite{electronic:ardrone}
+udnytte en AR.Drones %\cite{electronic:ardrone} fra Parrot
  indbyggede sensorapparat
 og kontrolinterface. I anden omgang handler det om at undersøge
 hvorledes sensorapparatet ombord på AR.Dronen kan udnyttes til at
@@ -132,6 +132,8 @@ perfekt stedfortræder i farlige, kedelige, eller belastende
 situationer. 
 
 \paragraph{Omkring AR.Dronen} %problem domæne,
+\todo{hvis læserens første møde med ar.dronen, så introduceres bedre!
+  + Parrot er producent}
 Grundmotivationen bag specialet har langt af vejen været at ``der skal være et underholdende
 indhold''. Kigger man på hjemmesiden til promovering af Parrots
 AR.Drone, \cite{electronic:ardrone} skinner underholdningfaktoren også
@@ -261,10 +263,15 @@ hjælpemidler til dedikeret støtte i forskellige arbejdssituationer.
 computer monolith, eller mekanisk klumpet platform, men lille hvor
 tilføje / fjerne moduler afhængig af produkt der designes til.
 
-
-%mere? - Minerva museums tourguide robot\cite{Thrun99minerva:a}?
-
-referencer til lignende arbejde, vores forskellig fordi..
+\paragraph{referencer til lignende arbejde}, vores forskellig fordi..
+Minerva museums tourguide robot\cite{Thrun99minerva:a}?
+er lavet til at vise gæster rundt på et museum *billede af Minerva*
+har kamera og afstandsmåler til at se publikum og navigere ift. pupl,
+*billede af ``photoshop'' ar.drone flyvende i l'Louvre*
+hvad ville der ske hvis vi tog samme scenarie og brugte en flyvende
+helikopter istedet, uddyybning at den skulle kunne fjernstyres, optage
+film af flyvning, fjernstyres hjemmefra via et webinterface (nævne
+problematisk hvis andre gæster-måske i konklusion).
 
 
 \section{Teseformulering/mål} % Thomas & Morten, Hvad
@@ -342,6 +349,11 @@ afvikling kommunikation, styring hvem er chef / sensor
 
 \paragraph{Python}
 platform skrevet i python med bibliotek / wrapper til opencv (ffmpeg), pygame, numpy...
+hvorfor valgte vi python, - fordi de er præcist lavet til
+prototype-programmering, evt. nævne at vi er kommet frem til at det i
+fremtiden vil være bedre at skrive en del i C og så lave python
+wrapper ovenpå - cite kunne være til en lærebog kendt af Ole, til at
+lære programmering gennem robotter på nettet...
 
 %%%% Introduction - Metode
 \subsection{Platform samt hjælpeværktøjer} % Thomas & Morten
@@ -1100,7 +1112,12 @@ billede der er indeholdt i det andet, er af noget mindre opløsning end det origi
 frontkameraets, mod $176 \times 144$ pixels originalt). Denne forskel
 i kvalitet har tydeligt en indflydelse på resultatet af diverse
 billedanalysealgoritmer, se sektion~\ref{ssec:smallmarks}.
-
+%
+%% sjovt at vi i begyndelsen af arbejdet hele tiden har sagt at nu
+%% skal vi også huske at teste præcist hvor meget den drifter i yaw
+%% piezo-måleren, men enten aldrig rigtig er kommet til det punkt
+%% eller også kommet forbi det - ved at acceptere det og så styre udenom
+%
 %Derefter finde ud af at jo mindre des mindre inerti kan være indeholdt, mere agile agil/adræt
 %gå fra centraliseret styring til fosøg med decentraliseret, swarm anonymitet, største proble er sanse apparatet, førhen flere ekserne kameraer til observation og feedback af position til flokken, nu forsøg med lokal dataindsamling fra bl.a. Kinect {http://www.ros.org/wiki/kinect}, {pelican quadrotor}
 
@@ -1115,10 +1132,11 @@ understøtte det videre arbejde med AR.Dronen. Platformen skal sikre
 let og effektiv adgang til AR.Dronens sensor output, samt give
 mulighed for at styre AR.Dronen, både manuelt med joystick og tastatur
 gennem en PC (altså ikke iPhone, iPad el. lign.) og ved hjælp af
-prædefinerede opgaver som beskrives nærmere i sektion~\ref{sec:tasks}.
+forprogrammerde sekvenser af bevægelsaer %prædefinerede opgaver
+ som beskrives nærmere i sektion~\ref{sec:tasks}.
 
 \section{Platformsadgang via Python}
-Python sproget blev i første omgang valgt for lette tilgængelighed for
+Python sproget blev i første omgang valgt for at lette tilgængeligheden for
 brugeren. Et af specialet mål er at stille en let anvendelig og
 let udbyggelig platform til rådighed for udviklermiljøet omkring
 AR.Dronen. 
@@ -1252,27 +1270,6 @@ def receive_and_show_picture():
 \label{fig:pythonimpl2}
 \end{framefig}
 
-\subsection{JIT-kompileret afkodning af billeder}
-%%% % % %
-Da Python er et fortolket højniveau sprog kan vi
-naturligvis ikke opnå samme afviklingshastighed som hvis vi havde anvendt C
-eller andre maskinnære sprog.  I forbindelse med afkodningen af video
-fra AR.Dronen anvender vi biblioteket Psyco~\cite{electronic:psyco}
-til netop at øge afviklingshastigheden. Psyco er en form for JIT compiler der lader os
-afvikle umodificeret Pythonkode hurtigere. Til sammenligning vil
-almindelig afviklet Python-kode til afkodning af 100 billeder fra
-AR.Dronens billedstrøm tage omkring 37.569 sekunder men hvis det samme
-Python-kode afvikles med hjælp fra Psyco er afviklingstiden kun 7.075
-sekunder. Ved brug af Psyco kan man altså hente og afkode 5 gange så mange
-billederammer fra AR.Dronen til brug på klienten. Psyco er lavet til
-32 bit maskiner og virker fint der, men desværre har udvikleren af
-Psyco valgt ikke at lave en 64-bit version af biblioteket. Et godt
-future-work projekt ville være at lave en implementation af
-billedeafkodningen i C eller lignende, for så at lave en
-Python-wrapper til brugeren af platformen til både 32 og 64 bit
-maskiner. Det vil være spændende at se om ikke det vil give en endnu
-hurtigere afviklingstid.
-%%%
 
 \pagebreak
 
@@ -1318,13 +1315,13 @@ simulere output fra AR.Dronen gennem testmodulet.
 %“klasse diagram eller lignende”
 
 
-\subsection{Receivers}
+\subsection{Datastrømme-modtagere på klienten}
 \label{subsec:receivers}
-Vores receivers er abstraktioner over de fysiske hardwaresensorer på
+Subklasser af \emph{Receiver} er abstraktioner over de fysiske hardwaresensorer på
 AR.Dronen. Receivernes opgaver er at initialisere UDP-kommunikationen
 med AR.Dronen ved at sende en startbesked og herefter modtage de
 datapakker AR.Dronen sender. Desuden skal datastrømmen holdes i live
-ved at sende startbeskeden i faste intervaller. 
+ved at sende startbeskeden \todo{andet ord end startbesked: watchdog-signal?} i faste intervaller. 
 \begin{framefig}
   \centering
   \includegraphics[width=1.0\textwidth]{grafik/receiveruml.png}
@@ -1343,15 +1340,34 @@ at tilpasse de enkelte receivere implementerer disse specifikke
 metoder (for eksempel til afkodning af den specifikke type data) der
 kaldes på bestemte tidspunkter under det generelle receiverloop.
  
-\subsubsection{Navdatareceiver}
-Navdatareceiveren modtager navdatastrøm(højde, hastighed m.m.) via UDP fra
+\subsubsection{Navdata-modtager}
+\emph{NavdataReceiveren} modtager navdatastrøm (AR.Droens afstand til
+jorden, flyvehastighed i x- og y-retning m.m.) via UDP fra
 AR.Dronen og decoder denne, i forhold til de structs der findes
-beskrevet i header filen \uri{navdata\_common.h}, \cite{ardroneorg:navdatacommonh} fra Parrots åbne API.
+beskrevet i headerfilen \uri{navdata\_common.h}, \cite{ardroneorg:navdatacommonh} fra Parrots åbne API.
 
-\subsubsection{Videoreceiver}
-Videoreceiveren modtager og afkoder AR.Dronens videostrøm. Afkodningen
-foregår på baggrund af den process der nævnes i sektion 7.2 side 43 i
-\cite{techreport:ardroneDevGuide}. Formatet der sendes i minder meget
+\subsubsection{Video-modtager og billedafkoding via Psyco}
+\emph{VideoReceiveren} modtager og afkoder AR.Dronens videostrøm. Afkodningen
+af billederne foregår på baggrund af den process der nævnes i sektion 7.2 side 43 i
+\cite{techreport:ardroneDevGuide}. 
+
+\paragraph{JIT-kompileret afkodning af billeder}
+%%% % % %
+Da Python er et fortolket højniveau sprog er det ikke muligt at opnå
+samme afviklingshastighed som ved afvikling af C eller andre
+maskinnære sprog. I forbindelse med afkodningen af video 
+fra AR.Dronen anvendes biblioteket Psyco~\cite{electronic:psyco}
+til netop at øge afviklingshastigheden. Psyco er en form for JIT
+compiler hvormed man kan afvikle umodificeret Pythonkode hurtigere. Til sammenligning vil
+almindelig afviklet Python-kode til afkodning af 100 billeder fra
+AR.Dronens billedstrøm tage omkring 37.569 sekunder men hvis det samme
+Python-kode afvikles med hjælp fra Psyco er afviklingstiden kun 7.075
+sekunder. Ved brug af Psyco kan man altså hente og afkode 5 gange så mange
+billederammer fra AR.Dronen til brug på klienten. Psyco er lavet til
+32 bit maskiner og virker fint der, men desværre har udvikleren af
+Psyco valgt ikke at lave en 64-bit version af biblioteket. 
+
+Formatet der sendes i minder meget
 om JPEG formatet og 
 forfatteren til den algoritme vi har tilpasset, spekulerer
 i på forumsiden, \cite{electronic:parrotforum2}, om det ville være muligt at anvende
@@ -1360,8 +1376,9 @@ at anvende et optimeret C bibliotek til formålet for derved at øge
 afkodningshastigheden og samtidig eliminere afhængigheden af Psyco som
 kun giver effektivitet på 32-bit platformen.
 
-\subsubsection{WIFI-receiver}
-Som de andre receivere modtager WIFI-receiveren en datastrøm fra
+
+\subsubsection{WIFI-signalstyrke modtager}
+Som de andre receivere modtager \emph{WIFIReceiveren} en datastrøm fra
 AR.Dronen. WIFI-strømmen er dog en tilføjelse vi har lavet og formatet
 der skal afkodes er blot en tekststreng bestående af en MAC-adresse og
 en signalstyrke, der modtages således en pakke for hver pakke
@@ -1389,11 +1406,12 @@ fra receiverne. Den virtuelle sensor bearbejder kontinuerligt eg.
 billeddata for at genkende henholdsvis markører på jorden og
 silhuetter umiddelbart foran AR.Dronen. Sensoren leverer således
 information om AR.Dronens omgivelser på et højere abstraktionsniveau
-end de rå værdier fra receiverstrømmene. For
-at kunne detektere både markører på gulvet og silhuetter er det
+end de rå værdier fra receiverstrømmene. 
+
+For at kunne detektere både markører på gulvet og silhuetter er det
 nødvendigt for sensoren hele tiden at skifte mellem bund- og
-frontkamera \todo{hvorfor to ** morten?}. Dette giver imidlertid problemer for AR.Dronens originale
-program der ved konstante kameraskift løbende øger sit
+frontkamera \todo{hvorfor to ** efter fronkamera morten?}. Dette giver
+imidlertid problemer for Parrots styreprogram der ved konstante kameraskift løbende øger sit
 hukommelsesforbrug indtil Linuxkernen lukker programmet ned. Vores
 målinger viser, at AR.Dronens program kun kan køre mellem ti og tolv
 minutter, såfremt vi samtidig skifter kamera med cirka 5
@@ -1423,10 +1441,18 @@ watchdog-beskeder, da disse håndteres transparent af systemet.
 Python-interfacet: \code{ControllerInterface} i filen \cite{github:controllers} definerer en række metoder til at
 fjernstyre AR.Dronens opførsel og bevægelser. Alt styring af AR.Dronen
 fra platformens tråde går altid forbi den samme ene instans af
-Python-interfacet. Udover at virke i platformen kan interfacet til
+Python-interfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i platformen kan interfacet til
 fjernstyring i det simpleste tilfælde også anvendes alene direkte fra
 Pythons interpreter, som beskrevet i eksemplet
 sektion~\ref{sec:sub:fjernstyrpy}.
+
+\begin{framefig}
+  \centering
+  \includegraphics[width=1.0\textwidth]{grafik/controllerinterface_agregate_uml.png}
+  \caption{Singeltonklassen ControllerInterface til fjernstyring af
+    AR.Dronen.}
+  \label{fig:ciagregateuml}
+\end{framefig}
 
 \subsection{Controllers}
 \label{subsec:controller}
@@ -1518,7 +1544,7 @@ som en mere selvstændig del af platformen. Taskmanageren skiller sig
 ud ved ikke, i modsætning til joystick- og keyboardcontrollerne, at
 arbejde direkte med kontrolinterfacet eller med output fra
 receiverne. Taskmanagerens opgave er udelukkende at starte
-forudspecificerede opgaver (tasks) og stoppe dem igen, samt at
+forudspecificerede opgaver (tasks; som gennemgåes i sektion~\ref{sec:tasks}) og stoppe dem igen, samt at
 facilitere beslutningen om hvilken task der har lov til at bevæge AR.Dronen. 
 
 \subsection{Testdevice}
@@ -2050,54 +2076,107 @@ at vi derfor må anvende andre algoritmer til lokalisering i vores system.
 
 
 %\subsection{Korridor vanishpoint}
-\section{Korridors forsvindingspunkt} % Thomas
+\section{Korridor-detektering} % Thomas
 %Hvad vil vi vise, afvise teste?
 %Hvad kan/skal resultatet bruges til?
 %Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
 %Hvad var resultatet?
 %perspektiver, hvad skal / kan vi bruge den nye viden til?
-%Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
+
 %intro
-Eksperimenterne herover har ind til videre omhandlet tilgange til det
-at genkende abstraktioner på konkrete absolute lokationer. Denne
-sektion beskæftiger sig istedet med udledningen af til relativ viden\todo{andet ord}
-fra rå sensordata.
+Denne sektion omhandler en metode til at genkende gangarealer og
+korridorer gennem frontkameraet på AR.Dronen.
 
-i form af udledning af højere abstrakt viden fra rå data, eller viden
-af lavere abstraktionsniveau ifølge Dey01 et al., \cite{Dey01:ctoolkit}.
-context-widget). 
-Et eksempel på
-relativ viden er hastigheden $v_x$ og $v_y$ som er tilgængelige gennem interfacet til
-AR.Dronen. Hastigheden er udledt af 
-En tilgang er at bruge bundkameraet og få quadrokopteren til at finde et punkt på gulvet og
-svæve over det. En anden tilgang er at teste om quadrokopteren kan orientere sig i forhold
-frontkameraet.
+\paragraph{Målet} 
+for dette eksperiment er at implementere og teste 2
+ting: 1) At finde sandsynligheden for at være i en korridor, og
+2) At finde ud af hvor enden af korridoren (forsvindingspunktet) er.
 
-I ``Minerva'' og ``opticalflow corridor vanishing point'' har robotterne fået
-forskellige handleprocedure afhængigt af hvilket miljø de befinder sig i.
+%mere intr, !det kan bruges til!
+\paragraph{Kontekstuel viden} er hensigtsmæssig at have for at kunne
+træffe funderede beslutninger om navigationen i specifikke
+omgivelser. Derfor vil det være interessant at se om det er muligt at
+implementere en korridor-detektions funktionalitet som senere vil kan
+blive en et virtuelle sensor hieraki.
+Robotten Minerva, \cite{Thrun99minerva:a}, fik lov at lave guidede
+tours på the Smithsonian i 2 
+uger. I eksperimentet var robotten blevet givet forskellige
+opførsler at udfører under forkellige forhold. Eksempelvis skulle den
+så ofte som muligt bruge analogien Coastal-planner, dvs. at følge
+væggene rundt så den havde mulighed for at genkende allerede gemte
+kendemærker. Når coastal-planner ikke var muligt skulle den gå over i
+open-sea mode, hvor den så havde et andet bevæggrundlag.
+Et andet eksempel på forskellige operationstilstande er i,
+\cite{single_img_pespective_cues}, hvor en quadrokopter med
+frontkamera med godt resultat kan kategoriseredens omgivelsertil at
+være i en trappeopgang, et gangareal eller et lille kontor. I
+mostætning til Minerva bruger denne tilgang ikke 2D kort eller
+omgivelser til pathplanning. Videnen om omgivelserne bruge til at
+indsnævre de optiske strukture (perspective cues) der skal søges og
+orienteres efter.
 
-%mål
-Målet for dette eksperiment er at : 2 ting
-1) finde ss. for at man er i en korridor, og
-2) hvor er enden af korridoren (forsvindingspunktet)
+\paragraph{Vanishing-point, et kendetegn for korridor}
+Algortimen virker ved at lede efter et billedes
+fælles-forsvindingspunkt.
 
-For senere at implementere det som en virtuel sensor som i sektion~\ref{sec:sub:virtuel}.
+Hvis et billede viser en korridor vil man i strukturen i billedet
+kunne se at mange linier gå vandret og lodret. En del linier vil gå
+diagonalt i billedet. Det har gennem eksperimentation vist sig, 
+at der hvor de diagonale liner skærer hinanden er der ofte et
+sammenfald med enden af korridoren i billedet.
 
-\
-Lidt omkring hvordan man kan detekte at man er i en lang koridor. Plus nogle referencer til andre hvorfra der er kommet inspiration.
+%metode
+\paragraph{Filtrering-processen}
+Første skridt når man står med et rå billede og vil undersøge om der er
+en korridor er først at filtrere det for at finde de lige
+linier. Hernæst at frasortere de vandrette og lodrette, men fordi
+AR.Dronen ikke altid holder lige i luften skal frasorteringen
+augmenteres med AR.Dronens $\phi$-vinkel\footnote{Husk $\phi$ er den
+  værdi der variere med AR.Dronens hældning sideværts.}. På den måde frasorteres de
+vandrette og lodrette linier fra billedet af gangen og ikke af
+billedrammen. Når man står tilbage med de diagonale linier
+sammenlignes de hver især en-og-en for at finde
+skæringspunkter. Punkterne for skæring tælles sammen og antallet
+gemmes for hvert gitterpunkt i et 2 dimensionelt array af form $n
+\times k$. %$n$ og $k$ er i eksperimentet sat til 11
+Den celle i det 2 dimensionelle array med størst værdi stemmer ofte
+overens med cellekoordinatet for billedets forsvindingspunkt.
+Processen gennemgåes nærmere i det følgende.
+%hvad er der i de følgende uddybbende sektioner herunder?
+
+\subsektion{At finde lige linier}
+Det at finde linier foregår i to skridt, gennem to forskellige
+algoritmer. I specialet er der gjort stort brug af open source
+computer vision biblioteket opencv, \cite{},
+kanter . Det
+foregår gennem to skridt
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/vanish_operation.png}
+  \caption{(a) Et billede af en gang påført gauss-sløring (b) Billede a efter kantdetektering (her et sobel-filter) (c) Hough-linier, udregnes udfra kantpunkterne i billede b (d) Vandrette og lodrette hough-linier sorteres fra billede c.}
+  \label{fig:houghprocess}
+\end{framefig}
 finde edges -> finde houghlines -> sortere linier (diagonale)
 -> finde skæringspunkter blandt diagonale linier, tælle område med
 flest skæringspunkter
+
+
+? udledningen af højere abstraktionslag virtuel sensor
+Dey01 et al., \cite{Dey01:ctoolkit} context-widget
+sammenlign med anden viden - hastigheden $v_x$ og $v_y$ 
+- Hastigheden er udledt af 
+
+? senere at implementere det som en virtuel sensor som i sektion~\ref{sec:sub:virtuel}.
+
+? referencer til andre hvorfra der er kommet inspiration.
+
+
+%implementation !how did we solve it!
+introtext
+
+næste skridt
 +augmenter med phi
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.99\textwidth]{grafik/vanish_operation1.png}
-  \caption{(a) Et billede af en gang påført gauss-sløring (b) Billede a efter kantdetektering (her et sobel-filter) (c) Hough-linier udregnes udfra kantpunkterne i billede b (d) Vandrette og lodrette hough-linier sorteres fra billede c.}
-  \label{fig:houghprocess}
-\end{figure}
-
+*ny figur med phi AUgmentet*
 
 
 
@@ -2109,16 +2188,15 @@ flest skæringspunkter
   \caption{Graf over rød-, grøn-, blå-farveværdier for en linie i
     billedet med pixel indeks $j=67,\ i=\{0,1,\ldots,320-1 \}$. Samt
     pixel intensitet, her givet ved summen af de tre farver for $i$ og
-    $j$. Der hvor grafens hældning er stejl er der stor sandsynlighed for en
+    $j$. Der hvor grafen for intensiteten har stejlest hældning er der stor sandsynlighed for en
     kant i billedet.}
   \label{fig:kanter1}
 \end{framefig}
 
 Kanter i et billede defineres som abrupt skift i farveværdi eller
-lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt
-(se f.eks.\newline
-\uri{http://en.wikipedia.org/wiki/Step\_detection\#Global}), men det
-er en anden tilgang. I dette afsnit beskrives en metode der søger
+lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt,
+  se f.eks., \cite{electronic:wiki_stepdetectglobal}, men det er en
+  anden tilgang. I dette afsnit beskrives en metode der søger 
 lokalt.} mellem naboer af pixels. Kanter er ofte en indikator for
 eksistensen af bl.a. ændringer i dybden af et billede og for
 overfladeændringer m.fl.
@@ -2128,33 +2206,26 @@ imellem tilstødende billedpunkter (pixel) kan ses som en graf af
 højder. De steder hvor der er stor højdemæssig afstand, altså hvor
 hældningen er stejl, er der som oftest en kant at finde.
 
-Til at finde kanter (edges) kan cannyfilteret, \cite{Canny1986}
-anvendes. Det tager et billede og returnere et binært billede
-(sort/hvid). Hvide billedpunkter indikere at der er en kant i det
-oprindellige billede, mens sort betyder at der ikke er ændringer.
-
 Fordi AR.Dronens kamera er med lille opløsning og det billeder af så
 tilpas ringe kvalitet vil det forbedre slutresultatet at bruge et
 båndpasfilter til at lave en ``udglatning'' af
 billedet. Udglatningsoperationen udføres med et gaussisk
-filter\footnote{Fra billedbehandlingsprogrammer som Photoshop og GIMP
-hedder det ``Gaussian blur'' filter.} en
-klokkegraf, \cite{electronic:wiki_gaussklokke}.
+ udglatningsfilter, \cite{electronic:wiki_gaussklokke}, (fra
+ billedbehandlingsprogrammer eg. GIMP\cite{gimp} er funktionen kendt
+ som Gaussian blur).
+
+Til at finde kanter (edges) kan cannyfilteret, \cite{Canny1986}
+anvendes. Det tager et billede og returnere et binært billede
+(sort/hvid). Hvide billedpunkter indikere at der er en kant i det
+oprindellige billede, mens sort betyder at der ikke er ændringer.
 
 Tager man alle pixelpositioner hvor den første afledte er over
 threshold kan man ende op med mange tykke kanter, for at præcisere
 placeringen kan man udtynde dem, ved at søge i retningen af den lokale
 gradient og istedet finde maximum/minimum. Videreudbygninger af
 Cannyfilteret efter 1986 bruger bl.a. endnu en retningsbestemt afledt
-af gradienten og finder maximum ved dens skærring med 0.
+af gradienten og finder maximum ved den anden afledtes skærring med 0.
 
-\begin{framefig}
-  \centering
-  \includegraphics[width=0.90\textwidth]{grafik/derivatives.png}
-  \caption{Se $f(x)$ som lysintensitet per pixellokation $x$. $f'(x)$ og $f''(x)$ er den hhv. første-- og anden-- afledte. Når $f''(x)$ skærre med nul har $f(x)$ den største hældning.
-Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivatives.gif}}
-  \label{fig:derivatives}
-\end{framefig}
 
 % \bigtriangledown^2G_{\sigma}(\bm{x})=\frac{1}{\sigma^3}\left(2-\frac{x^2+y^2}{2\sigma^2}\right)\exp\left(-\frac{x^2+y^2}{2\sigma^2}\right) 
 
@@ -2170,6 +2241,23 @@ Figuren er fundet via google hos \uri{www.cs.utah.edu/\~jmk/simian/img/derivativ
   \caption{En linie beskrevet ved det velkendte almindelige cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i polar koordinatsystem ved en vinkel $\Theta$ og en afstand $\rho$.}
   \label{fig:polar2cartesian}
 \end{framefig}
+
+%konklusion af korridor detektor
+
+\paragraph{virtuelle sensore} kan, som nævnt i beskrivelsen i
+sektion~\ref{sec:sub:virtuel}, bruges til at udlede højere niveau
+kontekstuel information fra rå sensordata. Et hieraki af virtuelle- og
+rå sensore er godt til at præsentere data for mennesker med
+forskellige kontekstuelle fortolkninger ``\textit{Jo mere abstrakt
+information AR.Dronen har adgang til des mere hensigtsmæssigt vil den
+kunne den kunne træffe sine valg om navigering i sine omgivelser}'',
+vil man sige. 
+
+men i ``Minerva'' og ``opticalflow corridor vanishing point'' har robotterne fået
+forskellige handleprocedure afhængigt af hvilket miljø de befinder sig i.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
 
@@ -2234,7 +2322,7 @@ antaget platform som AR.Dronen...
 til prisen er ar.droen ok, men virker måske ikke så godt til indendørs / præcision / turbulens ift lokationskrav, men så et andet brugsscenarie, noget turis-happening som flyv en tur på stævnsklint for 100 kroner, se andres optagede videoer *billede*,
 reference til fårehyrde-robot?
 
-eksempel argumentation på hvorfor AR.Dronen ikke virker som videnskabelig platform, for stor og klumpet, ny forskning i quadrokopter viser det også, eg. swarms med mikrokopter.
+eksempel argumentation på hvorfor AR.Dronen ikke virker som videnskabelig platform, for stor og klumpet, ny forskning i quadrokopter viser det også, eg. swarms med mikrokopter \cite{turpin:swarm}.
 
 \section{Fremtidig arbejde}
 

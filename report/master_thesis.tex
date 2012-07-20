@@ -341,17 +341,15 @@ Nogle bygninger på Katrinebjerg, indendørs...
 hvorfor / uddybende beskrivelse af kontor, gang, openspace
 %% - hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det (relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
 
-\paragraph{PC-linux}
-afvikling kommunikation, styring hvem er chef / sensor
-
-
-\paragraph{Python}
+\subsection{Python}
 platform skrevet i python med bibliotek / wrapper til opencv (ffmpeg), pygame, numpy...
 hvorfor valgte vi python, - fordi de er præcist lavet til
 prototype-programmering, evt. nævne at vi er kommet frem til at det i
 fremtiden vil være bedre at skrive en del i C og så lave python
 wrapper ovenpå - cite kunne være til en lærebog kendt af Ole, til at
 lære programmering gennem robotter på nettet...
+
+\subsection{OpenCV}
 
 %%%% Introduction - Metode
 \subsection{Platform samt hjælpeværktøjer} % Thomas & Morten
@@ -1291,7 +1289,7 @@ gennemgåes i sektion~\ref{sec:sub:controlinterface}).
  Med inspiration fra~\cite{lenser:behaviorbasedarchitecture} og
  \cite{Dey01:ctoolkit} er der udover de allerede nævnte grundreceivere
  implementeret en virtuel sensor (sektion~\ref{sec:sub:virtuel}) som
- bruges til at fortolke basedataen fra de almindelige receivere.
+ bruges til at fortolke datastrømmene fra de almindelige receivere.
 
 Platformens klasser instantieres, startes og tilgåes som udgangspunkt
 gennem droneklassen (dronemodulet). På denne måde kan udviklere der ønsker at
@@ -1367,14 +1365,13 @@ billederammer fra AR.Dronen til brug på klienten. Psyco er lavet til
 32 bit maskiner og virker fint der, men desværre har udvikleren af
 Psyco valgt ikke at lave en 64-bit version af biblioteket. 
 
-Formatet der sendes i minder meget
-om JPEG formatet og 
+Videoformatet der sendes fra AR.Dronen minder meget om JPEG formatet og 
 forfatteren til den algoritme vi har tilpasset, spekulerer
-i på forumsiden, \cite{electronic:parrotforum2}, om det ville være muligt at anvende
+på forumsiden, \cite{electronic:parrotforum2}, om det ville være muligt at anvende
 en decideret JPEG decoder til afkodningen. Dette kunne gøre det muligt
 at anvende et optimeret C bibliotek til formålet for derved at øge
 afkodningshastigheden og samtidig eliminere afhængigheden af Psyco som
-kun giver effektivitet på 32-bit platformen.
+kun fungerer på en 32-bit platform.
 
 
 \subsubsection{WIFI-signalstyrke modtager}
@@ -1821,6 +1818,30 @@ $ ./mapcreator.py -t
   \label{fig:taskcreator}
 \end{framefig}
 
+Taskcreator-værktøjet bruges til at instantiere, kombinere og afvikle
+Tasks. 
+Brugeren kan vælge mellem de tilgængelige Tasks ved at trykke
+på drop-down listen yderst til venstre i den røde firkant på
+figur~\ref{fig:taskcreator}. Herefter kan den valgte Tasks
+standardparametre tilpasses i inputfelterne, bl.a. kan man sætte hver
+Tasks level. En Tasks level beskriver dens prioritet i forhold til
+andre Tasks med samme parent. Den valgte Task
+instantieres ved at trykke 'Add task' og kan fjernes igen, ved at markere den med musen
+og trykke 'Delete task'. Tasks der nedarver fra klassen
+CompoundTask(ParCompoundTask, SeqCompoundTask og FollowTourTask)
+kan indeholde subtasks, subtasks tilføjes ved at holde 'ctrl' nede og
+trække en linie med musen fra CompoundTasken til den ønskede
+subtask. Hvis brugeren ønsker afkoble en subtask fra en CompoundTask,
+gøres det ved at gentage ovennævnte
+procedure. Figur~\ref{fig:taskcreator} viser et opbygget Tasktræ   
+bestående af tre ParCompundTasks og et antal TestTasks. 
+
+Når brugeren har instantieret og kombineret de ønskede Tasks, kan
+disse afvikles, og dermed udføres af AR.Dronen, ved at markere den
+ønskede Task og trykke på 'Execute task'. Afviklingen af en Task eller alle
+Tasks kan stoppes ved at trykke på henholdsvis 'Stop task' eller 'Stop
+all tasks'. 
+ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Eksperimenter - section
 \chapter{Eksperimenter} % Thomas & Morten

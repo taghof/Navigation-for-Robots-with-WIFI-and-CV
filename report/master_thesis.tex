@@ -3,7 +3,7 @@
 \documentclass[12pt]{report}
 %\documentclass[12pt,twoside,openright]{report}
 %\documentclass[10pt,twoside]{report}
-
+ 
 \usepackage[danish]{babel}
 \usepackage[ansinew]{inputenc}
 \usepackage{graphicx}
@@ -23,7 +23,16 @@
 
 %\usepackage{caption}
 %\usepackage{subcaption}
-%\usepackage{url}
+\usepackage[hyphens]{url}
+
+%Define a new 'leo' style for the package that will use a smaller font.
+\makeatletter
+\def\url@leostyle{
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+%% Now actually use the newly defined style.
+\urlstyle{leo}
+
 \usepackage{hyperref}
 
 \newenvironment{framefig}
@@ -79,7 +88,7 @@ for en menneskelig bruger.
 
 \pagebreak
 
-\chapter{Introduktion} %Thomas
+\chapter{Introduktion}  %Thomas
 % på videnskabeligt grundlag identificere, afgrænse og formulere en faglig problemstilling, 
 % definere og opstille testbare hypoteser inden for fagets emneområde, 
 % selvstændigt planlægge og under anvendelse af fagets videnskabelige metode gennemføre et større fagligt projekt, 
@@ -1670,11 +1679,18 @@ AR.Dronen har bevæget sig mellem to positioner.
 \end{framefig}
 
 \chapter{Klientværktøjer} % Morten,
-I dette kapitel gennemgåes de tre værktøjer vi har udviklet i
+I dette kapitel gennemgåes tre værktøjer som er udviklet i
 forbindelse med specialearbejdet. Der er tale om et program til at
 præsentere og visualisere datastrømmene fra AR.Drone(Sensor display),
-et program til at bygge de kort der anvendes af vores FollowTourTask(Mapcreator)
-og et program til at instantiere, kombinere og afvikle Tasks(Taskcreator).
+et program til at bygge de map-objekter der anvendes af vores FollowTourTask(Mapcreator)
+og et program til at instantiere, kombinere og afvikle
+Tasks(Taskcreator). Alle tre værktøjer anvender et drone-objekt som
+vist på figur~\ref{fig:initialiseringssekvens} og kan startes i
+henholdsvis normal- og testtilstand(se
+figur~\ref{fig:sensordisplayrun},\ref{fig:mapcreatorrun} og
+\ref{fig:taskcreatorrun}). Hvis brugeren vælger at starte et 
+værktøj i testtilstand, vil drone-objektet oprette forbindelse til et
+testdevice (beskrevet i sektion~\ref{sec:sub:testdevice}) istedet for AR.Dronen.
 
 \section{Sensor display}
 \begin{framefig}
@@ -1694,11 +1710,11 @@ og et program til at instantiere, kombinere og afvikle Tasks(Taskcreator).
   \caption{derp}
 \end{framefig}
 
-Sensordisplay-programmet er implementeret i
+Sensordisplay-værktøjet er implementeret i
 sensordisplay.py,~\cite{github:sensordisplay}. Programmet anvender et
 drone-objekt til at få adgang til AR.Dronens
 sensorstrømme. Brugeren vælger hvilken sensorstrøm der ønskes
-præsenteret ved at trykke på en af de fire radio buttons(Navdata,
+præsenteret, ved at trykke på en af de fire radio buttons(Navdata,
 Video, WIFI eller WIFI samples), som aktiverer hver deres
 præsentationstilstand. Hvis brugeren ønsker at indsamle datapakker til
 anvendelse i testtilstand, kan dette gøres ved at trykke på knappen
@@ -1706,23 +1722,23 @@ anvendelse i testtilstand, kan dette gøres ved at trykke på knappen
 programmets afslutning og kan herefter bruges af det implementerede
 testdevice, se sektion~\ref{sec:sub:testdevice}.
 
-Når navdatastrømmen er aktiv præsenteres brugeren for et billede som
-det på figur~\ref{fig:navdatadisplay}. På dette billede findes
-oplysninger såsom højde, hastighed, samt vinklerne $\theta$, $\phi$ og
+Når navdatastrømmen præsenteres, ser brugeren et skærmbillede som
+det på figur~\ref{fig:navdatadisplay}. På dette billede ses værdier
+såsom højde, hastighed, samt vinklerne $\theta$, $\phi$ og 
 $\psi$. Desuden vises oplysninger om AR.Dronens umiddelbare tilstand,
 såsom motortilstand, ultralydstilstand og om hvorvidt førnævnte vinkler er
 indenfor de tilladte grænser.
 
-Når videostrømmen er aktiv vises et billede som det på
+Når videostrømmen præsenteres, vises et billede som det på
 figur~\ref{fig:videodisplay}. Afhængig af hvilken videostrøm der
-modtages eller om der løbende skiftes videostrøm, vil en af billedrammerne
-der vises muligvis være sort. Hvis der løbende skiftes videostrøm,
+modtages, eller om der løbende skiftes videostrøm, vil en af
+billedrammerne muligvis være sort. Hvis der løbende skiftes videostrøm,
 vises det nyeste billede fra hver videostrøm i de to billedrammer.
 
-Hvis WIFI-sensorprogrammet(beskrevet i sektion~\ref{sec:sub:sub:wifisensor}), er startet på AR.Dronen og
-brugeren har valgt at vise WIFI-strømmen, vil brugeren blive
+Hvis WIFI-sensorprogrammet er startet på AR.Dronen (beskrevet i
+sektion~\ref{sec:sub:sub:wifisensor}) og WIFI-strømmen præsenteres, vil brugeren blive
 præsenteret for et billede som det på figur~\ref{fig:wifidisplay}. Her
-ses en søjle der repræsenterer den sidst kendte signalstyrke for hver
+ses en søjle der repræsenterer den sidst kendte signalstyrke, for hver
 erkendt WIFI-kilde. I denne præsentationstilstand er der desuden mulighed for
 at indsamle signalstyrkesamples og sætte en mål-signalstyrkesample. 
 
@@ -1742,36 +1758,35 @@ $ ./sensordisplay.py
 
 $ ./sensordisplay.py -t
 \end{verbatim}
-\caption{Afvikling af sensordisplay programmet fra en linuxkommandolinie.}
+\caption{Afvikling af sensordisplay-værktøjet fra en linuxkommandolinie.}
 \label{fig:sensordisplayrun}
 \end{framefig}
 
 \section{Mapcreator}
 \label{sec:mapcreator}
 \begin{framefig}
-  \centering
-  \subfigure[World editor]{\includegraphics[width=0.47\textwidth]{grafik/mapworld.png}
+  \subfigure[World editor]{\includegraphics[width=0.49\textwidth]{grafik/mapworld.png}
     \label{fig:mapworld}}
-  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[Tour editor]{\includegraphics[width=0.47\textwidth]{grafik/maptour.png}
+  ~ 
+  \subfigure[Tour editor]{\includegraphics[width=0.49\textwidth]{grafik/maptour.png}
     \label{fig:maptour}}
     \label{fig:mapcreator}
   \caption{Mapcreator-værktøjets to redigeringstilstande, world og tour.}
 \end{framefig}
-Mapcreator er et værktøj til at oprette og redigere map-objekter,
-map-objekter bruges af FollowTourTasks til at navigere
+Mapcreator er et værktøj til at oprette og redigere map-objekter.
+Map-objekter bruges af FollowTourTasks til at navigere
 efter. Mapcreator har to redigeringstilstande, world og tour, som kan
 vælges ved at trykke på det tilsvarende faneblad øverst i billedet. De
-to tilstande ses på figur~\ref{fig:mapcreator}
+to tilstande ses på figur~\ref{fig:mapcreator}.
 
 I world-redigeringstilstanden kan brugeren tilføje, flytte eller fjerne
 punkter fra kortet. Meningen med punkterne er, at de skal matche en
-visuel markør i den fysiske opstilling, som på
+visuel markør i den fysiske opstilling, som vist på
 figur~\ref{fig:simplesetup}. Internt i map-objektet vedligeholdes en
 liste med vinklerne mellem alle punkter, når punkter tilføjes, flyttes
 og slettes opdateres denne liste også automatisk. Udover punkternes
 fysiske position i forhold til hinanden, kan man også tilføje
-WIFI-signalstyrkemålinger(fingerprint) til punkterne ved at trykke på
+WIFI-signalstyrkemålinger (WIFI-fingerprint) til punkterne ved at trykke på
 'Add/update WIFI sample'-knappen og herefter trykke med musen på det
 punkt der ønskes markeret. Hvis WIFI-signalstyrkemålingen
 ønskes slettet, trykkes først på 'clear WIFI sample' og derefter på
@@ -1779,13 +1794,13 @@ punktet. World-skærmbilledet kan ses på figur~\ref{fig:mapworld}.
 
 I tour-redigeringstilstanden kan brugeren ikke længere redigere
 punkterne, til gengæld kan disse forbindes til en tour. Dette gøres
-ved at holde 'ctrl' nede og så trække en linie med musen mellem to punkter. Det
-er kun muligt at forbinde til enten det første eller sidste punkt i en
-eksisterende tour. Det er muligt at fjerne liniesegmenter fra en tour
+ved at holde 'ctrl' nede og så trække en linie mellem to punkter med musen. Det
+er kun muligt, at forbinde til det første eller sidste punkt i en
+eksisterende tour. Det er muligt, at fjerne liniesegmenter fra en tour
 ved at markere segmentet med musen og herfter trykke på knappen
 'Delete Segment'. Ved at markere et liniesegment og trykke enten
 'Add/remove A' eller 'Add/remove B' kan man markere, at dette
-liniesegment tilhører en specifik type. På sigt er det meningen at
+liniesegment tilhører en specifik type. På sigt er det meningen, at
 FollowTourTask skal kunne vælge en bevæge-algoritme på baggrund af
 denne information. Tour-skærmbilledet kan ses på figur~\ref{fig:maptour}.
 
@@ -1804,7 +1819,7 @@ $ ./mapcreator.py
 
 $ ./mapcreator.py -t
 \end{verbatim}
-\caption{Afvikling af mapcreator programmet fra en linuxkommandolinie.}
+\caption{Afvikling af mapcreator-værktøjet fra en linuxkommandolinie.}
 \label{fig:mapcreatorrun}
 \end{framefig}
 
@@ -1813,15 +1828,16 @@ $ ./mapcreator.py -t
 
 \begin{framefig}
   \centering
-  \includegraphics[width=0.90\textwidth]{grafik/taskcreator.png}
-  \caption{derpa}
+  \includegraphics[width=1.0\textwidth]{grafik/taskcreator.png}
+  \caption{Taskcreator-skærmbillede. Dropdown-listen med tilgængelige Tasks og  parameterinputfelterne
+  til den valgte Task, er markeret med rødt.}
   \label{fig:taskcreator}
 \end{framefig}
 
 Taskcreator-værktøjet bruges til at instantiere, kombinere og afvikle
-Tasks. 
+Tasks (beskrevet i sektion~\ref{sec:tasks}. 
 Brugeren kan vælge mellem de tilgængelige Tasks ved at trykke
-på drop-down listen yderst til venstre i den røde firkant på
+på dropdown-listen, som ses yderst til venstre i den røde firkant på
 figur~\ref{fig:taskcreator}. Herefter kan den valgte Tasks
 standardparametre tilpasses i inputfelterne, bl.a. kan man sætte hver
 Tasks level. En Tasks level beskriver dens prioritet i forhold til
@@ -1829,18 +1845,32 @@ andre Tasks med samme parent. Den valgte Task
 instantieres ved at trykke 'Add task' og kan fjernes igen, ved at markere den med musen
 og trykke 'Delete task'. Tasks der nedarver fra klassen
 CompoundTask(ParCompoundTask, SeqCompoundTask og FollowTourTask)
-kan indeholde subtasks, subtasks tilføjes ved at holde 'ctrl' nede og
-trække en linie med musen fra CompoundTasken til den ønskede
-subtask. Hvis brugeren ønsker afkoble en subtask fra en CompoundTask,
+kan indeholde subtasks. Subtasks tilføjes ved at holde 'ctrl' nede og
+trække en linie fra CompoundTasken til den ønskede
+subtask med musen. Hvis brugeren ønsker afkoble en subtask fra en CompoundTask,
 gøres det ved at gentage ovennævnte
 procedure. Figur~\ref{fig:taskcreator} viser et opbygget Tasktræ   
 bestående af tre ParCompundTasks og et antal TestTasks. 
 
 Når brugeren har instantieret og kombineret de ønskede Tasks, kan
-disse afvikles, og dermed udføres af AR.Dronen, ved at markere den
+disse afvikles og dermed udføres af AR.Dronen. Dette gøres ved at markere den
 ønskede Task og trykke på 'Execute task'. Afviklingen af en Task eller alle
 Tasks kan stoppes ved at trykke på henholdsvis 'Stop task' eller 'Stop
 all tasks'. 
+
+Taskcreatoren startes som de andre værktøjer fra en
+linuxkommandolinie, se figur~\ref{fig:taskcreatorrun}
+\begin{framefig}
+\begin{verbatim}
+$ ./taskcreator.py
+  
+  eller hvis programmet ønskes anvendt i testtilstand
+
+$ ./taskcreator.py -t
+\end{verbatim}
+\caption{Afvikling af taskcreator-værktøjet fra en linuxkommandolinie.}
+\label{fig:taskcreatorrun}
+\end{framefig}
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Eksperimenter - section
@@ -2350,7 +2380,7 @@ omgivelser til pathplanning. Videnen om omgivelserne bruge til at
 indsnævre de optiske strukture (perspective cues) der skal søges og
 orienteres efter.
 
-\paragraph{Vanishing-point, et kendetegn for korridor}\newline
+\paragraph{Vanishing-point, et kendetegn for korridor}
 Algortimen virker ved at lede efter et billedes
 fælles-forsvindingspunkt.
 
@@ -2361,7 +2391,7 @@ at der hvor de diagonale liner skærer hinanden er der ofte et
 sammenfald med enden af korridoren i billedet.
 
 %metode
-\paragraph{Filtrering-processen}\newline
+\paragraph{Filtrering-processen}
 Første skridt når man står med et rå billede og vil undersøge om der er
 en korridor er først at filtrere det for at finde de lige
 linier. Hernæst at frasortere de vandrette og lodrette, men fordi

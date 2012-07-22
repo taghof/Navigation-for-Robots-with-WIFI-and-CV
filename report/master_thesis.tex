@@ -1297,7 +1297,7 @@ vist i figur~\ref{fig:pythonimpl1}. Controllerinterface-klassen
 gennemgåes i sektion~\ref{sec:sub:controlinterface}).
 Med inspiration fra~\cite{lenser:behaviorbasedarchitecture} og
 \cite{Dey01:ctoolkit} er der udover de allerede nævnte grundreceivere
-implementeret en virtuel sensor (sektion~\ref{sec:sub:virtuel}) som
+implementeret to virtuelle sensorer (sektion~\ref{sec:sub:virtuel}) som
 bruges til at fortolke datastrømmene fra de almindelige receivere. 
 
 Platformens klasser instantieres, startes og tilgåes som udgangspunkt
@@ -1398,34 +1398,41 @@ deres gennemsnit, deres varians og deres middelværdi. Når
 wifireceiverens get\_data() metode kaldes, er det disse værdier der
 returneres, værdierne finder anvendelse når wifidata skal matches med hinanden.
 
-\subsubsection{Virtuel sensor}
+\subsubsection{Virtuelle sensorer}
 \label{sec:sub:virtuel}
 %\cite{Dey01:ctoolkit}\cite{lenser:behaviorbasedarchitecture} #Bardram jcaf?
 Den virtuelle sensor er en sen tilføjelse til platformen og er som
 tidligere nævnt inspireret af sensorhierakierne beskrevet i
 \cite{lenser:behaviorbasedarchitecture} og \cite{Dey01:ctoolkit}, hvor
 sensorer opererer på forskellige niveauer og derfor leverer sensor
-output på forskellige 
-abstraktionsniveauer. I modsætning til receiverne modtager den
+output på forskellige abstraktionsniveauer. I modsætning til receiverne modtager den
 virtuelle sensor ikke data direkte fra AR.Dronen, men derimod netop
-fra receiverne. Den virtuelle sensor bearbejder kontinuerligt eg.
-billeddata for at genkende henholdsvis markører på jorden og
-silhuetter umiddelbart foran AR.Dronen. Sensoren leverer således
-information om AR.Dronens omgivelser på et højere abstraktionsniveau
-end de rå værdier fra receiverstrømmene. 
+fra receiverne.  De virtuelle sensorer leverer således information om
+AR.Dronens omgivelser på et højere abstraktionsniveau, end de rå
+værdier fra receiverstrømmene.  
 
-For at kunne detektere både markører på gulvet og silhuetter er det
-nødvendigt for sensoren hele tiden at skifte mellem bund- og
-frontkamera. Dette giver
-imidlertid problemer for Parrots styreprogram der ved konstante kameraskift løbende øger sit
-hukommelsesforbrug indtil Linuxkernen lukker programmet ned. Vores
-målinger viser, at AR.Dronens program kun kan køre mellem ti og tolv
-minutter, såfremt vi samtidig skifter kamera med cirka 5
-millisekunders interval. Selvom om dette problem ikke beskrives
-direkte nogen steder, antydes det dog af en udvikler på Parrots forum,
-at denne funktionalitet ikke er ment anvendt til hurtige kameraskift ved
-hjælp af software og at der derfor er stor sandsynlighed for at metoden
-ikke virker pålideligt, \cite{electronic:parrotforum1}.
+Den ene virtuelle sensor, PositionDetector,~\cite{github:virtuel},
+bearbejder kontinuerligt billeddata for at genkende henholdsvis
+markører på jorden og silhuetter umiddelbart foran AR.Dronen. For at kunne detektere både
+markører på gulvet og silhuetter er det nødvendigt for sensoren hele
+tiden at skifte mellem bund- og frontkamera. Dette giver imidlertid
+problemer for AR.Dronens styreprogram der ved konstante kameraskift
+løbende øger sit hukommelsesforbrug indtil Linuxkernen lukker
+styreprogrammet ned. Vores målinger viser, at AR.Dronens program kun kan
+køre mellem ti og tolv minutter, såfremt vi samtidig skifter kamera
+med cirka 5 millisekunders interval. Selvom om dette problem ikke
+beskrives direkte nogen steder, antydes det dog af en udvikler på
+Parrots forum, at denne funktionalitet ikke er ment anvendt til
+hurtige kameraskift ved hjælp af software og at der derfor er stor
+sandsynlighed for, at metoden ikke virker pålideligt,
+\cite{electronic:parrotforum1}.
+
+Den anden virtuelle sensor, DistanceTracker,~\cite{github:virtuel}, benytter
+hastighedsværdierne fra navdatastrømmen. Sensoren udfører løbende
+integration over hastighederne i x og y-retning. Dette giver os et
+brugbart estimat over den distance AR.Dronen har tilbagelagt. Se
+sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter vi har udført med
+DistanceTrackeren. 
 
 \subsection{Python interface til fjernstyring af AR.Dronen}
 \label{sec:sub:controlinterface}
@@ -1574,35 +1581,35 @@ optagelsen af sensoroutputtet, denne foregår i receiverklasserne.
 For at indkapsle forskellige bevægemønstre og for at kunne koordinere
 en parallel afvikling af disse, har vi implementeret et hierakisk
 opbygget tasksystem. Vi har valgt at kalde vores enheder for tasks
-istedet for behaviors, som ellers både bruges i artiklen 'A Modular Hierarchical Behavior-Based Architecture',
-~\cite{lenser:behaviorbasedarchitecture}, og i Lejos' subsumption-pakke, \cite{lejossub}. Grunden til dette er at flere af vores tasks er
+istedet for behaviors, der ellers både bruges i artiklen 'A Modular Hierarchical Behavior-Based Architecture',
+~\cite{lenser:behaviorbasedarchitecture}, og i Lejos' subsumption-pakke, \cite{lejossub}. Grunden til dette er, at flere af vores tasks er
 forholdsvis kortlivede(for eksempel take-off og landtasks) og derfor
 mere minder om en opgave der skal forberedes, udføres og
 afsluttes. Dette ses i modsætning til en behavior, som kan opfattes
 som en længerevarende opførsel. Vi har også implementeret højniveau bevægemønstre der
-minder mere om en traditionelle behaviors(for eksempel
+minder mere om en traditionelle behaviors (for eksempel
 FollowTourTask). Vi mener også at det giver mening, at kalde disse
 tasks, da de også implementeres efter vores generelle taskstruktur.
 
 Vores første udgaver af tasksystemet indbefattede tasks der indsamlede
-og behandlede data fra AR.Dronens sensorer, for herefter at stille
-disse data tilrådighed for andre tasks, gennem en delt kontekstliste. I
+og behandlede data fra AR.Dronens sensorer. De behandlede data blev
+herefter stillet til rådighed for andre tasks, gennem en delt kontekstliste. I
 de endelige udgaver er disse tasks dog udskilt til den virtuelle
 sensor, så tasks ikke skal behandle sensordata, men kun reagere og
 formidle bevægelse på baggrund af højniveau-sensordata. 
 
 \subsection{Task typer} 
 Vi har to hovedtyper, simple og compoundtasks. Simple tasks nedarver
-fra vores basetaskklasse Task. De repræsenterer oftest en simpel
+fra basetaskklassen Task. De repræsenterer oftest en simpel
 bevægelse, men kan være vilkårligt komplekse. For eksempel har vi en
 task der, blandt andet, implementerer en PID-controller. 
-Compoundtasks er tasks der indeholder en liste af subtasks og funktionalitet til
+CompoundTasks er tasks der indeholder en liste af subtasks og funktionalitet til
 at starte og stoppe disse subtasks. Vi opdeler CompoundTasks
 yderligere i to typer, sekventielle og parallelle. Sekventielle CompoundTasks
-starter deres subtasks en efter en, men venter med at starte en ny
+starter deres subtasks en efter en og venter med at starte en ny
 subtask før den forrige er afsluttet. En sekventiel CompoundTask
 stopper når den sidste subtask er afsluttet. Parallelle CompoundTask
-starter alle deres subtasks på en gang og stopper også når den
+starter alle deres subtasks på en gang og stopper når den
 sidste subtask er afsluttet. 
 
 \subsection{Task hieraki}
@@ -1617,17 +1624,79 @@ AR.Dronen på to betingelser: 1) ingen task med højere level og samme
 parent ønsker at bevæge AR.Dronen og 2) taskens parent har tilladelse
 til at flytte AR.Dronen.
 
-På ~\ref{fig:taskhieraky} ses et eksempel på et tasktræ
-konstrueret med vores taskcreator. Under antagelse af at hver TestTask
-ønsker at udføre et antal bevægelser og ikke på noget tidspunkt ønsker
-frivilligt at opgive bevægekontrollen, vil TestTask med level 1 slutte
+På figur~\ref{fig:taskhieraky} ses et eksempel på et tasktræ
+konstrueret med vores taskcreator, beskrevet i sektion~\ref{sec:taskcreator}. Under antagelse af, at hver TestTask
+ønsker at udføre et antal bevægelser med AR.Dronen og ønsker at udføre disse
+bevægelser uden pause, vil TestTask med level 1 slutte
 først og TestTask med level 2 slutte sidst.
 \begin{framefig}
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/taskhieraky.png}
-  \caption{Eksempel på et taskhieraki.}
+  \caption{Eksempel på et taskhieraki. Hver task er annoteret med
+    deres level, dette tal beskriver taskens prioritet i forhold til
+    andre tasks med samme parent.}
   \label{fig:taskhieraky}
 \end{framefig}
+
+\subsubsection{FollowTourTask}
+\label{sssec:followtourtask}
+Et mere realistisk og komplekst eksempel end det på
+figur~\ref{fig:taskhieraky}, er en FollowTourTask, hvis tasktræ kan ses
+på figur~\ref{fig:followtour}. En FollowTourTask nedarver fra en sekvensiel
+compoundtask og indeholder, udover takeoff og land-tasks, en
+parallel compoundtask der kan veksle mellem en MoveTask og en
+HoverTrackTask (det vil sige, at der veksles mellem bevægelse og
+fastholdelse af en erkendt position, HoverTrackTasken beskrives i
+sektion~\ref{sssec:hovertracktask}). Selve FollowTourTask 
+enheden holder styr på den tour der skal følges, ved hjælp af et
+map-objekt, se sektion~\ref{sec:mapcreator}, og sørger for at opdatere HoverTrackTasken med en ny
+målposition når det er nødvendigt. 
+Hvis man anskuer vores map-objekt som en relationel graf hvor alle knuder er
+forbundne, minder vores tilgang meget om Kuipers og Byuns metode der
+beskrives i \cite{murphy2000introduction}. Specielt lægges mærke til, at der i
+begge systemer udføres fejlkorrigering hver gang en ny position
+detekteres. I vores system sker dette ved at HoverTrackTasken bringer
+AR.Dronen indenfor en specifik afstand af den præcise position, før
+den sendes videre. Det ville desuden være let at tilføje metrisk data
+fra DistanceTrackeren(se sektion~\ref{sec:sub:virtuel}), til
+map-objektet, hver gang AR.Dronen har bevæget sig mellem to
+positioner. 
+
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.80\textwidth]{grafik/followtourhieraki.png}
+  \caption{Opbygningen af en FollowTourTask.}
+  \label{fig:followtour}
+\end{framefig}
+
+\subsubsection{HoverTrackTask}
+\label{sssec:hovertracktask}
+HoverTrackTasken implementerer en PID-controller,\cite{electronic:pid}, der
+kan holde AR.Dronen over en position.
+Når en markør(se \ref{fig:advancedmarker}) er synlig for AR.Dronens bundkamera, kan vi ved
+hjælp af PositionDetectoren(se sektion~\ref{sec:sub:virtuel}), få
+markørens position på billedet. Med denne position udregnes en
+error-værdi i x og y-retningerne i forhold til centrum af billedet,
+disse værdier er i pixels. For at kunne bruge errorværdierne, skal de
+konverteres til millimeter og der skal tages højde for AR.Dronens
+øjeblikkelige hældning. Denne konvertering og korrigering foregår
+efter den metode der beskrives og anvendes af Michaël Ludmann og
+Guillaume Depoyant i deres speciale
+LUDEP,~\cite{electronic:ludep},~\cite{electronic:ludepcon}. Efter
+udregningen af errorværdierne, anvendes de som i en standard
+PID-controller til at bestemme de endelige værdier der sendes til
+AR.Dronen. PID-funktionaliteten er implementeret i HoverTrackTaskens
+update-metode, \cite{github:newest}.  
+I forbindelse med deltagelse i en FollowTourTask, kan HoverTrackTasken
+tildeles information om den specifikke position der skal trackes. Den
+kan således lade andre tasks bevæge AR.Dronen, hvis den rigtige position
+ikke er fundet. HoverTrackTasken er i forbindelse med en
+FollowTourTask også ansvarlig for at dreje AR.Dronen i retning af den
+næste position, mens nuværende position fastholdes.   
+
+\subsection{AvoidTask}
+
+
 
 \subsection{Task implementationer}
 Vi har lavet to forskellige udgaver af vores
@@ -1665,7 +1734,7 @@ Architecture',\cite{lenser:behaviorbasedarchitecture}, er at en
 aktiveret behavior skal bestemme hvilke af sine underbehaviors der
 skal aktiveres. I artiklen er dette er praktisk, da deres robot kan udføre forskellige bevægelser
 på samme tid. Denne tilgang sikrer at det bedste sæt af parallelle
-behaviors kan beregnes og herefter aktiveres.
+behaviors kan bestemmes og herefter aktiveres.
 
 I vores ikke-trådbaserede tilgang forsimpler vi ovennævnte princip. Vi
 siger, at en Compoundtask på opfordring skal aktivere \emph{den} bedst
@@ -1691,35 +1760,6 @@ Denne ikke-trådbaserede tilgang virker mere velegnet til en træbaseret
 taskstruktur som vores. Kommunikationen mellem tasks er meget
 simplere og overheadet pga. de mange tråde undgåes. 
 
-\subsubsection{HoverTrackTask}
-\label{sssec:hovertracktask}
-
-\subsubsection{FollowTourTask}
-\label{sssec:followtourtask}
-Et mere realistisk og komplekst eksempel er en FollowTourTask, se
-\ref{fig:followtour}, denne task nedarver fra en sekvensiel
-compoundtask og indeholder udover takeoff og land-tasks også en
-parallel compoundtask der kan veksle mellem bevægelse og fastholdelse
-af en position(ved hjælp af en PID-controller). Selve FollowTourTask
-enheden holder styr på den tour der skal følges, ved hjælp af et
-map-objekt, og sørger for at opdatere HoverTrackTasken(PID) med en ny
-målposition når det er nødvendigt. 
-Hvis man anskuer vores map-objekt som en relationel graph hvor alle knuder er
-forbundne, minder vores tilgang meget om Kuipers og Byuns metode der
-beskrives i \cite{murphy2000introduction}. Specielt lægges mærke til at der i
-begge systemer udføres fejlkorrigering hver gang en ny position
-detekteres, i vores system sker dette ved at HoverTrackTasken bringer
-AR.Dronen indenfor en specifik afstand af den præcise position, før
-den sendes videre. Det ville desuden være let at lade vores
-*DistanceMeasurer* algoritme tilføje metrisk data til map-objektet, hver gang
-AR.Dronen har bevæget sig mellem to positioner.
-
-\begin{framefig}
-  \centering
-  \includegraphics[width=0.80\textwidth]{grafik/followtourhieraki.png}
-  \caption{Opbygningen af en FollowTourTask.}
-  \label{fig:followtour}
-\end{framefig}
 
 \chapter{Klientværktøjer} % Morten,
 I dette kapitel gennemgåes tre værktøjer som er udviklet i
@@ -1817,8 +1857,10 @@ $ ./sensordisplay.py -t
   \caption{Mapcreator-værktøjets to redigeringstilstande, world og tour.}
 \end{framefig}
 Mapcreator er et værktøj til at oprette og redigere map-objekter.
-Map-objekter bruges af FollowTourTasks til at navigere
-efter. Mapcreator har to redigeringstilstande, world og tour, som kan
+Map-objekter instantieres fra klassen PosMap(placeret i map.py,
+\cite{github:map}) og bruges af FollowTourTasks til at navigere
+efter. 
+Mapcreator har to redigeringstilstande, world og tour, som kan 
 vælges ved at trykke på det tilsvarende faneblad øverst i billedet. De
 to tilstande ses på figur~\ref{fig:mapcreator}.
 
@@ -1960,7 +2002,7 @@ signalstyrker sammenlignes ved først at finde en fællesmængde af
 WIFI-kilder i de to sæt og herefter udregne en afstand mellem de to
 sæt, baseret på denne fællesmængde. Lokaliseringsproceduren er
 illustreret på figur~\ref{fig:online} Algoritmen er implementeret i
-virtualsensors.py, \cite{github:virtual} og WIFI-mappet er
+virtualsensors.py, \cite{github:virtuel} og WIFI-mappet er
 implementeret som en del af map.py, \cite{github:map}. 
 
 \begin{framefig}
@@ -2697,7 +2739,7 @@ korrekte placering af vanishingpointet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
-\section{Distance-measure} % Thomas
+\section{DistanceTracker} % Thomas
 \label{sec:distance-mesu}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?

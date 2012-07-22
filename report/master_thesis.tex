@@ -772,7 +772,8 @@ mellem bruger og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikation}.
 
 \section{Kommunikation mellem AR.Dronen og klienter} %mellem AR.Dronen og en klient-enhed
 \label{ssec:kommunikation}
-\subsection{Ekstern klientkommunikation}
+
+%\paragraph{Ekstern klientkommunikation}\\
 En ekstern klients (en PC, smartphone eller lignende) interaktion med
 AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupper:
 \begin{itemize}
@@ -797,7 +798,8 @@ Det bemærkes, at så længe der ikke anvendes en intern klient
 (userspace process på AR.Dronens Linuxsystem), vil der
 altid være tale om en form for fjernstyring af
 AR.Dronen. 
-\subsection{Intern klientkommunikation}
+
+%\paragraph{Intern klientkommunikation}\\
 Når der ikke er tale om interaktion mellem AR.Dronen og en
 ekstern klient, kan interaktionen også foregå mellem 2 processor
 internt på AR.Drone-platformen, hvilket altid vil grupperes under
@@ -905,6 +907,14 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 
 %\section{Userspace process på AR.Dronen}
 
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.80\textwidth]{grafik/userspace_n_module.png}
+  \caption{Platformstrukturen på AR.Dronen gør det muligt at tilføje
+    kernemoduler, biblioteker og at køre programmer i userspace.}
+  \label{fig:sonicbeam2}
+\end{framefig}
+
 \section{Udvidelse af AR.Dronen med USB-\-moduler}
 \label{sec:udvidelse}
 En robotplatform der kan udvides med nye sensorer efter behov, er
@@ -934,7 +944,7 @@ i en af specialets tilhørende blogpost: "Enabling the Drone USB Port",
 Efter de indledende erfaringer med AR.Dronens USB-port, blev der
 implementeret en WIFI-sensor for på sigt at kunne anvende denne som 
 lokaliseringsenhed. WIFI-sensoren består af en USB-WIFI-adapter
-og et snifferprogram til at aflæse og videresende signalstyrkerne fra AR.Dronens
+og et snifferprogram (\emph{WIFI-sensor}) til at aflæse og videresende signalstyrkerne fra AR.Dronens
 omkringliggende accesspoints og andre WIFI-kilder. 
 
 Signalstyrken af et accesspoints radiosignalet siger noget om hvor

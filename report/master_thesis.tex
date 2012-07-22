@@ -392,6 +392,15 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 \paragraph{Lokalisering via Wifi-fingerprinting}
 %\paragraph{Simpel-blob}
 \paragraph{Blob-detection og PID styring} simpel blob, og udbygget nested blob
+\paragraph{Afstandsbedømmelse via optical flow}
+%\todo{fedt hvis det kan nåes at lave det...}
+% birds eye view (lidt refs under speciale-mappen), head bobbing, biers afstandsbedømmelse ligger i
+% optiske flow observeret fra A til B, forskel i tunnel og åbent land...
+
+%problematik at flyve fremad; for smalle trekanter, måske bedre at flyve sidelæns eller op og ned
+% evt afhjælpe med fiskeøje, så flow af featurepoints kan trackes
+% længere langs siden af kopteren når man flyver forbi...
+
 \paragraph{Korridor detektering}
 \paragraph{distance-measurererere}
 
@@ -763,31 +772,44 @@ mellem bruger og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikation}.
 
 \section{Kommunikation mellem AR.Dronen og klienter} %mellem AR.Dronen og en klient-enhed
 \label{ssec:kommunikation}
-Interaktionen med AR.Dronens Linux-platform og AR.Dronens styreprogram
-kan kategoriseres i 3 grupper:
+
+%\paragraph{Ekstern klientkommunikation}\\
+En ekstern klients (en PC, smartphone eller lignende) interaktion med
+AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupper:
 \begin{itemize}
-  \item Gennem en ekstern FTP, \cite{rfc959}, eller Telnet-klient over
-    WIFI fra en PC, smartphone eller lignende. 
-  \item Gennem en ekstern klient der sender AT-kommandoer\footnote{AT(tention)-kommandoer over
+  \item Fra en ekstern klientapplikation gennem FTP, \cite{rfc959},
+    eller Telnet (figur~\ref{fig:telnetterminal}) over WIFI til
+    services kørende i userspace på AR.Dronen. 
+  \item En ekstern klientapplikation kan sende AT-kommandoer\footnote{AT(tention)-kommandoer over
       trådløst netværk (gennemgåes nærmere i sektion
       \ref{sssec:atinterface}}) via UDP protokollen til AR.Dronens
-    styreprogram og modtager sensordata fra dette, ligeledes over WIFI fra en PC, smartphone eller lignende.
-  \item Gennem en intern klient, som er et program der eksekveres og kommunikerer internt
-    på AR.Dronens hardware. En intern klient kommunikerer med
-    AR.Dronens styreprogram  gennem de UDP-porte der også anvendes af
-    eksterne klienter.
+    styreprogram og kan modtage sensordata fra AR.Dronens styreprogram
+    over trådløs UDP.
 \end{itemize}
-
-Det bemærkes, at så længe der ikke anvendes en intern klient, vil der
-altid være tale om en form for fjernstyring af AR.Dronen.
-
+%
 \begin{framefig}
   \centering
-  \includegraphics[width=0.70\textwidth]{grafik/ar_drone_nokia900.png}
-  \caption{Fjernstyring af AR.Dronen med en Smartphone, her en
-    Nokia-telefon. Figuren er oprindeligt fra \cite{electronic:nokia}.}
-  \label{fig:nokiastyring}
+  \includegraphics[width=0.48\textwidth]{grafik/klient_server.png}
+  \caption{AR.Dronen kommunikerer med klienter over netværket gennem UDP og TCP.}
+  \label{fig:klientserver}
 \end{framefig}
+%
+Det bemærkes, at så længe der ikke anvendes en intern klient
+(userspace process på AR.Dronens Linuxsystem), vil der
+altid være tale om en form for fjernstyring af
+AR.Dronen. 
+
+%\paragraph{Intern klientkommunikation}\\
+Når der ikke er tale om interaktion mellem AR.Dronen og en
+ekstern klient, kan interaktionen også foregå mellem 2 processor
+internt på AR.Drone-platformen, hvilket altid vil grupperes under
+den første kategori herunder og sommetider som værende i begge kategorier:
+\begin{itemize}
+  \item Et program der køre internt i AR.Drone-platformens user-space,
+    og som derigennem har adgang til platformens services, heriblandt:
+  \item Intern interaktion med AR.Dronens interne styreprogram gennem
+    de 3 faste UDP porte, som også anvendes af de eksterne klienter.
+\end{itemize}
 
 \subsection{FTP og Telnet baseret kommunikation}
 \label{sssec:tcp}
@@ -804,8 +826,8 @@ overførte filer som standard i \uri{~/data/video} mappen på AR.Dronen.
 \subsection{UDP baseret kommunikation}
 \label{sssec:udp}
 I modsætning til FTP- og Telnet-klienterne, som er TCP baserede, anvendes
-UDP-protokollen til den kommunikation der sker mellem AR.Dronens styreprogram og
-in- og eksterne klienter.
+UDP-protokollen istedet til kommunikationen imellem intern og eksterne
+klienter og AR.Dronens styreprogram.
 
 AR.Dronens styreprogram sender og modtager pakker på tre UDP-porte:
 \begin{itemize}
@@ -817,8 +839,19 @@ AR.Dronens styreprogram sender og modtager pakker på tre UDP-porte:
     indeholdende statusinformation om f.eks. hastighed, eulervinkler,
     afstand til gulvet og generel information om navigationstilstanden.
 \end{itemize}
-
-
+%
+\begin{framefig}
+  \centering
+  \subfigure[AR.Dronens interne platforms struktur.]{\includegraphics[width=0.25\textwidth]{grafik/busybox.png}
+    \label{fig:busybox}}
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfigure[Interfacet til AR.Dronens styreprogram som userspace program.]{\includegraphics[width=0.49\textwidth]{grafik/userspace.png}
+    \label{fig:userspace}}
+  \label{fig:internstruktur}
+  \caption{Udover eksterne klienter der kommunikere over det trådløse
+    netværk, kan processor også kommunikere internt på AR.Dronen}
+\end{framefig}
+%
 \subsection{AT kommando interface}
 \label{sssec:atinterface}
 En klient som skal kommunikere med AR.Dronens styreprogram, gør dette ved hjælp af
@@ -839,11 +872,19 @@ figur \ref{fig:atsyntaks}.
   roll, pitch, gas og yaw.} 
 \label{fig:atsyntaks}
 \end{framefig}
-
+%
 Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer
 man hvorledes AR.Dronen skal bevæge sig ved translation og rotation,
 som beskrevet i \nameref{ssec:fysik}, sektion \ref{ssec:fysik}. 
-
+%
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.70\textwidth]{grafik/ar_drone_nokia900.png}
+  \caption{Fjernstyring af AR.Dronen med en Smartphone, her en
+    Nokia-telefon. Figuren er oprindeligt fra \cite{electronic:nokia}.}
+  \label{fig:nokiastyring}
+\end{framefig}
+%
 \begin{framefig}
 \begin{verbatim}
  AT*PCMD=21625,1,0,0,0,0<LF>
@@ -864,7 +905,17 @@ periodisk for at AR.Dronen ikke skal tolke forbindelsen til
 klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \ref{tab:kommandoer} i appendiks \ref{sec:at}. 
 
-\section{Udvidelse af AR.Dronen med USB-moduler}
+%\section{Userspace process på AR.Dronen}
+
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.80\textwidth]{grafik/userspace_n_module.png}
+  \caption{Platformstrukturen på AR.Dronen gør det muligt at tilføje
+    kernemoduler, biblioteker og at køre programmer i userspace.}
+  \label{fig:userspace15}
+\end{framefig}
+
+\section{Udvidelse af AR.Dronen med USB-\-moduler}
 \label{sec:udvidelse}
 En robotplatform der kan udvides med nye sensorer efter behov, er
 klart mere anvendelig end en helt lukket platform. Derfor blev det
@@ -893,7 +944,7 @@ i en af specialets tilhørende blogpost: "Enabling the Drone USB Port",
 Efter de indledende erfaringer med AR.Dronens USB-port, blev der
 implementeret en WIFI-sensor for på sigt at kunne anvende denne som 
 lokaliseringsenhed. WIFI-sensoren består af en USB-WIFI-adapter
-og et snifferprogram til at aflæse og videresende signalstyrkerne fra AR.Dronens
+og et snifferprogram (\emph{WIFI-sensor}) til at aflæse og videresende signalstyrkerne fra AR.Dronens
 omkringliggende accesspoints og andre WIFI-kilder. 
 
 Signalstyrken af et accesspoints radiosignalet siger noget om hvor
@@ -2417,13 +2468,124 @@ afkode QR-koden på alle afstande op til en meter. Resultatet viser med
 al tydelighed at vi ikke kan anvende QR-koder med AR.Dronens kamera og
 at vi derfor må anvende andre markører til lokalisering i vores system.
 
-%\subsection{Optisk flow navigation} % tt
-%\todo{fedt hvis det kan nåes at lave det...}
-% birds eye view (lidt refs under speciale-mappen), head bobbing, biers afstandsbedømmelse ligger i
-% optiske flow observeret fra A til B, forskel i tunnel og åbent land...
 
-%problematik at flyve fremad; for smalle trekanter, måske bedre at flyve sidelæns eller op og ned
-% evt afhjælpe med fiskeøje, så flow af featurepoints kan trackes længere langs siden af kopteren når man flyver forbi...
+\section{Afstandsbedømmelse via optical flow} %Afstandsmåling gennem Optical flow} % tt
+Målet med dette forsøg var at undersøge kvaliteten af en udledningen
+af afstand fra AR.Dronens frontkamera, bevægelser i planet og yaw-rotation.
+Til eksperimentet er der konstrueret et program, for hvilket det
+overordnede princip gennemgåes herunder.
+
+\subsection{Triangulering i 2 dimensioner}
+Forsøgsopstillingen er simplificeret til kun at foregår i planet,
+så det kun er bevægelser i $x$ og $y$ retningen der iberegnes,
+ændringer i højden forsøges minimeret så den parameter kan ignoreres.
+
+Det er sidestykket $|f2t\ p2|$ i trekanten på
+figur~\ref{fig:opticalafstand} der er forsøgt udregnet.
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.65\textwidth]{grafik/optical_afstand.png}
+  \caption{Opstillingen er set oppefra. AR.Dronen har flyttet sig fra
+    position $p1$ til $p2$ i $x,y$-planet på tiden
+    $\Delta t$. Den grønne cirkel (f2t) er et punkt på
+    væggen (feature-to-track) som følges gennem frontkameraet, oprindeligt fundet ved
+    OpenCV' funktion \code{goodFeaturesToTrack}. I opstillingen ønskes
+  liniestykket $|f2t\ p2|$ fundet.}
+  \label{fig:opticalafstand}
+\end{framefig}
+
+
+\subsection{Fra pixel-position til virkelig retning}
+En feature følges ved at den har en fast indgang, $i$, i den liste der
+returnes af funktionen til beregning af optical-flow (funktionen gennemgåes i
+sektion~\ref{sec:sub:feature-tracking}). Imellem hvert nyt billede
+laves en ny beregning af optical flow, og feature-indgangene i listen opdateres med nye 
+$(x_i,y_i)$-pixelpositioner.
+
+Af en features $x$-position i et billede kan man udregne vinklen i den
+virkelige verden i forhold til retningen på AR.Dronens frontkamera, se
+vinklen $A_{f2t i}$ i figur~\ref{fig:f2kvinkel}.
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.35\textwidth]{grafik/f2t.png}
+  \caption{Udregning af en features ($f2t_i$) vinkel i forhold til AR.Dronens
+    ligeud-retning. Vinklen beregnes udfra $x$-værdien $(x_{f2t i})$ af $f2t_i$' pixelposition.}
+  \label{fig:f2kvinkel}
+\end{framefig}
+
+
+\subsection{Optisk feature-tracking}
+\label{sec:sub:feature-tracking}
+Programmet sættes til først at finde en liste af egnede
+features\footnote{En egnet feature er et karakteristisk 
+  punkt i billedet som kan genkendes hvis billedet flytter
+  fokuspunkt. En feature kan være flere ting, bl.a. 2. ordens
+  gradient over af en hvis magnitude, hjørner på objekter,
+  karakteristisk teksture, osv.} (ft2) een gang i billedramme01 med OpenCV funktionen
+\emph{goodFeaturesToTrack}. Hvorefter hver enkelt f2t-position
+følges fra billedramme til billedramme med opticalflow-funktionen
+\emph{calcOpticalFlowPyrLK}. Når frontkameraet har skiftet så meget
+fokus at der ikke længere er overlap mellem det nuværende billede og
+det oprindelige billederamme01, foretages en ny indhenting af egnede
+features-to-track. Således at der altid er mindst $K$ antal f2t aktive ad gangen.
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.85\textwidth]{grafik/optflowpyrlk.png}
+  \caption{Et typisk egnet good-feature-to-track er som den grønne
+    ring på de 2 billedrammer: Et hjørne på en billedramme af et
+    billede i billedet.}
+  \label{fig:optflowpyrlk}
+\end{framefig}
+$K$ kan have forskellige værdier, men 15 har virket fornuftigt. Hvis
+AR.Dronen flyver hurtigt fremad falder features-to-track drastisk ud
+af billedrammen, og listen med features skal opdateres ofte. Jo højere $K$
+er, des oftere vil listen med features blive opdateret. Når AR.Dronen
+flyver langsomt sidelæns går der længere tid imellem hver tab af
+feature og $K$ kan sættes til en mindre værdi, for at opdatere sjælnere.
+
+
+\subsection{Yaw som midlertidig fælles reference}
+Der er imidlertid et problem i at, AR.Dronens front nærmest aldrig peger i den
+samme retning (i figur~\ref{fig:opticalafstand} ses AR.Dronens front
+peger i forskellige retninger ved de to positioner $p1$ og $p2$). For
+at triangulere skal man bruge 2 pejleretninger med fælles 
+reference. Den piezo-elektriske yaw-sensor er ikke præcis nok til at
+kunne udgøre det for kompas via dead-reckoning gennem en hel
+flyvning. Tanken er istedet at navdataens yaw-værdi, over korte
+tidsperioder, alligevel er stabil nok som fælles referencevinkel.
+
+\subsection{Resultater}
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.95\textwidth]{grafik/afstande_avg11_gauss11_thumb.png}
+  \caption{Den beregnede afstand ud til et fast punkt på væggen i en filmsekvens over
+    290 billedrammer, hvor AR.dronen flyver langsomt sidelæns ca. 5
+    meter fra punktet. Den gule og blå streg er optegnet i hånden for
+    tydelighed.
+    Den gule og blå streg er hhv. gennemsnittet og
+    gaussfiltreret over et vindue med 11 målinger. Enheden for
+    $x$-aksen er millimeter, mens $y$-aksen er billedrammenummeret.}
+  \label{fig:afstandavg11}
+\end{framefig}
+Resultatet af eksperimentet kan ses i figur~\ref{fig:afstandavg11}. De
+16 vildeste outsidere i målingerne er klippet af ved 27 meter. Den
+sande værdi ligger imellem $4,0$ og $6,5$ meter.
+Dette er et godt eksempel på et af tidspunkter hvor man bør træde et skridt
+tilbage og se situationen fra et andet perspektiv. Grunden til at det
+ikke virker som opsætningen er nu, er fordi vinklen der skal
+trianguleres udfra bliver for spids. Liniestykket imellem $p1$ og $p2$ er for kort. Det er meget
+begrænset hvor langt AR.Dronen kan nå at flyve mellem 2
+billedopdateringer. Selv hvis der kun er 10 billedopdateringer per sekund, så vil
+$\Delta t$ være lig $0,1$ sekunder. Hvis AR.Dronen bevæger sig med en
+hastigheden af eksempelvis $100$ millimeter per sekund, så er
+afstanden mellem de to punkter $100\ mm/s * 0,1\ s = 10\ mm$. Hvis de 2
+andre sidelængder så er $5\ m$, altså en faktor 500 gange større, er det nemt at se
+hvad lidt varians vil have af indflydelse på kvaliteten af
+afstandsbedømmelsen.
+
+En udbygning af afstandsbedømmelsen vil være at lade $\Delta t$ vokse
+lidt, således at afstanden udregnes hen over flere billeder ad gangen.
+
 
 
 
@@ -2493,19 +2655,6 @@ repræsenteret som klumper af billedpunkter til at blive til
 hough-linier. Herefter forklares hvordan linierne filtreres for
 tilsidst at sige noget om et tilstedeværende eller ikke
 tilstedeværende forsvindingspunkt.
-%hvad er der i de følgende uddybbende sektioner herunder?
-%(+metode) sub?
-%+-at finde lige linier, , subsub?
-%+-Augmentering med $\phi$
-%+-Celle med flest linie-skæringspunkter
-%+-troværdighed / trustworthyness
-
-%+At finde kanter i et billede
-%+Houghlinier
-
-%+resultater
-%+erfaringsudbytte
-
 
 \subsection{At finde lige linier}
 Det at finde linier foregår i to skridt via 2 forskellige
@@ -2717,7 +2866,7 @@ via $\phi$-grænsen. Der vil der blive et stort antal linieskæringer i
 siden som vil føre til fejl-placering af forsvindingspunktet.
 \begin{framefig}
   \centering
-  \includegraphics[width=0.89\textwidth]{grafik/vanishresult.png}
+  \includegraphics[width=0.39\textwidth]{grafik/vanishresult.png}
   \caption{Procent resultat af test på korridor-detektor
     virkningsgrad. I testen blev der ikke observeret false-positives.}
   \label{fig:vanishresult}

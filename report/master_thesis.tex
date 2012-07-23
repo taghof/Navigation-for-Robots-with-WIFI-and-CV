@@ -811,11 +811,23 @@ mellem klientenhed og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikatio
 %%%%      + Klient/server kommunikation - subsection
 
 
-\section{Kommunikation mellem AR.Dronen og klienter} %mellem AR.Dronen og en klient-enhed
+\section{Kommunikation mellem AR.Dronen og klienter} %mellem AR.Dronen
+                                %og en klient-enhed
+Den forbindelse der skal til for at fjernstyre AR.Dronen via en iPhone
+er den oftest brugte forbindelse, men en af mange
+interaktionsmuligheder. Herunder listes nogle af de muligheder
+AR.Dronens Linux-platform og AR.Dronens styreprogram åbner op for,
+både i form af fjernstyring og intern kommunikation på AR.Dronen.
 \label{ssec:kommunikation}
-
-%\paragraph{Ekstern klientkommunikation}\\
-En ekstern klientenhedss (PC, smartphone eller lignende) interaktion med
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.70\textwidth]{grafik/ar_drone_nokia900.png}
+  \caption{Fjernstyring af AR.Dronen med en Smartphone, her en
+    Nokia-telefon. Figuren er oprindeligt fra \cite{electronic:nokia}.}
+  \label{fig:nokiastyring}
+\end{framefig}
+\subsection{Ekstern klientkommunikation}
+En ekstern klients (PC, smartphone eller lignende) interaktion med
 AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupper:
 \begin{itemize}
   \item Fra en ekstern klientapplikation gennem FTP, \cite{rfc959},
@@ -835,27 +847,25 @@ AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupp
   \label{fig:klientserver}
 \end{framefig}
 %
-Det bemærkes, at så længe der ikke anvendes en intern klient
-(userspace process på AR.Dronens Linuxsystem), vil der
-altid være tale om en form for fjernstyring af
-AR.Dronen. 
+Interaktion mellem AR.Dronen og en ekstern klient benævnes som værende
+fjernstyring, mens AR.Dronen opfattes som værende autonom
+hvis kontrolsignaler til AR.Dronens styreprogram kommer fra en intern
+process der køre parallelt med AR.Dronens styreprogram på AR.Drone-platformen.
 
-%\paragraph{Intern klientkommunikation}\\
-Når der ikke er tale om interaktion mellem AR.Dronen og en
-ekstern klient, kan interaktionen også foregå mellem 2 processor
-internt på AR.Drone-platformen, hvilket altid vil grupperes under
-den første kategori herunder og sommetider som værende i begge kategorier herunder:
-\begin{itemize}
-  \item Et program der køre internt i AR.Drone-platformens user-space,
-    og som derigennem har adgang til platformens services, heriblandt:
-  \item Intern interaktion med AR.Dronens styreprogram gennem
-    de 3 faste UDP porte, som også anvendes af de eksterne klienter.
-\end{itemize}
+\subsection{Intern klientkommunikation}
+%Når interaktionen foregår mellem 2 processor
+%internt på AR.Drone-platformen, vil det altid grupperes under den
+%første kategori herunder og sommetider som værende i begge kategorier
+%herunder: 
+Interne processer på AR.Drone-platformen har mulighed for at
+kommunikere med AR.Dronens styreprogram gennem UDP, på lige fod med de eksterne
+klienter til fjernstyring. En intern process vil afvikles i userspace,
+en nærmere beskrivelse herom gennemgåes i sektion~\ref{sec:udvidelse}.
 %
 \begin{framefig}
   \centering
   \includegraphics[width=0.48\textwidth]{grafik/userspace.png}
-  \caption{En intern processklient på AR.Dronen, kommunikerer med AR.Dronen over netværket gennem UDP og TCP som ekstern klient, men har også adgang til platformen i userspace.}
+  \caption{En intern klient på AR.Dronen, kommunikerer med AR.Dronens styreprogram på 3 UDP-porte, men har også adgang til platformen som ethvert andet userspaceprogram.}
   \label{fig:userspaceklient}
 \end{framefig}
 %
@@ -867,8 +877,8 @@ Linuxinstallation ved at oprette en Telnetforbindelse til AR.Dronens
 faste IP-adresse: $192.168.1.1$. Efter at forbindelsen er etableret 
 får brugeren her adgang til en root-terminal (se figur~\ref{fig:telnetterminal}).
 
-Ved at oprette en FTP-forbindelse AR.Dronens FTP-server, ved hjælp af
-en FTP-klient, kan man overføre filer mellem AR.Dronen og en PC med
+Ved at oprette en FTP-forbindelse til AR.Dronens FTP-server, fra en
+FTP-klient, kan man overføre filer mellem AR.Dronen og en PC med 
 FTP-protokollens PUT og GET kommandoer. Hvis der ikke angives en sti lægges 
 overførte filer som standard i \uri{~/data/video} mappen på AR.Dronen.
 
@@ -888,18 +898,6 @@ AR.Dronens styreprogram sender og modtager pakker på tre UDP-porte:
     indeholdende statusinformation om f.eks. hastighed, eulervinkler,
     afstand til gulvet og generel information om navigationstilstanden.
 \end{itemize}
-
-\begin{framefig}
-  \centering
-  \subfigure[AR.Dronens interne platforms struktur.]{\includegraphics[width=0.25\textwidth]{grafik/busybox.png}
-    \label{fig:busybox}}
-  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[Interfacet til AR.Dronens styreprogram som userspace program.]{\includegraphics[width=0.49\textwidth]{grafik/userspace.png}
-    \label{fig:userspace}}
-  \label{fig:internstruktur}
-  \caption{Udover eksterne klienter der kommunikerer over det trådløse
-    netværk, kan processer også kommunikere internt på AR.Dronen}
-\end{framefig}
 
 \subsection{AT kommando interface}
 \label{sssec:atinterface}
@@ -926,13 +924,6 @@ Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer
 man hvorledes AR.Dronen skal bevæge sig ved translation og rotation,
 som beskrevet i \nameref{ssec:fysik}, sektion \ref{ssec:fysik}. 
 %
-\begin{framefig}
-  \centering
-  \includegraphics[width=0.70\textwidth]{grafik/ar_drone_nokia900.png}
-  \caption{Fjernstyring af AR.Dronen med en Smartphone, her en
-    Nokia-telefon. Figuren er oprindeligt fra \cite{electronic:nokia}.}
-  \label{fig:nokiastyring}
-\end{framefig}
 %
 \begin{framefig}
 \begin{verbatim}
@@ -955,7 +946,8 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \ref{tab:kommandoer} i appendiks \ref{sec:at}. 
 
 %\section{Userspace process på AR.Dronen}
-
+\section{Udvidelse af AR.Dronen med USB-\-moduler}
+\label{sec:udvidelse}
 \begin{framefig}
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/userspace_n_module.png}
@@ -963,9 +955,6 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
     kernemoduler, biblioteker og at køre programmer i userspace.}
   \label{fig:userspace15}
 \end{framefig}
-
-\section{Udvidelse af AR.Dronen med USB-\-moduler}
-\label{sec:udvidelse}
 En robotplatform der kan udvides med nye sensorer efter behov, er
 klart mere anvendelig end en helt lukket platform. Derfor blev det
 undersøgt om det er muligt at anvende AR.Dronens OTG-USB, 
@@ -2969,8 +2958,24 @@ Hvad var resultatet?
 perspektiver, hvad skal / kan vi bruge den nye viden til?
 Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
 
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.79\textwidth]{grafik/3mxdistribution.png}
+  \caption{Kumulative distribution af afstande målt ved at integrere over AR.Dronens udledte hastighed i fremadrettet flyveretning.
+    I testopstillingen fløj AR.Dronen 3 meter ligeud, i forskellige hastigheder og med 3 forskellige førere, ie. 2 forkellige autonome styringer og 1 menneskelig via joystick.}
+  \label{fig:xdistr}
+\end{framefig}
+
 jo mindre quadrokopter des mindre inerti kan være indeholdt, og jo
 mere agile agil/adræt vil den være, måske en pointe i futureworks...
+
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.89\textwidth]{grafik/3mydistribution.png}
+  \caption{Kumulative distribution af afstande målt ved at integrere over AR.Dronens udledte hastighed i sideværts flyveretning.
+    I testopstillingen fløj AR.Dronen kun fremad og ikke til siderne, med forskellige hastigheder og med 3 forskellige førere, ie. 2 forkellige autonome styringer og 1 menneskelig via joystick.}
+  \label{fig:ydistr}
+\end{framefig}
 
 Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
 
@@ -2979,16 +2984,16 @@ Algoritme integration over afstand
 Test, hvor virker det godt hvor er det problematisk
 reference til Parrots egen artikle herom; hastighed udledning bundkamera hvis muligt ellers udledning af accelerometer.
 
-\section{Erkendelse af miljø/mode...}
-Hvad vil vi vise, afvise teste?
-Hvad kan/skal resultatet bruges til?
-Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
-Hvad var resultatet?
-perspektiver, hvad skal / kan vi bruge den nye viden til?
-Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
+%% \section{Erkendelse af miljø/mode...}
+%% Hvad vil vi vise, afvise teste?
+%% Hvad kan/skal resultatet bruges til?
+%% Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
+%% Hvad var resultatet?
+%% perspektiver, hvad skal / kan vi bruge den nye viden til?
+%% Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
 
-Korridor (Hopper) vs. Åbent område (Zuse)
-Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi kan nå at måle afstande foran i optisk flow...
+%% Korridor (Hopper) vs. Åbent område (Zuse)
+%% Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi kan nå at måle afstande foran i optisk flow...
 
 
 \pagebreak

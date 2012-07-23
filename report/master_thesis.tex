@@ -359,6 +359,25 @@ wrapper ovenpå - cite kunne være til en lærebog kendt af Ole, til at
 lære programmering gennem robotter på nettet...
 
 \subsection{OpenCV}
+OpenCV er et bibliotek af optimerede algoritmer indenfor området
+computer vision,~\cite{opencv}\cite{opencv:wiki}. OpenCV blev
+oprindeligt startet af Intel(med bidrag fra optimerings eksperter i
+Intel Russia og Intels Performance Library Team), men udvikles nu af
+robotforskningslaboritoriet Willow Garage, \cite{willow}. Det har fra
+starten i 1999 været et mål, at skabe ikke bare åben. men også
+optimeret kode, til en grundlæggende computer vision infrastruktur.
+
+OpenCV blev i starten udviklet i C, men den seneste udvikling er
+udelukkende foregået i C++. Udover C og C++, findes der en række
+wrapper-interfaces til biblioteket, bland andre et Python
+interface,~\cite{opencv:wiki}.
+
+Opencvs optimerede algoritmer har, på grund af deres effektivitet,
+været uundværlige, blandt andet i implementationen af vores
+PositionSilhouetDetector (sektion~\ref{sec:sub:virtuel}). Forskellen i
+afviklingshastighed på en blobdetector implementeret i ren Python og
+en der anvender OpenCVs algoritmer, var tydelig under vores
+eksperimenter i sektion~\ref{ssec:visuellokalisering}.
 
 %%%% Introduction - Metode
 \subsection{Platform samt hjælpeværktøjer} % Thomas & Morten
@@ -839,7 +858,7 @@ AR.Dronens styreprogram sender og modtager pakker på tre UDP-porte:
     indeholdende statusinformation om f.eks. hastighed, eulervinkler,
     afstand til gulvet og generel information om navigationstilstanden.
 \end{itemize}
-%
+
 \begin{framefig}
   \centering
   \subfigure[AR.Dronens interne platforms struktur.]{\includegraphics[width=0.25\textwidth]{grafik/busybox.png}
@@ -848,10 +867,10 @@ AR.Dronens styreprogram sender og modtager pakker på tre UDP-porte:
   \subfigure[Interfacet til AR.Dronens styreprogram som userspace program.]{\includegraphics[width=0.49\textwidth]{grafik/userspace.png}
     \label{fig:userspace}}
   \label{fig:internstruktur}
-  \caption{Udover eksterne klienter der kommunikere over det trådløse
-    netværk, kan processor også kommunikere internt på AR.Dronen}
+  \caption{Udover eksterne klienter der kommunikerer over det trådløse
+    netværk, kan processer også kommunikere internt på AR.Dronen}
 \end{framefig}
-%
+
 \subsection{AT kommando interface}
 \label{sssec:atinterface}
 En klient som skal kommunikere med AR.Dronens styreprogram, gør dette ved hjælp af
@@ -1348,7 +1367,7 @@ vist i figur~\ref{fig:pythonimpl1}. Controllerinterface-klassen
 gennemgåes i sektion~\ref{sec:sub:controlinterface}).
 Med inspiration fra~\cite{lenser:behaviorbasedarchitecture} og
 \cite{Dey01:ctoolkit} er der udover de allerede nævnte grundreceivere
-implementeret en virtuel sensor (sektion~\ref{sec:sub:virtuel}) som
+implementeret to virtuelle sensorer (sektion~\ref{sec:sub:virtuel}) som
 bruges til at fortolke datastrømmene fra de almindelige receivere. 
 
 Platformens klasser instantieres, startes og tilgåes som udgangspunkt
@@ -1449,34 +1468,41 @@ deres gennemsnit, deres varians og deres middelværdi. Når
 wifireceiverens get\_data() metode kaldes, er det disse værdier der
 returneres, værdierne finder anvendelse når wifidata skal matches med hinanden.
 
-\subsubsection{Virtuel sensor}
+\subsubsection{Virtuelle sensorer}
 \label{sec:sub:virtuel}
 %\cite{Dey01:ctoolkit}\cite{lenser:behaviorbasedarchitecture} #Bardram jcaf?
-Den virtuelle sensor er en sen tilføjelse til platformen og er som
+De virtuelle sensorer er en sen tilføjelse til platformen og er som
 tidligere nævnt inspireret af sensorhierakierne beskrevet i
 \cite{lenser:behaviorbasedarchitecture} og \cite{Dey01:ctoolkit}, hvor
 sensorer opererer på forskellige niveauer og derfor leverer sensor
-output på forskellige 
-abstraktionsniveauer. I modsætning til receiverne modtager den
+output på forskellige abstraktionsniveauer. I modsætning til receiverne modtager den
 virtuelle sensor ikke data direkte fra AR.Dronen, men derimod netop
-fra receiverne. Den virtuelle sensor bearbejder kontinuerligt eg.
-billeddata for at genkende henholdsvis markører på jorden og
-silhuetter umiddelbart foran AR.Dronen. Sensoren leverer således
-information om AR.Dronens omgivelser på et højere abstraktionsniveau
-end de rå værdier fra receiverstrømmene. 
+fra receiverne.  De virtuelle sensorer leverer således information om
+AR.Dronens omgivelser på et højere abstraktionsniveau, end de rå
+værdier fra receiverstrømmene.  
 
-For at kunne detektere både markører på gulvet og silhuetter er det
-nødvendigt for sensoren hele tiden at skifte mellem bund- og
-frontkamera. Dette giver
-imidlertid problemer for Parrots styreprogram der ved konstante kameraskift løbende øger sit
-hukommelsesforbrug indtil Linuxkernen lukker programmet ned. Vores
-målinger viser, at AR.Dronens program kun kan køre mellem ti og tolv
-minutter, såfremt vi samtidig skifter kamera med cirka 5
-millisekunders interval. Selvom om dette problem ikke beskrives
-direkte nogen steder, antydes det dog af en udvikler på Parrots forum,
-at denne funktionalitet ikke er ment anvendt til hurtige kameraskift ved
-hjælp af software og at der derfor er stor sandsynlighed for at metoden
-ikke virker pålideligt, \cite{electronic:parrotforum1}.
+Den ene virtuelle sensor, PositionSilhouetDetector,~\cite{github:virtuel},
+bearbejder kontinuerligt billeddata for at genkende henholdsvis
+markører på jorden og silhuetter umiddelbart foran AR.Dronen. For at kunne detektere både
+markører på gulvet og silhuetter er det nødvendigt for sensoren hele
+tiden at skifte mellem bund- og frontkamera. Dette giver imidlertid
+problemer for AR.Dronens styreprogram der ved konstante kameraskift
+løbende øger sit hukommelsesforbrug indtil Linuxkernen lukker
+styreprogrammet ned. Vores målinger viser, at AR.Dronens program kun kan
+køre mellem ti og tolv minutter, såfremt vi samtidig skifter kamera
+med cirka 5 millisekunders interval. Selvom om dette problem ikke
+beskrives direkte nogen steder, antydes det dog af en udvikler på
+Parrots forum, at denne funktionalitet ikke er ment anvendt til
+hurtige kameraskift ved hjælp af software og at der derfor er stor
+sandsynlighed for, at metoden ikke virker pålideligt,
+\cite{electronic:parrotforum1}.
+
+Den anden virtuelle sensor, DistanceTracker,~\cite{github:virtuel}, benytter
+hastighedsværdierne fra navdatastrømmen. Sensoren udfører løbende
+integration over hastighederne i x og y-retning. Dette giver os et
+brugbart estimat over den distance AR.Dronen har tilbagelagt. Se
+sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter vi har udført med
+DistanceTrackeren. 
 
 \subsection{Python interface til fjernstyring af AR.Dronen}
 \label{sec:sub:controlinterface}
@@ -1551,27 +1577,26 @@ forskellige tilstande. Dette gøres ved at kalde \code{set\_control\_method} med
 en ny kontrolmetode som argument. 
 
 \subsubsection{Joystickcontroller}
-I platformen anvendes Joystick istedet for en iPhone eller
-iPad til at fjernstyre AR.Drone manuelt i forbindelse
-med testflyvninger. Der var flere praktiske grunde til at vi valgte at
-implementere en alternativ fjernstyring. Blandt andet havde vi et
-behov for at kunne interagere både med vores eget system og AR.Dronen
-på samme tid, mens vi til stadighed måtte have øjne på AR.Dronen. Vi
-fandt desuden ikke iPhone styringen tilstrækkelig præcis eller særlig
-intuitiv. Xbox360 controlleren derimod omtales som en af de bedst
-designede controllere og har endda fundet anvendelse af militære
-styrker i USA og storbritannien, \cite{electronic:zdnet},
-\cite{electronic:joystiq}, \cite{electronic:youtube1}.
-Fjernstyringsdelen er meget simpel og fungerer ved at oversætte
-værdier fra Xbox360 controlleren (som vi får givet af pygames, \cite{electronic:pygame},
-joystickmodul) og så sende disse til
-fjernstyrings-interfacet (ControllerInterface). Xbox360 Joystick-controlleren
-bruges udover manuel fjernstyring af AR.Dronen også til at starte
-forprogrammerede handlingssekvenser, ie. tasks (task beskrives nærmere
-i sektion~\ref{sec:tasks})).
-Således kan piloten manuelt bringe AR.Dronen i en ønsket position og så herefter starte den automatiske
-afvikling af et forudbestemt bevægemønster. 
-På figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
+I platformen anvendes Joystick istedet for en iPhone eller iPad til at
+fjernstyre AR.Drone manuelt i forbindelse med testflyvninger. Der var
+flere praktiske grunde til at vi valgte at implementere en alternativ
+fjernstyring. Blandt andet havde vi et behov for at kunne interagere
+både med vores eget system og AR.Dronen på samme tid, mens vi til
+stadighed måtte have øjne på AR.Dronen. Vi fandt desuden ikke iPhone
+styringen tilstrækkelig præcis eller særlig intuitiv. Xbox360
+controlleren derimod omtales som en af de bedst designede controllere
+og har endda fundet anvendelse af militære styrker i USA og
+storbritannien, \cite{electronic:zdnet}, \cite{electronic:joystiq},
+\cite{electronic:youtube1}.  Fjernstyringsdelen er meget simpel og
+fungerer ved at oversætte værdier fra Xbox360 controlleren (som vi får
+givet af pygames, \cite{electronic:pygame}, joystickmodul) og så sende
+disse til fjernstyrings-interfacet (ControllerInterface). Xbox360
+Joystick-controlleren bruges udover manuel fjernstyring af AR.Dronen
+også til at starte forprogrammerede handlingssekvenser, ie. tasks
+(task beskrives nærmere i sektion~\ref{sec:tasks})).  Således kan
+piloten manuelt bringe AR.Dronen i en ønsket position og så herefter
+starte den automatiske afvikling af et forudbestemt bevægemønster.  På
+figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
 controlleren.
 \begin{framefig}
   \centering
@@ -1593,16 +1618,6 @@ til at skifte kamera ('z'), til at få udskrevet aktive tasks('c'), til
 at få udskrevet en oversigt over tråde i programmet('t'), samt til at
 starte tasks ('1', '2' og '3'). %%%%% <ins>task</ins> <del>opgaver på autocontrolleren</del>
 
-\subsection{Taskmanager}
-\label{subsec:taskmanager}
-Taskmanagerklassen startede ud som en almindelig controller, men er endt
-som en mere selvstændig del af platformen. Taskmanageren skiller sig
-ud ved ikke, i modsætning til joystick- og keyboardcontrollerne, at
-arbejde direkte med kontrolinterfacet eller med output fra
-receiverne. Taskmanagerens opgave er udelukkende at starte
-forudspecificerede opgaver (tasks; som gennemgåes i sektion~\ref{sec:tasks}) og stoppe dem igen, samt at
-facilitere beslutningen om hvilken task der har lov til at bevæge AR.Dronen. 
-
 \subsection{Testdevice}
 \label{sec:sub:testdevice}
 Dette modul muliggør gennemførelsen af simple simuleringseksperimenter i et
@@ -1620,150 +1635,82 @@ og den sidste fordi samme computer nu står både for afsendelse,
 modtagelse og afkodning.  Testdevicemodulet har ikke noget at gøre med
 optagelsen af sensoroutputtet, denne foregår i receiverklasserne.
 
+\subsection{Taskmanager}
+\label{subsec:taskmanager}
+Taskmanagerklassen startede ud som en almindelig controller, men er
+endt som en mere selvstændig del af platformen. Taskmanageren skiller
+sig ud ved ikke, i modsætning til joystick- og keyboardcontrollerne,
+at arbejde direkte med kontrolinterfacet eller med output fra
+receiverne. Taskmanagerens opgave er at starte
+forudspecificerede opgaver (tasks som gennemgåes i
+sektion~\ref{sec:tasks}) og stoppe dem igen, samt at facilitere
+beslutningen, om hvilken task der har lov til at bevæge AR.Dronen.
+\pagebreak
 \section{Tasks} % Morten
 \label{sec:tasks}
 For at indkapsle forskellige bevægemønstre og for at kunne koordinere
 en parallel afvikling af disse, har vi implementeret et hierakisk
 opbygget tasksystem. Vi har valgt at kalde vores enheder for tasks
-istedet for behaviors, som ellers både bruges i artiklen 'A Modular Hierarchical Behavior-Based Architecture',
-~\cite{lenser:behaviorbasedarchitecture}, og i Lejos' subsumption-pakke, \cite{lejossub}. Grunden til dette er at flere af vores tasks er
-forholdsvis kortlivede(for eksempel take-off og landtasks) og derfor
-mere minder om en opgave der skal forberedes, udføres og
-afsluttes. Dette ses i modsætning til en behavior, som kan opfattes
-som en længerevarende opførsel. Vi har også implementeret højniveau bevægemønstre der
-minder mere om en traditionelle behaviors(for eksempel
-FollowTourTask). Vi mener også at det giver mening, at kalde disse
-tasks, da de også implementeres efter vores generelle taskstruktur.
+istedet for behaviors, der ellers både bruges i artiklen 'A Modular
+Hierarchical Behavior-Based Architecture',
+~\cite{lenser:behaviorbasedarchitecture}, og i Lejos'
+subsumption-pakke, \cite{lejossub}. Grunden til dette er, at flere af
+vores tasks er forholdsvis kortlivede(for eksempel take-off og
+landtasks) og derfor mere minder om en opgave der skal forberedes,
+udføres og afsluttes. Dette ses i modsætning til en behavior, som kan
+opfattes som en længerevarende opførsel. Vi har også implementeret
+højniveau bevægemønstre der minder mere om en traditionelle behaviors
+(for eksempel FollowTourTask). Vi mener, at det også giver mening, at
+kalde disse tasks, da de også implementeres efter vores generelle
+taskstruktur.
 
 Vores første udgaver af tasksystemet indbefattede tasks der indsamlede
-og behandlede data fra AR.Dronens sensorer, for herefter at stille
-disse data tilrådighed for andre tasks, gennem en delt kontekstliste. I
-de endelige udgaver er disse tasks dog udskilt til den virtuelle
-sensor, så tasks ikke skal behandle sensordata, men kun reagere og
-formidle bevægelse på baggrund af højniveau-sensordata. 
+og behandlede data fra AR.Dronens sensorer. De behandlede data blev
+herefter stillet til rådighed for andre tasks, gennem en delt
+kontekstliste. I de endelige udgaver er disse tasks udskilt som
+den virtuelle sensorer. Tasks skal således ikke behandle sensordata, men kun
+reagere og formidle bevægelse på baggrund af højniveau-sensordata.
 
-\subsection{Task typer} 
-Vi har to hovedtyper, simple og compoundtasks. Simple tasks nedarver
-fra vores basetaskklasse Task. De repræsenterer oftest en simpel
-bevægelse, men kan være vilkårligt komplekse. For eksempel har vi en
-task der, blandt andet, implementerer en PID-controller. 
-Compoundtasks er tasks der indeholder en liste af subtasks og funktionalitet til
-at starte og stoppe disse subtasks. Vi opdeler CompoundTasks
-yderligere i to typer, sekventielle og parallelle. Sekventielle CompoundTasks
-starter deres subtasks en efter en, men venter med at starte en ny
-subtask før den forrige er afsluttet. En sekventiel CompoundTask
-stopper når den sidste subtask er afsluttet. Parallelle CompoundTask
-starter alle deres subtasks på en gang og stopper også når den
-sidste subtask er afsluttet. 
-
-\subsection{Task hieraki}
-Ved hjælp af de ovenfor beskrevne tasktyper, og specialiseringer af
-disse, kan vi danne en task-træstruktur med parents og children. Strukturen minder om den beskrevet i
-\cite{lenser:behaviorbasedarchitecture}. Det grundliggende formål med
-denne træstruktur er at danne et task-hieraki. Taskmanageren skal
-ved hjælp af task-hierakiet sørge for, at der aldrig er mere end én task
-der bevæger AR.Dronen. Dette løses ved at give alle tasks en
-prioritet(level). En given task kan så få tilladelse, til at bevæge
-AR.Dronen på to betingelser: 1) ingen task med højere level og samme
-parent ønsker at bevæge AR.Dronen og 2) taskens parent har tilladelse
-til at flytte AR.Dronen.
-
-På ~\ref{fig:taskhieraky} ses et eksempel på et tasktræ
-konstrueret med vores taskcreator. Under antagelse af at hver TestTask
-ønsker at udføre et antal bevægelser og ikke på noget tidspunkt ønsker
-frivilligt at opgive bevægekontrollen, vil TestTask med level 1 slutte
-først og TestTask med level 2 slutte sidst.
-\begin{framefig}
-  \centering
-  \includegraphics[width=0.80\textwidth]{grafik/taskhieraky.png}
-  \caption{Eksempel på et taskhieraki.}
-  \label{fig:taskhieraky}
-\end{framefig}
-
-\subsection{Task implementationer}
-Vi har lavet to forskellige udgaver af vores
-task-system(tasks og taskmanager), som begge implementerer den
-opførsel og struktur der er beskrevet ovenfor. 
-
-Den første, trådbaserede, implementation er inspireret af Lejos' subsumption-pakke,
-~\cite{lejossub}. Lejos er en Firmwareerstatning til LEGO Mindstorms
-RCX- og NXT-platform, der tillader afviklingen af Java på disse
-platforme,~\cite{lejos}.
-Den ikke-trådbaserede implementation er primært inpireret af artiklen 'A Modular Hierarchical
-Behavior-Based Architecture',\cite{lenser:behaviorbasedarchitecture}.
-
-\paragraph{Trådbaseret} 
-Den første implementation er en trådbaseret løsning, dette betyder at
-hver task er implementeret som en individuel 
-tråd. I den trådbaserede implementation kører alle tasks samtidig. Når
-en task ønsker at bevæge AR.Dronen, får den tilladelse til dette ved
-at spørge sin parent(som muligvis skal spørge videre op i
-træet). 
-
-Denne tilgang minder meget om arkitekturen der anvendes af
-Lejos' subsumption pakke, \cite{lejossub}. Taskmanageren vil som tasktræets rod, have samme
-rolle som Arbitratoren i Lejos system. Denne arkitektur har primært et 'bottom-up'-flow, da det er de individuelle tasks
-selv der indhenter tilladelse, til at bevæge AR.Dronen, ved deres
-parent. En ulempe ved designet er dog, at flowet ikke kun går mod
-roden. En del kommunikation er nødvendig for sikre, at lavere-level tasks bliver
-deaktiveret når en højere-level task tager kontrollen. Vores erfaring
-med denne arkitektur er desuden, at den ikke skalerer særligt godt, på
-grund af overheadet ved at have en tråd per task. 
-
-\paragraph{Ikke-trådbaseret}
-Tilgangen i 'A Modular Hierarchical Behavior-Based
-Architecture',\cite{lenser:behaviorbasedarchitecture}, er at en
-aktiveret behavior skal bestemme hvilke af sine underbehaviors der
-skal aktiveres. I artiklen er dette er praktisk, da deres robot kan udføre forskellige bevægelser
-på samme tid. Denne tilgang sikrer at det bedste sæt af parallelle
-behaviors kan beregnes og herefter aktiveres.
-
-I vores ikke-trådbaserede tilgang forsimpler vi ovennævnte princip. Vi
-siger, at en Compoundtask på opfordring skal aktivere \emph{den} bedst
-egnede subtask, da vi ikke opererer ikke med flere aktive tasks samtidig\footnote{De
-  bevægelser vi har til rådighed kan ikke udføres uden indflydelse på 
-  hinanden}. Vi definerer altid den bedst egnede subtask som den med
-det højeste level og et ønske om at bevæge AR.Dronen.
-
-Den eneste tråd i denne implementation er taskmanageren, som
-kontinuerligt lader den bedst egnede task bevæge AR.Dronen. I Praksis
-sker dette ved at taskmanageren vedligeholder en sorteret liste over de
-aktive tasks. Under hver iteration kalder taskmanageren
-domove()-metoden på den første task i listen(tasken med det højeste level), hvis metoden returner
-False forsøges med den næste task i listen, hvis der returneres True
-afbrydes iterationen og der startes forfra. Kaldet til
-domove()-metoden propageres rekursivt ned gennem tasktræet og
-returnerer True hvis AR.Dronen blev bevæget og False hvis ingen task
-havde interesse i at bevæge den. Sammenlignet med
-den trådede udgave, er flowet 'top-down', da bevægelsen altid
-initieres af taskmanageren.    
-
-Denne ikke-trådbaserede tilgang virker mere velegnet til en træbaseret
-taskstruktur som vores. Kommunikationen mellem tasks er meget
-simplere og overheadet pga. de mange tråde undgåes. 
-
-\subsubsection{HoverTrackTask}
-\label{sssec:hovertracktask}
+\subsection{Task typer} Vi har to hovedtyper, simple og
+compoundtasks. Simple tasks nedarver fra basetaskklassen Task. De
+repræsenterer oftest en simpel bevægelse, men kan være vilkårligt
+komplekse. For eksempel har vi en task der, blandt andet,
+implementerer en PID-controller.
+  
+Compoundtasks  nedarver fra CompoundTask-klassen og indeholder en liste
+af subtasks. Vi opdeler compoundtasks yderligere i to typer, 
+sekventielle og parallelle(SeqCompoundTask og
+ParCompoundTask). Sekventielle compoundtasks starter deres 
+subtasks en efter en og venter med at starte en ny subtask, før den
+forrige er afsluttet. En sekventiel compoundtask stopper, når den
+sidste subtask er afsluttet. Parallelle compoundtasks starter alle
+deres subtasks på en gang og stopper når den sidste subtask er
+afsluttet. Herunder gives eksempler på henholdsvis èn compoundtask og
+to simple tasks. 
 
 \subsubsection{FollowTourTask}
 \label{sssec:followtourtask}
-Et mere realistisk og komplekst eksempel er en FollowTourTask, se
-\ref{fig:followtour}, denne task nedarver fra en sekvensiel
-compoundtask og indeholder udover takeoff og land-tasks også en
-parallel compoundtask der kan veksle mellem bevægelse og fastholdelse
-af en position(ved hjælp af en PID-controller). Selve FollowTourTask
-enheden holder styr på den tour der skal følges, ved hjælp af et
-map-objekt, og sørger for at opdatere HoverTrackTasken(PID) med en ny
-målposition når det er nødvendigt. 
-Hvis man anskuer vores map-objekt som en relationel graph hvor alle knuder er
+Et eksempel på en compoundtask er FollowTourTasken, hvis tasktræ kan ses
+på figur~\ref{fig:followtour}. En FollowTourTask nedarver fra en
+SeqCompoundTask og indeholder, udover takeoff og land-tasks, en 
+parallel compoundtask der kan veksle mellem en MoveTask og en
+HoverTrackTask (det vil sige, at der veksles mellem bevægelse og
+fastholdelse af en erkendt position, HoverTrackTasken beskrives i
+sektion~\ref{sssec:hovertracktask}). Selve FollowTourTask 
+enheden holder, ved hjælp af et
+map-objekt (se sektion~\ref{sec:mapcreator}), styr på den tour der skal
+følges og sørger for at opdatere HoverTrackTasken med en ny 
+målposition, når det er nødvendigt. 
+Hvis man anskuer vores map-objekt som en relationel graf, hvor alle knuder er
 forbundne, minder vores tilgang meget om Kuipers og Byuns metode der
-beskrives i \cite{murphy2000introduction}. Specielt lægges mærke til at der i
-begge systemer udføres fejlkorrigering hver gang en ny position
-detekteres, i vores system sker dette ved at HoverTrackTasken bringer
-AR.Dronen indenfor en specifik afstand af den præcise position, før
-den sendes videre. Det ville desuden være let at lade vores
-*DistanceMeasurer* algoritme tilføje metrisk data til map-objektet, hver gang
-AR.Dronen har bevæget sig mellem to positioner.
+beskrives i \cite{murphy2000introduction}. Specielt lægges mærke til, at der i
+begge systemer udføres fejlkorrigering, hver gang en ny position
+detekteres. I vores system sker dette ved, at HoverTrackTasken bringer
+AR.Dronen indenfor en maksimum afstand af den præcise position, før
+den sendes videre. Det ville desuden være let at tilføje metrisk data
+fra DistanceTrackeren(se sektion~\ref{sec:sub:virtuel}), til
+map-objektet, hver gang AR.Dronen har bevæget sig mellem to
+positioner. 
 
 \begin{framefig}
   \centering
@@ -1772,19 +1719,152 @@ AR.Dronen har bevæget sig mellem to positioner.
   \label{fig:followtour}
 \end{framefig}
 
-\chapter{Klientværktøjer} % Morten,
-I dette kapitel gennemgåes tre værktøjer som er udviklet i
-forbindelse med specialearbejdet. Der er tale om et program til at
-præsentere og visualisere datastrømmene fra AR.Drone(Sensor display),
-et program til at bygge de map-objekter der anvendes af vores FollowTourTask(Mapcreator)
-og et program til at instantiere, kombinere og afvikle
-Tasks(Taskcreator). Alle tre værktøjer anvender et drone-objekt som
-vist på figur~\ref{fig:initialiseringssekvens} og kan startes i
-henholdsvis normal- og testtilstand(se
+\subsubsection{HoverTrackTask}
+\label{sssec:hovertracktask}
+HoverTrackTasken, som er en simpel task, implementerer en
+PID-controller,\cite{electronic:pid}, der kan holde AR.Dronen over en
+position. 
+Når en markør(se \ref{fig:advancedmarker}) er synlig for AR.Dronens bundkamera, kan vi ved
+hjælp af PositionSilhouetDetectoren(se sektion~\ref{sec:sub:virtuel}), få
+markørens position på billedet. Med denne position udregnes en
+error-værdi i x og y-retningerne, i forhold til centrum af
+billedet.For at kunne bruge errorværdierne, skal de 
+konverteres fra pixels til millimeter og der skal tages højde for AR.Dronens
+øjeblikkelige hældning. Denne konvertering og korrigering foregår,
+efter den metode der beskrives og anvendes af Michaël Ludmann og
+Guillaume Depoyant i deres speciale
+LUDEP,~\cite{electronic:ludep},~\cite{electronic:ludepcon}. Efter
+udregningen af errorværdierne, anvendes de som i en standard
+PID-controller, til at bestemme de endelige værdier der sendes til kontrolinterfacet
+, for at bevæge AR.Dronen. PID-funktionaliteten er implementeret i HoverTrackTaskens
+update-metode, \cite{github:newest}.
+  
+I forbindelse med deltagelse i en FollowTourTask, kan HoverTrackTasken
+tildeles information om den specifikke position der skal trackes. Den
+kan således, lade andre tasks bevæge AR.Dronen, hvis den rigtige position
+ikke er fundet. HoverTrackTasken er, i forbindelse med en
+FollowTourTask, også ansvarlig for at dreje AR.Dronen i retning af den
+næste position, mens nuværende position fastholdes.
+
+\subsubsection{AvoidTask}
+\label{sssec:avoidtask} AvoidTasken er også et eksempel på en simpel
+task. Den anvender PositionSilhouetDetectoren(se
+sektion~\ref{sec:sub:virtuel}), til at detektere personer umiddelbart
+foran AR.Dronen. Hvis en person detekteres, vil AvoidTasken bevæge
+AR.Dronen op, indtil personen ikke længere er synlig for AR.Dronens
+frontkamera. Den forholdsvis simple task udnytter AR.Dronens muligheder,
+for at bevæge sig i rummet. Grunden til at AR.Dronen bevæges op og
+ikke til siden eller bagud er, at AR.Dronen ikke kan orientere sig i
+disse retninger uden at rotere. Risikoen forbundet
+med at bevæge sig op er lille (da vi kender loftshøjden), i forhold
+til risikoen ved at bevæge sig sidelæns eller baglæns i ikke-erkendt
+luftrum. Desuden er det let for de andre tasks, at fortsætte deres
+udførelse efter AvoidTasken stopper. Idet AR.Dronen bibeholder samme
+orientering mens AvoidTasken er aktiv. AvoidTasken kombineres let med
+andre tasks, f.eks. en FollowTourTask eller en simpel MoveTask, ved
+hjælp af taskcreator-værktøjet (sektion~\ref{sec:taskcreator}).
+
+\subsection{Task hieraki} Ved hjælp af de ovenfor beskrevne tasktyper,
+og specialiseringer af disse, kan vi danne en task-træstruktur med
+parents og children. Strukturen minder om den beskrevet i
+\cite{lenser:behaviorbasedarchitecture}. Det grundliggende formål med
+denne træstruktur er at danne et task-hieraki. Taskmanageren skal ved
+hjælp af task-hierakiet sørge for, at der aldrig er mere end én task
+der bevæger AR.Dronen. Dette løses ved at give alle tasks en
+prioritet(level). En given task kan så få tilladelse til at bevæge
+AR.Dronen, på to betingelser: 1) Ingen task med højere level og samme
+parent ønsker at bevæge AR.Dronen og 2) Taskens parent har tilladelse
+til at flytte AR.Dronen.
+
+På figur~\ref{fig:taskhieraky} ses et eksempel på et tasktræ
+konstrueret med vores taskcreator (sektion ~\ref{sec:taskcreator}). Under antagelse af, at hver TestTask
+ønsker at udføre et antal bevægelser med AR.Dronen og ønsker at udføre
+disse bevægelser uden pause, vil TestTask med level 1 slutte først og
+TestTask med level 2 slutte sidst.
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.80\textwidth]{grafik/taskhieraky.png}
+  \caption{Eksempel på et taskhieraki. Hver task er annoteret med
+    deres level, dette tal beskriver taskens prioritet i forhold til
+    andre tasks med samme parent.}
+  \label{fig:taskhieraky}
+\end{framefig}
+
+\subsection{Task implementationer} Vi har lavet to forskellige udgaver
+af vores task-system(taskmanageren og alle tasks), som begge implementerer
+den opførsel og struktur der er beskrevet ovenfor.
+
+Den første, trådbaserede, implementation er inspireret af Lejos'
+subsumption-pakke, ~\cite{lejossub}. Lejos er en Firmwareerstatning
+til LEGO Mindstorms RCX- og NXT-platform, der tillader afviklingen af
+Java på disse platforme,~\cite{lejos}.  Den anden, ikke-trådbaserede,
+implementation er primært inpireret af artiklen 'A Modular
+Hierarchical Behavior-Based
+Architecture',\cite{lenser:behaviorbasedarchitecture}.
+
+\subsubsection{Trådbaseret} 
+I den første trådbaserede løsning er hver task implementeret som en
+individuel tråd. Alle tasks kører samtidig. Når en task ønsker at bevæge
+AR.Dronen, får den tilladelse til dette ved at spørge sin parent(som
+muligvis skal spørge videre op i træet).
+
+Denne tilgang minder meget om arkitekturen der anvendes af Lejos'
+subsumption pakke, \cite{lejossub}. Taskmanageren vil, som tasktræets
+rod, have samme rolle som Arbitratoren i Lejos system. Denne
+arkitektur har primært et 'bottom-up'-flow, da det er de individuelle
+tasks der initierer bevægelsen af AR.Dronen. En ulempe ved designet er dog, at flowet ikke kun går
+mod taskmanageren. En del kommunikation er nødvendig for sikre, at
+lavere-level tasks bliver deaktiveret, når en højere-level task tager
+kontrollen. Vores erfaring med denne arkitektur er desuden, at den på
+grund af overheadet ved at have en tråd per task, ikke skalerer
+særligt godt. 
+
+\subsubsection{Ikke-trådbaseret} Tilgangen i 'A Modular Hierarchical
+Behavior-Based Architecture',\cite{lenser:behaviorbasedarchitecture},
+er at en aktiveret behavior skal bestemme hvilke af sine
+subbehaviors der skal aktiveres. I artiklen er dette er praktisk, da
+deres robot kan udføre forskellige bevægelser på samme tid. Tilgangen
+sikrer, at det bedste sæt af parallelle behaviors kan bestemmes 
+og herefter aktiveres.
+
+I vores ikke-trådbaserede tilgang forsimpler vi ovennævnte princip. Vi
+siger, at en Compoundtask på opfordring skal aktivere \emph{den} bedst
+egnede subtask, da vi ikke opererer ikke med flere aktive tasks
+samtidig\footnote{De bevægelser vi har til rådighed kan ikke udføres
+uden indflydelse på hinanden}. Vi definerer altid den bedst egnede
+subtask, som den med det højeste level og et ønske om at bevæge
+AR.Dronen.
+
+Den eneste tråd i denne implementation er taskmanageren. Denne lader
+kontinuerligt den bedst egnede task bevæge AR.Dronen. I Praksis 
+sker dette ved at taskmanageren vedligeholder en sorteret liste over
+de aktive tasks. Under hver iteration kalder taskmanageren
+domove()-metoden på den første task i listen(tasken med det højeste
+level). Kaldet til domove()-metoden propageres rekursivt ned gennem
+tasktræet og returnerer True hvis AR.Dronen blev bevæget og False hvis
+ingen task havde interesse i at bevæge den. Hvis metoden returner
+False forsøges med den næste task i listen, hvis der returneres True
+afbrydes iterationen og der startes forfra. Sammenlignet med den
+trådede udgave, er flowet 'top-down', da bevægelsen altid initieres af
+taskmanageren.
+
+Denne ikke-trådbaserede tilgang virker mere velegnet til en træbaseret
+taskstruktur som vores. Kommunikationen mellem tasks er simplere
+og overheadet pga. de mange tråde undgåes.
+
+\chapter{Klientværktøjer} % Morten, I dette kapitel gennemgåes tre
+værktøjer som er udviklet i forbindelse med specialearbejdet. Der er
+tale om et program til at præsentere og visualisere datastrømmene fra
+AR.Drone(Sensor display), et program til at bygge de map-objekter der
+anvendes af vores FollowTourTask(Mapcreator) og et program til at
+instantiere, kombinere og afvikle Tasks(Taskcreator). Alle tre
+værktøjer anvender et drone-objekt som vist på
+figur~\ref{fig:initialiseringssekvens} og kan startes i henholdsvis
+normal- og testtilstand(se
 figur~\ref{fig:sensordisplayrun},\ref{fig:mapcreatorrun} og
-\ref{fig:taskcreatorrun}). Hvis brugeren vælger at starte et 
-værktøj i testtilstand, vil drone-objektet oprette forbindelse til et
-testdevice (beskrevet i sektion~\ref{sec:sub:testdevice}) istedet for AR.Dronen.
+\ref{fig:taskcreatorrun}). Hvis brugeren vælger at starte et værktøj i
+testtilstand, vil drone-objektet oprette forbindelse til et testdevice
+(beskrevet i sektion~\ref{sec:sub:testdevice}) istedet for AR.Dronen.
 
 \section{Sensor display}
 \begin{framefig}
@@ -1868,8 +1948,10 @@ $ ./sensordisplay.py -t
   \caption{Mapcreator-værktøjets to redigeringstilstande, world og tour.}
 \end{framefig}
 Mapcreator er et værktøj til at oprette og redigere map-objekter.
-Map-objekter bruges af FollowTourTasks til at navigere
-efter. Mapcreator har to redigeringstilstande, world og tour, som kan
+Map-objekter instantieres fra klassen PosMap(placeret i map.py,
+\cite{github:map}) og bruges af FollowTourTasks til at navigere
+efter. 
+Mapcreator har to redigeringstilstande, world og tour, som kan 
 vælges ved at trykke på det tilsvarende faneblad øverst i billedet. De
 to tilstande ses på figur~\ref{fig:mapcreator}.
 
@@ -2011,7 +2093,7 @@ signalstyrker sammenlignes ved først at finde en fællesmængde af
 WIFI-kilder i de to sæt og herefter udregne en afstand mellem de to
 sæt, baseret på denne fællesmængde. Lokaliseringsproceduren er
 illustreret på figur~\ref{fig:online} Algoritmen er implementeret i
-virtualsensors.py, \cite{github:virtual} og WIFI-mappet er
+virtualsensors.py, \cite{github:virtuel} og WIFI-mappet er
 implementeret som en del af map.py, \cite{github:map}. 
 
 \begin{framefig}
@@ -2114,6 +2196,7 @@ denne eksperimentrække videre. En videreudvikling af vores algoritme
 kunne muligvis fungere som støtte til en primær visuel lokaliseringsmetode. 
 
 \subsection{Visuel lokalisering}
+\label{ssec:visuellokalisering}
 \begin{framefig}
   \centering
   \subfigure[Simpel markør]{
@@ -2157,7 +2240,7 @@ for at få en idé om metodens anvendelighed i en kontekst hvor
 effektivitet er afgørende.. 
 Vi anvendte til dette forsøg også kun en enkelt markør og forsøget
 afvikledes ved at AR.Dronen blev fløjet i position over denne,
-hvorefter HoverTrackTasken blev aktiveret. Det viste sig tydeligt
+hvorefter HoverTrackTasken blev aktiveret. Det viste sig tydeligt,
 at blobdetectoren ikke var effektiv nok. Vi var ikke i stand til
 at opdatere hurtigt nok og som resultat nåede AR.Dronen ofte at bevæge
 sig væk fra markøren. Dette resultat fik os til at reimplementere
@@ -2846,7 +2929,7 @@ korrekte placering af vanishingpointet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
-\section{Distance-measure} % Thomas
+\section{DistanceTracker} % Thomas
 \label{sec:distance-mesu}
 Hvad vil vi vise, afvise teste?
 Hvad kan/skal resultatet bruges til?

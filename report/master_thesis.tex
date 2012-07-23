@@ -351,26 +351,45 @@ hvorfor / uddybende beskrivelse af kontor, gang, openspace
 %% - hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det (relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
 
 \subsection{Python}
-platform skrevet i python med bibliotek / wrapper til opencv (ffmpeg), pygame, numpy...
-hvorfor valgte vi python, - fordi de er præcist lavet til
-prototype-programmering, evt. nævne at vi er kommet frem til at det i
-fremtiden vil være bedre at skrive en del i C og så lave python
-wrapper ovenpå - cite kunne være til en lærebog kendt af Ole, til at
-lære programmering gennem robotter på nettet...
+Vi valgt at skrive klientplatformen i Python. Grunden til dette er
+primært Pythons læsbarhed og simple syntaks. Læsbar kode fordrer ikke bare
+hurtig udvikling fra vores side, men også at andre udviklere hurtigere
+kan sætte sig ind i koden og videreudvikle på den. Pythons simple
+syntaks betyder, at klientplatformen også vil henvende sig til mindre
+erfarne udviklere. Da vi har haft som mål, at skabe en let anvendelig
+og let udbyggelig klientplatform, er Python det oplagte valg.
+ 
+Eksemplerne i sektion~\ref{sec:platformsadgang} viser hvor lidt kode
+der behøves, for at anvende klientplatformen. Desuden henvises til
+implementationen af vores klientværktøjer,
+\cite{github:sensordisplay}\cite{github:mapcreator}\cite{github:taskcreator},
+for eksempler der anvender klientplatformen.  
+
+Udfordingen ved valget af implementationssprog er, at Python som
+et dynamisk typet, fortolket sprog, ikke performance-mæssigt kan
+sammenlignes med mere maskinnære sprog som C og C++. For at overkomme
+denne udfordring, har vi gjort anvendelse af OpenCVs billedalgoritmer(beskrevet
+nedenunder) og Psyco,~\cite{electronic:psyco}, i forbindelse med afkodning af
+billeder fra AR.Dronen(se desuden sektion~\ref{subsec:receivers}). En fremtidig forbedring kunne være, at
+implementere afkodningen af AR.Dronens billeder i et C-bibliotek og
+bygge en Pythonwrapper til dette.    
 
 \subsection{OpenCV}
-OpenCV er et bibliotek af optimerede algoritmer indenfor området
+OpenCV er et bibliotek af optimerede algoritmer, indenfor området
 computer vision,~\cite{opencv}\cite{opencv:wiki}. OpenCV blev
-oprindeligt startet af Intel(med bidrag fra optimerings eksperter i
+oprindeligt startet af Intel(med bidrag fra optimeringseksperter i
 Intel Russia og Intels Performance Library Team), men udvikles nu af
-robotforskningslaboritoriet Willow Garage, \cite{willow}. Det har fra
+robotforskningslaboratoriet Willow Garage, \cite{opencv:willow:wiki}. Det har fra
 starten i 1999 været et mål, at skabe ikke bare åben. men også
 optimeret kode, til en grundlæggende computer vision infrastruktur.
 
 OpenCV blev i starten udviklet i C, men den seneste udvikling er
 udelukkende foregået i C++. Udover C og C++, findes der en række
-wrapper-interfaces til biblioteket, bland andre et Python
-interface,~\cite{opencv:wiki}.
+interfaces til biblioteket, bland andre et Python
+interface,~\cite{opencv:wiki}. Python interfacet fungerer som en
+wrapper om OpenCVs C/C++ algoritmer. Ved anvendelse af dette
+interface, får vi altså kombineret Pythons brugervenlighed og OpenCVs
+hastighed.  
 
 Opencvs optimerede algoritmer har, på grund af deres effektivitet,
 været uundværlige, blandt andet i implementationen af vores
@@ -380,8 +399,12 @@ en der anvender OpenCVs algoritmer, var tydelig under vores
 eksperimenter i sektion~\ref{ssec:visuellokalisering}.
 
 %%%% Introduction - Metode
-\subsection{Platform samt hjælpeværktøjer} % Thomas & Morten
-%arkitektur perspektivering analyse?
+\subsection{Klientplatform og klientværktøjer} % Thomas & Morten
+Vores klientplatform kan betegnes som et system til indsamling af
+AR.Dronens sensorstrømme og fjernstyring af denne. Klientplatformen
+har fasciliteret de eksperimenter
+
+
 forskellige frameworks til sensordata opsamling og
 udledning/abstraktioner Dey's toolkit / JCAF, Lenser m.fl.
 - vi forestiller os en platform med understøttelse af virtuelle
@@ -411,6 +434,7 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 \paragraph{Lokalisering via Wifi-fingerprinting}
 %\paragraph{Simpel-blob}
 \paragraph{Blob-detection og PID styring} simpel blob, og udbygget nested blob
+
 \paragraph{Afstandsbedømmelse via optical flow}
 %\todo{fedt hvis det kan nåes at lave det...}
 % birds eye view (lidt refs under speciale-mappen), head bobbing, biers afstandsbedømmelse ligger i
@@ -423,8 +447,6 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 \paragraph{Korridor detektering}
 \paragraph{distance-measurererere}
 
-\paragraph{avoid silhouet}
-\paragraph{low battery}
 \paragraph{Erkendelse af miljø...}
  Korridor (Hopper) vs. Åbent område (Zuse)
 
@@ -448,7 +470,7 @@ Beskrivelse af indholdet på bloggen, versionshåndtering, tilgængelighed for comu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Quadrokopter AR.Drone}
 \label{sec:AR.Drone}
-AR.Drone er en quadrokopter fremstillet og udviklet af det franske
+AR.Dronen er en quadrokopter fremstillet og udviklet af det franske
 firma Parrot, \cite{electronic:parrot},
 \cite{electronic:wiki_parrot}. AR står Augmented Reality,
 \cite{electronic:nbc}. En quadrokopter benytter fire faste rotorer til
@@ -1217,12 +1239,13 @@ understøtte det videre arbejde med AR.Dronen. Platformen skal sikre
 let og effektiv adgang til AR.Dronens sensor output, samt give
 mulighed for at styre AR.Dronen, både manuelt med joystick og tastatur
 gennem en PC (altså ikke iPhone, iPad el. lign.) og ved hjælp af
-forprogrammerde sekvenser af bevægelsaer %prædefinerede opgaver
- som beskrives nærmere i sektion~\ref{sec:tasks}.
+forprogrammerede sekvenser af bevægelser som beskrives nærmere i
+sektion~\ref{sec:tasks}. 
 
 \section{Platformsadgang via Python}
-Python sproget blev i første omgang valgt for at lette tilgængeligheden for
-brugeren. Et af specialet mål er at stille en let anvendelig og
+\label{sec:platformsadgang}
+Python blev, som tidligere nævnt, valgt for at lette tilgængeligheden for
+brugeren. Et af specialets mål er, at stille en let anvendelig og
 let udbyggelig platform til rådighed for udviklermiljøet omkring
 AR.Dronen. 
 

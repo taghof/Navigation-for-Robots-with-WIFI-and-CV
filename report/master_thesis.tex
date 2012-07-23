@@ -400,40 +400,22 @@ eksperimenter i sektion~\ref{ssec:visuellokalisering}.
 
 %%%% Introduction - Metode
 \subsection{Klientplatform og klientværktøjer} % Thomas & Morten
-Vores klientplatform kan betegnes som et system til indsamling af
+Vores implementerede klientplatform kan betegnes som et system til indsamling af
 AR.Dronens sensorstrømme og fjernstyring af denne. Klientplatformen
-har fasciliteret de eksperimenter
+har fasciliteret de eksperimenter som beskrives i sektion~\ref{chap:Eksperimenter} og
+dermed også udviklingen af de forskellige tasks i sektion~\ref{sec:tasks}. 
 
-
-forskellige frameworks til sensordata opsamling og
-udledning/abstraktioner Dey's toolkit / JCAF, Lenser m.fl.
-- vi forestiller os en platform med understøttelse af virtuelle
-sensore 
-
-Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. For f.eks. at minimere den tid der går fra at en ide implementeres i kode til aftestning på quadrokopteren, er det muligt at lave scripts (Task) bestående af kun få liniers kode der nemt afvikles på systemet.
-%
-\paragraph{drone.py} -modulet / -klassen er konstrueret for at tage sig af al kommunikationen mellem PC og AR.Dronen. Kommunikationen består i at opretholde forbindelsen, samt modtage datapakker fra quadrokopterens sensor system og at afsende styrekommandoer fra brugeren til AR.Dronen.
-%
-\paragraph{Tasks} er måden at afvikle og teste selvstyrende/kørende opførsel. For at muliggøre manuel støttes, styring og afhjælpning under aftestning kan brugeren anvende PC tastatur og XBox joystick.
-%
-\paragraph{Joystick- og Keyboard-Controller} er den del af platformen som lytter efter bruger input events til manuel styring af AR.Dronen og som input til den grafiske brugergrænseflade (GUI).
-%
-\paragraph{GUI til datarepræsentation}
-
-
-%%%% Introduction - Metode
-\paragraph{Mapdrawer / turplanlægger}
-
-
-%%%% Introduction - Metode
-\paragraph{Task manager plugin og tasks}
-
+Klientværktøjerne Sensordisplay, Mapcreator og Taskcreator, som alle
+beskrives i sektion ~\ref{chap:clienttools}, er udviklet for at lette arbejdet med
+klientplatformen. Blandt andet at give brugeren adgang til en grafisk
+repræsentation af AR.Dronens sensorstrømme. Klientværktøjerne har vist sig
+meget anvendelige i forbindelse med forberedelse og udførelse af
+eksperimenter med klientplatformen.
 
 \subsection{Eksperimenter} % Thomas,
 
 \paragraph{Lokalisering via Wifi-fingerprinting}
-%\paragraph{Simpel-blob}
-\paragraph{Blob-detection og PID styring} simpel blob, og udbygget nested blob
+\paragraph{Lokalisering via visuelle markører} simpel blob, og udbygget nested blob
 
 \paragraph{Afstandsbedømmelse via optical flow}
 %\todo{fedt hvis det kan nåes at lave det...}
@@ -445,22 +427,33 @@ Som hjælp til andre og til dette projekt er der konstrueret en række værktøjer. 
 % længere langs siden af kopteren når man flyver forbi...
 
 \paragraph{Korridor detektering}
-\paragraph{distance-measurererere}
+\paragraph{DistanceTracker}
 
 \paragraph{Erkendelse af miljø...}
  Korridor (Hopper) vs. Åbent område (Zuse)
 
 %%%% Introduction
-\section{Raport struktur} % Thomas, %/læsevejledning
-Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
-intro til medfølgende CD og blogpost, med kode på Github
 
 \section{Medfølgende CD}
 Dude its a CD
 
 \section{Projekt Blog på Github}
 \label{sec:blog}
-Beskrivelse af indholdet på bloggen, versionshåndtering, tilgængelighed for comunity
+Vi har i løbet af vores speciale, anvendt en blog til at beskrive
+tekniske fremgangsmåder og til at fungere som adgangspunkt til vores offentlige
+kode-repository. Bloggen hostes på Github og adressen angives
+i~\cite{}. Bloggen indeholder udover en projektbeskrivelse, især informationer om vores tidlige
+forsøg med AR.Dronen. Blandt andet beskrives proceduren for at
+aktivere AR.Dronens USB-port i detaljer. Denne procedure har vi
+stykket sammen fra adskillige kilder og vi håber med bloggen, at kunne
+tilbyde en mere samlet kilde for andre i vores situation.
+Et andet emne som behandles på bloggen er afvikling af kode på
+AR.Dronen, herunder proceduren for cross-compiling til ARM arkitekturen. 
+
+\section{Raport struktur} % Thomas, %/læsevejledning
+Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
+intro til medfølgende CD og blogpost, med kode på Github
+
 \pagebreak
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1873,6 +1866,7 @@ taskstruktur som vores. Kommunikationen mellem tasks er simplere
 og overheadet pga. de mange tråde undgåes.
 
 \chapter{Klientværktøjer} % Morten, I dette kapitel gennemgåes tre
+\label{chap:clienttools}
 værktøjer som er udviklet i forbindelse med specialearbejdet. Der er
 tale om et program til at præsentere og visualisere datastrømmene fra
 AR.Drone(Sensor display), et program til at bygge de map-objekter der
@@ -2071,6 +2065,7 @@ $ ./taskcreator.py -t
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Eksperimenter - section
 \chapter{Eksperimenter} % Thomas & Morten
+\label{chap:Eksperimenter}
 \section{Navigation}
 En vigtig forudsætning for at en robot kan navigere i et miljø er, at
 den er i stand til at lokalisere sig selv i dette miljø. Vi har derfor

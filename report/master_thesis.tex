@@ -829,7 +829,15 @@ den første kategori herunder og sommetider som værende i begge kategorier herund
   \item Intern interaktion med AR.Dronens styreprogram gennem
     de 3 faste UDP porte, som også anvendes af de eksterne klienter.
 \end{itemize}
-
+%
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.48\textwidth]{grafik/userspace.png}
+  \caption{En intern processklient på AR.Dronen, kommunikerer med AR.Dronen over netværket gennem UDP og TCP som ekstern klient, men har også adgang til platformen i userspace.}
+  \label{fig:userspaceklient}
+\end{framefig}
+%
+%
 \subsection{FTP og Telnet baseret kommunikation}
 \label{sssec:tcp}
 Fra en PC eller smartphone er det muligt at få adgang til AR.Dronens 

@@ -739,9 +739,9 @@ have observeret AR.Dronen under flyvning. Program.elf indeholder blandt andet:
 \item og en algoritme til at detektere tags i billeder i forbindelse
   med augmented reality spil, se figur~\ref{fig:tags}.
 \end{itemize}
-AR.Dronens styreprogram modtager kommandoer fra brugeren gennem en User
+AR.Dronens styreprogram modtager styringskommandoer fra brugeren gennem en User
 Datagram Protocol(UDP) port, \cite{rfc768}. Kommunikationsinterfacet
-mellem bruger og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikation}.
+mellem klientenhed og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikation}.
 
 \begin{framefig}
   \subfigure[Roundel]{\includegraphics[width=0.30\textwidth]{grafik/tag1.png}
@@ -774,7 +774,7 @@ mellem bruger og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikation}.
 \label{ssec:kommunikation}
 
 %\paragraph{Ekstern klientkommunikation}\\
-En ekstern klients (en PC, smartphone eller lignende) interaktion med
+En ekstern klientenhedss (PC, smartphone eller lignende) interaktion med
 AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupper:
 \begin{itemize}
   \item Fra en ekstern klientapplikation gennem FTP, \cite{rfc959},
@@ -790,7 +790,7 @@ AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupp
 \begin{framefig}
   \centering
   \includegraphics[width=0.48\textwidth]{grafik/klient_server.png}
-  \caption{AR.Dronen kommunikerer med klienter over netværket gennem UDP og TCP.}
+  \caption{Klienter kommunikerer med AR.Dronen over netværket gennem UDP og TCP.}
   \label{fig:klientserver}
 \end{framefig}
 %
@@ -803,11 +803,11 @@ AR.Dronen.
 Når der ikke er tale om interaktion mellem AR.Dronen og en
 ekstern klient, kan interaktionen også foregå mellem 2 processor
 internt på AR.Drone-platformen, hvilket altid vil grupperes under
-den første kategori herunder og sommetider som værende i begge kategorier:
+den første kategori herunder og sommetider som værende i begge kategorier herunder:
 \begin{itemize}
   \item Et program der køre internt i AR.Drone-platformens user-space,
     og som derigennem har adgang til platformens services, heriblandt:
-  \item Intern interaktion med AR.Dronens interne styreprogram gennem
+  \item Intern interaktion med AR.Dronens styreprogram gennem
     de 3 faste UDP porte, som også anvendes af de eksterne klienter.
 \end{itemize}
 

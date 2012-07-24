@@ -28,7 +28,7 @@ import threading
 import controllers
 import receivers
 import virtualsensors
-import newtasks as tasks
+import newesttasks as tasks
 import utils
 import settings
 import time
@@ -69,8 +69,11 @@ class Drone(object):
         return self.sensors
 
     def start(self):
-        self.detector_sensor = virtualsensors.Detector(self) 
-        self.sensors.append(self.detector_sensor)
+        self.position_detector = virtualsensors.PositionDetector(self) 
+        self.sensors.append(self.position_detector)
+
+        self.distance_tracker = virtualsensors.DistanceTracker(self) 
+        self.sensors.append(self.distance_tracker)
 
         if settings.TEST:
             self.testdevice.start()
@@ -86,7 +89,8 @@ class Drone(object):
             if navdata is not None:
                 bat   = navdata.get(0, dict()).get('battery', 0)
                 print 'Battery: ' + str(bat) + '\r'
-        
+
+        self.task_manager.start()
         self.interface.start()
         self.controller_manager.start_controllers()
                
@@ -106,13 +110,17 @@ class Drone(object):
             self.testdevice.stop()
         
         self.controller_manager.stop()
+        self.task_manager.stop()
         return 0
 
     def get_map(self):
         return self.map
 
     def get_detector_sensor(self):
-        return self.detector_sensor
+        return self.position_detector
+
+    def get_distance_sensor(self):
+        return self.distance_tracker
 
     def get_task_manager(self):
         return self.task_manager
@@ -136,35 +144,41 @@ class Drone(object):
         return self.gui
 
 def main():
-    video, gui, test, map = False, False, False, False
+    video, gui, test, map, task = False, False, False, False, False
     arg_len = len(sys.argv)
     for i in range(arg_len):
         if sys.argv[i] == '-v':
             video = True
-        elif sys.argv[i] == '-g':
+        elif sys.argv[i] == '-sd':
             gui = True
         elif sys.argv[i] == '-t':
             test = True
-        elif sys.argv[i] == '-m':
+        elif sys.argv[i] == '-mc':
             map = True
-            
+        elif sys.argv[i] == '-tc':
+            task = True
+
     os.system('clear')
 
     drone = Drone(test)
     drone.start()
     
     if gui:
-        import presenter
-        gui = presenter.PresenterGui(drone)
+        import sensordisplay
+        gui = sensordisplay.PresenterGui(drone)
         drone.gui = gui
     
     elif video:
-        import presenter
-        gui = presenter.VideoWindow(drone)
+        import sensordisplay
+        gui = sensordisplay.VideoWindow(drone)
         drone.gui = gui
     elif map:
-        import mapdraw
-        gui = mapdraw.TaskGUI(drone)
+        import mapcreator
+        gui = mapcreator.MapGUI(drone)
+        drone.gui = gui
+    elif task:
+        import taskcreator
+        gui = taskcreator.TaskGUI(drone)
         drone.gui = gui
     else:
         gui = None

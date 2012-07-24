@@ -11,7 +11,7 @@ import map
 import math
 import os
 import pickle
-import newtasks as tasks
+import newesttasks as tasks
 import inspect
 import string
 import drone
@@ -89,13 +89,17 @@ class TaskGUI(object):
         self.task_del_task_button = gtk.Button("Delete task")
         self.task_del_task_button.connect("clicked", self.pushed_action, 'del task')
 
-        self.task_kill_all_button = gtk.Button("Delete task")
-        self.task_kill_all_button.connect("clicked", self.pushed_action, 'kill task')
+        self.task_kill_button = gtk.Button("Stop task")
+        self.task_kill_button.connect("clicked", self.pushed_action, 'kill task')
 
-        self.task_action_hbox.add(self.task_combobox)
+        self.task_kill_all_button = gtk.Button("Stop all tasks")
+        self.task_kill_all_button.connect("clicked", self.pushed_action, 'kill all')
+
+        #self.task_action_hbox.add(self.task_combobox)
         self.task_action_hbox.add(self.task_add_button)
-        self.task_action_hbox.add(self.task_exe_button)
         self.task_action_hbox.add(self.task_del_task_button)
+        self.task_action_hbox.add(self.task_exe_button)
+        self.task_action_hbox.add(self.task_kill_button)
         self.task_action_hbox.add(self.task_kill_all_button)
 
         self.fill_param_box(None, None)
@@ -215,8 +219,8 @@ class TaskGUI(object):
         
         args = inspect.getargspec(selected_task.__init__)[0]
         defaults = inspect.getargspec(selected_task.__init__)[3]
-
-        reslist = []
+        self.task_param_hbox.pack_start(self.task_combobox, False, False, 3)
+        #reslist = []
         for i in range(len(args)):
             a = args[i]
             if a != 'self' and a != 'drone' and a != 'callback' and a != 'context':
@@ -226,7 +230,7 @@ class TaskGUI(object):
                 if defaults is not None and len(defaults) > 0 and i >= (len(args) - len(defaults)):
                     e.set_text(str(defaults[i - (len(args)-len(defaults))]))
                 e.set_visibility(True)
-                reslist.append((a, e))
+                #reslist.append((a, e))
                 self.task_param_hbox.pack_start(l, False, False, 3)
                 self.task_param_hbox.pack_start(e, False, False, 3)
 
@@ -319,8 +323,16 @@ class TaskGUI(object):
                            t[2].remove_subtask(self.selected_task[2])
 
                self.tasks.remove(self.selected_task)
+       
+        elif data == 'kill task':
+           t = self.selected_task 
+           if t is not None:
+               t[2].stop()
                            
-        
+        elif data == 'kill all':
+            task_manager = self.drone.get_task_manager()#.get_controller(settings.AUTOCONTROL)
+            task_manager.kill_tasks()
+       
         self.area.queue_draw()
         
 

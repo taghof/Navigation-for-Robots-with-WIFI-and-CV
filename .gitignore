@@ -3,6 +3,16 @@
 .#*
 #*
 *.pyc
+*.log
+*.pdf
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.toc
+*.so
+*.out
+_*
 testdata
 old
 media

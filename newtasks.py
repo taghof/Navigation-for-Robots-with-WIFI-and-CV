@@ -52,6 +52,14 @@ class TaskManager(object):
         self.lock = threading.Lock()
         self.required_runlevel = 0
 
+    def start(self):
+        threading.Thread(target=self.runner).start()
+
+    def runner(self):
+        while not self.stopping:
+            for t in self.active_tasks:
+                if t.domove():
+                    break
 
     def request_control(self, caller):
         # print 'caller: ', caller, '\r'
@@ -108,7 +116,9 @@ class TaskManager(object):
         if not self.stopping:
             task.parent = self
             self.active_tasks.append(task)
-            threading.Thread(target=task.run).start() 
+            self.active_tasks.sort(key=lambda x: x.level, reverse=True)
+
+#threading.Thread(target=task.run).start() 
 
         self.lock.release()
         return task
@@ -169,9 +179,16 @@ class Task(object):
         self.start_time = None
         self.loop_sleep = 0.5
         self.stopping = False
-        
+        self.active = True
         self.state = settings.INIT
         self.control = False
+
+    def dostop(self):
+        self.active = False
+        self.done()
+
+    def domove(self):
+        pass
 
     def move(self, r, p, g, y ):
 
@@ -262,7 +279,7 @@ class Task(object):
         
         if self.state == settings.RUNNING:
             self.state = settings.STOPPING
-
+       
     def done(self, args=None):
         """ done
 
@@ -433,6 +450,41 @@ class MoveTask(Task):
         else:
             self.move(0,0,0,0)
 
+    def domove(self):
+        if self.distance is not None and self.context[2] is not None and (math.fabs(self.context[2][0]) >= self.distance or math.fabs(self.context[2][1]) >= self.distance):
+            print 'stopped by condition\r' 
+            self.stop()
+            self.dostop()
+            return False
+        else:
+             if self.direction == 1:
+                 self.interface.move(0, -self.speed, None, 0.0, True)
+                 return True
+            #print 'moved forward\r'
+             elif self.direction == 2 :
+                 self.move(self.speed, 0, None, 0.0, True)
+                 return True
+            #print 'moved right\r'
+             elif self.direction == 3:
+                 self.move(0, self.speed, None, 0.0, True)
+                 return True
+            #print 'moved backward\r'
+             elif self.direction == 4:
+                 self.move(-self.speed, 0, None, 0.0, True)
+                 return True
+            #print 'moved left\r'
+             elif self.direction == 5:
+                 self.move(None, None, self.speed, 0.0, True)
+                 return True
+            #print 'moved up\r'
+             elif self.direction == 6:
+                 self.move(None, None, -self.speed, 0.0, True)
+                 return True
+            #print 'moved down\r'
+             else:
+                 self.move(0,0,0,0, True)
+                 return True
+
     def pre_loop(self):
         """ Super override, starts the stop-timer if one is present and then uses the move method. """
         if self.time is not None:
@@ -476,6 +528,12 @@ class TakeoffTask(Task):
             time.sleep(self.wait)
             self.stop()
 
+    def domove(self):
+        self.interface.take_off()
+        time.sleep(self.wait)
+        self.dostop()
+        return True
+
 class LandTask(Task):
     """ LandTask
 
@@ -494,6 +552,12 @@ class LandTask(Task):
         time.sleep(self.wait)
         self.stop()
 
+    def domove(self):
+        self.interface.land()
+        time.sleep(self.wait)
+        self.dostop()
+        return True
+
 class TestTask(Task):
     """ LandTask
 
@@ -506,6 +570,7 @@ class TestTask(Task):
         Task.__init__(self, drone, callback, context, level)
         self.wait = float(wait)
         self.timeout = float(timeout)
+        self.reps = 10
 
     def pre_loop(self):
         """ Like in the TakeoffTask a main loop is unnecessary, the entire task is carried out here. """
@@ -515,7 +580,7 @@ class TestTask(Task):
 
         if self.timeout > 0.0:
             threading.Timer(float(self.timeout), self.stop).start()
-        self.reps = 10
+        
 
     def loop(self):
         if self.reps > 0:
@@ -531,6 +596,21 @@ class TestTask(Task):
                     self.reps -= 1
         else:
             self.stop()
+
+    def domove(self):
+
+        if self.reps > 0:
+            ran = random.randint(1, 10)
+            if ran == 11:
+                return False
+            else:
+                print 'test domove(): ', self.level
+                self.interface.move(1,1,1,1,True)
+                self.reps -= 1
+                return True
+        else:
+            self.dostop()
+            return False
 
 class HoverTrackTask(Task):
     """
@@ -674,7 +754,81 @@ class HoverTrackTask(Task):
                         self.mode = 'track'
                         self.t1 = time.time()
                         return
-         
+   
+    def domove(self):
+        
+        if self.mode == 'detect':
+            print 'detecting'
+            self.settled = False
+           
+            pos = self.detector.points #bd.detect_position(img)
+            if len(pos) > 0:
+                for p in pos:
+                     if self.target_position.color == p[2]:
+                         self.current_pos = p
+                         print 'begin tracking\r'
+                         self.mode = 'track'
+                         self.tracker.init((p[0], p[1]), p[3])
+                         self.t1 = time.time()
+                         return self.domove()
+            else:
+                return False
+                
+            
+        elif self.mode == 'track':
+            powers = self.update()
+            if powers is not None:
+                # check if we are within error limits
+                #print 'xy_error: ', self.last_errors.get_avg(), ' (20), alt_error: ', self.error_alt, ' (20), psi_error: ', self.error_psi, ' (+/-0.5)\r'
+                psi = self.error_psi is not None and -0.5 < self.error_psi < 0.5
+                last_errors = self.last_errors.get_avg() <= 20.0
+                alt_errors = self.error_alt <= 20
+                                
+                if psi and last_errors and alt_errors: 
+                    self.settled = True
+                    return False
+                else:
+                    self.settled = False
+
+                # Use the calculated PID output to actually move
+                if powers[0] == powers[1] == powers[2] == powers[3] == 0.0:
+                    self.interface.move(powers[0], powers[1], powers[2], powers[3], False)
+                    return True
+                else:
+                    self.interface.move(powers[0], powers[1], powers[2], powers[3], True)
+                    return True
+            else:
+                # try to recover
+                print 'Lost track, trying to recover\r'
+                self.mode = 'recover'
+                return self.domove()
+
+        elif self.mode == 'recover':
+            pos = self.detector.points
+            if len(pos) > 0:
+                for p in pos:
+                    if self.target_position is not None and self.target_position.color == p[2]:
+                        print 'Correct position found, done recovering\r'
+                        self.current_pos = p
+                        self.tracker.init((p[0], p[1]), p[3])
+                        self.mode = 'track'
+                        self.t1 = time.time()
+                        return self.domove()
+
+                    elif self.target_position is None:
+                        print 'Some position found, done recovering\r'
+                        self.tracker.init((p[0], p[1]), p[3])
+                        self.current_pos = p
+                        self.mode = 'track'
+                        self.t1 = time.time()
+                        return self.domove()
+            else:
+                if self.navdata_sensor.get_data().get(0, dict()).get('altitude', 0) >= self.recover_alt:
+                    self.interface.move(0.0, 0.0, 0.0, 0.0)
+                    return True
+                else:
+                    self.interface.move(0.0, 0.0, 0.2, 0.0)
+                    return True
 
     def post_loop(self):
         # remember to cancel timers and to put the vehicle in hover mode after moving
@@ -973,11 +1127,13 @@ class CompoundTask(Task):
                  t.callback = self.sub_callback
              t.context = self.context
         self.subtasks.extend(tasks)
+        self.subtasks.sort(key=lambda x: x.level, reverse=True)
 
     def remove_subtask(self, t):
         print 'removing\r'
-        if t in self.subtasks:
-            self.subtasks.remove(t)
+        #if t in self.subtasks:
+        self.subtasks.remove(t)
+        self.subtasks.sort(key=lambda x: x.level, reverse=True)
 
     def sub_callback(self, caller):
         """ This method can be overridden if a subclass wishes for processing to happen when subtasks finish """
@@ -991,12 +1147,15 @@ class CompoundTask(Task):
             for t in self.subtasks:
                 if isinstance(t, ty):
                     t.stop()
+                    t.dostop()
                 elif isinstance(t, CompoundTask):
                     t.stop(ty)
+                    t.dostop()
         else:
             self.state = settings.STOPPING
             for t in self.subtasks:
                 t.stop()
+                t.dostop()
 
     def done(self, args=None):
         """ Super extension, adds some print to better localise compound stop. """
@@ -1086,14 +1245,16 @@ class SeqCompoundTask(CompoundTask):
 
          self.state = settings.STOPPING
 
-   
+    def domove(self):
+        return self.current_subtask.domove()
+
 class ParCompoundTask(CompoundTask):
 
     def __init__(self, drone, callback, context, level=0):
         CompoundTask.__init__(self, drone, callback, context, level)
         self.subtasks = []
         self.threads = []
-
+        
 
     def stop(self, ty=None):
         """ If the stop method is supplied with a type parameter all subtasks of this type will be terminated, else
@@ -1103,12 +1264,15 @@ class ParCompoundTask(CompoundTask):
             for t in self.subtasks:
                 if isinstance(t, ty):
                     t.stop()
+                    t.dostop()
                 elif isinstance(t, CompoundTask):
                     t.stop(ty)
+                    t.dostop()
         else:
             for t in self.subtasks:
                 print 'stopping: ', t, '\r' 
                 t.stop()
+                t.dostop()
 
     def set_conf_1(self):
         """ Sets a specific list of subtasks """
@@ -1116,8 +1280,8 @@ class ParCompoundTask(CompoundTask):
         task1.set_conf_2()
         task2 = SeqCompoundTask(drone, self.sub_callback, self.context)
         task1.set_conf_3()
-        self.subtasks = [task1, task2]
-       
+        self.add_subtasks = [task1, task2]
+        
     def pre_loop(self):
         """ Super override, start all subtasks to run parallel, perhaps some compatibilty check 
         between subtasks should be performed 
@@ -1138,6 +1302,16 @@ class ParCompoundTask(CompoundTask):
 
         self.state = settings.STOPPING
 
+    def domove(self):
+        active = False
+        for st in self.subtasks:
+            if st.active:
+                active = True
+            if st.domove():
+                return True
+        if not active:
+            self.dostop()
+        return False
 
 class FollowTourTask(SeqCompoundTask):
     """ FollowTourTask
@@ -1160,8 +1334,14 @@ class FollowTourTask(SeqCompoundTask):
         # build subtasks
         self.add_subtasks(self.create_subtasks())
 
-    def loop(self):
+    def domove(self):
+        retval = SeqCompoundTask.domove(self)
+        if self.h.settled:
+            print 'Next segment'
+            self.setup_next_segment()
+        return retval
 
+    def loop(self):
         if self.h.settled:
             print 'derp looping'
             self.setup_next_segment()
@@ -1179,7 +1359,6 @@ class FollowTourTask(SeqCompoundTask):
             self.h.target_position = self.tour[self.current_segment][1]
             self.h.settled = False
             self.h.mode = 'detect'
-            # self.m.set_mode(self.angles[self.current_segment])
             self.current_segment += 1
 
     def create_subtasks(self):
@@ -1203,6 +1382,7 @@ class FollowTourTask(SeqCompoundTask):
         self.m = MoveTask(self.p.drone, self.p.sub_callback, self.p.context, None, None, 0.065, 1)
         self.m.level = 0
         self.m.dep_subtasks.append(MeasureDistanceTask(self.p.drone, self.p.sub_callback, self.p.context))
+
         self.p.add_subtasks([self.h, self.m])
         
         res.append(self.to)
@@ -1245,9 +1425,10 @@ class AvoidTask(Task):
         self.level = 1
         self.loop_sleep = 0.01
         self.current_silhouet = None
-
-    def pre_loop(self):
         self.detector = self.drone.get_detector_sensor()
+    
+    def pre_loop(self):
+        pass
 
     def loop(self):
         silhouets = self.detector.silhouets
@@ -1265,7 +1446,30 @@ class AvoidTask(Task):
             self.current_silhouet = None
             self.move(0.0, 0.0, 0.0, 0.0)
             self.parent.release_control(self)
+       
+    def domove(self):
+         silhouets = self.detector.silhouets
+
             
+         if len(silhouets) == 0 and self.current_silhouet is not None:
+            print 'Blob avoided...\r'
+            self.current_silhouet = None
+            #self.move(0.0, 0.0, 0.0, 0.0)
+            return False
+         
+         elif len(silhouets) == 0 :
+             return False
+         
+         else:
+             for s in silhouets:
+                 (xpos, ypos, width, height) = s
+                 if width*height > 500:
+                     print 'AVOIDING!!!\r'
+                     self.current_silhouet = s
+                     self.interface.move(0.0, 0.0, 0.5, 0.0)
+                     return True
+             return False
+        
 
 def get_all_tasks():
     """ returns a list of all the subtasks extending Task """

@@ -846,5 +846,17 @@ class VideoWindow(gtk.Window):
         self.show_grayscale = not self.show_grayscale
 
 if __name__ == '__main__':
-    presenter = PresenterGui()#VideoWindow()#PresenterGui()
+    import os, drone
+    test = False
+    arg_len = len(sys.argv)
+    for i in range(arg_len):
+        if sys.argv[i] == '-t':
+            test = True
+    os.system('clear')
+
+    drone = drone.Drone(test)
+    drone.start()
+    presenter = PresenterGui(drone)#VideoWindow()#PresenterGui()
+    drone.gui = presenter
+    
     presenter.show()

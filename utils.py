@@ -721,7 +721,7 @@ class PointTracker(threading.Thread):
         else:
             self.point = p
 
-
+        
         self.org_width = self.frame0.shape[1]
         self.org_height = self.frame0.shape[0]
 

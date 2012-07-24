@@ -7,10 +7,11 @@ import numpy as np
 import time
 import datetime
 import math
+import random
 import blobdetect as bd
 from collections import OrderedDict
 
-class Detector(object):
+class PositionDetector(object):
 
     def __init__(self, drone):
         self.drone = drone
@@ -21,7 +22,12 @@ class Detector(object):
         self.map = self.drone.get_map()
         #self.show = True
         self.show = False
-        self.mode = 'wifi'
+        self.loop_sleep = 0.03
+        if settings.TEST:
+            self.mode = 'normal'
+        else:
+            self.mode = 'wifi'
+
         self.silhouets = []
         self.points = []
         self.last_small = None
@@ -62,14 +68,15 @@ class Detector(object):
         while not self.status == settings.STOPPING:
             
             if frames >= 199:
-                #pass
-                self.drone.stop()
+                pass
+                #self.drone.stop()
             frames += 1
             #print 'frames: ',frames
             img = self.video_sensor.get_data()
                       
             if img is None:
                 frames -= 1
+                print 'no images'
                 pass
                        
             elif self.mode == 'normal':
@@ -131,20 +138,31 @@ class Detector(object):
             elif self.mode == 'wifi':
                 wifi_pos = self.detect_position_wifi()
                 if wifi_pos is not None:
-                    print wifi_pos.name 
+                    #print wifi_pos.name 
                     if wifi_pos.name == 'pos3':
                         pf += 1
            
+            elif self.mode == 'test':
+                ran = random.randint(0, 50)
+                if ran in [48, 1, 4, 7, 22, 30]:
+                    color = random.randint(0, 4)
+                    img = img[0:176, 0:144]
+                    self.points = [(88.0, 72.0, color, img)]
+                    self.last_small = img
+                elif ran == 50:
+                    self.silhouets = [[88.0, 20, 200, 100]]
+                else:
+                    self.points = []
+                    self.silhouets = []
 
             if self.show and img is not None:
-
                 cv2.imshow(win1 ,img)
 
-            time.sleep(0.03)
+            time.sleep(self.loop_sleep)
         
-        print frames
-        print 'pointrate: ', pf/float(frames), '\r'
-        print 'silrate: ', sf/float(frames), '\r'
+        # print frames
+        # print 'pointrate: ', pf/float(frames), '\r'
+        # print 'silrate: ', sf/float(frames), '\r'
 
     def get_status(self):
         return self.status
@@ -157,7 +175,7 @@ class Detector(object):
     
     def stop(self):
         self.status = settings.STOPPING
-        print 'stopping detector\r'
+        print 'stopping PositionDetector\r'
 
     def detect_position_img(self, img):
         result = []
@@ -348,3 +366,102 @@ class Detector(object):
 
     def record_target_sample(self):
         pass
+
+
+class DistanceTracker(object):
+
+    def __init__(self, drone):
+        self.status = settings.INIT
+        self.drone = drone
+        self.video_sensor = self.drone.get_video_sensor()
+        self.wifi_sensor = self.drone.get_wifi_sensor()
+        self.navdata_sensor = self.drone.get_navdata_sensor()
+        self.interface = self.drone.get_interface()
+        self.map = self.drone.get_map()
+       
+        self.dist_x = 0
+        self.dist_y = 0
+        self.last_time = None
+        self.last_vx = 0
+        self.last_vy = 0
+        self.loop_sleep = 0.03
+
+    def runner(self):
+        self.last_time = time.time()
+        self.status = settings.RUNNING
+        while not self.status == settings.STOPPING:
+             self.measure()
+             time.sleep(self.loop_sleep)
+        print 'moved: (', self.dist_x, ', ', self.dist_y, ')'
+
+    def measure(self):
+        """ The measure method does the hard work of performing a crude integration of the
+        velocities from the drone navdata """
+       
+        now_time = time.time()
+        elapsed_time = self.last_time - now_time
+        vx = self.navdata_sensor.get_data().get(0, dict()).get('vx', 0)
+        vy = self.navdata_sensor.get_data().get(0, dict()).get('vy', 0)
+         
+
+        if (vx < 0) == (self.last_vx < 0): 
+            small_vx = min(math.fabs(vx), math.fabs(self.last_vx)) 
+            rect_x = small_vx*elapsed_time
+            tri_x = ((max(math.fabs(vx), math.fabs(self.last_vx))-small_vx)/2)*elapsed_time
+            if vx < 0:
+                self.dist_x -= tri_x + rect_x
+            else:
+                self.dist_x += tri_x + rect_x
+        else:
+            time_fraction_x = (math.fabs(self.last_vx)/(math.fabs(self.last_vx)+ math.fabs(vx)))   
+            area_vx_last = (self.last_vx * time_fraction_x)/2
+            if self.last_vx < 0:
+                area_vx_last *= (-1)
+            area_vx = (vx * (1-time_fraction_x))/2
+            if vx < 0:
+                area_vx *= (-1)
+            self.dist_x += (area_vx_last + area_vx)*elapsed_time
+
+
+        if (vy < 0) == (self.last_vy < 0): 
+            small_vy = min(math.fabs(vy), math.fabs(self.last_vy)) 
+            rect_y = small_vy*elapsed_time
+            tri_y = ((max(math.fabs(vy), math.fabs(self.last_vy))-small_vy)/2)*elapsed_time
+             
+            if vy < 0:
+                self.dist_y -= tri_y + rect_y
+            else:
+                self.dist_y += tri_y + rect_y
+        else:
+            time_fraction_y = (math.fabs(self.last_vy)/(math.fabs(self.last_vy)+ math.fabs(vy)))*elapsed_time   
+            area_vy_last = (self.last_vy * time_fraction_y)/2
+            if self.last_vy < 0:
+                area_vy_last *= (-1)
+            area_vy = (vy * (1-time_fraction_y))/2
+            if vy < 0:
+                area_vy *= (-1)
+            self.dist_y += (area_vy_last + area_vy)*elapsed_time
+
+        # Make ready for next iteration
+        self.last_vy = vy
+        self.last_vx = vx
+        self.last_time = now_time
+
+    def get_status(self):
+        return self.status
+
+    def set_status(self, arg):
+        self.status = arg
+
+    def start(self):
+        threading.Thread(target=self.runner).start() 
+    
+    def stop(self):
+        self.status = settings.STOPPING
+        print 'stopping DistanceTracker\r'
+
+    def reset(self):
+        """ resets the distance travelled, so far this has been of little use """
+
+        self.dist_x = 0
+        self.dist_y = 0

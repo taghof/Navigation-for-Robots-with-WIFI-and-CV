@@ -71,7 +71,7 @@ class TaskManager(object):
         while len(self.active_tasks) > 0:
             t = self.active_tasks.pop()
             print 'killing: ', t
-            t.dostop()
+            t.stop()
         self.lock.release()        
        
     def stop(self):
@@ -143,14 +143,13 @@ class Task(object):
         self.navdata_sensor = self.drone.get_navdata_sensor()
         self.wifi_sensor = self.drone.get_wifi_sensor()
         self.detector = self.drone.get_detector_sensor()
-        #self.subtasks = []
         self.start_time = None
         self.active = True
 
     def init(self):
         pass
 
-    def dostop(self):
+    def stop(self):
         print 'stopping: ', self, '\r' 
         self.active = False
         self.done()
@@ -181,9 +180,6 @@ class MoveTask(Task):
         """ constructor which besides the three common task parameters also takes time, speed and direction """
 
         Task.__init__(self, drone, callback, context, level)
-       
-        if distance is not None:
-            print 'should not happen in FollowTour\r'
         
         if timeout is not None:
             self.time = float(timeout)
@@ -209,7 +205,7 @@ class MoveTask(Task):
         print 'moving'
         if self.distance is not None and self.context[2] is not None and (math.fabs(self.context[2][0]) >= self.distance or math.fabs(self.context[2][1]) >= self.distance):
             print 'stopped by condition\r' 
-            self.dostop()
+            self.stop()
             return False
         else:
              if self.direction == 1:
@@ -260,7 +256,7 @@ class TakeoffTask(Task):
     def domove(self):
         self.interface.take_off()
         time.sleep(self.wait)
-        self.dostop()
+        self.stop()
         return True
 
 class LandTask(Task):
@@ -278,22 +274,19 @@ class LandTask(Task):
     def domove(self):
         self.interface.land()
         time.sleep(self.wait)
-        self.dostop()
+        self.stop()
         return True
 
 class TestTask(Task):
-    """ LandTask
-
-    The LandTask sends the land command to the drone via the control interface and 
-    the waits for a given time to end
+    """ TestTask
 
     """
-    def __init__(self, drone, callback, context, wait=0.0, timeout=0.0, level=0):
+    def __init__(self, drone, callback, context, wait=0.0, timeout=0.0, level=0, reps=10000):
         """ The constructor takes one extra parameter, the time to wait before ending. """
         Task.__init__(self, drone, callback, context, level)
         self.wait = float(wait)
         self.timeout = float(timeout)
-        self.reps = 10
+        self.reps = int(reps)
 
     def init(self):
         """ Like in the TakeoffTask a main loop is unnecessary, the entire task is carried out here. """
@@ -316,7 +309,7 @@ class TestTask(Task):
                 self.reps -= 1
                 return True
         else:
-            self.dostop()
+            self.stop()
             return False
 
 class HoverTrackTask(Task):
@@ -456,8 +449,8 @@ class HoverTrackTask(Task):
                     self.interface.move(0.0, 0.0, 0.2, 0.0, True)
                     return True
     
-    def dostop(self):
-        Task.dostop(self)
+    def stop(self):
+        Task.stop(self)
         # remember to cancel timers and to put the vehicle in hover mode after moving
         for t in self.timers:
             t.cancel()
@@ -706,13 +699,13 @@ class CompoundTask(Task):
         """ This method can be overridden if a subclass wishes for processing to happen when subtasks finish """
         pass
     
-    def dostop(self):
+    def stop(self):
         """ If the stop method is supplied with a type parameter all subtasks of this type will be terminated, else
         all subtasks will terminated and thus the compound task itself will end.
         """
         for t in self.subtasks:
-            t.dostop()
-        Task.dostop(self)
+            t.stop()
+        Task.stop(self)
 
     def done(self, args=None):
         """ Super extension, adds some print to better localise compound stop. """
@@ -807,14 +800,13 @@ class ParCompoundTask(CompoundTask):
         self.subtasks = []
         self.threads = []
         
-
-    def dostop(self):
+    def stop(self):
         """ If the stop method is supplied with a type parameter all subtasks of this type will be terminated, else
         all subtasks will terminated and thus the compound task itself will end.
         """
         for t in self.subtasks:
-            t.dostop()
-        Task.dostop(self)
+            t.stop()
+        Task.stop(self)
 
     def set_conf_1(self):
         """ Sets a specific list of subtasks """
@@ -874,7 +866,7 @@ class FollowTourTask(SeqCompoundTask):
            
     def setup_next_segment(self):
         if not self.current_segment < len(self.tour):
-            self.p.dostop()
+            self.p.stop()
             self.current_segment = 0
             self.h.target_position = self.tour[0][0]
             self.h.mode = 'recover'

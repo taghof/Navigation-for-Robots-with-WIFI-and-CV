@@ -2561,13 +2561,12 @@ frontkameraet ud for de to positioner (se evt. figur \ref{fig:optflowpyrlk}).
   \centering
   \includegraphics[width=0.85\textwidth]{grafik/strand2.png}
   \caption{AR.Drone flyver sidelæns mens frontkameraet filmer
-    væggen. Den grønne cirkel ($f2t$) er en gendkendelig feature (uddybes i
+    væggen. Den grønne cirkel ($f2t$) er en genkendelig feature (uddybes i
     sektion~\ref{sec:sub:feature-tracking}) som optræder i hvert af de
     2 billeder taget ud for position $p1$ og $p2$. Det er afstanden mellem
-    $f2t$ og $p2$ der ønskes fundet. Den grå pil i figuren viser
+    $f2t$ og $p2$, i planet, der ønskes fundet. Den grå pil i figuren viser
     AR.Dronens sidelæns flyveretning. De orange pile viser
-    hvilken vej fronten på AR.Dronen peger og i hvilken retning
-    frontkameraet filmer.}
+    hvilken retning AR.Dronens frontkamera filmer.}
   \label{fig:stranden2}
 \end{framefig}
 I figur~\ref{fig:stranden2} får den genkendelige feature (i den grønne cirkel) den samme
@@ -2575,8 +2574,18 @@ rolle som båden i figur~\ref{fig:stranden}. Kodeimplementationen er
 dog ikke begrænset til at holde styr på afstanden til kun et enkelt
 punkt, men tager vare på en hel liste af features i videosekvensen fra
 AR.Dronens frontkamera. Fra hver feature er det muligt at udregne
-afstande til AR.Dronens position. I sektionen herunder beskrives den valgte
-metode til at finde, genfinde og genkende features i en videosekvens.
+afstande til AR.Dronens position. I sektionen herunder (sektion~\ref{sec:sub:feature-tracking}) beskrives den valgte
+metode til at finde, genfinde og genkende features i en
+videosekvens. I de næste 2 sektioner derefter (\ref{pixel2vinkel} og
+\ref{yaw}) forsøges forklaret hvorledes vinklerne $a1$ og $a2$ af
+figur~\ref{stranden} udledes af pixel-positioner i billedet fra
+frontkameraet, til brug i den virkelige verden.
+I sektion~\ref{liniestykkeb} forklares udregningen af liniestykket $b$
+imellem de to positioner $p1$ og $p2$, for til sidst at kunne udregne
+afstanden $|ft2 p2|$ i sektion~\ref{afstandenf2tp2}.
+Sektion~\ref{afstandresult} fremlægger resultatet af det ene
+eksperiment der nåede at blive udført.
+
 
 \subsection{Optisk feature-tracking}
 \label{sec:sub:feature-tracking}
@@ -2617,6 +2626,7 @@ følges fra billedramme til billedramme med opticalflow-funktionen
 
 
 \subsection{Fra pixel-position til virkelig retning}
+\label{pixel2vinkel}
 Fordi AR.Dronen ikke altid peger præcis i retningen af det der
 skal afstandbedømmes, ie. oftest ligger featuren i billedet, hvortil afstanden
 skal bedømmes, enten til venstre eller til højre for midten af
@@ -2659,6 +2669,7 @@ globalt koordinatsystem, hvor vinkler imellem positioner i den
 virkelige verden har samme referencepunkt.
 
 \subsection{Yaw som fælles reference}
+\label{yaw}
 Der er imidlertid et problem i at, AR.Dronens front nærmest aldrig peger i den
 samme retning (i figur~\ref{fig:absoluteevinkler} ses AR.Dronens front
 peger i forskellige retninger ved de to positioner $p1$ og $p2$). For
@@ -2680,6 +2691,7 @@ tidsperioder, alligevel er stabil nok som fælles referencevinkel.
 
 \subsection{Længden: 3. og sidste kendte parameter} %Triangulering i 2
                                 %dimensioner}
+\label{liniestykkeb}
 Der mangles at kende en sidste parameter ud af 3 for at kunne bestemme
 alle de andre elementer i trekanten $|p1, f2t, p2|$, heriblandt
 afstanden $|f2t p2|$. Den sidste ukendte parameter længden $|p1 p2|$
@@ -2707,6 +2719,7 @@ udledningen af længden mellem AR.Dronens 2 positioner.
 \end{framefig}
 
 \subsection{Afstanden findes}
+\label{afstandenf2tp2}
 Det er sidestykket $|f2t\ p2|$ i trekanten på
 figur~\ref{fig:opticalafstand} der er forsøgt udregnet. Eftersom der
 nu er fremskaffet 3 elementer af trekanten $|p1 f2t p2|$'s vinkler og
@@ -2727,6 +2740,7 @@ heriblandt den længe ønskede $|p2 f2t|$.
 \end{framefig}
 
 \subsection{Resultater}
+\label{afstandresult}
 \begin{framefig}
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/afstande_avg11_gauss11_thumb.png}

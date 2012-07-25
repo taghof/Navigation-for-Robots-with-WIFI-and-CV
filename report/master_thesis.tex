@@ -6,6 +6,7 @@
  
 \usepackage[danish]{babel}
 \usepackage[ansinew]{inputenc}
+%\usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{framed}
 \usepackage{subfigure}
@@ -44,22 +45,50 @@
 \newcommand{\todo}[1]{\textbf{todo:}(#1)}
 \newcommand{\dronen}[1]{#1}
 \newcommand{\drone}[0]{AR.Drone} 
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
 
 \begin{document}
-\title{Master Thesis}
-\author{Thomas Thyregod 20051688\\ Morten Daugaard 20051715\\ \texttt{tysse, taghof}@cs.au.dk\\\\ Department of Computer Science, University of Aarhus\\ Aabogade 34, 8200 Aarhus N, Denmark\\\\
-\hline\\
-\vspace{4cm}\\
-\makeatletter
-\texttt{Semi Autonomous Indoor}\\ %Indoor? - nogle udendørs robotter heller ikke bruge gps, for dyrt i præcision...
-\texttt{Navigation for Arial Robots}\\
-\vspace{4cm}\\
-\hline\\
-}
-\date{\today}
-\maketitle
-%\newpage
+\begin{titlepage}
+\begin{center}
 
+
+% Upper part of the page
+\includegraphics[width=0.50\textwidth]{./grafik/segl.jpg}\\[1cm]    
+
+\textsc{\LARGE Aarhus Universitet}\\[0.2cm]
+\textsc{Datalogisk Institut}\\[1.0cm]
+\textsc{\Large Master's Thesis}\\[1.0cm]
+
+
+% Title
+\HRule \\[0.4cm]
+{ \huge \bfseries Semi-autonom indendørs navigation for luftbåren robot}\\[0.4cm]
+
+\HRule \\[1.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.5\textwidth}
+\begin{flushleft} \large
+Morten Daugaard, 20051715
+Thomas Thyregod, 20051688
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Vejleder:} \\
+Ole Caprani
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+% Bottom of the page
+{\large \today}
+
+\end{center}
+
+\end{titlepage}
 \pagestyle{headings}
 
 \section*{Abstract}
@@ -68,18 +97,16 @@ In english...
 \section*{Resume}
 %Indeholder og gennemgår i det følgende (på dansk).
 %-Kort intro hvad vil vi gøre...
-Dette speciale handler om at klarlægge muligheder for at gøre en
-quadrotor %\cite{electronic:wiki_quadrotor}
- delvis selvflyvende i et
-indendørsmiljø. Mere specifikt handler det i første omgang om at
-kontruere en base i software som der kan bygges videre på senere ved at
-udnytte en AR.Drones %\cite{electronic:ardrone} fra Parrot
- indbyggede sensorapparat
-og kontrolinterface. I anden omgang handler det om at undersøge
-hvorledes sensorapparatet ombord på AR.Dronen kan udnyttes til at
-udlede mere abstrakt information ud af som igen kan anvendes til at
-abtrahere en indforstået model som AR.Dronen kan navigere i til støtte
-for en menneskelig bruger.
+Dette speciale handler om at klarlægge muligheder, for at gøre en
+quadrokopter, AR.Drone, delvis selvflyvende i et indendørsmiljø. Mere
+specifikt implementeres i første omgang en let anvendelig softwareplatform der kan
+udnytte AR.Dronens indbyggede sensorapparat. Platformen anvendes
+herefter til de videre eksperimenter. Det undersøges hvorledes
+sensorapparatet ombord på AR.Dronen kan udnyttes, til at udlede mere
+abstrakt information om miljøet i den umiddelbare nærhed. Denne
+information anvendes til at lade AR.Dronen navigere i henholdsvis
+korridorer og åbne rum med visuelle markører på gulvet.
+
 \todo{Kort uddybning af, hvad har vi gjort, hvad var resultatet.}
 
 \pagebreak
@@ -375,6 +402,7 @@ implementere afkodningen af AR.Dronens billeder i et C-bibliotek og
 bygge en Pythonwrapper til dette.    
 
 \subsection{OpenCV}
+\label{opencv}
 OpenCV er et bibliotek af optimerede algoritmer, indenfor området
 computer vision,~\cite{opencv}\cite{opencv:wiki}. OpenCV blev
 oprindeligt startet af Intel(med bidrag fra optimeringseksperter i
@@ -407,17 +435,35 @@ dermed også udviklingen af de forskellige tasks i sektion~\ref{sec:tasks}.
 
 Klientværktøjerne Sensordisplay, Mapcreator og Taskcreator, som alle
 beskrives i sektion ~\ref{chap:clienttools}, er udviklet for at lette arbejdet med
-klientplatformen. Blandt andet at give brugeren adgang til en grafisk
+klientplatformen. Blandt andet ved at give brugeren adgang til en grafisk
 repræsentation af AR.Dronens sensorstrømme. Klientværktøjerne har vist sig
 meget anvendelige i forbindelse med forberedelse og udførelse af
 eksperimenter med klientplatformen.
 
 \subsection{Eksperimenter} % Thomas,
+For at teste AR.Dronen og vores klientplatform, har vi udført en række
+eksperimenter. Eksperimenterne omhandler generelt udledning af
+kontekstuel information fra AR.Dronens sensorstrømme. Mere specifikt
+tester vi metoder til lokalisering, afstandsbedømmelse, måling af
+tilbagelagt afstand(Odometri) og korridordetektering.
 
 \paragraph{Lokalisering via Wifi-fingerprinting}
+Ved hjælp af en WIFI-fingerprinting algoritme, har vi undersøgt
+muligheden for at lokalisere AR.Dronen i forhold til et antal
+fastlagte positioner. Eksperimenternes opstilling og resultater kan
+ses i sektion~\ref{ssec:wifilokalisering}.
+
 \paragraph{Lokalisering via visuelle markører} simpel blob, og udbygget nested blob
+Vi har designet et antal forskellige visuelle markører. Markørerne er
+blevet testet for hvor godt de kunne genkendes af AR.Dronen, både
+i statiske opstillinger og i forbindelse med bevægelse. Disse
+eksperimenter har også fungeret som test af vores tasksystem
+og de udviklede tasks. Eksperimenternes opstilling og resultater kan
+ses i sektion~\ref{ssec:visuellokalisering}. 
 
 \paragraph{Afstandsbedømmelse via optical flow}
+Vi har undersøgt muligheden for at udlede afstande, til objekter
+synlige for AR.Dronens frontkamera. 
 %\todo{fedt hvis det kan nåes at lave det...}
 % birds eye view (lidt refs under speciale-mappen), head bobbing, biers afstandsbedømmelse ligger i
 % optiske flow observeret fra A til B, forskel i tunnel og åbent land...
@@ -429,20 +475,17 @@ eksperimenter med klientplatformen.
 \paragraph{Korridor detektering}
 \paragraph{DistanceTracker}
 
-\paragraph{Erkendelse af miljø...}
- Korridor (Hopper) vs. Åbent område (Zuse)
-
 %%%% Introduction
 
 \section{Medfølgende CD}
 Dude its a CD
 
-\section{Projekt Blog på Github}
+\section{Projekt Blog}
 \label{sec:blog}
 Vi har i løbet af vores speciale, anvendt en blog til at beskrive
 tekniske fremgangsmåder og til at fungere som adgangspunkt til vores offentlige
 kode-repository. Bloggen hostes på Github og adressen angives
-i~\cite{}. Bloggen indeholder udover en projektbeskrivelse, især informationer om vores tidlige
+i~\cite{blog}. Bloggen indeholder udover en projektbeskrivelse, især informationer om vores tidlige
 forsøg med AR.Dronen. Blandt andet beskrives proceduren for at
 aktivere AR.Dronens USB-port i detaljer. Denne procedure har vi
 stykket sammen fra adskillige kilder og vi håber med bloggen, at kunne
@@ -633,33 +676,32 @@ omking 12 minutters flyvetid, \cite{electronic:wiki_ar.drone}.
 
 \section{AR.Dronens fysik}
 \label{ssec:fysik}
-AR.Dronen fåes som nævnt med 2 skrog eller skjold
+AR.Dronen fåes som nævnt med to skrog eller skjold
 (figur~\ref{fig:indendoersskjold}), og vejer 420 gram med det
-
-indendørs skrog monteret. 420 gram er en relativ lille vægt i forhold til andre
-quadrokoptere, \cite{quteprints33767}, som har 4-5 kg de skal
+indendørs skrog monteret. 420 gram er en relativ lille vægt i forhold
+til andre quadrokoptere, \cite{quteprints33767}, som har 4-5 kg de skal
 løfte. 
 
-På en AR.Drone sidder de 4 propeller i hver sit hjørne af en
+På en AR.Drone sidder de fire propeller i hver sit hjørne af en
 kulfiberkryds. Når en propel roterer om sin akse flytter den 
 luften i et areal rundt om propellen. Lufttrykket på undersiden af
 propellen bliver herved større end lufttrykket på oversiden af
 propellen. Hvis AR.Dronen ligger vandret vil forskellen i lufttryk
 giver en Bernoullieffekt,\cite{nla.cat-vn856146}, som påvirker
-AR.Dronen med en kraft modsat tyngdekraften(thrust), 
+AR.Dronen med en kraft modsat tyngdekraften (thrust), 
 \cite{electronic:wiki_quadrotor}. Udover thrust påvirker den 
-roterende bevægelse også propellens base med et moment(torque)
+roterende bevægelse også propellens base med et moment (torque)
 modsat propellens retning. Eksempelvis vil en helikopter uden haleror
 dreje ukontrollerbart rundt om sig selv, men fordi AR.Dronen har et par
 rotorer som drejer med uret og et andet par som drejer modsat mod
 uret, \cite{techreport:ardroneDevGuide}, bliver summen af
-momentpåvirkningen nul, såfremt de 4 rotorer drejer med samme hastighed. 
+momentpåvirkningen nul, såfremt de fire rotorer drejer med samme hastighed. 
 Denne egenskab bruges også til at styre AR.Dronens flyvning og bevægelser i
-rummet, som kan beskrives med 3 bevægelsesakser: x, y og z, hvor
-henholdsvis $\theta$, $\phi$ og $\psi$ er de tilhørende
-rotationsvinkler. På figur~\ref{fig:drone_movements} forklares hvordan
-en quadrokopter i det generelle tilfælde kan bevæges omkring de tre akser, det bemærkes at x og y-akserne på
-denne figur er forskudt 45$^{\circ}$ så de flugter med motorerne(for at
+rummet, som kan beskrives med tre bevægelsesakser: x, y og z, og de tilhørende
+rotationsvinkler $\phi$, $\theta$  og $\psi$ (Tait-Bryan-vinklerne, \cite{wiki:euler}). På figur~\ref{fig:drone_movements} forklares hvordan
+en quadrokopter i det generelle tilfælde kan bevæges omkring de tre
+akser. Det bemærkes at x og y-akserne på
+denne figur er forskudt 45$^{\circ}$ så de flugter med motorerne (for at
 lette forklaringen), hvorimod AR.Dronens akser er forskudt så y-aksens positive retning peger i
 samme retning som dennes frontkamera, se figur~\ref{fig:drone_akser}.   
 
@@ -671,8 +713,8 @@ omdrejningshastigheden på de to bagerste propeller øges.
 %spørgsmålet er, hvad er moment påvirkningen af $(2*omega_H + delta_A - delta_B) - (2*omega_H)$ 
 Dette resulterer i at AR.Dronen hælder lidt fremad. Samme princip gør sig
 gældende når AR.Dronen skal flytte sig sideværts. Når AR.Dronen skal
-bevæges om z-aksen foregår det som på figur~\ref{fig:drone_movements}d,
-det vil sige, at man enten øger eller sænker omdrejningshastigheden på
+bevæges om z-aksen foregår det som på figur~\ref{fig:drone_movements}d.
+Det vil sige, at man enten øger eller sænker omdrejningshastigheden på
 de propelpar som drejer samme vej, således at det ene pars
 momentpåvirkning overstiger det andets og dermed får AR.Dronen til at
 rotere. 
@@ -682,37 +724,35 @@ rotere.
   \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
 
   \caption{(a) vinkelhastigheden $\Omega_H$ øges med $\Delta_A$ på
-    alle 4 propeller, quadrokopteren øger dermed løftekraften
+    alle 4 propeller, dermed øges quadrokopterens løftekraft
     (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og
     mindskes på højre propel, quadrokopteren laver et ``roll'' til højre
-    (acceleration i Euler-vinklen theta), (c) samme som b, men i pitch
-    (acceleration i euler-vinkel phi) (d) En større vinkelhastighed på de
+    (ændring i $\phi$), (c) samme som b, men i pitch
+    (ændring i $\theta$) (d) En større vinkelhastighed på de
     med-uret-drejende propeller gør at torque bliver ulige og at
-    quadrokopteren drejer mod venstre (acceleration i
-    yaw/psi-vinklen). Ved bevægelser frem og tilbage udledes en positiv
+    quadrokopteren roterer(yaw) mod venstre (ændring i $\psi$). Ved bevægelser frem og tilbage udledes en positiv
     eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts
-    ($V_y$). figuren er fra ~\cite{techreport:ardroneDevGuide}.}
+    ($V_y$). Figuren er fra ~\cite{techreport:ardroneDevGuide}.}
 
   \label{fig:drone_movements}
 \end{framefig}
 
 Når AR.Dronen går fra at ligge vandret til istedet at hælde, så
 flyttes noget thrust fra at virke lodret imod tyngdekraften til
-også at virke sideværts. Det betyder at propellernes samlede
+også at virke sideværts. Det betyder, at propellernes samlede
 omdrejningshastighed skal øges for at opretholde den samme afstand til
-gulvet. Ifølge SDK DevGuide\cite{techreport:ardroneDevGuide} bør $\theta$ og $\phi$ ikke overstige 0.52 rad(30$^{\circ}$)
+gulvet. Ifølge SDK DevGuide,~\cite{techreport:ardroneDevGuide}, bør
+$\phi$ og $\theta$ ikke overstige 0.52 rad (30$^{\circ}$)
 ellers kan flyvehøjden ikke opretholdes. 
 
 AR.Dronens styreprogram har en parameter der beskriver den øvre grænse for hvor
 meget quadrokopteren maximalt må krænge. Denne parameter,
 \emph{Euler\_angle\_max }, virker som en cut-offvinkel, dvs. at
-AR.Dronen under flyvning løbende tester at hverken pitch ($\phi$)- eller roll
-($\theta$)-vinklen overskrider grænsen. Sker dette lukkes systemet ned,
-kraften til rotorene stoppes og AR.Dronen falder til jorden. 
-
-Den maximale hældning kan sættes til f.eks. 0.25 rad via AT-kommandoen i figur
-
-\ref{fig:ateulerangle}.
+AR.Dronen under flyvning løbende tester at hverken pitch ($\theta$) eller roll
+($\phi$) overskrider grænsen. Sker dette lukkes systemet ned, kraften
+til rotorene stoppes og AR.Dronen falder til jorden.Den maximale
+hældning kan sættes til f.eks. 0.25 rad via AT-kommandoen vist i
+figur~\ref{fig:ateulerangle}. 
 
 \begin{framefig}
 \begin{verbatim}
@@ -1224,19 +1264,21 @@ gennem en PC (altså ikke iPhone, iPad el. lign.) og ved hjælp af
 forprogrammerede sekvenser af bevægelser som beskrives nærmere i
 sektion~\ref{sec:tasks}. 
 
-\section{Platformsadgang via Python}
+\section{Platformens anvendelse}
 \label{sec:platformsadgang}
 Python blev, som tidligere nævnt, valgt for at lette tilgængeligheden for
 brugeren. Et af specialets mål er, at stille en let anvendelig og
 let udbyggelig platform til rådighed for udviklermiljøet omkring
-AR.Dronen. 
+AR.Dronen. Herunder vises simple eksempler på hvordan klientplatformen
+kan anvendes. 
 
 \subsection{Nem fjenstyring af AR.Dronen i Python}
 \label{sec:sub:fjernstyrpy}
 Et simpelt eksempel på anvendelse af vores kontrolinterface gives ved at
 starte pythons fortolker, importere examples-modulet og herefter
 afvikle en metode indeholdende kommandoer til
-AR.Dronen. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex1}.
+AR.Dronen. Det antages, at computeren der afvikler eksemplet er forbundet med AR.Dronens
+trådløse netværk. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex1}.
 
 \begin{framefig}
     \begin{verbatim}
@@ -1249,14 +1291,13 @@ AR.Dronen. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex1}.
 
 Metoden \code{square()} der kaldes i eksemplet i figur~\ref{fig:pythoninterpex1},
 lader AR.Dronen lette, flyve rundt i en firkant og for herefter at
-lande igen(under antagelse af at klientcomputeren er forbundet med AR.Dronens
-trådløse netværk). Bevægelsesmønstret opnåes ved at der kaldes en
-metode(\code{take\_off}, \code{move} eller \code{land}) på kontrolinterfacet, hvorefter der er en pause
-før den næste metode kaldes. Metodekaldende oversættes af interfacet til
+lande igen . Bevægelsesmønstret opnåes ved at der kaldes en
+metode (\code{take\_off}, \code{move} eller \code{land}) på kontrolinterfacet(sektion~\ref{sec:sub:controlinterface}), hvorefter der er en pause
+før den næste metode kaldes. Metodekaldende oversættes af kontrolinterfacet til
 AT-kommandoer og sendes så som UDP-pakker til AR.Dronens
 kommandoport. Den konkrete implementation af \code{square()} ses i
-figur~\ref{fig:pythonimpl1}. Det bemærkes at kontrolinterfacetråden
-skal startes (kald af \code{c.start()}) før kommandoerne har nogen effekt.
+figur~\ref{fig:pythonimpl1}. Det bemærkes, at kontrolinterfacet skal
+startes (ved kald af \code{c.start()}) før kommandoerne har nogen effekt. 
 
 \begin{framefig}
   \lstset{language=Python, frame=none}
@@ -1289,18 +1330,21 @@ def square():
     c.stop()
 \end{lstlisting}
 \caption{Python implementation der importerer og anvender vores kontrolinterface til en
-  simpel flyvning}
+  simpel flyvning. De fire første numeriske parametre der gives til
+  move-metoden repræsenterer henholdsvis roll, pitch, thust og
+  yaw. Den boolske parameter indentificerer overfor kontrolinterfacet,
+  om der tale om værdier fra en fysisk kontrolenhed(XBox360 controller)}
 \label{fig:pythonimpl1}
 \end{framefig}
 
-\subsection{Modtagelse af sensordata fra AR.Dronen i Python} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
+\subsection{Modtagelse af sensordata fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
 I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og wifi-data fra AR.Dronen.
 For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
 indsamle data fra de ombordværende sensorer, samt at kunne stille
 disse data til rådighed for andre dele af systemet. Til dette formål
 har vi designet og implementeret en receiver-struktur bestående af tre
-receiver-moduler, disse moduler eksekveres i hver deres process og
-sørger selv for at initiere forbindelsen med dronen. Efter
+receiver-moduler. Disse moduler eksekveres i hver deres process og
+sørger selv for at initiere forbindelsen med AR.Dronen. Efter
 initialiseringen lytter hver receiver efter enten video-, navigations-
 eller wifi-pakker og når en sådan modtages udføres en passende
 afkodning af pakken og den afkodede data deles med processen der
@@ -1311,7 +1355,7 @@ tilkoblet. Sektion~\ref{subsection:receiver} giver et eksempel
 på hvordan man lettest anvender videoreceiveren, til at modtage og vise
 et enkelt billede fra AR.Dronens videostrøm. Anvendelsen af de to
 andre receivere foregår på fuldstændig samme måde som videoreceiveren,
-den eneste forskel er typen af data der returneres. 
+den eneste forskel er typen af data der modtages. 
 
 \subsection{Eksempel på modtagelse af videostream}
 \label{subsection:receiver}
@@ -1325,12 +1369,12 @@ netværk. Eksemplet startes fra Pythons kommandopromt.
 >>> import examples as e
 >>> e.receive_and_show_picture()
 \end{verbatim}
-\caption{Import og afvikling af simpelt videoreceiver-eksempel i pythonfortolkeren}
+\caption{Import og afvikling af simpelt videoreceiver-eksempel i Pythonfortolkeren}
 \label{fig:pythoninterpex2}
 \end{framefig}
 
-Som det ses på figur~\ref{fig:pythonimpl2} kræver det tre liniers reel
-kode for at modtage et billede(og endnu fire for at vise det), vi
+Som det ses på figur~\ref{fig:pythonimpl2} kræver det tre liniers kode
+for at modtage et billede (og endnu fire for at vise det), vi 
 mener at dette fint illustrerer, hvordan vi med dette abstraktionslag kan
 tilbyde et let anvendeligt interface til AR.Dronens forskellige
 sensoroutput.   
@@ -1368,18 +1412,15 @@ Platformen består af et antal klasser placeret i et antal
 Python-moduler som beskrives nærmere i det følgende. Her er
 indledningsvis en kort introduktion for overblikkets skyld. Der er
 udviklet tre forskellige receiverklasser til at modtage henholdvis video, 
-navdata og WIFI-målinger disse beskrives under
-\nameref{subsec:receivers}, sektion \ref{subsec:receivers}. Der er udviklet to forskellige
-controllerklasser til joystick og keyboard som beskrives i sektion
-\nameref{subsec:controller} \ref{subsec:controller}). Der er
+navigationsdata(navdata) og WIFI-data. Disse beskrives i sektion \ref{subsec:receivers}. Der er udviklet to forskellige
+controllerklasser til joystick og keyboard som beskrives i sektion \ref{subsec:controller}. Der er
 kontrueret en taskmanager (sektion~\ref{subsec:taskmanager}) med ansvar for at opstarte autonome
-delopgaver heri kaldet task(tasks beskrives i
-sektion~\ref{sec:tasks}). For at styre AR.Dronen skal
-kontrolinterface-klassen bruges. Et simpelt eksempel herpå er allerede
-vist i figur~\ref{fig:pythonimpl1}. Controllerinterface-klassen
+delopgaver kaldet tasks (tasks beskrives i
+sektion~\ref{sec:tasks}). For at styre AR.Dronen anvendes et kontrolinterface. Et simpelt eksempel herpå er allerede
+vist i figur~\ref{fig:pythonimpl1}. Kontrolinterfacet
 gennemgåes i sektion~\ref{sec:sub:controlinterface}).
 Med inspiration fra~\cite{lenser:behaviorbasedarchitecture} og
-\cite{Dey01:ctoolkit} er der udover de allerede nævnte grundreceivere
+\cite{Dey01:ctoolkit} er der, udover de allerede nævnte grundreceivere,
 implementeret to virtuelle sensorer (sektion~\ref{sec:sub:virtuel}) som
 bruges til at fortolke datastrømmene fra de almindelige receivere. 
 
@@ -1391,12 +1432,12 @@ sekvensdiagrammet i figur~\ref{fig:initialiseringssekvens}.
 \begin{framefig}
   \centering
   \includegraphics[width=1.0\textwidth]{grafik/initialisering.png}
-  \caption{Klientapplikationens entrypoint til platformen, er gennem
+  \caption{Klientapplikationens entrypoint til platformen er gennem
     instantiering af drone-klassen, som sørger for at instantiere
     resten af objekterne og processerne i platformen.}
   \label{fig:initialiseringssekvens}
 \end{framefig}
-Udover ovenstående er der lavet et testdevice modul, som anvendes i forbindelse
+Udover ovenstående er der lavet et testdevice, som anvendes i forbindelse
 med udvikling, når det ikke er muligt at have en AR.Drone fysisk
 tilstede. Sektion~\ref{sec:sub:testdevice} beskriver muligheden for at
 simulere output fra AR.Dronen gennem testmodulet.
@@ -1411,12 +1452,12 @@ Subklasser af \emph{Receiver} er abstraktioner over de fysiske hardwaresensorer 
 AR.Dronen. Receivernes opgaver er at initialisere UDP-kommunikationen
 med AR.Dronen ved at sende en startbesked og herefter modtage de
 datapakker AR.Dronen sender. Desuden skal datastrømmen holdes i live
-ved at sende startbeskeden \todo{andet ord end startbesked: watchdog-signal?} i faste intervaller. 
+ved at sende et watchdog-signal i faste intervaller. 
 \begin{framefig}
   \centering
   \includegraphics[width=1.0\textwidth]{grafik/receiveruml.png}
   \caption{Klassehierakiet for receiverklasser. Nedarvende klasser kan
-    specialisere sig ved at override de to metoder
+    specialisere sig ved at overskrive de to metoder
     \code{on\_receive\_data} og \code{on\_request\_data}.}
   \label{fig:receiveruml}
 \end{framefig}
@@ -1428,13 +1469,13 @@ multiprocessing-modul. Receiverprocessen kommunikerer ved hjælp af en
 delt liste, som anvendes både til at overføre signaler og data.  For
 at tilpasse de enkelte receivere implementerer disse specifikke
 metoder (for eksempel til afkodning af den specifikke type data) der
-kaldes på bestemte tidspunkter under det generelle receiverloop.
+kaldes på bestemte tidspunkter i det generelle receiverloop.
  
 \subsubsection{Navdata-modtager}
-\emph{NavdataReceiveren} modtager navdatastrøm (AR.Droens afstand til
+\emph{NavdataReceiveren} modtager AR.Dronens navdatastrøm (AR.Dronens afstand til
 jorden, flyvehastighed i x- og y-retning m.m.) via UDP fra
 AR.Dronen og decoder denne, i forhold til de structs der findes
-beskrevet i headerfilen \uri{navdata\_common.h}, \cite{ardroneorg:navdatacommonh} fra Parrots åbne API.
+beskrevet i headerfilen navdata\_common.h,~\cite{ardroneorg:navdatacommonh}, fra Parrots SDK.
 
 \subsubsection{Video-modtager og billedafkoding via Psyco}
 \emph{VideoReceiveren} modtager og afkoder AR.Dronens videostrøm. Afkodningen
@@ -1446,40 +1487,40 @@ af billederne foregår på baggrund af den process der nævnes i sektion 7.2 side 4
 Da Python er et fortolket højniveau sprog er det ikke muligt at opnå
 samme afviklingshastighed som ved afvikling af C eller andre
 maskinnære sprog. I forbindelse med afkodningen af video 
-fra AR.Dronen anvendes biblioteket Psyco~\cite{electronic:psyco}
+fra AR.Dronen anvendes biblioteket Psyco,~\cite{electronic:psyco},
 til netop at øge afviklingshastigheden. Psyco er en form for JIT
 compiler hvormed man kan afvikle umodificeret Pythonkode hurtigere. Til sammenligning vil
-almindelig afviklet Python-kode til afkodning af 100 billeder fra
+almindelig afviklet Pythonkode til afkodning af 100 billeder fra
 AR.Dronens billedstrøm tage omkring 37.569 sekunder men hvis det samme
 Python-kode afvikles med hjælp fra Psyco er afviklingstiden kun 7.075
 sekunder. Ved brug af Psyco kan man altså hente og afkode 5 gange så mange
-billederammer fra AR.Dronen til brug på klienten. Psyco er lavet til
-32 bit maskiner og virker fint der, men desværre har udvikleren af
-Psyco valgt ikke at lave en 64-bit version af biblioteket. 
+billeder. Psyco er lavet til 32 bit maskiner og virker fint der, men
+desværre har udvikleren af Psyco valgt ikke at lave en 64-bit version
+af biblioteket.  
 
 Videoformatet der sendes fra AR.Dronen minder meget om JPEG formatet og 
 forfatteren til den algoritme vi har tilpasset, spekulerer
 på forumsiden, \cite{electronic:parrotforum2}, om det ville være muligt at anvende
 en decideret JPEG decoder til afkodningen. Dette kunne gøre det muligt
 at anvende et optimeret C bibliotek til formålet for derved at øge
-afkodningshastigheden og samtidig eliminere afhængigheden af Psyco som
+afkodningshastigheden og samtidig eliminere afhængigheden af Psyco, som
 kun fungerer på en 32-bit platform.
 
 
-\subsubsection{WIFI-signalstyrke modtager}
+\subsubsection{WIFI-modtager}
 Som de andre receivere modtager \emph{WIFIReceiveren} en datastrøm fra
 AR.Dronen. WIFI-strømmen er dog en tilføjelse vi har lavet og formatet
 der skal afkodes er blot en tekststreng bestående af en MAC-adresse og
-en signalstyrke, der modtages således en pakke for hver pakke
-det indlejrede WIFI-sensor-program(beskrevet i
-sektion~\ref{sec:sub:sub:wifisensor}) opsnapper. WIFI-receiveren
+en signalstyrke. Der modtages således en pakke for hver pakke
+det indlejrede WIFI-sensor-program (beskrevet i
+sektion~\ref{sec:sub:sub:wifisensor}) modtager. WIFI-receiveren
 skiller sig ud fra de 
 andre receivere, ved at placere de modtagne adresse/signal-par i en
 liste og holde denne liste opdateret med de nyeste signalværdier for
-hver adresse, for hver adresse gemmes desuden de sidste *X* modtagne værdier,
+hver adresse. For hver adresse gemmes desuden de sidste 20 modtagne værdier,
 deres gennemsnit, deres varians og deres middelværdi. Når
-wifireceiverens get\_data() metode kaldes, er det disse værdier der
-returneres, værdierne finder anvendelse når wifidata skal matches med hinanden.
+WIFIReceiverens get\_data() metode kaldes, er det disse værdier der
+returneres.
 
 \subsubsection{Virtuelle sensorer}
 \label{sec:sub:virtuel}
@@ -1490,12 +1531,12 @@ tidligere nævnt inspireret af sensorhierakierne beskrevet i
 sensorer opererer på forskellige niveauer og derfor leverer sensor
 output på forskellige abstraktionsniveauer. I modsætning til receiverne modtager den
 virtuelle sensor ikke data direkte fra AR.Dronen, men derimod netop
-fra receiverne.  De virtuelle sensorer leverer således information om
+fra receiverne. De virtuelle sensorer leverer således information om
 AR.Dronens omgivelser på et højere abstraktionsniveau, end de rå
 værdier fra receiverstrømmene.  
 
 Den ene virtuelle sensor, PositionSilhouetDetector,~\cite{github:virtuel},
-bearbejder kontinuerligt billeddata for at genkende henholdsvis
+bearbejder kontinuerligt videodata for at genkende henholdsvis
 markører på jorden og silhuetter umiddelbart foran AR.Dronen. For at kunne detektere både
 markører på gulvet og silhuetter er det nødvendigt for sensoren hele
 tiden at skifte mellem bund- og frontkamera. Dette giver imidlertid
@@ -1506,7 +1547,7 @@ køre mellem ti og tolv minutter, såfremt vi samtidig skifter kamera
 med cirka 5 millisekunders interval. Selvom om dette problem ikke
 beskrives direkte nogen steder, antydes det dog af en udvikler på
 Parrots forum, at denne funktionalitet ikke er ment anvendt til
-hurtige kameraskift ved hjælp af software og at der derfor er stor
+hurtige kameraskift i software og at der derfor er stor
 sandsynlighed for, at metoden ikke virker pålideligt,
 \cite{electronic:parrotforum1}.
 
@@ -1517,7 +1558,7 @@ brugbart estimat over den distance AR.Dronen har tilbagelagt. Se
 sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter vi har udført med
 DistanceTrackeren. 
 
-\subsection{Python interface til fjernstyring af AR.Dronen}
+\subsection{Kontrolinterface til fjernstyring af AR.Dronen}
 \label{sec:sub:controlinterface}
 \todo{Uddybes en del, med referencer til eksempler med AT-kommando
   beskeder. Scratch that, reference til det simple ekempel med Python
@@ -1526,21 +1567,21 @@ Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
 gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
 på en Python-wrapper, \cite{electronic:venthur}, til dette interface. Vi har implementeret
-interfacet som en Python tråd der løbende sender kommandoer med de
+interfacet som en Pythontråd der løbende sender kommandoer med de
 aktuelle kontrolværdier til AR.Dronen. 
-Dette betyder at platformen ikke afhænger af at alle
+Dette betyder, at platformen ikke afhænger af at alle
 kontrolpakker når deres destination, hvilket er praktisk da
 UDP-protokollen netop ikke garanterer at en pakke når sin destination. %think I understand but humor me and elaborate...
 Ved at sende al kontrolkommunikation gennem interfacet, behøves vi heller ikke at tænke på detaljer som sekvensnumre og
 watchdog-beskeder, da disse håndteres transparent af systemet.
   
-Python-interfacet: \code{ControllerInterface} i filen \cite{github:controllers} definerer en række metoder til at
+Kontrolinterfacet( implementeret i ControllerInterface-klassen, \cite{github:controllers}) definerer en række metoder til at
 fjernstyre AR.Dronens opførsel og bevægelser. Alt styring af AR.Dronen
 fra platformens tråde går altid forbi den samme ene instans af
-Python-interfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i platformen kan interfacet til
-fjernstyring i det simpleste tilfælde også anvendes alene direkte fra
-Pythons interpreter, som beskrevet i eksemplet
-sektion~\ref{sec:sub:fjernstyrpy}.
+Python-interfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i platformen, kan interfacet til
+i simple tilfælde også anvendes alene, direkte fra
+Pythons interpreter (som beskrevet i eksemplet
+sektion~\ref{sec:sub:fjernstyrpy}).
 
 \begin{framefig}
   \centering
@@ -1555,16 +1596,15 @@ sektion~\ref{sec:sub:fjernstyrpy}.
 Selvom det er muligt, er det ikke praktisk anvendeligt at brugeren skal
 afvikle scripts, der anvender kontrolinterfacet, for hver ønsket
 bevægelse (som det der er beskrevet i eksemplet i
-figur~\ref{fig:pythonimpl1}), i stedet er der implementeret to
-controllere til at tage mod input fra brugeren, ie.
-en keyboardcontroller der lytter efter input
+figur~\ref{fig:pythonimpl1}). I stedet er der implementeret to
+controllere til at tage mod input fra brugeren, en keyboardcontroller der lytter efter input
 fra tastaturet og en joystickcontroller der er tilknyttet en fysisk
 Xbox360-controller (se figur~\ref{fig:xboxlayout}).
 
-Man kan starte systemet op med begge controllere på samme tid, eller
+Man kan starte systemet med begge controllere på samme tid, eller
 undlade en eller begge. Under udviklingen af systemet har vi oftest
 anvendt begge controllere sideløbende, da de komplimenterer hinanden.
-Man kan som sagt anvende platformen helt uden controllere, og udelukkende anvende
+Man kan som sagt anvende platformen helt uden controllere og udelukkende anvende
 taskmanageren til at kontrollere AR.Dronen, men skulle der i det
 tilfælde ske noget uforudset under udførslen af en opgave, vil der
 ikke være nogen mulighed for at bringe AR.Dronen manuelt (og sikkert) ned. 
@@ -1573,7 +1613,7 @@ ikke være nogen mulighed for at bringe AR.Dronen manuelt (og sikkert) ned.
   \centering
   \includegraphics[width=0.6\textwidth]{grafik/controlleruml.png}
   \caption{Klassehieraki for klasser der nedarver fra
-    Controller-klassen. Underklasser af Controller er kendetegnet ved
+    Controller-klassen. Subklasser af Controller er kendetegnet ved
     at have adgang til styring af AR.Dronen gennem controlinterfacet.}
   \label{fig:controlleruml}
 \end{framefig}
@@ -1590,7 +1630,8 @@ forskellige tilstande. Dette gøres ved at kalde \code{set\_control\_method} med
 en ny kontrolmetode som argument. 
 
 \subsubsection{Joystickcontroller}
-I platformen anvendes Joystick istedet for en iPhone eller iPad til at
+platformen understøtter XBox360 controlleren gennem den implementerede
+Joystickcontroller. XBox360 controlleren anvendes istedet for en iPhone eller iPad, til at
 fjernstyre AR.Drone manuelt i forbindelse med testflyvninger. Der var
 flere praktiske grunde til at vi valgte at implementere en alternativ
 fjernstyring. Blandt andet havde vi et behov for at kunne interagere
@@ -1603,12 +1644,11 @@ storbritannien, \cite{electronic:zdnet}, \cite{electronic:joystiq},
 \cite{electronic:youtube1}.  Fjernstyringsdelen er meget simpel og
 fungerer ved at oversætte værdier fra Xbox360 controlleren (som vi får
 givet af pygames, \cite{electronic:pygame}, joystickmodul) og så sende
-disse til fjernstyrings-interfacet (ControllerInterface). Xbox360
-Joystick-controlleren bruges udover manuel fjernstyring af AR.Dronen
-også til at starte forprogrammerede handlingssekvenser, ie. tasks
-(task beskrives nærmere i sektion~\ref{sec:tasks})).  Således kan
+disse til kontrolinterfacet. Xbox360
+Joystickcontrolleren bruges udover manuel fjernstyring af AR.Dronen
+også til at starte tasks (task beskrives nærmere i sektion~\ref{sec:tasks})).  Således kan
 piloten manuelt bringe AR.Dronen i en ønsket position og så herefter
-starte den automatiske afvikling af et forudbestemt bevægemønster.  På
+starte afvikling af et forudbestemt bevægemønster. På
 figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
 controlleren.
 \begin{framefig}
@@ -1619,34 +1659,34 @@ controlleren.
 \end{framefig}
 
 \subsubsection{Keyboardcontroller}
-Hvis man ønsker at starte platformen op uden grafisk brugerflade (og
-tilhørende GTK keyboardbindinger), er det
+Hvis man ønsker at starte platformen uden grafisk brugerflade (og
+dermed uden tilhørende funktionalitet til at håndtere input fra brugeren), er det
 praktisk stadig at kunne anvende tastaturet som input (evt. i kombination med Xbox360
 controlleren). Vi har derfor implementeret en simpel
-keyboardcontroller der læser input fra terminalen. Vi anvender ikke
+keyboardcontroller, der læser input fra terminalen. Vi anvender ikke
 keyboardet til direkte styring af AR.Dronen (da Xbox360
-controlleren er mere intuitiv og nu alligevel er tilgængelig), men
+controlleren er mere intuitiv og ligeledes tilgængelig), men
 istedet til ting som at få udskrevet nuværende batteriniveau ('b'),
-til at skifte kamera ('z'), til at få udskrevet aktive tasks('c'), til
-at få udskrevet en oversigt over tråde i programmet('t'), samt til at
+til at skifte kamera ('z'), til at få udskrevet aktive tasks ('c'), til
+at få udskrevet en oversigt over tråde i programmet ('t'), samt til at
 starte tasks ('1', '2' og '3'). %%%%% <ins>task</ins> <del>opgaver på autocontrolleren</del>
 
 \subsection{Testdevice}
 \label{sec:sub:testdevice}
 Dette modul muliggør gennemførelsen af simple simuleringseksperimenter i et
 test miljø. Grundideen bag modulet er, at man skal kunne optage, ikke
-bare film, men alle sensoroutput fra en flyvning med AR.Dronen, for så
+bare video, men alle sensoroutput fra en flyvning med AR.Dronen, for så
 senere at kunne afspille hele flyvningen igen. Selve afspilningen
-foregår næsten transparent for resten af platformen, receiverne skal
+foregår næsten transparent for resten af platformen. Receiverne skal
 stadig initiere kommunikationen (nu blot med testdevicet og ikke den
-reelle AR.Drone), forbindelsen
-skal stadig holdes i live og dataen der modtages skal stadig
-afkodes. De eneste synlige forskelle der er mellem test og
-live-sessions er timing og hastighed, den første fordi vi ikke har
+reelle AR.Drone). Forbindelsen skal stadig holdes i live og data der
+modtages skal stadig afkodes. De eneste synlige forskelle der er mellem test og
+live-kørsler er timing og hastighed, den første fordi vi ikke har
 prioriteret at afsende testdataen i de intervaller de blev modtaget i
 og den sidste fordi samme computer nu står både for afsendelse,
 modtagelse og afkodning.  Testdevicemodulet har ikke noget at gøre med
-optagelsen af sensoroutputtet, denne foregår i receiverklasserne.
+optagelsen af sensoroutputtet. Dette foregår ved hjælp af
+sensordisplay-værktøjet, beskrevet i sektion~\ref{sec:sensordisplay}.
 
 \subsection{Taskmanager}
 \label{subsec:taskmanager}
@@ -1654,8 +1694,7 @@ Taskmanagerklassen startede ud som en almindelig controller, men er
 endt som en mere selvstændig del af platformen. Taskmanageren skiller
 sig ud ved ikke, i modsætning til joystick- og keyboardcontrollerne,
 at arbejde direkte med kontrolinterfacet eller med output fra
-receiverne. Taskmanagerens opgave er at starte
-forudspecificerede opgaver (tasks som gennemgåes i
+receiverne. Taskmanagerens opgave er at starte task (tasks som gennemgåes i
 sektion~\ref{sec:tasks}) og stoppe dem igen, samt at facilitere
 beslutningen, om hvilken task der har lov til at bevæge AR.Dronen.
 \pagebreak
@@ -1668,7 +1707,7 @@ istedet for behaviors, der ellers både bruges i artiklen 'A Modular
 Hierarchical Behavior-Based Architecture',
 ~\cite{lenser:behaviorbasedarchitecture}, og i Lejos'
 subsumption-pakke, \cite{lejossub}. Grunden til dette er, at flere af
-vores tasks er forholdsvis kortlivede(for eksempel take-off og
+vores tasks er forholdsvis kortlivede (for eksempel take-off og
 landtasks) og derfor mere minder om en opgave der skal forberedes,
 udføres og afsluttes. Dette ses i modsætning til en behavior, som kan
 opfattes som en længerevarende opførsel. Vi har også implementeret
@@ -1681,8 +1720,8 @@ Vores første udgaver af tasksystemet indbefattede tasks der indsamlede
 og behandlede data fra AR.Dronens sensorer. De behandlede data blev
 herefter stillet til rådighed for andre tasks, gennem en delt
 kontekstliste. I de endelige udgaver er disse tasks udskilt som
-den virtuelle sensorer. Tasks skal således ikke behandle sensordata, men kun
-reagere og formidle bevægelse på baggrund af højniveau-sensordata.
+virtuelle sensorer. Tasks skal således ikke behandle sensordata, men
+kun reagere og formidle bevægelse på baggrund af højniveau-sensordata.
 
 \subsection{Task typer} Vi har to hovedtyper, simple og
 compoundtasks. Simple tasks nedarver fra basetaskklassen Task. De
@@ -1692,12 +1731,12 @@ implementerer en PID-controller.
   
 Compoundtasks  nedarver fra CompoundTask-klassen og indeholder en liste
 af subtasks. Vi opdeler compoundtasks yderligere i to typer, 
-sekventielle og parallelle(SeqCompoundTask og
+sekventielle og parallelle (SeqCompoundTask og
 ParCompoundTask). Sekventielle compoundtasks starter deres 
-subtasks en efter en og venter med at starte en ny subtask, før den
+subtasks en efter en og venter med at starte en ny subtask, indtil den
 forrige er afsluttet. En sekventiel compoundtask stopper, når den
 sidste subtask er afsluttet. Parallelle compoundtasks starter alle
-deres subtasks på en gang og stopper når den sidste subtask er
+deres subtasks på en gang og stopper, når den sidste subtask er
 afsluttet. Herunder gives eksempler på henholdsvis èn compoundtask og
 to simple tasks. 
 
@@ -1708,8 +1747,7 @@ på figur~\ref{fig:followtour}. En FollowTourTask nedarver fra en
 SeqCompoundTask og indeholder, udover takeoff og land-tasks, en 
 parallel compoundtask der kan veksle mellem en MoveTask og en
 HoverTrackTask (det vil sige, at der veksles mellem bevægelse og
-fastholdelse af en erkendt position, HoverTrackTasken beskrives i
-sektion~\ref{sssec:hovertracktask}). Selve FollowTourTask 
+fastholdelse af en erkendt position). Selve FollowTourTask 
 enheden holder, ved hjælp af et
 map-objekt (se sektion~\ref{sec:mapcreator}), styr på den tour der skal
 følges og sørger for at opdatere HoverTrackTasken med en ny 
@@ -1721,7 +1759,7 @@ begge systemer udføres fejlkorrigering, hver gang en ny position
 detekteres. I vores system sker dette ved, at HoverTrackTasken bringer
 AR.Dronen indenfor en maksimum afstand af den præcise position, før
 den sendes videre. Det ville desuden være let at tilføje metrisk data
-fra DistanceTrackeren(se sektion~\ref{sec:sub:virtuel}), til
+fra DistanceTrackeren (se sektion~\ref{sec:sub:virtuel}), til
 map-objektet, hver gang AR.Dronen har bevæget sig mellem to
 positioner. 
 
@@ -1736,9 +1774,9 @@ positioner.
 \label{sssec:hovertracktask}
 HoverTrackTasken, som er en simpel task, implementerer en
 PID-controller,\cite{electronic:pid}, der kan holde AR.Dronen over en
-position. 
-Når en markør(se \ref{fig:advancedmarker}) er synlig for AR.Dronens bundkamera, kan vi ved
-hjælp af PositionSilhouetDetectoren(se sektion~\ref{sec:sub:virtuel}), få
+erkendt position. 
+Når en markør (se \ref{fig:advancedmarker}) er synlig for AR.Dronens bundkamera, kan vi ved
+hjælp af PositionSilhouetDetectoren (se sektion~\ref{sec:sub:virtuel}), få
 markørens position på billedet. Med denne position udregnes en
 error-værdi i x og y-retningerne, i forhold til centrum af
 billedet.For at kunne bruge errorværdierne, skal de 
@@ -1748,25 +1786,26 @@ efter den metode der beskrives og anvendes af Michaël Ludmann og
 Guillaume Depoyant i deres speciale
 LUDEP,~\cite{electronic:ludep},~\cite{electronic:ludepcon}. Efter
 udregningen af errorværdierne, anvendes de som i en standard
-PID-controller, til at bestemme de endelige værdier der sendes til kontrolinterfacet
-, for at bevæge AR.Dronen. PID-funktionaliteten er implementeret i HoverTrackTaskens
+PID-controller, til at bestemme de endelige værdier der sendes til
+kontrolinterfacet, for at bevæge AR.Dronen. PID-funktionaliteten er
+implementeret i HoverTrackTaskens 
 update-metode, \cite{github:newest}.
   
 I forbindelse med deltagelse i en FollowTourTask, kan HoverTrackTasken
 tildeles information om den specifikke position der skal trackes. Den
-kan således, lade andre tasks bevæge AR.Dronen, hvis den rigtige position
+kan således lade andre tasks bevæge AR.Dronen, hvis den rigtige position
 ikke er fundet. HoverTrackTasken er, i forbindelse med en
 FollowTourTask, også ansvarlig for at dreje AR.Dronen i retning af den
 næste position, mens nuværende position fastholdes.
 
 \subsubsection{AvoidTask}
 \label{sssec:avoidtask} AvoidTasken er også et eksempel på en simpel
-task. Den anvender PositionSilhouetDetectoren(se
+task. Den anvender PositionSilhouetDetectoren (se
 sektion~\ref{sec:sub:virtuel}), til at detektere personer umiddelbart
 foran AR.Dronen. Hvis en person detekteres, vil AvoidTasken bevæge
 AR.Dronen op, indtil personen ikke længere er synlig for AR.Dronens
-frontkamera. Den forholdsvis simple task udnytter AR.Dronens muligheder,
-for at bevæge sig i rummet. Grunden til at AR.Dronen bevæges op og
+frontkamera. Den forholdsvis simple task udnytter AR.Dronens
+muligheder for at bevæge sig i rummet. Grunden til at AR.Dronen bevæges op og
 ikke til siden eller bagud er, at AR.Dronen ikke kan orientere sig i
 disse retninger uden at rotere. Risikoen forbundet
 med at bevæge sig op er lille (da vi kender loftshøjden), i forhold
@@ -1798,7 +1837,7 @@ TestTask med level 2 slutte sidst.
   \centering
   \includegraphics[width=0.80\textwidth]{grafik/taskhieraky.png}
   \caption{Eksempel på et taskhieraki. Hver task er annoteret med
-    deres level, dette tal beskriver taskens prioritet i forhold til
+    deres level. Dette tal beskriver taskens prioritet i forhold til
     andre tasks med samme parent.}
   \label{fig:taskhieraky}
 \end{framefig}
@@ -1808,7 +1847,7 @@ af vores task-system(taskmanageren og alle tasks), som begge implementerer
 den opførsel og struktur der er beskrevet ovenfor.
 
 Den første, trådbaserede, implementation er inspireret af Lejos'
-subsumption-pakke, ~\cite{lejossub}. Lejos er en Firmwareerstatning
+subsumption-pakke, ~\cite{lejossub}. Lejos er en firmwareerstatning
 til LEGO Mindstorms RCX- og NXT-platform, der tillader afviklingen af
 Java på disse platforme,~\cite{lejos}.  Den anden, ikke-trådbaserede,
 implementation er primært inpireret af artiklen 'A Modular
@@ -1818,7 +1857,7 @@ Architecture',\cite{lenser:behaviorbasedarchitecture}.
 \subsubsection{Trådbaseret} 
 I den første trådbaserede løsning er hver task implementeret som en
 individuel tråd. Alle tasks kører samtidig. Når en task ønsker at bevæge
-AR.Dronen, får den tilladelse til dette ved at spørge sin parent(som
+AR.Dronen, får den tilladelse til dette ved at spørge sin parent (som
 muligvis skal spørge videre op i træet).
 
 Denne tilgang minder meget om arkitekturen der anvendes af Lejos'
@@ -1835,14 +1874,14 @@ særligt godt.
 \subsubsection{Ikke-trådbaseret} Tilgangen i 'A Modular Hierarchical
 Behavior-Based Architecture',\cite{lenser:behaviorbasedarchitecture},
 er at en aktiveret behavior skal bestemme hvilke af sine
-subbehaviors der skal aktiveres. I artiklen er dette er praktisk, da
+subbehaviors der skal aktiveres. I artiklen er dette praktisk, da
 deres robot kan udføre forskellige bevægelser på samme tid. Tilgangen
 sikrer, at det bedste sæt af parallelle behaviors kan bestemmes 
 og herefter aktiveres.
 
 I vores ikke-trådbaserede tilgang forsimpler vi ovennævnte princip. Vi
 siger, at en Compoundtask på opfordring skal aktivere \emph{den} bedst
-egnede subtask, da vi ikke opererer ikke med flere aktive tasks
+egnede subtask, da vi ikke opererer med flere aktive tasks
 samtidig\footnote{De bevægelser vi har til rådighed kan ikke udføres
 uden indflydelse på hinanden}. Vi definerer altid den bedst egnede
 subtask, som den med det højeste level og et ønske om at bevæge
@@ -1852,7 +1891,7 @@ Den eneste tråd i denne implementation er taskmanageren. Denne lader
 kontinuerligt den bedst egnede task bevæge AR.Dronen. I Praksis 
 sker dette ved at taskmanageren vedligeholder en sorteret liste over
 de aktive tasks. Under hver iteration kalder taskmanageren
-domove()-metoden på den første task i listen(tasken med det højeste
+domove()-metoden på den første task i listen (tasken med det højeste
 level). Kaldet til domove()-metoden propageres rekursivt ned gennem
 tasktræet og returnerer True hvis AR.Dronen blev bevæget og False hvis
 ingen task havde interesse i at bevæge den. Hvis metoden returner
@@ -1865,22 +1904,23 @@ Denne ikke-trådbaserede tilgang virker mere velegnet til en træbaseret
 taskstruktur som vores. Kommunikationen mellem tasks er simplere
 og overheadet pga. de mange tråde undgåes.
 
-\chapter{Klientværktøjer} % Morten, I dette kapitel gennemgåes tre
+\chapter{Klientværktøjer} % Morten, 
 \label{chap:clienttools}
-værktøjer som er udviklet i forbindelse med specialearbejdet. Der er
+I dette kapitel gennemgåes tre værktøjer som er udviklet i forbindelse med specialearbejdet. Der er
 tale om et program til at præsentere og visualisere datastrømmene fra
-AR.Drone(Sensor display), et program til at bygge de map-objekter der
-anvendes af vores FollowTourTask(Mapcreator) og et program til at
-instantiere, kombinere og afvikle Tasks(Taskcreator). Alle tre
+AR.Drone (Sensor display), et program til at bygge de map-objekter der
+anvendes af FollowTourTasken(Mapcreator) og et program til at
+instantiere, kombinere og afvikle Tasks (Taskcreator). Alle tre
 værktøjer anvender et drone-objekt som vist på
 figur~\ref{fig:initialiseringssekvens} og kan startes i henholdsvis
-normal- og testtilstand(se
-figur~\ref{fig:sensordisplayrun},\ref{fig:mapcreatorrun} og
+normal- og testtilstand (se
+figur~\ref{fig:sensordisplayrun}, \ref{fig:mapcreatorrun} og
 \ref{fig:taskcreatorrun}). Hvis brugeren vælger at starte et værktøj i
 testtilstand, vil drone-objektet oprette forbindelse til et testdevice
 (beskrevet i sektion~\ref{sec:sub:testdevice}) istedet for AR.Dronen.
 
 \section{Sensor display}
+\label{sec:sensordisplay}
 \begin{framefig}
   \subfigure[Navdata display]{\includegraphics[width=0.49\textwidth]{grafik/guinav.png}
     \label{fig:navdatadisplay}}
@@ -1895,14 +1935,16 @@ testtilstand, vil drone-objektet oprette forbindelse til et testdevice
     \label{fig:sampledisplay}}
  
   \label{fig:sensordisplay}
-  \caption{derp}
+  \caption{Sensordisplay værktøjet har fire præsentationstilstande. En
+  til hver af de tre sensorstrømme(navdata, video og WIFI), samt en
+  til at sammenligne WIFI-signalstyrker.}
 \end{framefig}
 
 Sensordisplay-værktøjet er implementeret i
 sensordisplay.py,~\cite{github:sensordisplay}. Programmet anvender et
 drone-objekt til at få adgang til AR.Dronens
 sensorstrømme. Brugeren vælger hvilken sensorstrøm der ønskes
-præsenteret, ved at trykke på en af de fire radio buttons(Navdata,
+præsenteret, ved at trykke på en af de fire radio buttons (Navdata,
 Video, WIFI eller WIFI samples), som aktiverer hver deres
 præsentationstilstand. Hvis brugeren ønsker at indsamle datapakker til
 anvendelse i testtilstand, kan dette gøres ved at trykke på knappen
@@ -1912,9 +1954,9 @@ testdevice, se sektion~\ref{sec:sub:testdevice}.
 
 Når navdatastrømmen præsenteres, ser brugeren et skærmbillede som
 det på figur~\ref{fig:navdatadisplay}. På dette billede ses værdier
-såsom højde, hastighed, samt vinklerne $\theta$, $\phi$ og 
+såsom højde, hastighed, samt vinklerne $\phi$, $\theta$ og 
 $\psi$. Desuden vises oplysninger om AR.Dronens umiddelbare tilstand,
-såsom motortilstand, ultralydstilstand og om hvorvidt førnævnte vinkler er
+såsom motortilstand, ultralydstilstand og om hvorvidt førnævnte Tait-Bryan-vinkler er
 indenfor de tilladte grænser.
 
 Når videostrømmen præsenteres, vises et billede som det på
@@ -1930,11 +1972,16 @@ ses en søjle der repræsenterer den sidst kendte signalstyrke, for hver
 erkendt WIFI-kilde. I denne præsentationstilstand er der desuden mulighed for
 at indsamle signalstyrkesamples og sætte en mål-signalstyrkesample. 
 
-Disse indsamlede signalstyrkesamples kan sammenlignes, både med hinanden og
-mål-signalstyrkesamplen, dette gøres i den fjerde og sidste 
-præsentationstilstand. I denne tilstand, vises en søjle for hver
-WIFI-kilde og i denne søjle indikeres kildens signalstyrke for hver
-indsamlet sample, se figur~\ref{fig:sampledisplay}.
+Under udviklingen af WIFI-fingerprintingalgoritmen beskrevet i~\ref{sssec:wifialgo},
+har vi haft brug for at kunne følge udviklingen i wifisignalstyrker
+mellem forskellige lokationer. Dette kan gøres i den fjerde og sidste
+præsentationstilstand. En signalstyrkesample registreres ved at trykke
+på knappen 'Take Sample'. Disse indsamlede signalstyrkesamples kan
+herefter sammenlignes. Skærmbilledet, figur~\ref{fig:sampledisplay},
+viser en ramme for hver erkendt WIFI-kilde. I rammerne angives
+WIFI-kildens signalstyrke for hver registreret
+signalstyrkesample. Signalstyrkerne vises som søjler der således viser
+kildens signalstyrkeudvikling.
 
 Sensordisplay programmet startes fra en linuxkommandolinie, som vist
 på figur~\ref{fig:sensordisplayrun}
@@ -1959,7 +2006,8 @@ $ ./sensordisplay.py -t
   \subfigure[Tour editor]{\includegraphics[width=0.49\textwidth]{grafik/maptour.png}
     \label{fig:maptour}}
     \label{fig:mapcreator}
-  \caption{Mapcreator-værktøjets to redigeringstilstande, world og tour.}
+  \caption{Mapcreator-værktøjet, som anvendes til at redigere 2D kort,
+    har to redigeringstilstande, world(a) og tour(b).}
 \end{framefig}
 Mapcreator er et værktøj til at oprette og redigere map-objekter.
 Map-objekter instantieres fra klassen PosMap(placeret i map.py,
@@ -1970,10 +2018,10 @@ vælges ved at trykke på det tilsvarende faneblad øverst i billedet. De
 to tilstande ses på figur~\ref{fig:mapcreator}.
 
 I world-redigeringstilstanden kan brugeren tilføje, flytte eller fjerne
-punkter fra map-objektet. Meningen med punkterne er, at de skal matche en
+punkter på et 2D kort. Meningen med punkterne er, at de skal matche en
 visuel markør i den fysiske opstilling, som vist på
 figur~\ref{fig:simplesetup}. Internt i map-objektet vedligeholdes en
-liste med vinklerne mellem alle punkter, når punkter tilføjes, flyttes
+liste med vinklerne mellem alle punkter. Når punkter tilføjes, flyttes
 og slettes opdateres denne liste også automatisk. Udover punkternes
 fysiske position i forhold til hinanden, kan man også tilføje
 WIFI-signalstyrkemålinger (WIFI-fingerprint) til punkterne ved at trykke på
@@ -1986,12 +2034,14 @@ I tour-redigeringstilstanden kan brugeren ikke længere redigere
 punkterne, til gengæld kan disse forbindes til en tour. Dette gøres
 ved at holde 'ctrl' nede og så trække en linie mellem to punkter med musen. Det
 er kun muligt, at forbinde til det første eller sidste punkt i en
-eksisterende tour. Det er muligt, at fjerne liniesegmenter fra en tour
+eksisterende tour. Det er muligt at fjerne liniesegmenter fra en tour
 ved at markere segmentet med musen og herfter trykke på knappen
 'Delete Segment'. Ved at markere et liniesegment og trykke enten
 'Add/remove A' eller 'Add/remove B' kan man markere, at dette
-liniesegment tilhører en specifik type. På sigt er det meningen, at
-FollowTourTask skal kunne vælge en bevæge-algoritme på baggrund af
+liniesegment tilhører en specifik type. Denne annotering af
+liniesegmenter anvendes endnu ikke til noget af FollowTourTasken. På
+sigt er det dog meningen, at
+FollowTourTasken skal kunne vælge en bevæge-algoritme på baggrund af
 denne information. Tour-skærmbilledet kan ses på figur~\ref{fig:maptour}.
 
 Når programmet sluttes, gemmes map-objektet i filen
@@ -2025,22 +2075,21 @@ $ ./mapcreator.py -t
 \end{framefig}
 
 Taskcreator-værktøjet bruges til at instantiere, kombinere og afvikle
-Tasks (beskrevet i sektion~\ref{sec:tasks}. 
-Brugeren kan vælge mellem de tilgængelige Tasks ved at trykke
+tasks (beskrevet i sektion~\ref{sec:tasks}). 
+Brugeren kan vælge mellem de tilgængelige tasks ved at trykke
 på dropdown-listen, som ses yderst til venstre i den røde firkant på
-figur~\ref{fig:taskcreator}. Herefter kan den valgte Tasks
-standardparametre tilpasses i inputfelterne, bl.a. kan man sætte hver
-Tasks level. En Tasks level beskriver dens prioritet i forhold til
-andre Tasks med samme parent. Den valgte Task
+figur~\ref{fig:taskcreator}. Herefter kan standardparametrene for den valgte task
+tilpasses i inputfelterne, bl.a. kan man her angive taskens level. En tasks level beskriver dens prioritet i forhold til
+andre tasks med samme parent. Den valgte task
 instantieres ved at trykke 'Add task' og kan fjernes igen, ved at markere den med musen
 og trykke 'Delete task'. Tasks der nedarver fra klassen
-CompoundTask(ParCompoundTask, SeqCompoundTask og FollowTourTask)
+CompoundTask (ParCompoundTask, SeqCompoundTask og FollowTourTask)
 kan indeholde subtasks. Subtasks tilføjes ved at holde 'ctrl' nede og
-trække en linie fra CompoundTasken til den ønskede
-subtask med musen. Hvis brugeren ønsker afkoble en subtask fra en CompoundTask,
+trække en linie fra compoundtasken til den ønskede
+subtask med musen. Hvis brugeren ønsker afkoble en subtask fra en compoundtask,
 gøres det ved at gentage ovennævnte
-procedure. Figur~\ref{fig:taskcreator} viser et opbygget Tasktræ   
-bestående af tre ParCompundTasks og et antal TestTasks. 
+procedure. Figur~\ref{fig:taskcreator} viser et opbygget tasktræ   
+bestående af tre ParCompundTasks og fire TestTasks. 
 
 Når brugeren har instantieret og kombineret de ønskede Tasks, kan
 disse afvikles og dermed udføres af AR.Dronen. Dette gøres ved at markere den
@@ -3085,7 +3134,7 @@ forsøget forsimplet tager ikke højde for rotation i planet
 
 Test, hvor virker det godt hvor er det problematisk
 reference til Parrots egen artikle herom; hastighed udledning bundkamera hvis muligt ellers udledning af accelerometer.
-\cite{velocity_estimation_inside_the_drone,}
+%\cite{velocity_estimation_inside_the_drone,}
 %Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
 Vi kan ikke r
 

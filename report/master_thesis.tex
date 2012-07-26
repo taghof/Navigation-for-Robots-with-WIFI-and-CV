@@ -4,7 +4,7 @@
 %\documentclass[12pt,twoside,openright]{report}
 %\documentclass[10pt,twoside]{report}
  
-\usepackage[danish]{babel}
+\usepackage[english, danish]{babel}
 \usepackage[ansinew]{inputenc}
 %\usepackage[utf8]{inputenc}
 \usepackage{graphicx}
@@ -90,26 +90,34 @@ Ole Caprani
 
 \end{titlepage}
 \pagestyle{headings}
-
-\section*{Abstract}
-In english...
-
-\section*{Resume}
+\begin{otherlanguage}{english}
+\abstract{
+This thesis investigates the possibility of making a quadrokopter,
+AR.Drone, fly semi autonomously in an indoor environment. Firstly an
+easy to use software platform that utilizes the AR.Drone sensing
+apparatus is contructed. The platform is then used for further
+experiments. These experiments explores how the sensor apparatus
+aboard the AR.Drone can be exploited to derive more abstract
+information about the near environment. This information is used to
+make the AR.Drone navigate through respectively corridors and open
+spaces with visual markers on the floor.
+}
+\end{otherlanguage}
+\abstract{
 %Indeholder og gennemgår i det følgende (på dansk).
 %-Kort intro hvad vil vi gøre...
-Dette speciale handler om at klarlægge muligheder, for at gøre en
+Dette speciale handler om at klarlægge mulighederne, for at gøre en
 quadrokopter, AR.Drone, delvis selvflyvende i et indendørsmiljø. Mere
-specifikt implementeres i første omgang en let anvendelig softwareplatform der kan
-udnytte AR.Dronens indbyggede sensorapparat. Platformen anvendes
-herefter til de videre eksperimenter. Det undersøges hvorledes
-sensorapparatet ombord på AR.Dronen kan udnyttes, til at udlede mere
-abstrakt information om miljøet i den umiddelbare nærhed. Denne
-information anvendes til at lade AR.Dronen navigere i henholdsvis
-korridorer og åbne rum med visuelle markører på gulvet.
-
+specifikt implementeres i første omgang en let anvendelig
+softwareplatform, der kan udnytte AR.Dronens indbyggede
+sensorapparat. Platformen anvendes herefter til de videre
+eksperimenter. Det undersøges hvorledes sensorapparatet ombord på
+AR.Dronen kan udnyttes, til at udlede mere abstrakt information om
+miljøet i den umiddelbare nærhed. Denne information anvendes til at
+lade AR.Dronen navigere i henholdsvis korridorer og åbne rum med
+visuelle markører på gulvet. 
 \todo{Kort uddybning af, hvad har vi gjort, hvad var resultatet.}
-
-\pagebreak
+}
 
 \tableofcontents
 
@@ -301,7 +309,7 @@ tilføje / fjerne moduler afhængig af produkt der designes til.
 Minerva museums tourguide robot\cite{Thrun99minerva:a}?
 er lavet til at vise gæster rundt på et museum *billede af Minerva*
 har kamera og afstandsmåler til at se publikum og navigere ift. pupl,
-*billede af ``photoshop'' ar.drone flyvende i l'Louvre*
+*billede af ``photoshop'' ar.drone flyvende i l'Louvre*g
 hvad ville der ske hvis vi tog samme scenarie og brugte en flyvende
 helikopter istedet, uddyybning at den skulle kunne fjernstyres, optage
 film af flyvning, fjernstyres hjemmefra via et webinterface (nævne
@@ -345,71 +353,88 @@ Er det en del af opgaven at se om AR.Dronen er den rigtige platform at lave dett
 %% Højniveau?:
 %% - er der noget højt,... abstraktion?
 hvordan teori
-
-
-
-%%%% Introduction - Metode
-\subsection{AR.Drone} % Thomas,
-Selvstændig selvstående paragraf omkring, valg af AR.Dronen. Hvorfor har vi valgt den, hvad tilfredstiller den, hvad tilfredstiller den ikke. Hvad skal den bruges til.
-
-generelle sensore på dronen; 2 kameraer, acceleration, rotation, hastighed, 
-wifi-kommunikation
-
-Discussion af AR.Dronen som tilfredstillende basis... ``Modelling and
-control of a quad-rotor robot'', Pounds et al, \cite{quteprints33767}
-bygge en ny mekanisk forsimplet udgave af en quadrocopter, mere robust
-=> færre reperationer... --- formentlig ofte et spørgsmål om
-tilgængelighed, ``it's good enough'' ej genopfinde dybtalerken....
-
-Definition på en robot; kan udføre en opgave - en sekvens af operationer/handlinger -- eksemplet en ``dum'' industrirobot,
-anden karakteriserende pind/punkt/egenskab; at den på baggrund af sensorinput (feedback kontrol) kan træffe beslutninger / beslutningstræ...
-Disse to egenskaber findes allerede i AR.Dronen, udfra det er den tilpas til at starte ud med når vi skal lege med robotter
-
-\paragraph{2 AR.Droner} % Thomas, en med ekstern lab-forsyning, en flyvende
-
-\paragraph{Nu med USB-driver}% Thomas & Morten
-- udvide features / muligheder / operationer / operationsområder, 
-- samt undersøgt muligheden for at udvide AR.Dronens Hardwareplatform med yderligere sensore eg. USB / mere flashdrive
-
-%%%% Introduction - Metode
-\subsection{Domæne/navigationsmiljø} % Thomas,
+Domæne/navigationsmiljø % Thomas,
 Nogle bygninger på Katrinebjerg, indendørs...
 hvorfor / uddybende beskrivelse af kontor, gang, openspace
 %% - hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det (relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
 
+\subsection{AR.Dronen} % Thomas, 
+AR.Dronen, som beskrives i detaljer i kapitel~\ref{sec:AR.Drone},
+tilfredstiller vores behov for en quadrokopter-platform. AR.Dronen
+stiller en række sensorer tilrådighed og præsenterer et veldefineret
+interface til fjernstyring. Alternativt kunne man have bygget en
+platform fra bunden, som i \cite{quteprints33767}. Til dette projekt,
+har dette dog ikke været en praktisk mulighed.
+
+Anvendelsen af AR.Dronen besværliggøres af den korte batteritid(10-12
+minutters flyvetid). Vi har dog kunnet minimere problemet, ved at
+anvende seks batterier og fire opladere. Desuden har vi, under
+eksperimenter der ikke krævede flyvning, anvendt en strømforsyning fra
+en PC i stedet for et batteri.
+
+Med AR.Dronen er vi hurtigt i luften og der kan hurtigt bygges software
+der anvender det offentliggjorte interface. Til gengæld har vi ingen
+indflydelse på det styreprogram der kører på AR.Dronen og kan kun
+styre AR.Dronen gennem interfacet. Det er muligt at implementere et
+alternativt styreprogram til at AR.Dronen, men det har ikke været et
+mål med dette speciale.
+
+Der gives en detaljeret vurdering af AR.Dronen som robotplatform i
+sektion~\ref{ssec:dronerecap}.
+
+%%%% Introduction - Metode
+\subsection{Klientplatform og klientværktøjer} % Thomas & Morten 
+Der er implementeret en klientplatform til indsamling af AR.Dronens
+sensorstrømme og fjernstyring af denne. Klientplatformen har
+fasciliteret de eksperimenter som beskrives i
+sektion~\ref{chap:Eksperimenter} og dermed også udviklingen af de
+forskellige tasks i sektion~\ref{sec:tasks}.
+
+Klientværktøjerne Sensordisplay, Mapcreator og Taskcreator, som alle
+beskrives i sektion ~\ref{chap:clienttools}, er udviklet for at lette
+arbejdet med klientplatformen. Blandt andet ved at give brugeren
+adgang til en grafisk repræsentation af AR.Dronens
+sensorstrømme. Klientværktøjerne har vist sig meget anvendelige i
+forbindelse med forberedelse og udførelse af eksperimenter med
+klientplatformen.
+
 \subsection{Python}
-Vi valgt at skrive klientplatformen i Python. Grunden til dette er
-primært Pythons læsbarhed og simple syntaks. Læsbar kode fordrer ikke bare
-hurtig udvikling fra vores side, men også at andre udviklere hurtigere
-kan sætte sig ind i koden og videreudvikle på den. Pythons simple
-syntaks betyder, at klientplatformen også vil henvende sig til mindre
-erfarne udviklere. Da vi har haft som mål, at skabe en let anvendelig
-og let udbyggelig klientplatform, er Python det oplagte valg.
+Vi valgt at skrive klientplatformen i
+Python. Grunden til dette er primært Pythons læsbarhed og simple
+syntaks. Læsbar kode fordrer ikke bare hurtig udvikling fra vores
+side, men også at andre udviklere hurtigere kan sætte sig ind i koden
+og videreudvikle på den. Pythons simple syntaks betyder, at
+klientplatformen også vil henvende sig til mindre erfarne
+udviklere. Da det har været et mål, at skabe en let anvendelig og let
+udbyggelig klientplatform, er Python et oplagt valg.
  
 Eksemplerne i sektion~\ref{sec:platformsadgang} viser hvor lidt kode
 der behøves, for at anvende klientplatformen. Desuden henvises til
 implementationen af vores klientværktøjer,
 \cite{github:sensordisplay}\cite{github:mapcreator}\cite{github:taskcreator},
-for eksempler der anvender klientplatformen.  
+for eksempler der anvender klientplatformen.
 
-Udfordingen ved valget af implementationssprog er, at Python som
-et dynamisk typet, fortolket sprog, ikke performance-mæssigt kan
+Udfordingen ved valget af implementationssprog er, at Python som et
+dynamisk typet, fortolket sprog, ikke performance-mæssigt kan
 sammenlignes med mere maskinnære sprog som C og C++. For at overkomme
-denne udfordring, har vi gjort anvendelse af OpenCVs billedalgoritmer(beskrevet
-nedenunder) og Psyco,~\cite{electronic:psyco}, i forbindelse med afkodning af
-billeder fra AR.Dronen(se desuden sektion~\ref{subsec:receivers}). En fremtidig forbedring kunne være, at
-implementere afkodningen af AR.Dronens billeder i et C-bibliotek og
-bygge en Pythonwrapper til dette.    
+denne udfordring, har vi gjort anvendelse af OpenCVs
+billedalgoritmer(beskrevet nedenunder) og
+Psyco,~\cite{electronic:psyco}, i forbindelse med afkodning af
+billeder fra AR.Dronen(se desuden sektion~\ref{subsec:receivers}). En
+fremtidig forbedring kunne være, at implementere afkodningen af
+AR.Dronens billeder i et C-bibliotek og bygge en Pythonwrapper til
+dette.
 
 \subsection{OpenCV}
-\label{opencv}
-OpenCV er et bibliotek af optimerede algoritmer, indenfor området
-computer vision,~\cite{opencv}\cite{opencv:wiki}. OpenCV blev
-oprindeligt startet af Intel(med bidrag fra optimeringseksperter i
-Intel Russia og Intels Performance Library Team), men udvikles nu af
-robotforskningslaboratoriet Willow Garage, \cite{opencv:willow:wiki}. Det har fra
-starten i 1999 været et mål, at skabe ikke bare åben. men også
-optimeret kode, til en grundlæggende computer vision infrastruktur.
+\label{opencv} OpenCV er et bibliotek af optimerede algoritmer,
+indenfor området computer
+vision,~\cite{opencv}\cite{opencv:wiki}. OpenCV blev oprindeligt
+startet af Intel(med bidrag fra optimeringseksperter i Intel Russia og
+Intels Performance Library Team), men udvikles nu af
+robotforskningslaboratoriet Willow Garage,
+\cite{opencv:willow:wiki}. Det har fra starten i 1999 været et mål, at
+skabe ikke bare åben. men også optimeret kode, til en grundlæggende
+computer vision infrastruktur.
 
 OpenCV blev i starten udviklet i C, men den seneste udvikling er
 udelukkende foregået i C++. Udover C og C++, findes der en række
@@ -417,7 +442,7 @@ interfaces til biblioteket, bland andre et Python
 interface,~\cite{opencv:wiki}. Python interfacet fungerer som en
 wrapper om OpenCVs C/C++ algoritmer. Ved anvendelse af dette
 interface, får vi altså kombineret Pythons brugervenlighed og OpenCVs
-hastighed.  
+hastighed.
 
 Opencvs optimerede algoritmer har, på grund af deres effektivitet,
 været uundværlige, blandt andet i implementationen af vores
@@ -426,76 +451,67 @@ afviklingshastighed på en blobdetector implementeret i ren Python og
 en der anvender OpenCVs algoritmer, var tydelig under vores
 eksperimenter i sektion~\ref{ssec:visuellokalisering}.
 
-%%%% Introduction - Metode
-\subsection{Klientplatform og klientværktøjer} % Thomas & Morten
-Vores implementerede klientplatform kan betegnes som et system til indsamling af
-AR.Dronens sensorstrømme og fjernstyring af denne. Klientplatformen
-har fasciliteret de eksperimenter som beskrives i sektion~\ref{chap:Eksperimenter} og
-dermed også udviklingen af de forskellige tasks i sektion~\ref{sec:tasks}. 
+\subsection{Eksperimenter} For at teste AR.Dronen og vores
+klientplatform, har vi udført en række eksperimenter. Eksperimenterne
+omhandler generelt udledning af kontekstuel information fra AR.Dronens
+sensorstrømme. Mere specifikt tester vi metoder til lokalisering,
+afstandsbedømmelse, måling af tilbagelagt afstand(Odometri) og
+korridordetektering.
 
-Klientværktøjerne Sensordisplay, Mapcreator og Taskcreator, som alle
-beskrives i sektion ~\ref{chap:clienttools}, er udviklet for at lette arbejdet med
-klientplatformen. Blandt andet ved at give brugeren adgang til en grafisk
-repræsentation af AR.Dronens sensorstrømme. Klientværktøjerne har vist sig
-meget anvendelige i forbindelse med forberedelse og udførelse af
-eksperimenter med klientplatformen.
+\paragraph{Lokalisering via Wifi-fingerprinting} Ved hjælp af en
+WIFI-fingerprinting algoritme, har vi undersøgt muligheden for at
+lokalisere AR.Dronen i forhold til et antal fastlagte
+positioner. Eksperimenternes opstilling og resultater kan ses i
+sektion~\ref{ssec:wifilokalisering}.
 
-\subsection{Eksperimenter} % Thomas,
-For at teste AR.Dronen og vores klientplatform, har vi udført en række
-eksperimenter. Eksperimenterne omhandler generelt udledning af
-kontekstuel information fra AR.Dronens sensorstrømme. Mere specifikt
-tester vi metoder til lokalisering, afstandsbedømmelse, måling af
-tilbagelagt afstand(Odometri) og korridordetektering.
+\paragraph{Lokalisering via visuelle markører} simpel blob, og
+udbygget nested blob Vi har designet et antal forskellige visuelle
+markører. Markørerne er blevet testet for hvor godt de kunne genkendes
+af AR.Dronen, både i statiske opstillinger og i forbindelse med
+bevægelse. Disse eksperimenter har også fungeret som test af vores
+tasksystem og de udviklede tasks. Eksperimenternes opstilling og
+resultater kan ses i sektion~\ref{ssec:visuellokalisering}.
 
-\paragraph{Lokalisering via Wifi-fingerprinting}
-Ved hjælp af en WIFI-fingerprinting algoritme, har vi undersøgt
-muligheden for at lokalisere AR.Dronen i forhold til et antal
-fastlagte positioner. Eksperimenternes opstilling og resultater kan
-ses i sektion~\ref{ssec:wifilokalisering}.
+\paragraph{Afstandsbedømmelse via optical flow} Vi har undersøgt
+muligheden for at udlede afstande, til objekter synlige for AR.Dronens
+frontkamera.  Ved at lade AR.Dronen flyve sidelæns, trianguleres
+afstande ud til genstande foran frontkameraet. Dette gøres ved brug af
+den tilbagelagte afstand og målte vinkler til genstanden.
 
-\paragraph{Lokalisering via visuelle markører} simpel blob, og udbygget nested blob
-Vi har designet et antal forskellige visuelle markører. Markørerne er
-blevet testet for hvor godt de kunne genkendes af AR.Dronen, både
-i statiske opstillinger og i forbindelse med bevægelse. Disse
-eksperimenter har også fungeret som test af vores tasksystem
-og de udviklede tasks. Eksperimenternes opstilling og resultater kan
-ses i sektion~\ref{ssec:visuellokalisering}. 
+\paragraph{Korridor detektering} Der er eksperimenteret med muligheden
+for at detektere et korridormiljø. Med en sådan detektion, kan
+AR.Dronen bevæge sig i forhold til denne specifikke
+miljøtype. Algoritmen analyserer på indholdet af diagonale linier i
+billedet fra frontkameraet.
 
-\paragraph{Afstandsbedømmelse via optical flow}
-Vi har undersøgt muligheden for at udlede afstande, til objekter
-synlige for AR.Dronens frontkamera. 
-%\todo{fedt hvis det kan nåes at lave det...}
-% birds eye view (lidt refs under speciale-mappen), head bobbing, biers afstandsbedømmelse ligger i
-% optiske flow observeret fra A til B, forskel i tunnel og åbent land...
-
-%problematik at flyve fremad; for smalle trekanter, måske bedre at flyve sidelæns eller op og ned
-% evt afhjælpe med fiskeøje, så flow af featurepoints kan trackes
-% længere langs siden af kopteren når man flyver forbi...
-
-\paragraph{Korridor detektering}
-\paragraph{DistanceTracker}
-
-%%%% Introduction
+\paragraph{DistanceTracker} En del af den navigationsdata vi modtager
+fra AR.Dronen er hastighedsestimater. Vi har anvendt disse
+hastighedsestimater til at implementere en odometrisk
+afstandsmåler(DistanceTracker). Implementationen integrerer over de
+modtagne hastighedsestimater. Vores eksperimenter med DistanceTracker
+involverer manuelle og automatiserede flyvninger over mere eller
+mindre ensartede overflader.
 
 \section{Medfølgende CD}
-Dude its a CD
+På den medfølgende CD findes kildekoden til den udviklede
+klientplatform inklusiv de udviklede tasks.
 
 \section{Projekt Blog}
-\label{sec:blog}
-Vi har i løbet af vores speciale, anvendt en blog til at beskrive
-tekniske fremgangsmåder og til at fungere som adgangspunkt til vores offentlige
-kode-repository. Bloggen hostes på Github og adressen angives
-i~\cite{blog}. Bloggen indeholder udover en projektbeskrivelse, især informationer om vores tidlige
-forsøg med AR.Dronen. Blandt andet beskrives proceduren for at
-aktivere AR.Dronens USB-port i detaljer. Denne procedure har vi
-stykket sammen fra adskillige kilder og vi håber med bloggen, at kunne
-tilbyde en mere samlet kilde for andre i vores situation.
-Et andet emne som behandles på bloggen er afvikling af kode på
-AR.Dronen, herunder proceduren for cross-compiling til ARM arkitekturen. 
+\label{sec:blog} Under specialets udvikling, er der anvendt en blog
+til at beskrive tekniske fremgangsmåder og til at fungere som
+adgangspunkt til det offentlige kode-repository. Bloggen hostes på
+Github og adressen angives i~\cite{blog}. Bloggen indeholder udover en
+projektbeskrivelse, især informationer om vores tidlige forsøg med
+AR.Dronen. Blandt andet beskrives proceduren for at aktivere
+AR.Dronens USB-port i detaljer. Et andet emne som behandles på bloggen
+er afvikling af kode på AR.Dronen, herunder proceduren for
+cross-compiling til ARM arkitekturen. Procedurerne er stykket sammen
+fra adskillige kilder og formålet med bloggen er blandt andet, at
+kunne tilbyde en mere komplet kilde for andre i vores situation.
 
-\section{Raport struktur} % Thomas, %/læsevejledning
-Introduktion til rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit indeholder.
-intro til medfølgende CD og blogpost, med kode på Github
+\section{Raport struktur} % Thomas, %/læsevejledning Introduktion til
+rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit
+indeholder.  intro til medfølgende CD og blogpost, med kode på Github
 
 \pagebreak
 
@@ -758,7 +774,6 @@ figur~\ref{fig:ateulerangle}.
 \begin{verbatim}
  AT*CONFIG=605,"control:euler_angle_max","0.25"
 \end{verbatim}
-
   \caption{Eksempel på indholdet af en AT-kommandobesked. Beskeden
     overføres fra klient-enheden til AR.Dronen på UDP-port 5556. Lige
     netop denne besked sætter en parameter i AR.Dronens
@@ -778,7 +793,6 @@ installeret. Det bemærkes at 2.6.27 er den første kerne med indbygget
 support for UBIFS, \cite{electronic:wiki_ubifs}, som er det filsystem der
 anvendes på AR.Dronens NAND flash-hukommelse.
 
-
 \subsection{Busybox Linux platformen på AR.Dronen}
 \label{sssec:busybox}
 Udover Linux kernen leveres AR.Drone også med
@@ -796,7 +810,6 @@ et netværk mellem en ekstern klient og AR.Dronen selv, samt en
 telnet-server, \cite{rfc854}, der giver adgang til AR.Dronens terminal
 og en texteditor(Vi) der gør det muligt at redigere filer direkte på
 AR.Dronen. 
-
 
 \subsection{AR.Dronens styreprogram fra Parrot}
 \label{sssec:program.elf}
@@ -844,11 +857,9 @@ mellem klientenhed og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikatio
 %%%%      + Klient/server kommunikation - subsection
 
 
-\section{Kommunikation mellem AR.Dronen og klienter} %mellem AR.Dronen
-                                %og en klient-enhed
-Den forbindelse der skal til for at fjernstyre AR.Dronen via en iPhone
-er den oftest brugte forbindelse, men en af mange
-interaktionsmuligheder. Herunder listes nogle af de muligheder
+\section{Kommunikation mellem AR.Dronen og klienter} %mellem AR.Dronen %og en klient-enhed
+AR.Dronen fjernstyres oftest via en iPhone, men dette er blot en af
+flere interaktionsmuligheder. Herunder listes nogle af de muligheder
 AR.Dronens Linux-platform og AR.Dronens styreprogram åbner op for,
 både i form af fjernstyring og intern kommunikation på AR.Dronen.
 \label{ssec:kommunikation}
@@ -883,7 +894,7 @@ AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupp
 Interaktion mellem AR.Dronen og en ekstern klient benævnes som værende
 fjernstyring, mens AR.Dronen opfattes som værende autonom
 hvis kontrolsignaler til AR.Dronens styreprogram kommer fra en intern
-process der køre parallelt med AR.Dronens styreprogram på AR.Drone-platformen.
+process der kører parallelt med AR.Dronens styreprogram på AR.Dronen.
 
 \subsection{Intern klientkommunikation}
 %Når interaktionen foregår mellem 2 processor
@@ -990,16 +1001,15 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 \end{framefig}
 En robotplatform der kan udvides med nye sensorer efter behov, er
 klart mere anvendelig end en helt lukket platform. Derfor blev det
-undersøgt om det er muligt at anvende AR.Dronens OTG-USB, 
-\cite{electronic:otg} port til andet end at lave softwareopdateringer.
+undersøgt om det er muligt at anvende AR.Dronens OTG-USB-port, \cite{electronic:otg}, til andet end at lave softwareopdateringer.
 Dette har blandt andet indbefattet at kompilere kernemoduler til AR.Dronens linuxkerne,
 samt at omgå AR.Dronens software for ikke at miste strømmen til
-porten, \cite{blog:usb}. Den indledende proof-of-concept test var at få mounted en almindelig USB-memorystick
-og skrive til og læse fra den. Indstallationsprocesuren er forholdsvis
+USB-porten, \cite{blog:usb}. Den indledende proof-of-concept test var, at få mounted en almindelig USB-memorystick
+og skrive til og læse fra den. Indstallationsproceduren er forholdsvis
 simpel, idet Linuxdriverne til dette formål er meget generiske. Proceduren
 til at aktivere AR.Dronens USB-port og læse fra en USB-memorystick kan læses
-i en af specialets tilhørende blogpost: "Enabling the Drone USB Port",
-\cite{blog:usb}. 
+i en af specialets tilhørende blogposts: "Enabling the Drone USB
+Port",~\cite{blog:usb}. 
 \begin{framefig}
   \centering
   \subfigure[Hjemmelavet USB-kabel, en USB memorystick og en WIFI USB-dongle til tilslutning på AR.Dronen.]{
@@ -1011,44 +1021,43 @@ i en af specialets tilhørende blogpost: "Enabling the Drone USB Port",
   \label{fig:usbdevices}
 \end{framefig}
 
-\subsection{WIFI-sensor-program på AR.Dronen}
+\subsection{WIFI-sensor på AR.Dronen}
 Efter de indledende erfaringer med AR.Dronens USB-port, blev der
-implementeret en WIFI-sensor for på sigt at kunne anvende denne som 
+implementeret en WIFI-sensor, for på sigt at kunne anvende denne som 
 lokaliseringsenhed. WIFI-sensoren består af en USB-WIFI-adapter
-og et snifferprogram (\emph{WIFI-sensor}) til at aflæse og videresende signalstyrkerne fra AR.Dronens
-omkringliggende accesspoints og andre WIFI-kilder. 
+og et (\emph{WIFI-sensor-program}) til at aflæse og videresende
+signalstyrkerne fra AR.Dronens omkringliggende accesspoints og andre
+WIFI-kilder.  
 
-Signalstyrken af et accesspoints radiosignalet siger noget om hvor
+Signalstyrken fra et accesspoint siger generelt noget om hvor
 langt modtageren er fra accesspointet. Hvis man ved på hvilken etage
 og i hvilket lokale et accesspunkt er placeret, og man modtager et
 signal med svag signalstyrke, så ved man at man er langt væk fra den
 placering. Hvis man istedet modtager et kraftigt signal fra samme
-accespoint, så ved man at man er tæt på placeringen. Lokalisering via WIFI
-bruger den egenskab at radiosignalstyrker aftager med sendeafstanden
-til at give specifikke lokationer unikke karakteristika, ie. et
-fingeraftryk. Et WIFI-fingerprint kommer i form af en 
+accespoint, så ved man at man er tæt på placeringen. 
+Lokalisering via WIFI-fingerprinting bruger radiosignalstyrker til at
+give specifikke lokationer unikke karakteristika,
+WIFI-fingerprints. Et WIFI-fingerprint kommer i form af en  
 mængde af accesspoint-identifikationer med tilhørende målte
-signalstyrkeværdier på en given lokation. Man kan på forhånd indsamlet
-WIFI-fingeraftryk på reference positioner omkring i en
-bygning. Reference punkternes tilhørende signalstyrker kan så
-senere sammenlignes med et nyeligt indsamlet WIFI-fingerprint
-signalstyrker til at finde en tætteste match og dermed ens nuværende
-lokation.
+signalstyrkeværdier på en given lokation, se
+sektion~\ref{ssec:wifilokalisering} for en detaljeret beskrivelse af
+WIFI-fingerprinting. 
 
-For at teknikken skal fungere og for at få fingeraftryk med flest markøre
-antager snifferprogrammet at det 
-anvendte trådløse interface er sat op i monitor og 
-promiscous mode\footnote{Normalt vil et netværksinterface frasortere og
-  ikke videresende datapakker der ikke er adresseret til processoren,
-  men i promiscous mode sendes al trafik videre.} så det videresender alle pakker der sendes fra de
+For at teknikken skal fungere bedst, skal WIFI-sensor-programmet
+modtage og behandle så mange WIFI-pakker som muligt. Derfor sættes
+WIFI-adapteren i monitor og  promiscous mode\footnote{Normalt vil et
+  netværksinterface frasortere og   ikke videresende datapakker der
+  ikke er adresseret til processoren,   men i promiscous mode sendes
+  al trafik videre.} så den modtager alle pakker der sendes fra de 
 omkringliggende WIFI-kilder. Netværksinterfacet indstilles gennem et
-script (\uri{load.sh}, \cite{github:loadsh}) som kaldes i forlængelse af AR.Dronens 
-oprindelige bootup-sekvens. Scriptet sørger også for at indlæse alle de
-nødvendige kernemoduler.
+script (\uri{load.sh}, \cite{github:loadsh}) som kaldes i forlængelse
+af AR.Dronens  oprindelige bootup-sekvens. Scriptet sørger også for at
+indlæse alle de nødvendige kernemoduler og starte
+WIFI-sensor-programmet. 
 
 \subsubsection{WIFI-sensor hardware}
 AR.Dronen er blevet udstyret med en Dlink DWL-G122 WIFI-adapter,
-\cite{electronic:dwlg122}. Lige netop denne adapter blev valgt fordi
+\cite{electronic:dwlg122}. Denne adapter blev valgt fordi
 den bygger på et Ralink chipset, \cite{electronic:wikiralink} og
 understøtter monitor mode. Desuden udgiver Ralink linuxdrivere til
 deres chipsets. Efter længere tids søgen og eksperimenteren, blev den
@@ -1060,39 +1069,39 @@ indlæst, genkendes adapteren og interfacet \emph{ra0} oprettes i
 \subsubsection{WIFI-sensor software}
 \label{sec:sub:sub:wifisensor}
 De første eksperimenter med hensyn til at kompilere og afvikle kode
-på AR.Dronen kan ses i specialets blogpost "Compiling code for the
+på AR.Dronen, kan ses bloggen under "Compiling code for the
 AR.Drone", \cite{blog:compiling}. Det var simple 'hello 
-world' eksempler, men det gav indsigt i proceduren omkring
+world' eksempler, men de gav indsigt i proceduren omkring
 crosscompiling til AR.Drone-arkitekturen og den anvendte toolchain. 
 
 For at skrive et program der kan modtage pakker fra et
 netværksinterface anvender man ofte linux' pcap (packet capture)
 bibliotek\cite{electronic:pcap}. Dette er dog ikke installeret på
-AR.Dronen som standard og skulle først kompileres til ARM-arkitekturen
-for så at linke til det og senere anvende programmet på AR.Dronen,
-se blogposten \cite{blog:compiling}. 
+AR.Dronen som standard og skulle først kompileres til ARM-arkitekturen,
+før WIFI-sensor-programmet kunne linke til det, se blogposten
+\cite{blog:compiling}.  
 
-Arbejdet med at installere et yderligere netværk på AR.Dronen
-resulterede i et \emph{WIFI-sensor}-program der køre på AR.Dronen. Det
-ny program henter WIFI-pakker som det indstallerede
-netværksinterface henter fra luften. De opsnappede WIFI-pakker skilles
-ad og MAC\footnote{Media Access Control}-adressen på pakkens afsender samt signalstyrken puttes i en ny
-besked, som afsendes fra AR.Dronen. De afsendte pakker er del af en sensorstrøm der
-ligner det der ellers kommer fra AR.Dronen, ie. navdata og video.
+WIFI-sensor-programmet kører på AR.Dronen. Det henter WIFI-pakker som
+det installerede netværksinterface, gennem WIFI-adapteren, henter fra
+luften. De modtagne WIFI-pakker indlæses og MAC\footnote{Media Access
+Control}-adressen på pakkens afsender, samt signalstyrken puttes i en
+ny besked, som afsendes fra AR.Dronen. De afsendte pakker er del af en
+sensorstrøm, WIFI-strømmen, og ligner det der ellers kommer fra
+AR.Dronen(navdata og video). Strømmen fra WIFI-sensoren går over UDP-port
+5551. Kommunikationen anvender denne port for at holde
+klientens interface til AR.Dronen nogenlunde konsistent.
 
-Det konstruerede WIFI-sensor-program kan opstartes med et interfacenavn som
+WIFI-sensor-programmet kan opstartes med et interfacenavn som
 inputargument, men som standard anvendes \emph{ra0}-interfacet. Man
-kan desuden vælge at angive en fast kanal, eller man kan vælge at anvende
-channelhopping til at modtage pakker fra forskellige
-kanaler. Derudover er det muligt at få tekstuel output til terminalen. 
-WIFI-sensor-programmet er lavet så det kan startes automatisk når AR.Dronen booter op.
+kan desuden vælge at angive en fast kanal, eller man kan vælge at
+anvende channelhopping til at modtage pakker fra forskellige
+kanaler. Derudover er det muligt at få tekstuel output til terminalen.
 For ikke unødigt at spilde processorkrafter med at modtage og behandle
-pakker, hvis de alligevel ikke skal bruges, så venter WIFI-sensor-programmet efter opstart på et start-signal fra
-klienten via en UDP-initialiseringspakke. Modtages startsignalet
-begynder WIFI-sensor-programmet at sender signalstyrker og
-MAC-adresser videre til klienten. UDP strømmen fra WIFI-sensoren går
-over UDP-port 5551. Kommunikationen er valgt til at gå over UDP-port nummer 5551 for at klientens
-interface til AR.Dronen forbliver nogenlunde konsistent.
+pakker, hvis de alligevel ikke skal bruges, så venter
+WIFI-sensor-programmet efter opstart på et start-signal fra klienten
+via en UDP-initialiseringspakke. Modtages startsignalet begynder
+WIFI-sensor-programmet at sende MAC-adresser og signalstyrker videre
+til klienten.
 
 \section{Vurdering af AR.Dronen som robotplatform} % Thomas,
 \label{ssec:dronerecap}
@@ -1185,15 +1194,15 @@ generhverve det fåtal af billedframes der går tabt pga. fejl i
 transmissionen. Det er bedre at indlæse den næste datapakke
 istedet. Information i den gamle datapakke vil alligevel være forældet
 % Kan den måles?, hvad er den teoretisk effektive overførselshastighed?
-%
 og irrelevant. Vores erfaring har også været, at vi har modtaget både
 video og navdatastrømmen med en passende framerate til vores formål.
 \todo{kontrol af manual merge morten?}
 
-\subsection{Billedkvalitet} AR.Drone er et produkt der er designet til
-at skulle være billig i produktion for dermed let at kunne erhverves af menigmand. I
-dette valg af design har Parrot afvejet et tradeoff mellem
-videokvalitet of framerate. Det
+\subsection{Billedkvalitet} 
+AR.Dronen er et produkt der er designet til
+at skulle være billig i produktion, for dermed let at kunne erhverves af menigmand. I
+deres valg af design har Parrot afvejet et tradeoff mellem
+videokvalitet og framerate. Det
 betyder, at opdateringshastigheden af billeder og data fra AR.Dronen er
 tilstrækkelig i de fleste tilfælde, men, som det fremgår afafsnit~\ref{sec:QRdecoding}, er billedkvaliteten ikke tilstrækkelig
 til f.eks. afkodning af QR-koder, \cite{electronic:wikiqr}.
@@ -1207,40 +1216,25 @@ til f.eks. afkodning af QR-koder, \cite{electronic:wikiqr}.
   \label{fig:2frames}
 \end{framefig}
 
-%\subsection{Zap imellem 2 kameraer} I forbindelsen mellem klient og
-%AR.Dronen kan man kun modtage en billedramme ad gangen. Dvs. at enten
-%skal man få billeder fra frontkameraet eller fra bundkameraet. -- Skal
-%man bruge billeder fra begge kameraer, må man skifte imellem dem
-%(zappe) og skiftevis få et billede fra frontkamera hver anden gang og
-%bundkameraet de andre gange.  Dette er ikke praktisk idet det vil
-%nedsætte opdateringshastigheden yderligere i eksempelvis en
-%feedback-kontrol løkke. Ydermere er der et lille delay forbundet med
-%at skifte feed fra fra det ene til det andet kamera.  Insisterer man
-%alligevel på at få billeder fra begge kameraer samtidig, er det dog
-%muligt. Billeder fra de to kameraer lægges ovenpå hinanden til eet
-%billede (se figur~\ref{fig:2frames}), som så kan modtages af klienten.
-%Det billede der er indeholdt i det andet er af noget mindre opløsning
-%($88 \times 72$) end hvis det havde været sendt alene ($320 \times
-%240$). Denne forskel i kvalitet har tydeligt en indflydelse på
-%resultatet af diverse billedanalysealgoritmer.
-
 \subsection{Zap imellem 2 kameraer} 
 I videostrømmen mellem en klient og AR.Dronen sendes kun et billede ad
 gangen. Man kan modtage fire forskellige slags billeder: fra
 frontkameraet, fra bundkameraet, fra frontkameraet med bundkameraets
 billede overlagt i øverste venstre hjørne og fra bundkameraet med
-frontkameraets billede overlagt i øverste ventre hjørne. Skal man bruge billeder i fuld størrelse fra
-begge kameraer, må man skifte imellem dem (zappe) og skiftevis få et
-billede fra front- og bundkamera. Dette er ikke praktisk, idet det vil nedsætte
-opdateringshastigheden i eksempelvis en feedback-kontrol
-løkke. Ydermere er der et lille delay forbundet med at skifte feed
-fra det ene til det andet kamera. Anvender man de kombinerede
-billeder, se figur~\ref{fig:2frames}, skal man være opmærksom på
-billede der er indeholdt i det andet, er af noget mindre opløsning end det originale($88
-\times 72$ pixels for bundkameraets billede når det er lagt ovenpå
-frontkameraets, mod $176 \times 144$ pixels originalt). Denne forskel
-i kvalitet har tydeligt en indflydelse på resultatet af diverse
-billedanalysealgoritmer, se sektion~\ref{ssec:smallmarks}.
+frontkameraets billede overlagt i øverste ventre hjørne(de fire videostrømme). Skal
+der bruges billeder i fuld størrelse fra begge kameraer, er det
+nødvendigt at skifte imellem to videostrømme (zappe) og skiftevis få
+et billede fra front- og bundkamera. Dette er ikke praktisk, idet det
+vil nedsætte opdateringshastigheden i eksempelvis en feedback-kontrol
+løkke. Desuden er der et lille delay forbundet med at skifte fra den
+ene til det anden kamerastrøm. Anvender man de kombinerede billeder,
+se figur~\ref{fig:2frames}, skal man være opmærksom på, at der billede
+der er indeholdt i det andet, er af noget mindre opløsning end det
+originale($88 \times 72$ pixels for bundkameraets billede når det er
+lagt ovenpå frontkameraets, mod $176 \times 144$ pixels
+originalt). Denne forskel i kvalitet har tydeligt en indflydelse på
+resultatet af diverse billedanalysealgoritmer, se
+sektion~\ref{ssec:smallmarks}.
 %
 %% sjovt at vi i begyndelsen af arbejdet hele tiden har sagt at nu
 %% skal vi også huske at teste præcist hvor meget den drifter i yaw
@@ -1261,24 +1255,24 @@ understøtte det videre arbejde med AR.Dronen. Platformen skal sikre
 let og effektiv adgang til AR.Dronens sensor output, samt give
 mulighed for at styre AR.Dronen, både manuelt med joystick og tastatur
 gennem en PC (altså ikke iPhone, iPad el. lign.) og ved hjælp af
-forprogrammerede sekvenser af bevægelser som beskrives nærmere i
-sektion~\ref{sec:tasks}. 
+forprogrammerede sekvenser af bevægelser(tasks, beskrives nærmere i
+sektion~\ref{sec:tasks}). 
 
 \section{Platformens anvendelse}
 \label{sec:platformsadgang}
 Python blev, som tidligere nævnt, valgt for at lette tilgængeligheden for
 brugeren. Et af specialets mål er, at stille en let anvendelig og
 let udbyggelig platform til rådighed for udviklermiljøet omkring
-AR.Dronen. Herunder vises simple eksempler på hvordan klientplatformen
+AR.Dronen. Herunder vises simple eksempler på hvordan dele af klientplatformen
 kan anvendes. 
 
 \subsection{Nem fjenstyring af AR.Dronen i Python}
 \label{sec:sub:fjernstyrpy}
-Et simpelt eksempel på anvendelse af vores kontrolinterface gives ved at
-starte pythons fortolker, importere examples-modulet og herefter
-afvikle en metode indeholdende kommandoer til
-AR.Dronen. Det antages, at computeren der afvikler eksemplet er forbundet med AR.Dronens
-trådløse netværk. Fremgangsmåden ses på figur~\ref{fig:pythoninterpex1}.
+Et simpelt eksempel på anvendelse af det implementerede
+kontrolinterface gives på figur~\ref{fig:pythoninterpex1}. Først
+startes pythons fortolker, herefter importeres examples-modulet og
+metoden square() afvikles. Det antages, at computeren der afvikler
+eksemplet er forbundet med AR.Dronens trådløse netværk.
 
 \begin{framefig}
     \begin{verbatim}
@@ -1342,24 +1336,24 @@ I det følgende gennemgåes mulighederne for at modtage datapakker med video, navi
 For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
 indsamle data fra de ombordværende sensorer, samt at kunne stille
 disse data til rådighed for andre dele af systemet. Til dette formål
-har vi designet og implementeret en receiver-struktur bestående af tre
+er der designet og implementeret en receiver-struktur bestående af tre
 receiver-moduler. Disse moduler eksekveres i hver deres process og
 sørger selv for at initiere forbindelsen med AR.Dronen. Efter
 initialiseringen lytter hver receiver efter enten video-, navigations-
 eller wifi-pakker og når en sådan modtages udføres en passende
 afkodning af pakken og den afkodede data deles med processen der
 startede receiveren. De tre receivere er ikke
-afhængige af hinanden og kan afvikles hver for sig, ligeledes kan vi
-vælge at afvikle vores samlede system med en eller flere receivere
+afhængige af hinanden og kan afvikles hver for sig, således kan
+klientplatformen konfigureres til at afvikles med en eller flere receivere
 tilkoblet. Sektion~\ref{subsection:receiver} giver et eksempel
-på hvordan man lettest anvender videoreceiveren, til at modtage og vise
+på hvordan videoreceiveren lettest anvendes, til at modtage og vise
 et enkelt billede fra AR.Dronens videostrøm. Anvendelsen af de to
 andre receivere foregår på fuldstændig samme måde som videoreceiveren,
 den eneste forskel er typen af data der modtages. 
 
 \subsection{Eksempel på modtagelse af videostream}
 \label{subsection:receiver}
-Eftersom vores videoreceiver kan anvendes for sig selv, vises her et
+Eftersom videoreceiveren kan anvendes for sig selv, vises her et
 eksempel på hvor få linier kode man behøver for at modtage og vise et
 billede fra AR.Dronens kamera. Eksemplet antager at der
 allerede er oprettet en virkende forbindelse med AR.Dronens trådløse
@@ -1374,8 +1368,8 @@ netværk. Eksemplet startes fra Pythons kommandopromt.
 \end{framefig}
 
 Som det ses på figur~\ref{fig:pythonimpl2} kræver det tre liniers kode
-for at modtage et billede (og endnu fire for at vise det), vi 
-mener at dette fint illustrerer, hvordan vi med dette abstraktionslag kan
+for at modtage et billede (og endnu fire for at vise det). Dette
+illustrerer fint, hvordan dette abstraktionslag kan
 tilbyde et let anvendeligt interface til AR.Dronens forskellige
 sensoroutput.   
 \begin{framefig}
@@ -1506,7 +1500,6 @@ at anvende et optimeret C bibliotek til formålet for derved at øge
 afkodningshastigheden og samtidig eliminere afhængigheden af Psyco, som
 kun fungerer på en 32-bit platform.
 
-
 \subsubsection{WIFI-modtager}
 Som de andre receivere modtager \emph{WIFIReceiveren} en datastrøm fra
 AR.Dronen. WIFI-strømmen er dog en tilføjelse vi har lavet og formatet
@@ -1543,7 +1536,7 @@ tiden at skifte mellem bund- og frontkamera. Dette giver imidlertid
 problemer for AR.Dronens styreprogram der ved konstante kameraskift
 løbende øger sit hukommelsesforbrug indtil Linuxkernen lukker
 styreprogrammet ned. Vores målinger viser, at AR.Dronens program kun kan
-køre mellem ti og tolv minutter, såfremt vi samtidig skifter kamera
+køre mellem ti og tolv minutter, såfremt der samtidig skiftes kamera
 med cirka 5 millisekunders interval. Selvom om dette problem ikke
 beskrives direkte nogen steder, antydes det dog af en udvikler på
 Parrots forum, at denne funktionalitet ikke er ment anvendt til
@@ -1560,19 +1553,16 @@ DistanceTrackeren.
 
 \subsection{Kontrolinterface til fjernstyring af AR.Dronen}
 \label{sec:sub:controlinterface}
-\todo{Uddybes en del, med referencer til eksempler med AT-kommando
-  beskeder. Scratch that, reference til det simple ekempel med Python
-  fjernstyring i firkant figur~\ref{fig:pythonimpl1}, eller hvad?}
-Ved hjælp af AT-kommandoerne definerer AR.Dronen et interface til
+Ved hjælp af AT-kommandoerne definerer AR.Dronen et AT-interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
 gøre dette AT-interface mere praktisk anvendeligt har vi videreudviklet
-på en Python-wrapper, \cite{electronic:venthur}, til dette interface. Vi har implementeret
-interfacet som en Pythontråd der løbende sender kommandoer med de
+på en Python-wrapper, \cite{electronic:venthur}, til AT-interfacet. Vi har implementeret
+kontrolinterface som en Pythontråd der løbende sender kommandoer med de
 aktuelle kontrolværdier til AR.Dronen. 
 Dette betyder, at platformen ikke afhænger af at alle
 kontrolpakker når deres destination, hvilket er praktisk da
 UDP-protokollen netop ikke garanterer at en pakke når sin destination. %think I understand but humor me and elaborate...
-Ved at sende al kontrolkommunikation gennem interfacet, behøves vi heller ikke at tænke på detaljer som sekvensnumre og
+Ved at sende al kontrolkommunikation gennem kontrolinterfacet, skal der ikke tænkes på detaljer som sekvensnumre og
 watchdog-beskeder, da disse håndteres transparent af systemet.
   
 Kontrolinterfacet( implementeret i ControllerInterface-klassen, \cite{github:controllers}) definerer en række metoder til at
@@ -1601,12 +1591,12 @@ controllere til at tage mod input fra brugeren, en keyboardcontroller der lytter
 fra tastaturet og en joystickcontroller der er tilknyttet en fysisk
 Xbox360-controller (se figur~\ref{fig:xboxlayout}).
 
-Man kan starte systemet med begge controllere på samme tid, eller
-undlade en eller begge. Under udviklingen af systemet har vi oftest
-anvendt begge controllere sideløbende, da de komplimenterer hinanden.
+Platformen kan startes med begge controllere på samme tid, men det er
+også muligt at eller begge. Under udviklingen af platformen er begge
+controllere oftest anvendt sideløbende, da de komplimenterer hinanden.
 Man kan som sagt anvende platformen helt uden controllere og udelukkende anvende
 taskmanageren til at kontrollere AR.Dronen, men skulle der i det
-tilfælde ske noget uforudset under udførslen af en opgave, vil der
+tilfælde ske noget uforudset under udførslen af en task, vil der
 ikke være nogen mulighed for at bringe AR.Dronen manuelt (og sikkert) ned. 
 
 \begin{framefig}
@@ -1633,20 +1623,19 @@ en ny kontrolmetode som argument.
 platformen understøtter XBox360 controlleren gennem den implementerede
 Joystickcontroller. XBox360 controlleren anvendes istedet for en iPhone eller iPad, til at
 fjernstyre AR.Drone manuelt i forbindelse med testflyvninger. Der var
-flere praktiske grunde til at vi valgte at implementere en alternativ
-fjernstyring. Blandt andet havde vi et behov for at kunne interagere
-både med vores eget system og AR.Dronen på samme tid, mens vi til
-stadighed måtte have øjne på AR.Dronen. Vi fandt desuden ikke iPhone
-styringen tilstrækkelig præcis eller særlig intuitiv. Xbox360
+flere praktiske grunde til at implementere en alternativ
+fjernstyring. Blandt andet havde var der et behov for at kunne interagere
+både med platformen og AR.Dronen på samme tid, mens der til
+stadighed var øjne på AR.Dronen. Desuden blev iPhonestyringen hverken
+fundet tilstrækkelig præcis eller særlig intuitiv. Xbox360
 controlleren derimod omtales som en af de bedst designede controllere
 og har endda fundet anvendelse af militære styrker i USA og
 storbritannien, \cite{electronic:zdnet}, \cite{electronic:joystiq},
 \cite{electronic:youtube1}.  Fjernstyringsdelen er meget simpel og
-fungerer ved at oversætte værdier fra Xbox360 controlleren (som vi får
-givet af pygames, \cite{electronic:pygame}, joystickmodul) og så sende
+fungerer ved at oversætte værdier fra Xbox360 controlleren (som gives af pygames joystickmodul, \cite{electronic:pygame}) og så sende
 disse til kontrolinterfacet. Xbox360
 Joystickcontrolleren bruges udover manuel fjernstyring af AR.Dronen
-også til at starte tasks (task beskrives nærmere i sektion~\ref{sec:tasks})).  Således kan
+også til at starte tasks (sektion~\ref{sec:tasks}). Således kan
 piloten manuelt bringe AR.Dronen i en ønsket position og så herefter
 starte afvikling af et forudbestemt bevægemønster. På
 figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
@@ -1662,19 +1651,19 @@ controlleren.
 Hvis man ønsker at starte platformen uden grafisk brugerflade (og
 dermed uden tilhørende funktionalitet til at håndtere input fra brugeren), er det
 praktisk stadig at kunne anvende tastaturet som input (evt. i kombination med Xbox360
-controlleren). Vi har derfor implementeret en simpel
-keyboardcontroller, der læser input fra terminalen. Vi anvender ikke
-keyboardet til direkte styring af AR.Dronen (da Xbox360
+controlleren). Der er derfor implementeret en simpel
+keyboardcontroller, der læser input fra terminalen. Keyboardet
+anvendes ikke til direkte styring af AR.Dronen (da Xbox360
 controlleren er mere intuitiv og ligeledes tilgængelig), men
-istedet til ting som at få udskrevet nuværende batteriniveau ('b'),
-til at skifte kamera ('z'), til at få udskrevet aktive tasks ('c'), til
-at få udskrevet en oversigt over tråde i programmet ('t'), samt til at
-starte tasks ('1', '2' og '3'). %%%%% <ins>task</ins> <del>opgaver på autocontrolleren</del>
+i stedet til ting såsom: At få udskrevet nuværende batteriniveau
+('b'), at skifte kamera ('z'), at få udskrevet aktive tasks ('c'), at
+få udskrevet en oversigt over tråde i programmet ('t'), samt at 
+starte tasks ('1', '2' og '3').
 
 \subsection{Testdevice}
 \label{sec:sub:testdevice}
 Dette modul muliggør gennemførelsen af simple simuleringseksperimenter i et
-test miljø. Grundideen bag modulet er, at man skal kunne optage, ikke
+test miljø. Tanken bag modulet er, at man skal kunne optage, ikke
 bare video, men alle sensoroutput fra en flyvning med AR.Dronen, for så
 senere at kunne afspille hele flyvningen igen. Selve afspilningen
 foregår næsten transparent for resten af platformen. Receiverne skal
@@ -1701,35 +1690,35 @@ beslutningen, om hvilken task der har lov til at bevæge AR.Dronen.
 \section{Tasks} % Morten
 \label{sec:tasks}
 For at indkapsle forskellige bevægemønstre og for at kunne koordinere
-en parallel afvikling af disse, har vi implementeret et hierakisk
-opbygget tasksystem. Vi har valgt at kalde vores enheder for tasks
-istedet for behaviors, der ellers både bruges i artiklen 'A Modular
+en parallel afvikling af disse, er der implementeret et hierakisk
+opbygget tasksystem. Enhederne i dette system kaldes tasks og ikke
+behaviors, der ellers både bruges i artiklen 'A Modular 
 Hierarchical Behavior-Based Architecture',
 ~\cite{lenser:behaviorbasedarchitecture}, og i Lejos'
-subsumption-pakke, \cite{lejossub}. Grunden til dette er, at flere af
-vores tasks er forholdsvis kortlivede (for eksempel take-off og
+subsumption-pakke, \cite{lejossub}. Grunden til dette er, at flere af 
+de implementerede tasks er forholdsvis kortlivede (for eksempel take-off og
 landtasks) og derfor mere minder om en opgave der skal forberedes,
 udføres og afsluttes. Dette ses i modsætning til en behavior, som kan
-opfattes som en længerevarende opførsel. Vi har også implementeret
+opfattes som en længerevarende opførsel. Der er også implementeret
 højniveau bevægemønstre der minder mere om en traditionelle behaviors
 (for eksempel FollowTourTask). Vi mener, at det også giver mening, at
 kalde disse tasks, da de også implementeres efter vores generelle
 taskstruktur.
 
-Vores første udgaver af tasksystemet indbefattede tasks der indsamlede
+De første udgaver af tasksystemet indbefattede tasks der indsamlede
 og behandlede data fra AR.Dronens sensorer. De behandlede data blev
 herefter stillet til rådighed for andre tasks, gennem en delt
 kontekstliste. I de endelige udgaver er disse tasks udskilt som
 virtuelle sensorer. Tasks skal således ikke behandle sensordata, men
 kun reagere og formidle bevægelse på baggrund af højniveau-sensordata.
 
-\subsection{Task typer} Vi har to hovedtyper, simple og
-compoundtasks. Simple tasks nedarver fra basetaskklassen Task. De
-repræsenterer oftest en simpel bevægelse, men kan være vilkårligt
-komplekse. For eksempel har vi en task der, blandt andet,
-implementerer en PID-controller.
+\subsection{Task typer} 
+Der er to hoved-tasktyper, simple og compoundtasks. Simple tasks nedarver
+fra basetaskklassen Task. De repræsenterer oftest en simpel bevægelse,
+men kan være vilkårligt komplekse. For eksempel har vi en task der,
+blandt andet, implementerer en PID-controller.
   
-Compoundtasks  nedarver fra CompoundTask-klassen og indeholder en liste
+Compoundtasks nedarver fra CompoundTask-klassen og indeholder en liste
 af subtasks. Vi opdeler compoundtasks yderligere i to typer, 
 sekventielle og parallelle (SeqCompoundTask og
 ParCompoundTask). Sekventielle compoundtasks starter deres 
@@ -1752,8 +1741,8 @@ enheden holder, ved hjælp af et
 map-objekt (se sektion~\ref{sec:mapcreator}), styr på den tour der skal
 følges og sørger for at opdatere HoverTrackTasken med en ny 
 målposition, når det er nødvendigt. 
-Hvis man anskuer vores map-objekt som en relationel graf, hvor alle knuder er
-forbundne, minder vores tilgang meget om Kuipers og Byuns metode der
+Hvis map-objekt anskues som en relationel graf, hvor alle knuder er
+forbundne, minder den implementerede opførsel meget om Kuipers og Byuns metode der
 beskrives i \cite{murphy2000introduction}. Specielt lægges mærke til, at der i
 begge systemer udføres fejlkorrigering, hver gang en ny position
 detekteres. I vores system sker dette ved, at HoverTrackTasken bringer
@@ -1775,11 +1764,11 @@ positioner.
 HoverTrackTasken, som er en simpel task, implementerer en
 PID-controller,\cite{electronic:pid}, der kan holde AR.Dronen over en
 erkendt position. 
-Når en markør (se \ref{fig:advancedmarker}) er synlig for AR.Dronens bundkamera, kan vi ved
-hjælp af PositionSilhouetDetectoren (se sektion~\ref{sec:sub:virtuel}), få
-markørens position på billedet. Med denne position udregnes en
-error-værdi i x og y-retningerne, i forhold til centrum af
-billedet.For at kunne bruge errorværdierne, skal de 
+Når en markør (se \ref{fig:advancedmarker}) er synlig for AR.Dronens
+bundkamera, kan markørens billedkoordinat tilgåes via af
+PositionSilhouetDetectoren (se sektion~\ref{sec:sub:virtuel}). Med
+dette billedkoordinat udregnes en error-værdi i x og y-retningerne, i forhold til centrum af
+billedet. For at kunne bruge errorværdierne, skal de 
 konverteres fra pixels til millimeter og der skal tages højde for AR.Dronens
 øjeblikkelige hældning. Denne konvertering og korrigering foregår,
 efter den metode der beskrives og anvendes af Michaël Ludmann og
@@ -1808,7 +1797,7 @@ frontkamera. Den forholdsvis simple task udnytter AR.Dronens
 muligheder for at bevæge sig i rummet. Grunden til at AR.Dronen bevæges op og
 ikke til siden eller bagud er, at AR.Dronen ikke kan orientere sig i
 disse retninger uden at rotere. Risikoen forbundet
-med at bevæge sig op er lille (da vi kender loftshøjden), i forhold
+med at bevæge sig op er lille (da loftshøjden er kendt), i forhold
 til risikoen ved at bevæge sig sidelæns eller baglæns i ikke-erkendt
 luftrum. Desuden er det let for de andre tasks, at fortsætte deres
 udførelse efter AvoidTasken stopper. Idet AR.Dronen bibeholder samme
@@ -1842,8 +1831,9 @@ TestTask med level 2 slutte sidst.
   \label{fig:taskhieraky}
 \end{framefig}
 
-\subsection{Task implementationer} Vi har lavet to forskellige udgaver
-af vores task-system(taskmanageren og alle tasks), som begge implementerer
+\subsection{Task implementationer} 
+Der er implementeret to forskellige udgaver
+af vores task-system(taskmanageren og alle tasks), begge implementerer
 den opførsel og struktur der er beskrevet ovenfor.
 
 Den første, trådbaserede, implementation er inspireret af Lejos'
@@ -1867,7 +1857,7 @@ arkitektur har primært et 'bottom-up'-flow, da det er de individuelle
 tasks der initierer bevægelsen af AR.Dronen. En ulempe ved designet er dog, at flowet ikke kun går
 mod taskmanageren. En del kommunikation er nødvendig for sikre, at
 lavere-level tasks bliver deaktiveret, når en højere-level task tager
-kontrollen. Vores erfaring med denne arkitektur er desuden, at den på
+kontrollen. Erfaringen med denne arkitektur er desuden, at den på
 grund af overheadet ved at have en tråd per task, ikke skalerer
 særligt godt. 
 
@@ -1879,12 +1869,12 @@ deres robot kan udføre forskellige bevægelser på samme tid. Tilgangen
 sikrer, at det bedste sæt af parallelle behaviors kan bestemmes 
 og herefter aktiveres.
 
-I vores ikke-trådbaserede tilgang forsimpler vi ovennævnte princip. Vi
-siger, at en Compoundtask på opfordring skal aktivere \emph{den} bedst
+I den ikke-trådbaserede tilgang forsimples ovennævnte princip. En
+Compoundtask på opfordring skal aktivere \emph{den} bedst 
 egnede subtask, da vi ikke opererer med flere aktive tasks
 samtidig\footnote{De bevægelser vi har til rådighed kan ikke udføres
-uden indflydelse på hinanden}. Vi definerer altid den bedst egnede
-subtask, som den med det højeste level og et ønske om at bevæge
+uden indflydelse på hinanden}. Den bedst egnede
+subtask defineres altid, som den med det højeste level og et ønske om at bevæge
 AR.Dronen.
 
 Den eneste tråd i denne implementation er taskmanageren. Denne lader
@@ -1973,7 +1963,7 @@ erkendt WIFI-kilde. I denne præsentationstilstand er der desuden mulighed for
 at indsamle signalstyrkesamples og sætte en mål-signalstyrkesample. 
 
 Under udviklingen af WIFI-fingerprintingalgoritmen beskrevet i~\ref{sssec:wifialgo},
-har vi haft brug for at kunne følge udviklingen i wifisignalstyrker
+har det været nødvendigt, at kunne følge udviklingen i wifisignalstyrker
 mellem forskellige lokationer. Dette kan gøres i den fjerde og sidste
 præsentationstilstand. En signalstyrkesample registreres ved at trykke
 på knappen 'Take Sample'. Disse indsamlede signalstyrkesamples kan
@@ -2115,26 +2105,32 @@ $ ./taskcreator.py -t
 %%%%     Eksperimenter - section
 \chapter{Eksperimenter} % Thomas & Morten
 \label{chap:Eksperimenter}
-\section{Navigation}
 En vigtig forudsætning for at en robot kan navigere i et miljø er, at
-den er i stand til at lokalisere sig selv i dette miljø. Vi har derfor
-ekperimenteret med forskellige former for lokalisering. Mere specifikt
-har vi arbejdet med lokalisering ved hjælp af WIFI-signalstyrker og
-lokalisering ved hjælp af visuelle markører. Vi har i vores
-eksperimenter gjort brug af et map-objekt med beskrivelser af
-lokationer(bestående af indsamlede WIFI-signalstyrker, markørbeskrivelse og koordinater) og en
-rutebeskrivelse bestående af en liste med lokationer. Map-objektet
-indeholder desuden en fortegnelse over vinkelretninger mellem alle
+den er i stand til at lokalisere sig selv i dette miljø. Der er derfor
+blevet ekperimenteret med forskellige former for lokalisering. Mere
+specifikt er der arbejdet med lokalisering ved hjælp af
+WIFI-signalstyrker og lokalisering ved hjælp af visuelle markører. I
+eksperimenterne er der gjort brug af et map-objekt med beskrivelser af
+lokationer(bestående af indsamlede WIFI-signalstyrker,
+markørbeskrivelse og koordinater) og en rutebeskrivelse bestående af
+en liste med lokationer. Map-objektet indeholder desuden en
+fortegnelse over vinkelretninger mellem alle
 lokationspar. Map-objektet oprettes let ved hjælp af
-Mapcreator-værktøjet beskrevet i \ref{sec:mapcreator}. For at teste forskellige de lokaliseringsmetoder har vi
-anvendt HoverTrackTasks(se section \ref{sssec:hovertracktask}) og
-FollowTourTasks(se section \ref{sssec:followtourtask}).
+Mapcreator-værktøjet beskrevet i \ref{sec:mapcreator}. For at teste
+forskellige de lokaliseringsmetoder anvendes HoverTrackTasks(se
+section \ref{sssec:hovertracktask}) og FollowTourTasks(se section
+\ref{sssec:followtourtask}).
+
+Udover lokalisering, er mulighederne for at udlede andre
+informationer fra AR.Dronens miljø også blevet
+undersøgt. F.eks. hvor langt AR.Dronen har bevæget sig, hvorvidt den
+befinder sig i en korridor og afstanden til andre objekter.
 
 \subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
 \label{ssec:wifilokalisering}
-Som nævnt i sektion~\ref{sec:udvidelse} har vi udvidet AR.Dronen med
+Som nævnt i sektion~\ref{sec:udvidelse} er AR.Dronen blevet udvidet med
 en WIFI-sensor. Denne sender løbende information om de omkringliggende
-WIFI-kilders signalstyrker. I de følgende eksperimenter anvender vi en
+WIFI-kilders signalstyrker. I de følgende eksperimenter anvendes en
 teknik kaldet WIFI-fingerprinting. WIFI-fingerprinting fungerer i
 hovedtræk ved at der opbygges et WIFI-map
 under en initiel offline-fase, hvorefter livesignalstyrkemålinger kan
@@ -2144,13 +2140,17 @@ at jo mere offlinedata der indsamles, jo bedre fungerer
 lokaliseringen. WIFI-fingerprintingteknikken beskrives i
 \cite{832252}. 
 
+Under eksperimenterne anvendes kun den allerede tilstedeværende
+WIFI-infrastruktur i testmiljøet(Zuse-bygningen, \cite{zuse}).
+
 \subsubsection{WIFI-fingerprinting-algoritmen}
 \label{sssec:wifialgo}
-I de følgende eksperimenter anvender vi en fingerprintingalgoritme,
-der udfører en simpel nearest-neighbor søgning i et
-WIFI-map, som opbygges umiddelbart før eksperimentets
-udførelse. Et overblik over offline-proceduren kan ses på
-figur~\ref{fig:offline}. 
+I de følgende eksperimenter anvendes en fingerprintingalgoritme, der
+udfører en simpel nearest-neighbor søgning i et WIFI-map. Dette
+WIFI-map opbygges under offline.proceduren umiddelbart før
+eksperimentets udførelse og er en integreret del af det map-objekt der
+anvendes af FollowTourTasken. Et overblik over offline-proceduren kan
+ses på figur~\ref{fig:offline}. 
 Nearest-neighbor søgningen udføres ved at sammenligne hvert
 punkt i WIFI-mappet med de nuværende signalstyrker. To sæt af
 signalstyrker sammenlignes ved først at finde en fællesmængde af
@@ -2223,13 +2223,13 @@ antal korrekte lokaliseringer.
   \label{fig:wifidetection1}
   \end{framed}
 \end{table} 
-Som det ses er resultaterne meget svingende. Med vores fingerprinting
+Som det ses er resultaterne meget svingende. Med den implementerede fingerprinting
 algoritme og afstande mellem lokationerne på 3 meter eller derunder,
-kan vi ikke garantere en konsistent lokalisering.
+kan en konsistent lokalisering ikke garanteres.
 
 \subsubsection{Andet Eksperiment}
-Vores andet eksperiment med WIFI-lokalisering er direkte afledt af de
-dårlige resultater i det første eksperiment. Vi besluttede  at øge
+Det andet eksperiment med WIFI-lokalisering er direkte afledt af de
+dårlige resultater i det første eksperiment. Det blev besluttet at øge
 afstanden mellem punkterne til 6 meter, for herefter at gentage
 eksperimentet som beskrevet ovenover.
 Resultatet af dette eksperiment kan ses på
@@ -2254,10 +2254,15 @@ gennemførsel er markant bedre end under det første eksperiment
   \label{fig:wifidetection2}
   \end{framed}
 \end{table} 
-Det faktum, at vi kun kan forvente en konsistent lokalisering hvis
-vores lokationer ligger med 6 meters afstand gør, at vi ikke fører
-denne eksperimentrække videre. En videreudvikling af vores algoritme
-kunne muligvis fungere som støtte til en primær visuel lokaliseringsmetode. 
+
+\subsubsection{Resultater}
+Med denne opstilling, kan man kun forvente en konsistent lokalisering, hvis
+lokationerne ligger med 6 meters afstand eller mere. Dette resultat
+gør, at denne eksperimentrække ikke føres videre. WIFI-fingerprintingalgoritmen, eller en videreudvikling,
+kunne muligvis fungere som støtte til en primær visuel
+lokaliseringsmetode.
+Bedre resultater kunne muligvis være opnået hvis der var opstillet en
+WIFI-infrastruktur specifikt til eksperimentet. 
 
 \subsection{Visuel lokalisering}
 \label{ssec:visuellokalisering}
@@ -2279,49 +2284,51 @@ kunne muligvis fungere som støtte til en primær visuel lokaliseringsmetode.
 \subsubsection{Lokalisering via simple markører} % Thomas & Morten
 \paragraph{Første eksperiment}
 \label{p:simple1}
-Vores første forsøg med visuel lokalisering anvendte en simpel rød
-markør i A5 størrelse, se figur~\ref{fig:simplemarker}. Vi havde til
-formålet implementeret en blobdetectionalgoritme i Python, \cite{github:blob}, som for
-hver pixel vurderer om den er rød nok til at være en del af markøren. Algoritmen antager at der i
+Det første forsøg med visuel lokalisering anvendte en simpel rød
+markør i A5 størrelse, se figur~\ref{fig:simplemarker}. Til eksperimentet
+var der implementeret en blobdetectionalgoritme i Python, \cite{github:blob}, som for
+hver pixel vurderer om denne er rød nok til at være en del af markøren. Algoritmen antager at der i
 billedet kun findes et rødt objekt og er på grund af Pythons
-afviklingshastighed ikke videre hurtig, men til dette simple
-eksperiment var den passende.
+afviklingshastighed ikke videre hurtig. Til dette eksperiment hvor
+hastighed ikke var afgørende, var den dog anvendelig.
+
 Eksperimentet udførtes ved at markøren blev placeret på
 gulvet og AR.Dronen placeret i position over markøren, hvorefter
-blobdetectionalgoritmen blev startet. Vi definerer detektionsraten som
+blobdetectionalgoritmen blev startet. Detektionsraten defineressom
 antal succesfulde detektioner delt med antal gentagelser af
-algoritmen. Vi kørte algoritmen 200 gange i henholdsvis 0.5, 1.0, 1.5
+algoritmen. Algoritmen kørtes 200 gange i henholdsvis 0.5, 1.0, 1.5
 og 2.0 meters højde og resultaterne kan ses i tabel
 ~\ref{fig:detection1}, sammen med resultaterne for de andre markører.
  
-Vores første forsøg viste os, at vi i højder fra 0.5 til 2.0 meter altid var i stand
-til at genkende den simple markør med AR.Dronens bundkamera.
+Det første forsøg viste, at den simple markør, i højder fra 0.5 til
+2.0 meter, altid kunne genkendes med AR.Dronen bundkamera.
 
 \paragraph{Andet eksperiment} 
-Vores næste skridt var at anvende ovennævnte lokaliseringsmetode i
-forbindelse med afviklingen af en HoverTrackTask(sektion ~\ref{sssec:hovertracktask})
-for at få en idé om metodens anvendelighed i en kontekst hvor
-effektivitet er afgørende.. 
-Vi anvendte til dette forsøg også kun en enkelt markør og forsøget
+Næste skridt var at anvende ovennævnte lokaliseringsmetode i
+forbindelse med afviklingen af en HoverTrackTask(sektion
+~\ref{sssec:hovertracktask}). Dette blev gjort, for at få en idé om
+metodens anvendelighed i en kontekst hvor effektivitet er afgørende.
+
+Til dette forsøg anvendtes også kun en enkelt markør og forsøget
 afvikledes ved at AR.Dronen blev fløjet i position over denne,
-hvorefter HoverTrackTasken blev aktiveret. Det viste sig tydeligt,
-at blobdetectoren ikke var effektiv nok. Vi var ikke i stand til
-at opdatere hurtigt nok og som resultat nåede AR.Dronen ofte at bevæge
-sig væk fra markøren. Dette resultat fik os til at reimplementere
-HoverTrackTasken således at den anvendte vores blobdetector til at
-opdage markøren og herefter anvendte en af OpenCVs
-opticalflow-algoritmer (cv2.calcOpticalFlowPyrLK, \cite{opencv:optflow}) til at tracke den i videostrømmen. Afviklingen af
-opticalflow-algoritmen er omtrent 10 gange hurtigere end vores
-blobdetector. Da vi gentog forsøget med denne tilføjelse var AR.Dronen
-meget mere responsiv og efter at have fintunet HoverTrackTaskens
-PID-parametre var AR.Dronen i stand til at forblive over markøren. På
-fig~\ref{fig:simplehover} ses HoverTrackTraskens PID error-værdier i
-forhold til markøren på gulvet, over en periode på mere end 2
-minutter. Errorværdierne er omregnet fra pixels til millimeter ved
-hjælp af den højdeværdi vi løbende får fra navdatastrømmen. Det bemærkes at
-der er et udsving omtrent midt i forløbet. Dette er ikke usædvanligt,
-da AR.Dronen er meget påvirkelig af 
-turbulens og dette let forekommer, især i mindre lokaler.
+hvorefter HoverTrackTasken blev aktiveret. Det viste sig tydeligt, at
+blobdetectoren ikke var effektiv nok. Der blev ikke opdateret hurtigt
+nok og som resultat nåede AR.Dronen ofte at bevæge sig væk fra
+markøren. Dette resultat fik os til at reimplementere HoverTrackTasken
+således, at den anvendte den implementerede blobdetector til at opdage
+markøren og herefter anvendte en af OpenCVs opticalflow-algoritmer
+(cv2.calcOpticalFlowPyrLK, \cite{opencv:optflow}) til at tracke den i
+videostrømmen. Afviklingen af opticalflow-algoritmen er omtrent 10
+gange hurtigere end blobdetectoren. Ved gentagelse af forsøget med denne
+tilføjelse, var AR.Dronen meget mere responsiv og efter at have
+fintunet HoverTrackTaskens PID-parametre var AR.Dronen i stand til at
+forblive over markøren. På fig~\ref{fig:simplehover} ses
+HoverTrackTraskens PID error-værdier i forhold til markøren på gulvet,
+over en periode på mere end 2 minutter. Errorværdierne er omregnet fra
+pixels til millimeter ved hjælp af den højdeværdi vi løbende får fra
+navdatastrømmen. Det bemærkes at der er et udsving omtrent midt i
+forløbet. Dette er ikke usædvanligt, da AR.Dronen er meget påvirkelig
+af turbulens og dette let forekommer, især i mindre lokaler.
 \begin{framefig}
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/simpledronehover.png}
@@ -2334,10 +2341,10 @@ turbulens og dette let forekommer, især i mindre lokaler.
 
 \paragraph{Tredje eksperiment}
 \label{p:simple3}
-Sidste eksperiment med de simple markører anvendte en FollowTourTask
+Sidste eksperiment med simple markører anvendte en FollowTourTask
 der fulgte en rute mellem fire markører på gulvet. Eksperimenterne startede
 denne gang fra jorden, da en FollowTourTask selv letter og lander.
-Vores setup, både det konstruerede map-objekt og den fysiske opstilling ses
+Eksperimentets setup, både det konstruerede map-objekt og den fysiske opstilling ses
 på figur ~\ref{fig:simplesetup}.
 \begin{framefig}[H]
   \centering
@@ -2347,120 +2354,122 @@ på figur ~\ref{fig:simplesetup}.
   \label{fig:simplesetup}
 \end{framefig}
 
-Vi forventede her at udfordringen ville være at opdage markøren tidsnok til at stoppe
-AR.Dronen før den var fløjet forbi. Dette problem kan dog løses ved at
-lade AR.Dronen flyve i en passende højde, vi fandt at en
-højde på 1800 mm var passende til dette formål. Til gengæld
-afdækkede vi to andre problemer. 
-Det første problem var relateret til at
-alle vores markører var ens, dette betød at der var tilfælde hvor
-AR.Dronen fandt samme lokation to gange i træk, men antog at den
-fundne lokation var den næste i rutebeskrivelsen. Problemet lagde
-grund til tanken om at anvende mere avancerede lokationsmarkører for
-at opnå en mere præcis lokalisering. Det andet problem
-var at hvis vi først mistede en markør fra AR.Dronens synsfelt, så
-var det umuligt at fortsætte. Dette problem løstes ved at tilføje en
-recovermode til HoverTrackTasken, således at denne kunne bevæge
-AR.Dronen opad indtil enten markøren igen kunne genkendes eller en højdegrænse
-blev nået, hvorefter experimentet alligevel måtte afsluttes. Denne
-simple tilføjelse gjorde vores FollowTourTask meget mere robust.   
+Det var forventet, at udfordringen ville være at opdage markøren
+tidsnok, til at stoppe AR.Dronen før den var fløjet forbi. Dette
+problem kan dog løses ved at lade AR.Dronen flyve i en passende højde,
+en højde på 1800 mm blev fundet passende til formålet. Til
+gengæld afdækkede eksperimentet to andre problemer. Det første
+problem var relaterede til, at alle vores markører var ens. Dette betød, at der var
+tilfælde hvor AR.Dronen fandt samme lokation to gange i træk, men
+antog at den fundne lokation var den næste i
+rutebeskrivelsen. Problemet lagde grund til tanken om at anvende mere
+avancerede lokationsmarkører for at opnå en mere bedre
+lokalisering. Det andet problem var, at hvis AR.Dronen først mistede en markør
+fra synsfeltet, så var det umuligt at fortsætte. Dette
+problem løstes ved at tilføje en recovermode til HoverTrackTasken,
+således at denne kunne bevæge AR.Dronen opad indtil enten markøren
+igen kunne genkendes eller en højdegrænse blev nået, hvorefter
+experimentet alligevel måtte afsluttes. Denne simple tilføjelse gjorde
+vores FollowTourTask meget mere robust.
 
 \paragraph{Resultater}
-De overordnede resultater af vores eksperimenter med de simple
-lokationsmarkører var, at vi fik bekræftet AR.Dronens evne til at
-genkende simple markører og at vi fik udviklet både HoverTrackTasken
-og FollowTourTasken. Vi fandt desuden ud af at vores markørsetup var
-for simpelt til at være praktisk anvendeligt og at vi måtte udvikle
-mere avancerede markører for bedre at understøtte vores FollowTourTask.
-\cite{electronic:youtube2}(youtube link) viser en video hvor vores AR.Drone flyver frem
+De overordnede resultater af eksperimenterne med simple
+lokationsmarkører var, at AR.Dronens evne til at
+genkende simple markører blev bekræftet. Desuden blev både HoverTrackTasken
+og FollowTourTasken udviklet i løbet af eksperimentet. I løbet af
+tredje eksperiment viste det sig, at markørkonceptet var
+for simpelt til at være praktisk anvendeligt. Dette medførte
+udviklingen af mere avancerede markører, for bedre understøttelse af FollowTourTasken.
+\cite{electronic:youtube2}(youtube link) viser en video hvor AR.Dronen flyver frem
 og tilbage mellem to simple markører og demonstrerer at lokaliseringen,
 på trods af de to nævnte problemer, oftest fungerer. 
 
 \subsubsection{Lokalisering via avancerede markører} % Thomas & Morten
-Vi valgte efter de indledende eksperimenter at designe og anvende en
-mere avanceret form for markør. Vores første redesign var markøren der
+Efter de indledende eksperimenter blevt det besluttet at designe og anvende en
+mere avanceret markør. Det første redesign var markøren der
 ses på figur~\ref{fig:semiadvancedmarker}. 
 
 \paragraph{Detekteringsalgoritme}
 Grundideen er at man først detekterer den røde firkant, hvorefter det
 indkransede område afsøges for en farvet blob der relaterer markøren
-til en specifik lokation. For at sikre en hurtig detektering(og dermed
-lokalisering) gør vores algoritme omfattende brug af OpenCVs
-optimerede billedbehandlingsalgoritmer, \cite{opencv:main}. Vores detekterings algoritme
-er implementeret i vores virtuelle sensor og afvikles således konstant
-for at give et så nøjagtigt billede af det øjeblikkelige miljø som muligt. 
-Første skridt i algoritmen er at udføre thresholding ved hjælp af
-OpensCV inRange algoritme. Dette giver os et billede hvor alle de
-oprindelige røde pixels nu er hvide og resten er sorte.
-Andet skridt er at finde konturer i det binære billede. Dette gøres med
-OpenCVs findContours algoritme.
-Tredje skridt indbefatter at udvælge de konturer der har et stort nok
-areal til at være interessante. Dette gøres med OpenCVs contourArea
-algoritme.
-Fjerde skridt er at undersøge områderne der dækkes af de udvalgte
-konturer for at finde en farvet blob. Denne undersøgelse anvender igen
-OpenCVs inRange algoritme. Hvis en sådan farvet blob findes,
-kan vi sammenligne farven med beskrivelsen af de forskellige
-lokationer vi finder i vores map-objekt og dermed lokalisere AR.Dronen
+til en specifik lokation. 
+
+For at sikre en hurtig detektering(og dermed lokalisering) gør algoritmen omfattende brug af OpenCVs optimerede
+billedbehandlingsalgoritmer,
+\cite{opencv:main}. Detekteringsalgoritmen er implementeret i den
+virtuelle sensor PositionSilhouetDetector og afvikles 
+således konstant for at give et så nøjagtigt billede af det
+øjeblikkelige miljø som muligt. Første skridt i algoritmen er at
+udføre thresholding ved hjælp af OpensCV inRange algoritme. Dette
+giver et billede, hvor alle de oprindelige røde pixels nu er hvide
+og resten er sorte.  Andet skridt er at finde konturer i det binære
+billede. Dette gøres med OpenCVs findContours algoritme. Tredje
+skridt indbefatter at udvælge de konturer der har et stort nok areal
+til at være interessante. Dette gøres med OpenCVs contourArea
+algoritme.  Fjerde skridt er at undersøge områderne der dækkes af de
+udvalgte konturer, for at finde en farvet blob. Denne undersøgelse
+anvender igen OpenCVs inRange algoritme. Hvis en sådan farvet blob
+findes, kan farven sammenlignes med beskrivelsen af de forskellige
+lokationer i map-objektet og dermed lokalisere AR.Dronen
 præcist.
 
 \paragraph{Første eksperiment}
 \label{p:advanced1}
-Vores indledende eksperiment udførtes på samme måde som
+Dette eksperiment udførtes på samme måde som
 \ref{p:simple1}, blot var den simple markør skiftet 
 ud med en semiavanceret markør, vist på figur
-~\ref{fig:semiadvancedmarker}. Vores forventninger var fra start, at vi
-ville få svært ved at identificere markøren over en hvis højde, da den
+~\ref{fig:semiadvancedmarker}. Forventningen var fra start, at det
+ville være svært at identificere markøren over en hvis højde, da den
 røde markering ikke er lige så koncentreret som på den simple
-markør. Efter at have tilpasset vores thresholdværdier og udført
-eksperimentet i højder fra 1 til 2.5 meter, kunne vi bekræfte vores
-formodning. Vi kunne med med en hvis sikkerhed genkende den semiavancerede markør
-op til 1.5 meters højde, men herefter faldt detektionsraten
-betydeligt, resultaterne kan ses i tabel \ref{fig:detection1}. En
-detektionshøjde på 1.5 ligger lidt under de 1.8 meter 
-vi tidligere havde bestemt som en passende flyvehøjde. Vi valgte
-derfor at udvikle en markør med en større rød overflade, se
+markør. Efter at have tilpasset algoritmens thresholdværdier og udført
+eksperimentet i højder fra 0.5 til 2.0 meter, blev forventningerne
+bekræftet. Den semiavancerede markør kunne med en hvis sikkerhed
+genkendes op til 1.5 meters højde, men herefter faldt detektionsraten
+betydeligt, resultaterne kan ses i tabel \ref{fig:detection1}. 
+
+En detektionshøjde på 1.5 meter ligger lidt under 1.8 meter, som tidligere var
+bestemt som en passende flyvehøjde. En markør med større rød overflade
+blev derfor udviklet, se
 figur~\ref{fig:advancedmarker}, for at sikre bedre detektion. En
-gentagelse af eksperimentet med den avancerede markør bekræftede at
+gentagelse af eksperimentet med den avancerede markør bekræftede, at
 denne nu kunne detekteres i op til 2 meters højde. Den avancerede
-markør er desuden designet sådan at den på sigt kan bruges til at
-udlede AR.Dronens præcise retning, hvilket ville gøre os mindre
-afhængige af de upræcise $\psi$-målinger fra AR.Dronens piezo-sensor(
+markør er desuden designet sådan, at den på sigt kan bruges til at
+udlede AR.Dronens præcise retning. Dette vil gøre FollowTourTasken mindre
+afhængig af de upræcise $\psi$-målinger fra AR.Dronens piezo-sensor(
 se sektion~\ref{ssec:dronerecap}). 
 
 \paragraph{Andet eksperiment}
-Vores andet eksperiment er næsten identisk med det der blev udført for
-de simple markører. Det skal dog nævnes at vores HoverTrackTask i
+Dette eksperiment er næsten identisk, med det andet eksperiment der blev udført for
+de simple markører. Det skal dog nævnes, at vores HoverTrackTask i
 mellemtiden blev redigeret til at anvende den virtuelle sensors
 detekteringsresultater, istedet for selv at udføre en
-detekteringsalgoritme som det var tilfældet under de tidligere
-eksperimenter. Under dette eksperiment var den virtuelle sensor
-indstillet til ikke at skifte mellem de to kamerafeeds. 
+detekteringsalgoritme. Under dette eksperiment var den virtuelle sensor
+indstillet til ikke at skifte mellem de to kamerastrømme. 
 Som forventet var AR.Dronen også i stand til at holde positionen over
 den avancerede markør.
 
 \paragraph{Tredje eksperiment}
 \label{p:advanced3}
-Dette eksperiment varierede fra det ovenstående ved at den virtuelle
-sensor her løbende skiftede kamerafeed. Vi ønskede at undersøge om
+Dette eksperiment varierede fra det ovenstående, ved at den virtuelle
+sensor her løbende skiftede kamerastrøm. Det blev undersøgt om
 HoverTrackTasken stadig var i stand til at stabilisere AR.Dronen over
-en erkendt lokation når bundkameraets framerate blev begrænset. Forsøget viste
+en erkendt lokation, når bundkameraets framerate blev begrænset. Forsøget viste
 AR.Dronen stadig forblev stabil over lokationen. Til gengæld stoppede
 den pludseligt da AR.Dronens originale styringssoftware lukkede ned efter omtrent ti
 minutter. Nærmere undersøgelser viser at AR.Dronens software muligvis
 har en memoryleak. Dette viser sig ved at softwarens hukommelsesforbrug
-stiger kraftigt så snart vi iværksætter hurtige kameraskift ved brug
+stiger kraftigt, så snart de hurtige kameraskift iværksættes ved brug
 af AR-kommandoen set\_config. Denne opførsel beskrives også i sektion~\ref{sec:sub:virtuel}. 
 
 \paragraph{Fjerde eksperiment}
-Ligesom \ref{p:simple3} anvendte vi til dette formål en opsætning med
-fire markører, formålet var at bekræfte at vi stadig med de nye
-markører og den ændrede HoverTrackTask var i stand til navigere mellem
+Ligesom \ref{p:simple3}, anvendtes til dette eksperiment en opsætning med
+fire markører. Formålet var at bekræfte, at der stadig med de nye
+markører og den ændrede HoverTrackTask, kunne navigeres mellem
 de fire punkter med vores FollowTourTask. Opstillingen kan ses på
 figur ~\ref{fig:advancedsetup}.
 
-Eksperimentet bekræftede, at AR.Dronen konsistent kunne lokalisere sig
-selv. 
+Eksperimentet bekræftede, at FollowTourTasken konsistent kunne
+lokalisere AR.Dronon og følge den fastlagte tour. 
 \begin{framefig}[H]
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/advancedsetup.png}
@@ -2471,15 +2480,15 @@ selv.
 
 \subsubsection{Detektering af markører på små billeder}
 \label{ssec:smallmarks}
-I de ovenstående eksperimenter har vi anvendt AR.Dronens bundkamera.
+I de ovenstående eksperimenter anvendes AR.Dronens bundkamera.
 Dette har en opløsning på 176x144. Der er dog andre tasks der skal
-bruge data fra frontkameraet. Af den grund kan vi være nødt til kontinuerligt at zappe mellem
+bruge data fra frontkameraet. Af den grund kan det være nødvendigt kontinuerligt at zappe mellem
 de to kameraer og dette fungererer som nævnt i sektion~\ref{p:advanced3} ikke særligt
-godt. Vi har derfor undersøgt mulighederne for at anvende den
+godt. Derfor undersøges mulighederne for at anvende den
 videostrøm hvor bundkameraets billeder er lagt oven på 
-frontkameraets(se \ref{fig:2frames}). Når vi udtrækker bundkameraets billeder fra
-denne strøm, får vi billeder i en opløsning på 88x72.
-Eksperimenterne er fuldstændig magen til dem vi udførte i sektion~\ref{p:simple1} og
+frontkameraets(se \ref{fig:2frames}). Når bundkameraets billeder udtrækkes fra
+denne strøm, er disse billeder i en opløsning på 88x72.
+Eksperimenterne er fuldstændig magen til dem der udførtes i sektion~\ref{p:simple1} og
  sektion~\ref{p:advanced1}. De er ligeledes udført i højderne 0.5, 1.0, 1.5 og 2.0 og er
 udført både med de simple, semiavancerede og avancerede
 markører. Resultaterne ses i tabel~\ref{fig:detection2}, de viser tydeligt at
@@ -2534,14 +2543,14 @@ hvorefter detektionsraten falder betydeligt.
 
 \subsubsection{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}
-Vi har undersøgt muligheden for at anvende QR-koder til
+I det følgende afsnit undersøges muligheden for at anvende QR-koder til
 lokalisering. Man er begyndt at se QR-koder mange steder i det
 offentlige rum, hvor de ofte bruges i forbindelse med
 reklamekampagner. QR-koder bruges ofte til at indkode en webadresse,
 men kan i princippet anvendes til at indkode en arbitrær
 streng. QR-koder er blevet mere populære i takt med at opløsningen på
-mobiltelefonkameraer er steget, således har de fleste moderne
-mobiltelefonerkameraer en opløsning flere gange højere end AR.Dronens
+mobiltelefonkameraer er steget. De fleste moderne mobiltelefoner har
+således et kamera med en opløsning flere gange højere end AR.Dronens 
 kamera. 
 
 Til dette eksperiment anvendtes bibliotekerne pyqrcode, 
@@ -2558,20 +2567,21 @@ QR-kode ved at scanne den med en iPhone.
   \label{fig:qr_woah}
 \end{framefig}
 
-Formålet med eksperimentet var primært at undersøge om AR.Dronens
-kameras opløsning er god nok til at vi kan afkode QR-koder. Til
-formålet fremstillede vi QR-koden der ses på figur \ref{fig:qr_woah},
-printede den ud på et A4 ark og sikrede os at den kunne afkodes ved hjælp af en iPhone. Herefter
-skrev vi et lille testprogram der henter billeder fra AR.Dronens
+Formålet med eksperimentet var primært, at undersøge om AR.Dronens
+kameras opløsning er høj nok til at afkode QR-koder. Til
+formålet fremstilledes QR-koden der ses på figur
+\ref{fig:qr_woah}. Den blev printet på et A4 ark og det blev
+kontrolleret at koden kunne afkodes ved hjælp af en iPhone. Herefter
+konstrueredes et lille testprogram der henter billeder fra AR.Dronens
 frontkamera (320x240 pixels) og scanner disse for QR-koder ved hjælp af Zbar.
 
-Afviklingen af eksperimentet foregik ved at vi placerede QR-koden på
-en væg og herefter placerede AR.Dronen i skiftende afstande til
-væggen. Vi forsøgte at afkode QR-koden i afstande op til en meter, men
-fik på intet tidpunkt en succesfuld afkodning. IPhonen kunne samtidig
+Afviklingen af eksperimentet foregik ved at QR-koden blev placeret på
+en væg og AR.Dronen placeret i skiftende afstande til væggen. QR-koden
+blev forsøgt afkodet på afstande op til en meter, men der var på intet
+tidpunkt en succesfuld afkodning. IPhonen kunne samtidig 
 afkode QR-koden på alle afstande op til en meter. Resultatet viser med
-al tydelighed at vi ikke kan anvende QR-koder med AR.Dronens kamera og
-at vi derfor må anvende andre markører til lokalisering i vores system.
+al tydelighed, at QR-koder ikke kan anvendes med AR.Dronens kamera og
+at andre markører derfor må anvendes til lokalisering.
 
 
 \section{Afstandsbedømmelse vha. triangulering i planet} %via optical flow} %Afstandsmåling gennem Optical flow} % tt
@@ -3127,74 +3137,70 @@ korrekte placering af vanishingpointet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
-\section{Distance-tracker} % Thomas
-\label{sec:distance-mesu}
-%Hvad vil vi vise, afvise teste?
-%Hvad kan/skal resultatet bruges til?
-Dette eksperiment handler om at undersøge virkningsgraden af en metode
-til at tracke eller holde styr på afstanden som AR.Droenen har fløjet
-over en tur. Konceptet er kendt triptælleren i biler, og
-tacho-counteren i motoren på nogle kørende robotter. Indenfor navigation er der en teknologi der hedder
+\section{DistanceTracker} % Thomas
+\label{sec:distance-mesu} 
+%Hvad vil vi vise, afvise teste?  
+%Hvadkan/skal resultatet bruges til?  
 
-forsøget forsimplet tager ikke højde for rotation i planet
+Dette eksperiment undersøger virkningsgraden af en odometrisk
+afstandsmåler. Den odometriske afstandsmåler er implementeret i den
+virtuelle sensor DistanceTracker,~\cite{github:virtuel}, og holder
+styr på den afstand AR.Dronen har bevæget sig i løbet af en
+flyvning. Konceptet er kendes som en triptæller i biler og som en
+tacho-counter i motoren på nogle kørende robotter.  
 
-Test, hvor virker det godt hvor er det problematisk
-reference til Parrots egen artikle herom; hastighed udledning bundkamera hvis muligt ellers udledning af accelerometer.
-%\cite{velocity_estimation_inside_the_drone,}
-%Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
-Vi kan ikke r
+Indenfor robotnavigation anvendes ofte en teknik kaldet
+dead reckoning, \cite{wiki:deadreck}. Dead reckoning betyder, at den nuværende
+position udregnes på baggrund af en tidligere positionsudregning og viden om
+retning og hastighed. En mulig anvendelse af DistanceTrackeren kan
+således være, som en del af en sådan dead reckoning algoritme. En
+forudsætning for en præcis dead reckoning er dog, at den udledte
+afstand er præcis. Dette undersøges herunder.
 
- ved at integrere over AR.Dronens udledte hastighed i fremadrettet flyveretning.
+DistanceTrackeren fungerer ved at integrere over de
+hastighedsestimater, der modtages i AR.Dronens navdatastrøm. Disse
+hastighedsestimater er baseret på en kombination af accelerometerdata
+og en avanceret hastighedsudledning fra
+bundkameraet,~\cite{velocity_estimation_inside_the_drone}.   
 
-%Hvad var resultatet?
+\subsection{Eksperimentet}
+Eksperimentet blev udført ved at placere to markører med 3 meters
+afstand på gulvet. Herefter blev der gennemført 3 forskellige typer
+flyvninger mellem de to markører: Manuel flyvning med ensartet underlag, automatisk flyvning
+med ensartet overflade og automatisk flyvning uensartet overflade. Hver
+type flyvning blev gentaget 10 gange. Generelt foregik de manuelle
+flyvninger hurtigere end de automatiserede (de automatiserede
+flyvninger blev udført ved hjælp af en FollowTourTask). Resultaterne af
+flyvningerne kan ses på figur~\ref{fig:xdistr} og
+figur~\ref{fig:ydistr}, som viser henholdsvis de målte afstande i
+x-aksens retning(flyveretningen) og i y-aksens retning.
 
-
-    Den røde graf er målinger ved 
-    I testopstillingen fløj AR.Dronen 3 meter ligeud, i forskellige hastigheder og med 3 forskellige førere, ie. 2 forkellige autonome styringer og 1 menneskelig via joystick.
 \begin{framefig}
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/3mxdistribution.png}
-  \caption{Kumulative fordeling af afstande målt i fremadrettet flyveretning over 3000 millimeter.
-    Målingerne er lavet ved 3 forskellige testopsætninger.}
+  \caption{Kumulativ fordeling af målte afstande. Målingerne blev
+    foretaget under fremadrettet flyvning over 3000 millimeter. Der
+    blev udført manuelle og automatiserede flyvninger over ensartet og 
+    uensartet overflade}
   \label{fig:xdistr}
 \end{framefig}
-
-
 
 \begin{framefig}
   \centering
   \includegraphics[width=0.91\textwidth]{grafik/3mydistribution.png}
-  \caption{Kumulative distribution af afstande målt ved at integrere over AR.Dronens udledte hastighed i sideværts flyveretning.
-    I testopstillingen fløj AR.Dronen kun fremad og ikke til siderne, med forskellige hastigheder og med 3 forskellige førere, ie. 2 forkellige autonome styringer og 1 menneskelig via joystick.}
+  \caption{Kumulativ distribution af målte afstande. Målingerne
+    repræsenterer AR.Dronens tilbagelagte afstand på tværs af
+    flyveretningen og burde altid være lav, da AR.Dronen kun blev
+    fløjet fremad og ikke til siderne.} 
   \label{fig:ydistr}
 \end{framefig}
 
+\subsection{Resultater}
 %perspektiver, hvad skal / kan vi bruge den nye viden til?
-jo mindre quadrokopter des mindre inerti kan være indeholdt, og jo
-mere agile agil/adræt vil den være, måske en pointe i futureworks...
 
 Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
 
 Algoritme integration over afstand
-
-
-
-%Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
-
-%% \section{Erkendelse af miljø/mode...}
-%% Hvad vil vi vise, afvise teste?
-%% Hvad kan/skal resultatet bruges til?
-%% Hvordan løste vi det, undersøgte det, hvordan udførte vi eksperimentet?
-%% Hvad var resultatet?
-%% perspektiver, hvad skal / kan vi bruge den nye viden til?
-%% Det er muligt at nogle af disse spørgsmål/pinde/punkter er sagt/ skal siges allerede i introen...
-
-%% Korridor (Hopper) vs. Åbent område (Zuse)
-%% Er der noget at hente fra koridor vanishing point? der vil være noget hvis vi kan nå at måle afstande foran i optisk flow...
-
-
-\pagebreak
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Konklusion - section

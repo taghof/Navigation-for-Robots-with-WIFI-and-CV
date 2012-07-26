@@ -2575,13 +2575,13 @@ at vi derfor må anvende andre markører til lokalisering i vores system.
 
 
 \section{Afstandsbedømmelse vha. triangulering i planet} %via optical flow} %Afstandsmåling gennem Optical flow} % tt
-For at lette læserens forståelse af forfatterens intention i dette afsnit er der forsøgt at gøre en
-fælles grounding, forfatter og læser imellem, gennem nedenstående
-billedelige forklaring: Eksemplet er et lignende test-scenarie, men
-fra en anden verden uden flyvende quadrokoptere.
+For at lette formidlingen af ideen bag dette eksperiment er det her
+forsøgt at introducere problemstillingen via en lignende, men noget
+simplere testopstilling, helt uden quadrokoptere.
+
 Figur~\ref{fig:stranden} viser hvordan to mennesker på to forskellige
 positioner langs en kyst kan udregne afstanden ud til et skib på
-havet, ved hjælp af triangulering.
+havet ved hjælp af triangulering.
 \begin{framefig}
   \centering
   \includegraphics[width=0.85\textwidth]{grafik/strandloeve.png}
@@ -2590,17 +2590,17 @@ havet, ved hjælp af triangulering.
     vinklerne imellem hinanden og båden (hhv. $a1$ og $a2$).}
   \label{fig:stranden}
 \end{framefig}
-Hvis de to mennesker kender den fælles afstand imellem sig, her kaldet
-$b$, og vinklerne imellem hinanden og båden, kaldet $a1$ og $a2$, så
-kan de i fællesskab nemt udregne afstanden ud til båden. Afstanden
-imellem personen bagerst og båden i figuren vil eksempelvis kunne udregnes ved
+Hvis $b$, $a1$ og $a2$ er kendt, så kan de to på stranden i fællesskab
+nemt udregne afstanden ud til båden. Afstanden imellem personen
+bagerst og båden i figuren vil eksempelvis kunne udregnes ved 
 hjælp af,~\cite{wiki:sinus}, som afstand: $A1 = \frac{\sin(a2) * b}{
   \sin(180-(a2+a1)) }$.
 
-Ideen med det egentlige eksperiment er at få AR.Dronen til alene at agere de 2
-mennesker på stranden i eksemplet herover og derigennem finde afstande
-til objekter foran frontkameraet. Hvis AR.Dronen sættes til at flyve sidelæns i
-et lige stykke, svarende til strandkanten herover, vil den
+Ideen med det egentlige eksperiment er så at få AR.Dronen til alene at agere de 2
+mennesker i eksemplet herover og derigennem finde afstande
+til objekter foran frontkameraet. 
+
+Hvis AR.Dronen sættes til at flyve sidelæns i et lige stykke, svarende til strandkanten herover, vil den
 til 2 tider $t1$ og $t2$ være ved 2 positioner $p1$ og $p2$. Hvis
 tiden imellem de to tider er tilpas lille, eller hvis AR.Dronen flyver
 tilpas langsomt, vil der være et overlap i billederne taget med
@@ -2610,22 +2610,32 @@ frontkameraet ud for de to positioner (se evt. figur \ref{fig:optflowpyrlk}).
   \centering
   \includegraphics[width=0.85\textwidth]{grafik/strand2.png}
   \caption{AR.Drone flyver sidelæns mens frontkameraet filmer
-    væggen. Den grønne cirkel ($f2t$) er en gendkendelig feature (uddybes i
+    væggen. Den grønne cirkel ($f2t$) er en genkendelig feature (uddybes i
     sektion~\ref{sec:sub:feature-tracking}) som optræder i hvert af de
-    2 billeder taget ud for position $p1$ og $p2$. Det er afstanden mellem
-    $f2t$ og $p2$ der ønskes fundet. Den grå pil i figuren viser
+    2 billeder. Billederne er taget ud for position $p1$ og $p2$. Det er afstanden mellem
+    $f2t$ og $p2$, i planet, der ønskes fundet. Den grå pil i figuren viser
     AR.Dronens sidelæns flyveretning. De orange pile viser
-    hvilken vej fronten på AR.Dronen peger og i hvilken retning
-    frontkameraet filmer.}
+    hvilken retning AR.Dronens frontkamera filmer.}
   \label{fig:stranden2}
 \end{framefig}
 I figur~\ref{fig:stranden2} får den genkendelige feature (i den grønne cirkel) den samme
-rolle som båden i figur~\ref{fig:stranden}. Kodeimplementationen er
-dog ikke begrænset til at holde styr på afstanden til kun et enkelt
-punkt, men tager vare på en hel liste af features i videosekvensen fra
+rolle som båden i figur~\ref{fig:stranden}, mens AR.Drones 2
+positioner har menneskenes rolle. Kodeimplementationen er ikke
+begrænset til kun at holde styr på afstanden til et enkelt 
+punkt, men tager vare på en hel liste af features i billederne fra videosekvensen fra
 AR.Dronens frontkamera. Fra hver feature er det muligt at udregne
-afstande til AR.Dronens position. I sektionen herunder beskrives den valgte
-metode til at finde, genfinde og genkende features i en videosekvens.
+afstande til AR.Dronens position. I sektionen herunder (sektion~\ref{sec:sub:feature-tracking}) beskrives den valgte
+metode til at finde, genfinde og genkende features i en
+videosekvens. I de næste 2 sektioner derefter (\ref{pixel2vinkel} og
+\ref{yaw}) forsøges forklaret hvorledes vinklerne $a1$ og $a2$ af
+figur~\ref{fig:stranden} udledes af pixel-positioner i billedet fra
+frontkameraet, til brug i den virkelige verden.
+I sektion~\ref{liniestykkeb} forklares udregningen af liniestykket $b$
+imellem de to positioner $p1$ og $p2$, for til sidst at kunne udregne
+afstanden $|ft2\ p2|$ i sektion~\ref{afstandenf2tp2}.
+Sektion~\ref{afstandresult} fremlægger resultatet af det ene
+eksperiment der blev udført.
+
 
 \subsection{Optisk feature-tracking}
 \label{sec:sub:feature-tracking}
@@ -2636,8 +2646,8 @@ features\footnote{En egnet feature er et karakteristisk
   punkt i billedet som kan genkendes selvom billedet flytter
   fokuspunkt. En feature kan være flere ting, bl.a. 2. ordens
   gradient i billedintensiteten over en hvis magnitude, hjørner på objekter,
-  karakteristisk teksture, osv.} (ft2) een gang i billedramme0 med 
-\emph{goodFeaturesToTrack}. Hvorefter hver enkelt f2t-position
+  karakteristisk teksture, osv.} $(ft2_i)$ een gang i billedramme0 med 
+\emph{goodFeaturesToTrack}. Hvorefter hver enkelt $f2t$-position
 følges fra billedramme til billedramme med opticalflow-funktionen
 \emph{calcOpticalFlowPyrLK}. 
 %Når frontkameraet har skiftet så meget
@@ -2650,7 +2660,7 @@ følges fra billedramme til billedramme med opticalflow-funktionen
   \includegraphics[width=0.85\textwidth]{grafik/optflowpyrlk.png}
   \caption{Et typisk egnet good-feature-to-track er som den grønne
     ring på de 2 billedrammer: Et hjørne på en billedramme af et
-    billede i billedet. Den grønne cirkel fra billedet til venstre er
+    billede i billedet. Punktet bag den grønne cirkel i billedet til venstre er
     genfundet i billedet til højre vha. funktionen
     \emph{calcOpticalFlowPyrLK}. Funktionen returnere en liste med nye
     positioner for genkendte features (grønne cirkler).}
@@ -2664,22 +2674,21 @@ følges fra billedramme til billedramme med opticalflow-funktionen
 %flyver langsomt sidelæns går der længere tid imellem hver tab af
 %feature og $K$ kan sættes til en mindre værdi, for at opdatere sjælnere.
 
-
-\subsection{Fra pixel-position til virkelig retning}
-Fordi AR.Dronen ikke altid peger præcis i retningen af det der
-skal afstandbedømmes, ie. oftest ligger featuren i billedet, hvortil afstanden
-skal bedømmes, enten til venstre eller til højre for midten af
-billedet, som det ses af de to billeder i
-figur~\ref{fig:optflowpyrlk}. Hvor midten af billedet svarer til
-fronten på AR.Dronen.
-
-Konkret så følges en feature ved at den har en fast indgang, $i$, i den liste der
+Konkret så følges en feature ved at den har en fast indgang i en liste der
 returnes af \emph{calcOpticalFlowPyrLK}. Imellem hvert nyt billede
 laves en ny beregning af optical flow, og feature-indgangene i listen opdateres med nye 
 %$(x_i,y_i)$-
  pixelpositioner.
 
-Af en features horisontale pixel-position i et billede kan man udregne vinklen i den
+
+\subsection{Fra pixel-position til virkelig retning}
+\label{pixel2vinkel}
+Fordi AR.Dronen ikke altid peger præcis i retningen af det der
+skal afstandbedømmes (oftest ligger den fulgte feature enten til venstre eller til højre for midten af
+billedet, se de to billeder i figur~\ref{fig:optflowpyrlk}), er det
+nødvendigt at udregne featurens retning i forhold AR.Dronens front.
+
+Af en features horisontale pixel-position i billedet kan man udregne vinklen i den
 virkelige verden i forhold til retningen på AR.Dronens frontkamera, se
 vinklen $a_{\Delta}$ i figur~\ref{fig:optflowpyrlk2}.
 \begin{framefig}
@@ -2689,9 +2698,10 @@ vinklen $a_{\Delta}$ i figur~\ref{fig:optflowpyrlk2}.
     Bredden på billederne i videostrømmen fra AR.Dronens frontkamera
     er kendt som at være 320 px og kameraoptikken på AR.Dronens
     frontkamera er kendt til at have et horizontal udsyn på 92 $^{\circ}$. Hvis
-    den horisontale afstand i pixels mellem 2 punkter $\Delta px$ i det samme billede er kendt, kan denne
-    viden tilsammen give vinklen $a_{\Delta}$ imellem de 2 punkter,
-    som $a_{\Delta} = \Delta px * \frac{92^{\circ}}{320 px}$.}
+    den horisontale afstand ($\Delta px$) i pixels mellem 2 punkter
+    (midten og featuren) i et billede er kendt, kan denne
+    viden tilsammen give vinklen $a_{\Delta}$, som $a_{\Delta} =
+    \Delta px * \frac{92^{\circ}}{320 px}$.} 
   \label{fig:optflowpyrlk2}
 \end{framefig}
 %\begin{framefig}
@@ -2702,20 +2712,22 @@ vinklen $a_{\Delta}$ i figur~\ref{fig:optflowpyrlk2}.
 %  \label{fig:f2kvinkel}
 %\end{framefig}
 Vinklen $a_{\Delta}$ er dog kun orienteret i forhold til AR.Dronens
-lokale interne koordinatsystem. For at få en vinkel ud som kan bruges i
-trianguleringen er det nødvendigt at flytte den over i et
-globalt koordinatsystem, hvor vinkler imellem positioner i den
-virkelige verden har samme referencepunkt.
+front, altså AR.Dronens lokale, interne, koordinatsystem. For at få en
+retning ud som kan bruges til triangulering, er det nødvendigt at
+flytte den over i et globalt koordinatsystem, så retninger og
+positioner har samme referencepunkt og kan bruges i den virkelige verden.
 
 \subsection{Yaw som fælles reference}
-Der er imidlertid et problem i at, AR.Dronens front nærmest aldrig peger i den
+\label{yaw}
+Der er imidlertid et problem i at AR.Dronens front nærmest aldrig peger i den
 samme retning (i figur~\ref{fig:absoluteevinkler} ses AR.Dronens front
 peger i forskellige retninger ved de to positioner $p1$ og $p2$). For
 at triangulere skal der bruges 2 pejleretninger med fælles 
 reference. Den piezo-elektriske yaw-sensor er ikke præcis nok til at
 kunne udgøre det for kompas via dead-reckoning gennem en hel
 flyvning. Tanken er istedet at yaw-værdien fra AR.Dronens navdata, over korte
-tidsperioder, alligevel er stabil nok som fælles referencevinkel.
+tidsperioder, alligevel er stabil nok som fælles referencevinkel,
+f.eks. mellem $p1$ og $p2$.
 \begin{framefig}
   \centering
   \includegraphics[width=0.65\textwidth]{grafik/absolutevinkler.png}
@@ -2727,40 +2739,43 @@ tidsperioder, alligevel er stabil nok som fælles referencevinkel.
   \label{fig:absoluteevinkler}
 \end{framefig}
 
-\subsection{Længden: 3. og sidste kendte parameter} %Triangulering i 2
+\subsection{Sidestykket b, 3. parameter i trekanten} %Triangulering i 2
                                 %dimensioner}
+\label{liniestykkeb}
 Der mangles at kende en sidste parameter ud af 3 for at kunne bestemme
-alle de andre elementer i trekanten $|p1, f2t, p2|$, heriblandt
-afstanden $|f2t p2|$. Den sidste ukendte parameter længden $|p1 p2|$
+alle de andre elementer i trekanten $|p1\ f2t\ p2|$, heriblandt
+afstanden $|f2t\ p2|$. Den sidste ukendte parameter længden $|p1\ p2|$
 (se figur~\ref{fig:linieb})
 er lidt besværlig at fremskaffe idet der ikke findes andre afstande at
-måle udfra. Til gengæld kendes hastigheden AR.Dronen har fløjet med for
-at komme fra $p1$ til $p2$. Hastigheden fåes fra AR.Dronens navdata
+måle udfra. Til gengæld kendes hastigheden som AR.Dronen har fløjet
+med imellem $p1$ til $p2$. Hastigheden fåes fra AR.Dronens navdata 
 som $v_x$ og $v_y$, og er hastigheden i x-aksens og y-aksens
-bevægelsesretning, ie. hhv. frem-tilbage og venstre-højre.
+bevægelsesretning ( hhv. $v_{\updownarrow}$ og $v_{\leftrightarrow}$ i
+figur~\ref{fig:linieb}).
+%( hhv. $v_{frem-tilbage}$ og $v_{venstre-højre}$ i figur~\ref{fig:linieb}).
 
-Forsøgsopstillingen er simplificeret til kun at foregå i planet,
+Testopstillingen er forsøgt simplificeret til kun at foregå i planet,
 så det kun er frem-, tilbage- og sideværts- bevægelser der
 iberegnes. Rotationer og ændringer i højden forsøges minimeret under
-flyvningen fra $p1$ til $p2$, så de parametre kan ignoreres i
-udledningen af længden mellem AR.Dronens 2 positioner.
+flyvningen imellem $p1$ og $p2$. Det antages herved at de parametre er så små
+at de kan ignoreres i udledningen af afstanden imellem $p1$ og $p2$.
 \begin{framefig}
   \centering
   \includegraphics[width=0.65\textwidth]{grafik/linieb.png}
   \caption{Opstillingen er set oppefra. AR.Dronen har flyttet sig fra
     position $p1$ til $p2$ i planet på tiden $\Delta t$. Her ønskes
-    sidelængden $b = |p1 p2|$ fundet. Afstanden $b$ findes ved:
-  $b = \Delta t * ( \sqrt{ v_x^2 + v_y^2 } )$.}
+    sidelængden $b = |p1\ p2|$ fundet. Afstanden $b$ findes ved:
+  $b = \Delta t * ( \sqrt{ v_{\updownarrow}^2 + v_{\leftrightarrow}^2 } )$.}
 % at integrere over hastigheden i x- og y- retning i tiden $\Delta t$.
   \label{fig:linieb}
 \end{framefig}
 
-\subsection{Afstanden findes}
+\subsection{Afstanden ud til objektet findes}
+\label{afstandenf2tp2}
 Det er sidestykket $|f2t\ p2|$ i trekanten på
 figur~\ref{fig:opticalafstand} der er forsøgt udregnet. Eftersom der
-nu er fremskaffet 3 elementer af trekanten $|p1 f2t p2|$'s vinkler og
-sider, er det nu muligt at alle vinkler og sidelængder i trekanten,
-heriblandt den længe ønskede $|p2 f2t|$.
+nu er fremskaffet 3 elementer af trekanten $|p1\ f2t\ p2|$'s vinkler og
+sider, er det nu muligt at beregne afstanden $|p2\ f2t|$.
 \begin{framefig}
   \centering
   \includegraphics[width=0.65\textwidth]{grafik/optical_afstand.png}
@@ -2769,13 +2784,14 @@ heriblandt den længe ønskede $|p2 f2t|$.
     $\Delta t$. Den grønne cirkel (f2t) er et punkt på
     væggen (feature-to-track) som følges gennem frontkameraet. I
     opstillingen ønskes liniestykket $|f2t\ p2|$ fundet. Ved at kende
-    vinklerne $a1$ og $a2$, samt længden $b = |p1 p2|$, er det nemt at
+    vinklerne $a1$ og $a2$, samt længden $b = |p1\ p2|$, er det nemt at
     finde den sidste afstand som: $|f2t\ p2| = \frac{\sin(a2) * b}{
   \sin(180-(a2+a1)) }$}
   \label{fig:opticalafstand}
 \end{framefig}
 
 \subsection{Resultater}
+\label{afstandresult}
 \begin{framefig}
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/afstande_avg11_gauss11_thumb.png}
@@ -2790,7 +2806,8 @@ heriblandt den længe ønskede $|p2 f2t|$.
 \end{framefig}
 Resultatet af eksperimentet kan ses i figur~\ref{fig:afstandavg11}. De
 16 vildeste outsidere i målingerne er klippet af ved 27 meter. Den
-sande værdi ligger imellem $4,0$ og $6,5$ meter.
+sande værdi (afstanden mellem AR.Dronen og væggen) ligger imellem $4,0$ og $6,5$ meter.
+
 Dette er et godt eksempel på et af tidspunkter hvor man bør træde et skridt
 tilbage og se situationen fra et andet perspektiv. Grunden til at det
 ikke virker som opsætningen er nu, er fordi vinklen der skal
@@ -2806,6 +2823,9 @@ afstandsbedømmelsen.
 
 En udbygning af afstandsbedømmelsen vil være at lade $\Delta t$ vokse
 lidt, således at afstanden udregnes hen over flere billeder ad gangen.
+Et andet forsøg kunne være at udbygge implementationen til at
+projektere featurens horisontale afstand i billedrammen ned på
+virkelighedens vandret ved at bruge $\phi$-vinklen fra AR.Dronens navdata.
 
 
 \section{Korridor-detektering} % Thomas

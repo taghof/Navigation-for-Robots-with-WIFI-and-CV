@@ -2830,94 +2830,125 @@ virkelighedens vandret ved at bruge $\phi$-vinklen fra AR.Dronens navdata.
 
 \section{Korridor-detektering} % Thomas
 %intro
-Denne sektion omhandler en metode til at genkende gangarealer og
-korridorer gennem frontkameraet på AR.Dronen.
-
-\paragraph{Målet} for dette eksperiment er at implementere og teste 2
+Denne sektion omhandler en metode til at detektere gangarealer og
+korridorer gennem frontkameraet på AR.Dronen. Målet for dette
+eksperiment er at implementere og teste to 
 ting: 1) At finde sandsynligheden for at være i en korridor, og
-2) At finde ud af hvor enden af korridoren (forsvindingspunktet) er.
+2) At finde ud af hvor i et billede enden af korridoren (forsvindingspunktet) er.
 
 %mere intr, !det kan bruges til!
-\paragraph{Kontekstuel viden} er hensigtsmæssig at have for at kunne
+Det er hensigtsmæssigt at have kontekstuel viden for at kunne
 træffe funderede beslutninger om navigationen i specifikke
 omgivelser. Derfor vil det være interessant at se om det er muligt at
-implementere en korridor-detektions funktionalitet som senere vil kan
-blive en et virtuelle sensor hieraki.
+implementere en korridor-detektions funktionalitet som senere kan
+blive en del af et virtuelle sensor hieraki.
 Robotten Minerva, \cite{Thrun99minerva:a}, fik lov at lave guidede
 tours på the Smithsonian i 2 
 uger. I eksperimentet var robotten blevet givet forskellige
 opførsler at udfører under forkellige forhold. Eksempelvis skulle den
 så ofte som muligt bruge analogien Coastal-planner, dvs. at følge
 væggene rundt så den havde mulighed for at genkende allerede gemte
-kendemærker. Når coastal-planner ikke var muligt skulle den gå over i
-open-sea mode, hvor den så havde et andet bevæggrundlag.
+kendemærker. Når Coastal-planner ikke var muligt skulle den gå over i
+Open-sea mode, hvor den så havde et andet bevæggrundlag.
 Et andet eksempel på forskellige operationstilstande er i,
-\cite{single_img_pespective_cues}, hvor en quadrokopter med
-frontkamera med godt resultat kan kategoriseredens omgivelsertil at
-være i en trappeopgang, et gangareal eller et lille kontor. I
-mostætning til Minerva bruger denne tilgang ikke 2D kort eller
+\cite{single_img_pespective_cues}, hvor en quadrokopter, med
+frontkamera, med godt resultat kan kategorisere dens omgivelser til at
+være i en trappeopgang, i et gangareal eller i et lille kontor. I
+modsætning til Minerva bruger denne tilgang ikke 2D kort eller
 omgivelser til pathplanning. Videnen om omgivelserne bruge til at
 indsnævre de optiske strukture (perspective cues) der skal søges og
 orienteres efter.
 
-\paragraph{Vanishing-point, et kendetegn for korridor.}
-Algortimen til at detektere korridore virker ved at lede efter et billedes
-fælles-forsvindingspunkt.
-
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.59\textwidth]{grafik/korridoreksempel.png}
+  \caption{Kendetegnende for et billede der er taget ned ad et
+    gangareal er forsvindingspunktet, som består af en del diagonale
+    linier som forsvinder ind i billedet og skære cirka i det samme punkt i billedet.}
+  \label{fig:korridoreksempel}
+\end{framefig}
+Eksistensen af et forsvindingspunkt i billedet fra AR.Dronens
+frontkamera kan bruges som indikator for om AR.Dronen befinder sig i
+en korridor.
+%
 Hvis et billede viser en korridor vil man i strukturen i billedet
-kunne se at mange linier gå vandret og lodret. En del linier vil gå
-diagonalt i billedet. Det har gennem eksperimentation vist sig, 
-at der hvor de diagonale liner skærer hinanden er der ofte et
-sammenfald med enden af korridoren i billedet.
+kunne se mange linier gå vandret og lodret, mens en del linier vil gå
+diagonalt i billedet, altså ind i korridoren. Gennem dette
+eksperiment har det vist sig, at der hvor de diagonale linier skærer
+hinanden er der ofte et sammenfald med enden af korridoren i billedet. 
 
-%metode
-\paragraph{Filtrering-processen}
-Første skridt når man står med et rå billede og vil undersøge om der er
-en korridor er først at filtrere det for at finde de lige
-linier. Hernæst at frasortere de vandrette og lodrette, men fordi
-AR.Dronen ikke altid holder lige i luften skal frasorteringen
-augmenteres med AR.Dronens $\phi$-vinkel\footnote{Husk $\phi$ er den
-  værdi der variere med AR.Dronens hældning sideværts.}. På den måde frasorteres de
-vandrette og lodrette linier fra billedet af gangen og ikke af
-billedrammen. Når man står tilbage med de diagonale linier
-sammenlignes de hver især en-og-en for at finde
-skæringspunkter. Punkterne for skæring tælles sammen og antallet
-gemmes for hvert gitterpunkt i et 2 dimensionelt array af form $n
-\times k$. %$n$ og $k$ er i eksperimentet sat til 11
-Den celle i det 2 dimensionelle array med størst værdi stemmer ofte
-overens med cellekoordinatet for billedets forsvindingspunkt.
-Processen gennemgåes nærmere i det følgende.
+\subsection{Korridordetektering som procesdiagram}
+Processen med at finde et forsvindingspunkt handler om at finde
+skæringspunktet af de diagonale linier som går gennem billedet.
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/korridorvandfald.png}
+  \caption{Detekteringsprocessen tager et billede fra
+    AR.Dronens frontkamera som input. Billedet filtreres for at finde
+    Houghtransformerede linier. De fundne linier sorteres så kun de
+    diagonale linier er tilbage. Fordelingen af linieskæringspunkter i
+  billedet beregnes. Den celle eller det område af billedet med størst
+  koncentration af linieskæringer udpeges som forsvindingspunkt.}
+  \label{fig:korridorvandfald}
+\end{framefig}
+Forsvindingspunktets placering i et billede findes gennem en række
+delskridt (se figur~\ref{fig:korridorvandfald}). Inputbilledet roteres først ift. AR.Dronens 
+roll-vinkel, $\phi$ (se figur~\ref{fig:korridorphi}), herefter
+beregnes linierne i billedet ved hjælp af et Canny-filter,~\cite{Canny1986}, og
+Houghtransformation,~\cite{duda1972houghline} (gennemgåes i sektion~\ref{sec:introCannyHough}). 
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/korridorphi.png}
+  \caption{For senere at lette frasorteringen af de vandrette og
+    lodrette linier fra i den reele korridor, augmenteres billedet med
+    AR.Dronens roll-vinkel $phi$. Herefter kan linier filtrerers
+    via deres hældning alene.}
+  \label{fig:korridorphi}
+\end{framefig}
+De ikke-diagonale
+linier frasorteres, hvorefter skæringspunker mellem hver af de
+diagonale linier beregnes. Antallet af linieskæringer tælles op
+for hver celle i billedet (der er $11 \times 11$ celler per
+billede, se figur~\ref{fig:phiaugmentet}).
+Afhængig af om der er en korridor eller ikke, er det som sagt oftest ved cellen
+med størst antal linieskæringer at forsvindingspunktet kan findes.
+%
 
 Herunder gennemgåes metoder til at finde kanter (edges) via
-canny-filter, samt hvorledes disse kanter går fra at være
+Canny-filter, samt hvorledes disse kanter går fra at være
 repræsenteret som klumper af billedpunkter til at blive til
-hough-linier. Herefter forklares hvordan linierne filtreres for
-tilsidst at sige noget om et tilstedeværende eller ikke
-tilstedeværende forsvindingspunkt.
+Houghtransformerede linier (der er en uddybende forklaring af
+teknikken i appendiks~\ref{app:linier}). Herefter forklares hvordan
+linierne filtreres for til sidst at sige noget om et tilstedeværende
+eller ikke tilstedeværende forsvindingspunkt.
 
-\subsection{At finde lige linier}
-Det at finde linier foregår i to skridt via 2 forskellige
-algoritmer. Til eksperimentet er open source computer vision bibliotekets, opencv,
-\cite{opencv:main} implentation af et Canny-filter, \cite{Canny1986}, brugt til at finde
+\subsection{At finde linier i billedet}
+\label{sec:introCannyHough}
+Det at finde linier foregår i to skridt via to forskellige
+algoritmer. I dette eksperiment er open source computer vision
+bibliotekets, OpenCV,~\cite{opencv:main}, implementation af et
+Canny-filter,~\cite{Canny1986}, brugt til at finde 
 kanter med. Udfra kanterne er der brugt en OpenCV implementation af
-Hough-transforms, \cite{duda1972houghline}, til at finde linier med polar-koordinater.
+Hough-transformation,~\cite{duda1972houghline}, til at finde linier
+med% polar-koordinater %polar-form
+. Der er lavet en
+mere detaljeret beskrivelse af metoderne til at detektere kanter og
+linier i appendiks~\ref{app:linier}.
 
-Figur~\ref{fig:houghprocess} viser de forskellige trin i
+Figurene~\ref{fig:vanishopa} til \ref{fig:vanishopd} illustrerer forskellige trin i
 filtreringsprocessen fra rå billede til en samling af diagonale linier
-på polær form. Kantdetekteringen i figuren \ref{fig:houghprocess}b er
-lavet med en Sobelfunktion, men i Python-implementationen er der brugt
-et Canny-filter.
+på polær form.
 \begin{framefig}
   \centering
   \subfigure[Et billede af en gang påført gauss-sløring]{
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_a.png}
     \label{fig:vanishopa}}
   %~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[Billede a efter kantdetektering (her et sobel-filter)]{
+  \subfigure[Billede a efter Canny kantdetektering]{
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_b.png}
     \label{fig:vanishopb}}
   %~ 
-  \subfigure[Hough-linier, udregnes udfra kantpunkterne i billede b]{
+  \subfigure[Houghtransformerede linier, udregnes udfra kantpunkterne i billede b]{
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_c.png}
     \label{fig:vanishopc}}
   %~ 
@@ -2925,19 +2956,20 @@ et Canny-filter.
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_d.png}
     \label{fig:vanishopd}}
   %~ 
-  \label{fig:houghprocess}
-  \caption{Detektering af Hough-linier.}
+  \label{fig:houghprocessen}
+  \caption{Detektering af Houghtransformerede linier.}
 \end{framefig}
 
-\subsection{Augmentering med $\phi$}
-Hver af de fundne linier har en hældning som herefter sammenlignes med
-grænseværdier opsat omkring variabelværdien $\phi$. Frasorteringen
-gennem grænseværdierne gør at problemet der søges løst kan forenkles
-til kun at omhandle det at finde området med flest
-linie-skæringspunkter blandt de diagonale linier i
-billedet. På figur~\ref{fig:phiaugmentet} kan man se $\phi$-vinklen
-augmenteret på billedet. Den tykke blå-farvede linie indikere det
-vandrette plan i billedet. Linien er en funktione af $\phi$.
+
+%% \subsection{Augmentering med $\phi$}
+%% Hver af de fundne linier har en hældning som herefter sammenlignes med
+%% grænseværdier opsat omkring variabelværdien $\phi$. Frasorteringen
+%% gennem grænseværdierne gør at problemet der søges løst kan forenkles
+%% til kun at omhandle det at finde området med flest
+%% linie-skæringspunkter blandt de diagonale linier i
+%% billedet. På figur~\ref{fig:phiaugmentet} kan man se $\phi$-vinklen
+%% augmenteret på billedet. Den tykke blå-farvede linie indikere det
+%% vandrette plan i billedet. Linien er en funktione af $\phi$.
 
 \begin{framefig}
   \centering
@@ -2954,7 +2986,7 @@ vandrette plan i billedet. Linien er en funktione af $\phi$.
     \label{fig:phiaugmentet}
   }
   \label{fig:linieceller}
-  \caption{Visualisering af vanishinpoint detektor.}
+  \caption{Visualisering af forsvindingspunkts-detektor.}
 \end{framefig}
 
 \subsection{Celle med flest linie-skæringspunkter}
@@ -2962,17 +2994,65 @@ Ved at finde det område af billedet hvor flest linier skærer
 hinanden, kan man under de rigtige forhold få et godt gæt på hvor
 billedets forsvindingspunkt kan findes. I figur~\ref{fig:phiaugmentet}
 ses ved området for celleindgang (5,5) 1307 linie-skæringer: En god
-indikator på et vanishingpoint. 
-
-\subsection{Troværdighed af et fundet vanishpunkt}
+indikator på et forsvindingspunkt. 
+%
 Observationer under eksperimenterne har vist at cellen med flest
-skæringspunkter skal indeholde et hvis antal for at undgå sande
-positiver, samt at der bør være skæringspunkter jævnt fordelt over det
-meste af billedet. 
+skæringspunkter skal indeholde et hvis antal for at algoritmen med
+rimelig sikkerhed kan sige at der faktisk er en korridor med
+tilhørende forsvindingspunkt (at undgå false-positives), samt at der bør
+være linieskæringspunkter jævnt fordelt over det meste af billedet. 
 
-\subsection{Forhold og anvendelsesområde}
-Figur~\ref{fig:phiaugmentet} er et eksempel på et billede med optimale
-forhold til at finde forsvindingspunkter. 
+\subsection{Resultater}
+Billedet a i figur~\ref{fig:linieceller} er et eksempel på et billede med optimale
+forhold til at finde et forsvindingspunkt. 
+
+%\subsection{Resultater}
+I 86 af de test der er lavet hvor korridorenden ses i midten af et billede, hvor billedet
+er taget fra midten og ned ad Ada 100-gangen, finder detektoren
+området for forsvindingspunktet hver gang. Udover de 86 er der 10
+tilfælde hvor detekteringen ikke virker. Et eksempel er hvis billedet
+er taget i den ene side af gangen, hvor 
+Canny-filteret har detekteret mange næsten lodrette linier, men ikke lodret nok til at blive frasorteret
+via $\phi$-grænsen. Der vil der blive et stort antal linieskæringer i
+siden som vil føre til fejl-placering af forsvindingspunktet (se figuren~\ref{fig:vanishfeler}).
+\begin{table}
+  \begin{center}
+  \begin{tabular}{ l | p{3,5cm} | p{5,5cm} }
+    ~  & tror der er & tror ej der er \\
+    \hline
+    der er faktisk & 79 \% & 11 \% \\
+    \hline
+    der er faktisk ikke & 0 \% & 10 \% \\
+  \end{tabular}
+  \end{center}
+  \caption{Resulter af detektering udført på 111 billeder.} 
+  \label{tab:vanishresults}
+\end{table}
+
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.8\textwidth]{grafik/out_put_6jpg_error.png}
+  \caption{Eksempel på synsvinkel hvor detektoren ikke fungere
+    optimalt. Canny-filteret har fundet mange kantpunkter i venstre
+    side af billedet hvor vægoverfladen er meget uensartet. Hvilket
+    det er umuligt for Houghtranformeringen at danne linier udfra som
+    der ikke er fejl på.}
+  \label{fig:vanishfeler}
+\end{framefig}
+Som det ses i tabel~\ref{tab:vanishresults} har detektoren i ca. 10
+procent af forsøgene ikke kunnet detekte placeringen af
+forsvindingspunktet korrekt. 
+%
+Som et mål for denne sektion blev der opsat et ønske om at detektoren skulle kunne
+outputte en sandsynlighed. Outputtet skulle være en sandsynlighed for hvorvidt AR.Dronen befandt
+sig i en korridor. Dette mål er ikke opfyldt.
+%
+Med de opstillinger der blev lavet test med, er der til gengæld ikke observeret
+nogle false positives, dvs. detektoren har ikke fejlagtigt 
+vist at der var en korridor i de test hvor der ikke var en korridor.
+I den opstilling der er lavet test med har detektoren konkret gættet
+rigtigt 98 gange ud af 111, hvilket giver en succesrate på 89 procent
+(se tabel~\ref{tab:vanishresults}).
 
 En videreudvikling kunne være at udbygge detektoren til at huske mere
 end fra bare en billedramme til den næste, evt. ved at parre
@@ -2986,144 +3066,6 @@ af, \cite{single_img_pespective_cues}, hvor der blandt andet bruges en
 Hidden markov model og Viterby-algoritme til at huske hvor korridorenden sidst blev set og om
 det så er rimeligt at tro at den er der hvor detektoren siger den er
 nu.
-
-\subsection{At finde kanter i et billede}
-Herunder gives en definition på hvad kanter (edges) er, samt deres egenskaber.
-Forklaring er simplificeret og tager udgangspunkt i et eksempel med
-kantdetektering i kun 1 dimension, hvor den rigtige teknik bruger
-gradienten i 2 dimensioner. 
-\begin{framefig}
-  \centering
-  \includegraphics[width=0.99\textwidth]{grafik/kant_detektering1a.png}
-  \caption{Graf over rød-, grøn-, blå-farveværdier for en linie i
-    billedet med pixel indeks $j=67,\ i=\{0,1,\ldots,320-1 \}$. Samt
-    pixel intensitet, her givet ved summen af de tre farver for $i$ og
-    $j$. Der hvor grafen, eg. for intensiteten, har stejlest hældning
-    er der stor sandsynlighed for en kant i billedet.}
-  \label{fig:kanter1}
-\end{framefig}
-
-Kanter i et billede defineres som abrupt skift i farveværdi eller
-lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt,
-  se f.eks., \cite{electronic:wiki_stepdetectglobal}, men det er en
-  anden tilgang. I dette afsnit beskrives en metode der søger 
-lokalt.} mellem naboer af pixels. Kanter er ofte en indikator for
-eksistensen af bl.a. ændringer i dybden af et billede og for
-overfladeændringer m.fl., se figur~\ref{fig:kanter1}. 
-
-For at forbedre resultatet af kant-filteret, kan indput-billedet
-forinden flyttes ned i dimension ved at bruge et
-båndpasfilter. Båndpasfilteret er en udglatning over
-billedet, som udføres med en \todo{convolve?} gaussisk
-klokke-operation, \cite{electronic:wiki_gaussklokke}, (fra
-billedbehandlingsprogrammer, eg. GIMP, \cite{gimp}, er funktionen kendt
-som Gaussian-blur).
-
-For herefter at finde kanter bruges cannyfilteret, \cite{Canny1986}.
-Canny blev valgt over Sobel, fordi Canny blev kendt først i specialet, men også
-fordi det ser ud til at kantmarkeringerne af et Sobelfilter er bredere end
-med Canny. Hvilket senere vil have indvirkning på Houghtransformens
-udførsel. \todo{er det rigtigt? hjemmel?}
-
-Cannyfilteret tager et farvebillede i 3 kanaler og returnere et binært billede
-(sort/hvid) som det i figur~\ref{fig:vanishopb}. Hvide billedpunkter
-\todo{hedder det noget andet end billedpunketer}
-indikere at der er en kant i det oprindellige billede, mens sort
-betyder at der ikke er ændringer. 
-
-Tager man alle pixelpositioner hvor den første afledte er over
-threshold \todo{problemet med Sobel?} kan man ende op med mange tykke
-kanter, for at præcisere placeringen kan man udtynde dem, ved at søge
-i retningen af den lokale gradient og istedet finde
-optimum. \todo{skal dette med?: Videreudbygninger af Cannyfilter-implementationen efter 1986
-bruger bl.a. endnu en retningsbestemt afledt af gradienten og finder
-maximum ved den anden afledtes skæring med 0. - Lindenberg88 den
-2. og 3. afledte...}
-
-\subsection{Liniedetektering via Houghtransform}
-Generaliseret houghtransformation, \cite{duda1972houghline}, er en
-metode til at finde perfekte linier hvor der ikke andet end
-billedpunkter. Dvs. metoden finder steder i et billeder hvor der ligger mange
-billedpunkter på en lige række, og kalder rækken for en linie.
-
-For hvert billedpunkt $(x_0, y_0)$ i billedet kan man skrive de linier
-der går gennem punktet som
-\begin{equation}
-  \label{linigennempunkteq}
-  \rho_{\theta} = x_0 * \cos{ \theta } + y_0 * \sin{ \theta }
-\end{equation}
-Hvor $0 \le \theta < 2 \pi$ og $0 \le \rho$, og hvor hvert par $(\theta, \rho_{\theta})$ vil repræsentere en linie igennem
-det punkt (se figur~\ref{fig:houghting}).
-
-\begin{framefig}
-  %\centering
-  \subfigure[En linie beskrevet ved det velkendte almindelige
-    cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i
-    polar koordinatsystem ved en vinkel $\theta$ og en afstand
-    $\rho$. Forholdet imellem de 2 repræsentationer er $y = 
-\left( 
-  - \frac{ \cos \theta }{ \sin \theta} 
-\right)x 
-+
- \left(
-   \frac{ \rho }{ \sin \theta } 
-\right) $]{
-    \includegraphics[width=0.32\textwidth]{grafik/polar2cartesian.png}
-    \label{fig:polar2cartesian}
-}
-  %~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[Houghtransform, linie med flest stemmer, de 3 blå kryds
-    er billedpunkter]{
-    \includegraphics[width=0.66\textwidth]{grafik/houghting.png}
-    \label{fig:houghting}}
-  \label{fig:houghprocess2}
-  %\caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
-\end{framefig}
-Man kan opsætte et kriterie for hvad der gør en
-god linie, ie. at linien skal gennemløbe mindst $X$ billedpunkter, for
-komme i betragtning til at være detekteret som en linie (minimumfor $X$
-er 3 punkter). De linie-par som er løsning til flest konkrete
-\ref{linigennempunkteq}-ligninger vil rangere højest i resultatlisten.
-Resultatet af at køre det cannyfiltrerede billed igennem en
-Houghtransform er en liste med linier, repræsenteret ved ($\theta_i$,
-$\rho_i$) par, og sorteret efter godhed.
-
-OpenCV har to implementationer af Houghtransforms: en standard som
-ovenfor beskrevet, og en probabilistisk Hough line transform. Den
-probalististiske returnere en liste af linier, repræsenteret ved
-liniernes endepunkter $(x_{i1}, y_{i1}), (x_{i2}, x_{i2})$ istedet for
-et $(\theta_i$,$\rho_i)$ par som ovenfor.
-
-\subsection{Resultater}
-De steder hvor billedets forsvindingspunkt ligger i midten af
-billedrammen af et billede taget ned ad Ada 100-gangen fra midten,
-finder detektoren området for forsvindingspunktet hver gang. Der er
-nogle tilfælde hvor det ikke altid virker: hvis billedet er taget i
-den ene side af gangen, hvor Canny-filteret har detekteret mange
-næsten lodrette linier, men ikke lodret nok til at blive frasorteret
-via $\phi$-grænsen. Der vil der blive et stort antal linieskæringer i
-siden som vil føre til fejl-placering af forsvindingspunktet.
-\begin{framefig}
-  \centering
-  \includegraphics[width=0.39\textwidth]{grafik/vanishresult.png}
-  \caption{Procent resultat af test på korridor-detektor
-    virkningsgrad. I testen blev der ikke observeret false-positives.}
-  \label{fig:vanishresult}
-\end{framefig}
-Som det ses i figur~\ref{fig:vanishresult} har detektoren i ca. 10
-procent af forsøgene ikke kunnet detekte placeringen af
-forsvindingspunktet korrekt. 
-%
-Som et mål for denne sektion blev der opsat et ønske om at detektoren skulle kunne
-outputte en sandsynlighed. Outputtet skulle være en sandsynlighed for hvorvidt AR.Dronen befandt
-sig i en korridor. Dette mål er ikke opfyldt.
-%
-Med de opstillinger der blev lavet test med, er der til gengæld ikke observeret
-nogle false positives, ie. detektoren har ikke fejlagtigt 
-vist at der var en korridor i de steder hvor der ikke var en korridor.
-Som det ser ud nu, har den nuværende implementation en virkningsgrad
-på 88 procent, dvs. i 88 tilfælde ud af 100 finder detektoren den
-korrekte placering af vanishingpointet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
@@ -3267,6 +3209,118 @@ kontrollere AR.Dronen.
   \caption{Gyldige AT-kommandoer} 
   \label{tab:kommandoer}
 \end{table} 
+
+
+\chapter{Canny kanter og Houghtransformerede linier}
+\label{app:linier}
+\todo{Tilføj Oles rettelser}
+%plus hvad er kanter, og hvad er linier...
+\section{At finde kanter i et billede}
+Herunder gives en definition på hvad kanter (edges) er, samt deres egenskaber.
+Forklaring er simplificeret og tager udgangspunkt i et eksempel med
+kantdetektering i kun 1 dimension, hvor den rigtige teknik bruger
+gradienten i 2 dimensioner. 
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.99\textwidth]{grafik/kant_detektering1a.png}
+  \caption{Graf over rød-, grøn-, blå-farveværdier for en linie i
+    billedet med pixel indeks $j=67,\ i=\{0,1,\ldots,320-1 \}$. Samt
+    pixel intensitet, her givet ved summen af de tre farver for $i$ og
+    $j$. Der hvor grafen, eg. for intensiteten, har stejlest hældning
+    er der stor sandsynlighed for en kant i billedet.}
+  \label{fig:kanter1}
+\end{framefig}
+
+Kanter i et billede defineres som abrupt skift i farveværdi eller
+lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt,
+  se f.eks., \cite{electronic:wiki_stepdetectglobal}, men det er en
+  anden tilgang. I dette afsnit beskrives en metode der søger 
+lokalt.} mellem naboer af pixels. Kanter er ofte en indikator for
+eksistensen af bl.a. ændringer i dybden af et billede og for
+overfladeændringer m.fl., se figur~\ref{fig:kanter1}. 
+
+For at forbedre resultatet af kant-filteret, kan indput-billedet
+forinden flyttes ned i dimension ved at bruge et
+båndpasfilter. Båndpasfilteret er en udglatning over
+billedet, som udføres med en \todo{convolve?} gaussisk
+klokke-operation, \cite{electronic:wiki_gaussklokke}, (fra
+billedbehandlingsprogrammer, eg. GIMP, \cite{gimp}, er funktionen kendt
+som Gaussian-blur).
+
+For herefter at finde kanter bruges cannyfilteret, \cite{Canny1986}.
+Canny blev valgt over Sobel, fordi Canny blev kendt først i specialet, men også
+fordi det ser ud til at kantmarkeringerne af et Sobelfilter er bredere end
+med Canny. Hvilket senere vil have indvirkning på Houghtransformens
+udførsel. \todo{er det rigtigt? hjemmel?}
+
+Cannyfilteret tager et farvebillede i 3 kanaler og returnere et binært billede
+(sort/hvid) som det i figur~\ref{fig:vanishopb}. Hvide billedpunkter
+\todo{hedder det noget andet end billedpunketer}
+indikere at der er en kant i det oprindellige billede, mens sort
+betyder at der ikke er ændringer. 
+
+Tager man alle pixelpositioner hvor den første afledte er over
+threshold \todo{problemet med Sobel?} kan man ende op med mange tykke
+kanter, for at præcisere placeringen kan man udtynde dem, ved at søge
+i retningen af den lokale gradient og istedet finde
+optimum. \todo{skal dette med?: Videreudbygninger af Cannyfilter-implementationen efter 1986
+bruger bl.a. endnu en retningsbestemt afledt af gradienten og finder
+maximum ved den anden afledtes skæring med 0. - Lindenberg88 den
+2. og 3. afledte...}
+
+\section{Liniedetektering via Houghtransformation}
+Generaliseret houghtransformation, \cite{duda1972houghline}, er en
+metode til at finde perfekte linier hvor der ikke andet end
+billedpunkter. Dvs. metoden finder steder i et billeder hvor der ligger mange
+billedpunkter på en lige række, og kalder rækken for en linie.
+
+For hvert billedpunkt $(x_0, y_0)$ i billedet kan man skrive de linier
+der går gennem punktet som
+\begin{equation}
+  \label{linigennempunkteq}
+  \rho_{\theta} = x_0 * \cos{ \theta } + y_0 * \sin{ \theta }
+\end{equation}
+Hvor $0 \le \theta < 2 \pi$ og $0 \le \rho$, og hvor hvert par $(\theta, \rho_{\theta})$ vil repræsentere en linie igennem
+det punkt (se figur~\ref{fig:houghting}).
+
+\begin{framefig}
+  %\centering
+  \subfigure[En linie beskrevet ved det velkendte almindelige
+    cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i
+    polar koordinatsystem ved en vinkel $\theta$ og en afstand
+    $\rho$. Forholdet imellem de 2 repræsentationer er $y = 
+\left( 
+  - \frac{ \cos \theta }{ \sin \theta} 
+\right)x 
++
+ \left(
+   \frac{ \rho }{ \sin \theta } 
+\right) $]{
+    \includegraphics[width=0.32\textwidth]{grafik/polar2cartesian.png}
+    \label{fig:polar2cartesian}
+}
+  %~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  \subfigure[Houghtransform, linie med flest stemmer, de 3 blå kryds
+    er billedpunkter]{
+    \includegraphics[width=0.66\textwidth]{grafik/houghting.png}
+    \label{fig:houghting}}
+  \label{fig:houghprocess2}
+  %\caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
+\end{framefig}
+Man kan opsætte et kriterie for hvad der gør en
+god linie, ie. at linien skal gennemløbe mindst $X$ billedpunkter, for
+komme i betragtning til at være detekteret som en linie (minimumfor $X$
+er 3 punkter). De linie-par som er løsning til flest konkrete
+\ref{linigennempunkteq}-ligninger vil rangere højest i resultatlisten.
+Resultatet af at køre det cannyfiltrerede billed igennem en
+Houghtransform er en liste med linier, repræsenteret ved ($\theta_i$,
+$\rho_i$) par, og sorteret efter godhed.
+
+OpenCV har to implementationer af Houghtransforms: en standard som
+ovenfor beskrevet, og en probabilistisk Hough line transform. Den
+probalististiske returnere en liste af linier, repræsenteret ved
+liniernes endepunkter $(x_{i1}, y_{i1}), (x_{i2}, x_{i2})$ istedet for
+et $(\theta_i$,$\rho_i)$ par som ovenfor.
 
 \chapter{Medfølgende CD / internet}
 \todo{Readme} Hvad skal læseren gøre, hvad er tilgængeligt

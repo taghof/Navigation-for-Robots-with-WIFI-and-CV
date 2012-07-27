@@ -590,8 +590,8 @@ ombord beskrives herunder.
   \subfigure[AR.Dronens bundkamera]{\includegraphics[width=0.45\textwidth]{grafik/bundkamera2.png}
     \label{fig:bundkamera}}
 
-  \label{fig:kameraer}
   \caption{AR.Dronens to kameraer}
+  \label{fig:kameraer}
 \end{framefig}
 
 \paragraph{Kameraer}
@@ -738,7 +738,6 @@ rotere.
 \begin{framefig}
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/drone_movements.png}
-
   \caption{(a) vinkelhastigheden $\Omega_H$ øges med $\Delta_A$ på
     alle 4 propeller, dermed øges quadrokopterens løftekraft
     (acceleration i Z-aksen), (b) Vinkelhastigheden øges på venstre og
@@ -749,7 +748,6 @@ rotere.
     quadrokopteren roterer(yaw) mod venstre (ændring i $\psi$). Ved bevægelser frem og tilbage udledes en positiv
     eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts
     ($V_y$). Figuren er fra ~\cite{techreport:ardroneDevGuide}.}
-
   \label{fig:drone_movements}
 \end{framefig}
 
@@ -840,9 +838,9 @@ mellem klientenhed og quadro\-kopteren beskrives i afsnit~\ref{ssec:kommunikatio
   \subfigure[stripes]{\includegraphics[width=0.30\textwidth]{grafik/tag3.png}
     \label{fig:stripes}}
 
-  \label{fig:tags}
   \caption{Visuelle tags der kan genkendes af AR.Dronen, billeder fra
     \cite{electronic:roundel} og \cite{techreport:ardroneDevGuide}}
+  \label{fig:tags}
 \end{framefig}
 
 \begin{framefig}
@@ -955,13 +953,13 @@ figur \ref{fig:atsyntaks}.
 \begin{verbatim}
  AT*[kommandonavn]=[sekvensnummer],[arg1, arg2 ... argN]<LF>
 \end{verbatim}
-\caption{Syntaksen for en AT-kommando: [kommandonavn] kan f.eks. være
-  \code{PCMD}, se \ref{tab:kommandoer}. [sekvensnummer]-heltallet skal være stigende for hver
-  ny afsendt AT-besked. Listen med argumenter: [arg1, arg2 ... argN],
-  varierer i længde afhængig af konteksten. Ved afsending af en
-  \code{PCMD}-kommando skal der medsendes 5 talværdier for hhv. flag,
-  roll, pitch, gas og yaw.} 
-\label{fig:atsyntaks}
+  \caption{Syntaksen for en AT-kommando: [kommandonavn] kan f.eks. være
+    \code{PCMD}, se \ref{tab:kommandoer}. [sekvensnummer]-heltallet skal være stigende for hver
+    ny afsendt AT-besked. Listen med argumenter: [arg1, arg2 ... argN],
+    varierer i længde afhængig af konteksten. Ved afsending af en
+    \code{PCMD}-kommando skal der medsendes 5 talværdier for hhv. flag,
+    roll, pitch, gas og yaw.} 
+  \label{fig:atsyntaks}
 \end{framefig}
 %
 Ved at afsende en kommando som i figur~\ref{fig:ateksempel} bestemmer
@@ -973,9 +971,9 @@ som beskrevet i \nameref{ssec:fysik}, sektion \ref{ssec:fysik}.
 \begin{verbatim}
  AT*PCMD=21625,1,0,0,0,0<LF>
 \end{verbatim}
-\caption{Eksempel på en \code{PCMD} AT-kommando. Denne specifikke
-  kommando bringer AR.Dronen i hovertilstand. [sekvensnummer]'et er 21625. Listen med argumenter er hhv. flag=1, roll=0, pitch=0, gas=0 og yaw=0.}
-\label{fig:ateksempel}   
+  \caption{Eksempel på en \code{PCMD} AT-kommando. Denne specifikke
+    kommando bringer AR.Dronen i hovertilstand. [sekvensnummer]'et er 21625. Listen med argumenter er hhv. flag=1, roll=0, pitch=0, gas=0 og yaw=0.}
+  \label{fig:ateksempel}   
 \end{framefig}
 %    [kommandonavn] er navnet på den ønskede kommando
 %    [sekvensnummer] er et globalt, altid stigende sekvensnummer
@@ -1395,7 +1393,7 @@ def receive_and_show_picture():
   \end{lstlisting}
   \caption{Python implementation der importerer og anvender
     videoreceiver til at modtage og vise et billede}
-\label{fig:pythonimpl2}
+  \label{fig:pythonimpl2}
 \end{framefig}
 
 
@@ -1924,10 +1922,11 @@ testtilstand, vil drone-objektet oprette forbindelse til et testdevice
   \subfigure[WIFI samples display]{\includegraphics[width=0.49\textwidth]{grafik/guisamples.png}
     \label{fig:sampledisplay}}
  
-  \label{fig:sensordisplay}
+
   \caption{Sensordisplay værktøjet har fire præsentationstilstande. En
   til hver af de tre sensorstrømme(navdata, video og WIFI), samt en
   til at sammenligne WIFI-signalstyrker.}
+  \label{fig:sensordisplay}
 \end{framefig}
 
 Sensordisplay-værktøjet er implementeret i
@@ -1995,9 +1994,10 @@ $ ./sensordisplay.py -t
   ~ 
   \subfigure[Tour editor]{\includegraphics[width=0.49\textwidth]{grafik/maptour.png}
     \label{fig:maptour}}
-    \label{fig:mapcreator}
+    
   \caption{Mapcreator-værktøjet, som anvendes til at redigere 2D kort,
     har to redigeringstilstande, world(a) og tour(b).}
+  \label{fig:mapcreator}
 \end{framefig}
 Mapcreator er et værktøj til at oprette og redigere map-objekter.
 Map-objekter instantieres fra klassen PosMap(placeret i map.py,
@@ -2278,8 +2278,9 @@ WIFI-infrastruktur specifikt til eksperimentet.
   \subfigure[avanceret markør]{\includegraphics[width=0.35\textwidth]{grafik/advancedmarker.png}
     \label{fig:advancedmarker}}
 
-  \label{fig:markers}
+  
   \caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
+  \label{fig:markers}
 \end{framefig}
 \subsubsection{Lokalisering via simple markører} % Thomas & Morten
 \paragraph{Første eksperiment}
@@ -2796,12 +2797,13 @@ sider, er det nu muligt at beregne afstanden $|p2\ f2t|$.
     opstillingen ønskes liniestykket $|f2t\ p2|$ fundet. Ved at kende
     vinklerne $a1$ og $a2$, samt længden $b = |p1\ p2|$, er det nemt at
     finde den sidste afstand som: $|f2t\ p2| = \frac{\sin(a2) * b}{
-  \sin(180-(a2+a1)) }$}
+    \sin(180-(a2+a1)) }$}
   \label{fig:opticalafstand}
 \end{framefig}
 
 \subsection{Resultater}
 \label{afstandresult}
+
 \begin{framefig}
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/afstande_avg11_gauss11_thumb.png}
@@ -2907,37 +2909,40 @@ tilstedeværende forsvindingspunkt.
 
 \subsection{At finde lige linier}
 Det at finde linier foregår i to skridt via 2 forskellige
-algoritmer. Til eksperimentet er open source computer vision bibliotekets, opencv,
-\cite{opencv:main} implentation af et Canny-filter, \cite{Canny1986}, brugt til at finde
-kanter med. Udfra kanterne er der brugt en OpenCV implementation af
-Hough-transforms, \cite{duda1972houghline}, til at finde linier med polar-koordinater.
+algoritmer. Til eksperimentet er open source computer vision
+bibliotekets, opencv, \cite{opencv:main} implentation af et
+Canny-filter,~\cite{Canny1986}, brugt til at finde kanter med. Udfra
+kanterne er der brugt en OpenCV implementation af
+Hough-transforms,~\cite{duda1972houghline}, til at finde linier med
+polar-koordinater.
 
-Figur~\ref{fig:houghprocess} viser de forskellige trin i
-filtreringsprocessen fra rå billede til en samling af diagonale linier
-på polær form. Kantdetekteringen i figuren \ref{fig:houghprocess}b er
-lavet med en Sobelfunktion, men i Python-implementationen er der brugt
-et Canny-filter.
+Figur~\ref{fig:houghprocess} viser de forskellige trin i filtreringsprocessen
+fra rå billede til en samling af diagonale linier på polær
+form. Kantdetekteringen i figuren~\ref{fig:vanishopb} er lavet med en
+Sobelfunktion, men i Python-implementationen er der brugt et
+Canny-filter}.
+
 \begin{framefig}
-  \centering
   \subfigure[Et billede af en gang påført gauss-sløring]{
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_a.png}
     \label{fig:vanishopa}}
-  %~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
+  ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
   \subfigure[Billede a efter kantdetektering (her et sobel-filter)]{
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_b.png}
     \label{fig:vanishopb}}
-  %~ 
+   
   \subfigure[Hough-linier, udregnes udfra kantpunkterne i billede b]{
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_c.png}
     \label{fig:vanishopc}}
-  %~ 
+  ~ 
   \subfigure[Vandrette og lodrette hough-linier sorteres fra billede c]{
     \includegraphics[width=0.45\textwidth]{grafik/vanish_operation_d.png}
     \label{fig:vanishopd}}
-  %~ 
-  \label{fig:houghprocess}
+
   \caption{Detektering af Hough-linier.}
+  \label{fig:houghprocess}
 \end{framefig}
+
 
 \subsection{Augmentering med $\phi$}
 Hver af de fundne linier har en hældning som herefter sammenlignes med
@@ -2961,10 +2966,10 @@ vandrette plan i billedet. Linien er en funktione af $\phi$.
     forsvindingspunkt i billedet. Biledet er augmenteret med
     AR.Dronens hældning $\phi$]{
     \includegraphics[width=0.6\textwidth]{grafik/out_put_2jpg.png}
-    \label{fig:phiaugmentet}
-  }
-  \label{fig:linieceller}
+    \label{fig:phiaugmentet}}
+
   \caption{Visualisering af vanishinpoint detektor.}
+  \label{fig:linieceller}
 \end{framefig}
 
 \subsection{Celle med flest linie-skæringspunkter}
@@ -3080,14 +3085,15 @@ det punkt (se figur~\ref{fig:houghting}).
 \right) $]{
     \includegraphics[width=0.32\textwidth]{grafik/polar2cartesian.png}
     \label{fig:polar2cartesian}
-}
+  }
   %~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
   \subfigure[Houghtransform, linie med flest stemmer, de 3 blå kryds
     er billedpunkter]{
     \includegraphics[width=0.66\textwidth]{grafik/houghting.png}
     \label{fig:houghting}}
+  %\caption{}
   \label{fig:houghprocess2}
-  %\caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
+  
 \end{framefig}
 Man kan opsætte et kriterie for hvad der gør en
 god linie, ie. at linien skal gennemløbe mindst $X$ billedpunkter, for
@@ -3137,7 +3143,7 @@ korrekte placering af vanishingpointet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % % % %
 
-\section{DistanceTracker} % Thomas
+\section{Odometrisk afstandsmåling} % Thomas
 \label{sec:distance-mesu} 
 %Hvad vil vi vise, afvise teste?  
 %Hvadkan/skal resultatet bruges til?  
@@ -3197,8 +3203,8 @@ x-aksens retning(flyveretningen) og i y-aksens retning.
 
 \subsection{Resultater}
 %perspektiver, hvad skal / kan vi bruge den nye viden til?
-
 Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
+
 
 Algoritme integration over afstand
 

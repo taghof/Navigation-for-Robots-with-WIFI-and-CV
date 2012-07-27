@@ -1699,7 +1699,7 @@ landtasks) og derfor mere minder om en opgave der skal forberedes,
 udføres og afsluttes. Dette ses i modsætning til en behavior, som kan
 opfattes som en længerevarende opførsel. Der er også implementeret
 højniveau bevægemønstre der minder mere om en traditionelle behaviors
-(for eksempel FollowTourTask). Vi mener, at det også giver mening, at
+(for eksempel FollowTourTask som gennemgåes i sektion~\ref{sssec:followtourtask}). Vi mener, at det også giver mening, at
 kalde disse tasks, da de også implementeres efter vores generelle
 taskstruktur.
 
@@ -2255,7 +2255,7 @@ gennemførsel er markant bedre end under det første eksperiment
   \end{framed}
 \end{table} 
 
-\subsubsection{Resultater}
+\subsection{Resultater}
 Med denne opstilling, kan man kun forvente en konsistent lokalisering, hvis
 lokationerne ligger med 6 meters afstand eller mere. Dette resultat
 gør, at denne eksperimentrække ikke føres videre. WIFI-fingerprintingalgoritmen, eller en videreudvikling,
@@ -2264,7 +2264,7 @@ lokaliseringsmetode.
 Bedre resultater kunne muligvis være opnået hvis der var opstillet en
 WIFI-infrastruktur specifikt til eksperimentet. 
 
-\subsection{Visuel lokalisering}
+\section{Visuel lokalisering}
 \label{ssec:visuellokalisering}
 \begin{framefig}
   \centering
@@ -2282,7 +2282,8 @@ WIFI-infrastruktur specifikt til eksperimentet.
   \caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
   \label{fig:markers}
 \end{framefig}
-\subsubsection{Lokalisering via simple markører} % Thomas & Morten
+
+\subsection{Lokalisering via simple markører} % Thomas & Morten
 \paragraph{Første eksperiment}
 \label{p:simple1}
 Det første forsøg med visuel lokalisering anvendte en simpel rød
@@ -2385,7 +2386,8 @@ udviklingen af mere avancerede markører, for bedre understøttelse af FollowTourT
 og tilbage mellem to simple markører og demonstrerer at lokaliseringen,
 på trods af de to nævnte problemer, oftest fungerer. 
 
-\subsubsection{Lokalisering via avancerede markører} % Thomas & Morten
+\subsection{Lokalisering via avancerede markører} % Thomas & Morten
+\label{ssec:avancemarkoer}
 Efter de indledende eksperimenter blevt det besluttet at designe og anvende en
 mere avanceret markør. Det første redesign var markøren der
 ses på figur~\ref{fig:semiadvancedmarker}. 
@@ -2479,7 +2481,7 @@ lokalisere AR.Dronon og følge den fastlagte tour.
   \label{fig:advancedsetup}
 \end{framefig}
 
-\subsubsection{Detektering af markører på små billeder}
+\subsection{Detektering af markører på små billeder}
 \label{ssec:smallmarks}
 I de ovenstående eksperimenter anvendes AR.Dronens bundkamera.
 Dette har en opløsning på 176x144. Der er dog andre tasks der skal
@@ -2542,7 +2544,7 @@ hvorefter detektionsraten falder betydeligt.
 \end{table} 
 
 
-\subsubsection{Lokalisering via QR-koder} % Morten
+\subsection{Lokalisering via QR-koder} % Morten
 \label{sec:QRdecoding}
 I det følgende afsnit undersøges muligheden for at anvende QR-koder til
 lokalisering. Man er begyndt at se QR-koder mange steder i det
@@ -3113,13 +3115,14 @@ flyvning. Konceptet er kendt som en triptæller i biler og som en
 tacho-counter i motoren på nogle kørende robotter.  
 
 Indenfor navigation anvendes en teknik kaldet dead
-reckoning,~\cite{wiki:deadreck}. Dead reckoning betyder, at den
+reckoning,~\cite{wiki:deadreck}. Dead reckoning-teknikken går ud på at den
 nuværende position udregnes på baggrund af en tidligere
 positionsudregning og viden om retning og hastighed. En mulig
 anvendelse af odemetri-afstandsmåleren kan således være, som en del af en
 sådan dead reckoning algoritme. En forudsætning for en robust og brugbar dead
-reckoning er dog, at den udledte afstand er troværdig. Præcisionen
-undersøges herunder.
+reckoning er dog, at den udledte afstand er troværdig. Præcisionen er
+noget af det der testet her.
+%Præcisionen undersøges herunder.
 
 DistanceTrackeren fungerer ved at integrere over de
 hastighedsestimater ($v_x$ og $v_y$), der modtages i AR.Dronens navdatastrøm. Disse
@@ -3136,15 +3139,18 @@ med ensartet underlag og automatisk flyvning uensartet underlag (gode
 features at tracke). Hver type flyvning blev gentaget 10
 gange. Den manuelle styring forgik ved brug af joystick, mens de
 automatiserede flyvninger blev udført ved brug af en
-FollowTourTask\todo{ref}. Generelt blev de manuelt styrede flyvninger gennemført med højere
+FollowTourTask (sektion~\ref{sssec:followtourtask}). Generelt blev de
+manuelt styrede flyvninger gennemført med højere 
 hastighed end de automatiserede, mens de automatiserede flyvninger i
 reglen tog længere tid at færdiggøre. Den længere udførselstid kommer
 af at odometri-afstandsmåleren skulle testes at virke sammen med
-markør-detektoren (\ref{}), der er en del af FollowTourTask.
+markør-detektoren (se sektion~\ref{ssec:avancemarkoer}), der er en del af FollowTourTask.
 
- (). Resultaterne af flyvningerne kan ses på figur~\ref{fig:xdistr} og
-figur~\ref{fig:ydistr}, som viser henholdsvis de målte afstande i
-x-aksens retning(flyveretningen) og i y-aksens retning.
+Resultaterne af flyvningerne kan ses på figur~\ref{fig:xdistr} og
+figur~\ref{fig:ydistr}. Figur~\ref{fig:xdistr} viser en fordeling over
+afstanden i fremadrettet flyveretning sådan som AR.Dronen og
+DistanceTraker har målt dem, mens figur~\ref{fig:ydistr} viser
+fordelingen af de målte afstande i y-aksens (sideværts) retning.
 
 \begin{framefig}
   \centering

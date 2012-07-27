@@ -2847,11 +2847,11 @@ virkelighedens vandret ved at bruge $\phi$-vinklen fra AR.Dronens navdata.
 Denne sektion omhandler en metode til at detektere gangarealer og
 korridorer gennem frontkameraet på AR.Dronen. Målet for dette
 eksperiment er at implementere og teste to 
-ting: 1) At finde sandsynligheden for at være i en korridor, og
+ting: 1) At finde ud af om AR.Dronen er i en korridor, og
 2) At finde ud af hvor i et billede enden af korridoren (forsvindingspunktet) er.
 
 %mere intr, !det kan bruges til!
-Det er hensigtsmæssigt at have kontekstuel viden for at kunne
+For en autonom AR.Drone er det hensigtsmæssigt at have kontekstuel viden for at kunne
 træffe funderede beslutninger om navigationen i specifikke
 omgivelser. Derfor vil det være interessant at se om det er muligt at
 implementere en korridor-detektions funktionalitet som senere kan
@@ -2869,7 +2869,7 @@ Et andet eksempel på forskellige operationstilstande er i,
 frontkamera, med godt resultat kan kategorisere dens omgivelser til at
 være i en trappeopgang, i et gangareal eller i et lille kontor. I
 modsætning til Minerva bruger denne tilgang ikke 2D kort eller
-omgivelser til pathplanning. Videnen om omgivelserne bruge til at
+omgivelser til pathplanning. Viden om omgivelserne bruge til at
 indsnævre de optiske strukture (perspective cues) der skal søges og
 orienteres efter.
 
@@ -2894,7 +2894,7 @@ hinanden er der ofte et sammenfald med enden af korridoren i billedet.
 
 \subsection{Korridordetektering som procesdiagram}
 Processen med at finde et forsvindingspunkt handler om at finde
-skæringspunktet af de diagonale linier som går gennem billedet.
+skæringspunktet af de diagonale linier som går ind i billedet.
 \begin{framefig}
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/korridorvandfald.png}
@@ -2907,7 +2907,7 @@ skæringspunktet af de diagonale linier som går gennem billedet.
   \label{fig:korridorvandfald}
 \end{framefig}
 Forsvindingspunktets placering i et billede findes gennem en række
-delskridt (se figur~\ref{fig:korridorvandfald}). Inputbilledet roteres
+deltrin (se figur~\ref{fig:korridorvandfald}). Inputbilledet roteres
 først ift. AR.Dronens roll-vinkel, $\phi$ (se
 figur~\ref{fig:korridorphi}), herefter beregnes linierne i billedet
 ved hjælp af et Canny-filter,~\cite{Canny1986}, og
@@ -2917,17 +2917,20 @@ sektion~\ref{sec:introCannyHough}).
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/korridorphi.png}
   \caption{For senere at lette frasorteringen af de vandrette og
-    lodrette linier fra i den reele korridor, augmenteres billedet med
-    AR.Dronens roll-vinkel $phi$. Herefter kan linier filtrerers
+    lodrette linier fra i den reele korridor, bruges AR.Dronens roll-vinkel $\phi$. Herefter kan linier filtrerers
     via deres hældning alene.}
   \label{fig:korridorphi}
 \end{framefig}
 De ikke-diagonale linier frasorteres, hvorefter skæringspunker mellem
-hver af de diagonale linier beregnes. Antallet af linieskæringer
+hvert par af de diagonale linier beregnes. Antallet af linieskæringer
 tælles op for hver celle i billedet (der er $11 \times 11$ celler per
-billede, se figur~\ref{fig:phiaugmentet}).  Afhængig af om der er en
-korridor eller ikke, er det som sagt oftest ved cellen med størst
-antal linieskæringer at forsvindingspunktet kan findes.
+billede, se figur~\ref{fig:phiaugmentet}).
+Afhængig af om der er en korridor eller ikke, er det som sagt oftest
+ved cellen med størst antal linieskæringer at forsvindingspunktet kan
+findes. Hvorvidt der er tale om et billede af en korridor kan ofte
+afgøres ved at kigge på om antallet af linieskæringer i cellen med
+flest skæringer er over en vis størrelse (en grænse på 100 har vist
+godt resultat).
 %
 Herunder gennemgåes metoder til at finde kanter (edges) via
 Canny-filter, samt hvorledes disse kanter går fra at være
@@ -3021,8 +3024,12 @@ indikator på et forsvindingspunkt.
 Observationer under eksperimenterne har vist, at cellen med flest
 skæringspunkter skal indeholde et hvis antal for at algoritmen med
 rimelig sikkerhed kan sige at der faktisk er en korridor med
-tilhørende forsvindingspunkt (at undgå false-positives), samt at der bør
-være linieskæringspunkter jævnt fordelt over det meste af billedet. 
+tilhørende forsvindingspunkt. Observationer har indikeret at detektoren
+kan gøres mere robust ved yderligere at analysere på om fordelingen af
+linieskæringspunkter er jævnt fordelt over det meste af billedet (i
+diagonalt mod forsvindingspunkt) og
+eksempelvis ikke kun er koncentreret omkring en enkelt linie eller
+enkelt område.
 
 \subsection{Resultater}
 Billedet a i figur~\ref{fig:linieceller} er et eksempel på et billede med optimale
@@ -3066,9 +3073,9 @@ Som det ses i tabel~\ref{tab:vanishresults} har detektoren i ca. 10
 procent af forsøgene ikke kunnet detekte placeringen af
 forsvindingspunktet korrekt. 
 %
-Som et mål for denne sektion blev der opsat et ønske om at detektoren skulle kunne
-outputte en sandsynlighed. Outputtet skulle være en sandsynlighed for hvorvidt AR.Dronen befandt
-sig i en korridor. Dette mål er ikke opfyldt.
+Oprindeligt blev der opsat et mål om at
+detektoren skulle kunne give en sandsynlighed for hvorvidt AR.Dronen befandt
+sig i en korridor. Det mål er ikke opfyldt.
 %
 Med de opstillinger der blev lavet test med, er der til gengæld ikke observeret
 nogle false positives, dvs. detektoren har ikke fejlagtigt 

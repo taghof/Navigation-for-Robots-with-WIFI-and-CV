@@ -3133,21 +3133,24 @@ Eksperimentet blev udført ved at placere to markører med 3 meters
 afstand på gulvet. Herefter blev der gennemført 3 forskellige typer
 flyvninger mellem de to markører: Manuel flyvning med ensartet
 underlag (uden gode features), automatisk flyvning
-med ensartet underlag og automatisk flyvning uensartet underlag (gode
+med ensartet underlag og automatisk flyvning med uensartet underlag (med gode
 features at tracke). Hver type flyvning blev gentaget 10
 gange. Den manuelle styring forgik ved brug af joystick, mens de
 automatiserede flyvninger blev udført ved brug af en
-FollowTourTask (sektion~\ref{sssec:followtourtask}). Generelt blev de
+FollowTourTask (sektion~\ref{sssec:followtourtask}). 
+
+\subsection{Resultater}
+Generelt blev de
 manuelt styrede flyvninger gennemført med højere 
 hastighed end de automatiserede, mens de automatiserede flyvninger i
-reglen tog længere tid at færdiggøre. Den længere udførselstid kommer
-af at odometri-afstandsmåleren skulle testes at virke sammen med
-markør-detektoren (se sektion~\ref{ssec:avancemarkoer}), der er en del af FollowTourTask.
+reglen tog længere tid at færdiggøre. Den længere flyvetid kommer
+af at odometri-afstandsmåleren afvikles sammen med markør-detektoren (gennemgået i sektion~\ref{ssec:avancemarkoer})
+som skal bruge ekstra tid på at udføre markør-detekterering i FollowTourTasken som
+brugt i eksperimentet.
 
 Resultaterne af flyvningerne kan ses på figur~\ref{fig:xdistr} og
 figur~\ref{fig:ydistr}. Figur~\ref{fig:xdistr} viser en fordeling over
-afstanden i fremadrettet flyveretning sådan som AR.Dronen og
-DistanceTraker har målt dem, mens figur~\ref{fig:ydistr} viser
+de målte afstanden i fremadrettet flyveretning, mens figur~\ref{fig:ydistr} viser
 fordelingen af de målte afstande i y-aksens (sideværts) retning.
 
 \begin{framefig}
@@ -3156,9 +3159,12 @@ fordelingen af de målte afstande i y-aksens (sideværts) retning.
   \caption{Kumulativ fordeling af målte afstande. Målingerne blev
     foretaget under fremadrettet flyvning over 3000 millimeter. Der
     blev udført manuelle og automatiserede flyvninger over ensartet og 
-    uensartet overflade}
+    uensartet overflade. Grøn er manuel flyvning, mens blå og rød er autonom flyvning.}
   \label{fig:xdistr}
 \end{framefig}
+Af figur~\ref{fig:xdistr} (og figur~\ref{fig:ydistr}) observeres det, at medianen af de målte afstande under
+de manuelt styrede flyvninger (grøn graf) ligger tydeligt lavere end
+medianen af afstande målt under de autonome flyvninger.
 
 \begin{framefig}
   \centering
@@ -3166,13 +3172,24 @@ fordelingen af de målte afstande i y-aksens (sideværts) retning.
   \caption{Kumulativ distribution af målte afstande. Målingerne
     repræsenterer AR.Dronens tilbagelagte afstand på tværs af
     flyveretningen og burde altid være lav, da AR.Dronen kun blev
-    fløjet fremad og ikke til siderne.} 
+    fløjet fremad og ikke til siderne. Grøn er manuel flyvning, mens
+    blå og rød er autonom flyvning.}
   \label{fig:ydistr}
 \end{framefig}
+En anden observation af eksperimentet og graferne herover er at
+fordelingen af de målte afstande ikke er distribueret omkring den sande
+værdi på 3000 mm, men generelt er fordelt omkring lavere værdier. Der
+er 2 mulige forklaringer på observationen: Enten er tidsfaktoren som
+der integreres over for lille, eller også er hastighedsudledningen fra
+AR.Dronens navdata generelt for lav. Hvis AR.Dronen sættes til altid
+kun at flyve med en og samme hastighed, kan problemet løses ved at bruge en
+større tidsfaktor i integrationen af hastigheden. En mere
+hensigtsmæssig og mere interessant løsning vil være at undersøge om
+hastigheden fra AR.Dronen skal kompenseres for med både en offsetfaktor og en
+hældningsfaktor i forhold til den reele værdi.
 
-\subsection{Resultater}
 %perspektiver, hvad skal / kan vi bruge den nye viden til?
-Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
+%Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
 
 
 

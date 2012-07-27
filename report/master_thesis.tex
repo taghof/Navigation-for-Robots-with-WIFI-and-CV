@@ -2126,7 +2126,7 @@ informationer fra AR.Dronens miljø også blevet
 undersøgt. F.eks. hvor langt AR.Dronen har bevæget sig, hvorvidt den
 befinder sig i en korridor og afstanden til andre objekter.
 
-\subsection{Lokalisering via Wifi-fingerprinting} % Morten (1side)
+\section{Lokalisering via Wifi-fingerprinting} % Morten (1side)
 \label{ssec:wifilokalisering}
 Som nævnt i sektion~\ref{sec:udvidelse} er AR.Dronen blevet udvidet med
 en WIFI-sensor. Denne sender løbende information om de omkringliggende
@@ -2143,7 +2143,7 @@ lokaliseringen. WIFI-fingerprintingteknikken beskrives i
 Under eksperimenterne anvendes kun den allerede tilstedeværende
 WIFI-infrastruktur i testmiljøet(Zuse-bygningen, \cite{zuse}).
 
-\subsubsection{WIFI-fingerprinting-algoritmen}
+\subsection{WIFI-fingerprinting-algoritmen}
 \label{sssec:wifialgo}
 I de følgende eksperimenter anvendes en fingerprintingalgoritme, der
 udfører en simpel nearest-neighbor søgning i et WIFI-map. Dette
@@ -2181,7 +2181,7 @@ implementeret som en del af map.py, \cite{github:map}.
   \label{fig:online}
 \end{framefig}
 
-\subsubsection{Første Eksperiment}
+\subsection{Første Eksperiment}
 Opstillingen til dette eksperiment består af 3 markører med 3 meters
 mellemrum som vist på figur~\ref{fig:wifisetup}. Efter opstillingen
 udførtes en indsamling af WIFI-signalstyrker som beskrevet i
@@ -2227,7 +2227,7 @@ Som det ses er resultaterne meget svingende. Med den implementerede fingerprinti
 algoritme og afstande mellem lokationerne på 3 meter eller derunder,
 kan en konsistent lokalisering ikke garanteres.
 
-\subsubsection{Andet Eksperiment}
+\subsection{Andet Eksperiment}
 Det andet eksperiment med WIFI-lokalisering er direkte afledt af de
 dårlige resultater i det første eksperiment. Det blev besluttet at øge
 afstanden mellem punkterne til 6 meter, for herefter at gentage
@@ -3088,19 +3088,20 @@ Dette eksperiment undersøger virkningsgraden af en odometrisk
 afstandsmåler. Den odometriske afstandsmåler er implementeret i den
 virtuelle sensor DistanceTracker,~\cite{github:virtuel}, og holder
 styr på den afstand AR.Dronen har bevæget sig i løbet af en
-flyvning. Konceptet er kendes som en triptæller i biler og som en
+flyvning. Konceptet er kendt som en triptæller i biler og som en
 tacho-counter i motoren på nogle kørende robotter.  
 
-Indenfor robotnavigation anvendes ofte en teknik kaldet
-dead reckoning, \cite{wiki:deadreck}. Dead reckoning betyder, at den nuværende
-position udregnes på baggrund af en tidligere positionsudregning og viden om
-retning og hastighed. En mulig anvendelse af DistanceTrackeren kan
-således være, som en del af en sådan dead reckoning algoritme. En
-forudsætning for en præcis dead reckoning er dog, at den udledte
-afstand er præcis. Dette undersøges herunder.
+Indenfor navigation anvendes en teknik kaldet dead
+reckoning,~\cite{wiki:deadreck}. Dead reckoning betyder, at den
+nuværende position udregnes på baggrund af en tidligere
+positionsudregning og viden om retning og hastighed. En mulig
+anvendelse af odemetri-afstandsmåleren kan således være, som en del af en
+sådan dead reckoning algoritme. En forudsætning for en robust og brugbar dead
+reckoning er dog, at den udledte afstand er troværdig. Præcisionen
+undersøges herunder.
 
 DistanceTrackeren fungerer ved at integrere over de
-hastighedsestimater, der modtages i AR.Dronens navdatastrøm. Disse
+hastighedsestimater ($v_x$ og $v_y$), der modtages i AR.Dronens navdatastrøm. Disse
 hastighedsestimater er baseret på en kombination af accelerometerdata
 og en avanceret hastighedsudledning fra
 bundkameraet,~\cite{velocity_estimation_inside_the_drone}.   
@@ -3108,12 +3109,19 @@ bundkameraet,~\cite{velocity_estimation_inside_the_drone}.
 \subsection{Eksperimentet}
 Eksperimentet blev udført ved at placere to markører med 3 meters
 afstand på gulvet. Herefter blev der gennemført 3 forskellige typer
-flyvninger mellem de to markører: Manuel flyvning med ensartet underlag, automatisk flyvning
-med ensartet overflade og automatisk flyvning uensartet overflade. Hver
-type flyvning blev gentaget 10 gange. Generelt foregik de manuelle
-flyvninger hurtigere end de automatiserede (de automatiserede
-flyvninger blev udført ved hjælp af en FollowTourTask). Resultaterne af
-flyvningerne kan ses på figur~\ref{fig:xdistr} og
+flyvninger mellem de to markører: Manuel flyvning med ensartet
+underlag (uden gode features), automatisk flyvning
+med ensartet underlag og automatisk flyvning uensartet underlag (gode
+features at tracke). Hver type flyvning blev gentaget 10
+gange. Den manuelle styring forgik ved brug af joystick, mens de
+automatiserede flyvninger blev udført ved brug af en
+FollowTourTask\todo{ref}. Generelt blev de manuelt styrede flyvninger gennemført med højere
+hastighed end de automatiserede, mens de automatiserede flyvninger i
+reglen tog længere tid at færdiggøre. Den længere udførselstid kommer
+af at odometri-afstandsmåleren skulle testes at virke sammen med
+markør-detektoren (\ref{}), der er en del af FollowTourTask.
+
+ (). Resultaterne af flyvningerne kan ses på figur~\ref{fig:xdistr} og
 figur~\ref{fig:ydistr}, som viser henholdsvis de målte afstande i
 x-aksens retning(flyveretningen) og i y-aksens retning.
 

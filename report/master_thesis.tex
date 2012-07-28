@@ -125,197 +125,192 @@ visuelle markører på gulvet.
 
 \chapter{Introduktion}  %Thomas
 \label{sec:introduktion}
-%%Med 1970'ernes øgede tilgængelighed af halvlederteknologi og de faldende
-%priser på mikroprocessore %http://en.wikipedia.org/wiki/Intel_4004
-%
-%%intelligens (AI) eller det at en maskine er \emph{autonom}.
+%% \begin{framefig}
+%%   \centering
+%%   \includegraphics[width=0.50\textwidth]{grafik/flyingvideogame.png}
+%%   \caption{AR.Dronens logo med slagordene \emph{the Flying Video Game}
+%%     figuren er taget fra \cite{devisen}.}
+%%   \label{fig:devisen}
+%% \end{framefig}
 
-%DEF: Unmanned Arial Vehicle (UAV)
-Quadrokopter
-
-\paragraph{Omkring AR.Dronen}
-%  + Parrot er producent}
-%AR.Drone, \cite{electronic:ardrone} 
-%(se figur~\ref{fig:devisen}).
-\begin{framefig}
-  \centering
-  \includegraphics[width=0.50\textwidth]{grafik/flyingvideogame.png}
-  \caption{AR.Dronens logo med slagordene \emph{the Flying Video Game} figuren er klippet ud fra \cite{devisen}.}
-  \label{fig:devisen}
-\end{framefig}
-AR.Drone blev introduceret i 2010 som ``the~Flying~Video~Game'' og
+AR.Drone,~\cite{electronic:ardrone}, er en quadrokopter,~\cite{electronic:wiki_quadrotor}, der er udviklet af
+Parrot,~\cite{electronic:parrot}. AR.Dronen blev i 2010 introduceret som ``the~Flying~Video~Game'' og
 promoveres stadig af producenten som et stykke legetøj, der fjernstyres fra
 brugerens iPhone eller iPad. Siden har AR.Dronen dog fundet stor
-anvendelse, ikke blot som et avanceret stykke legetøj; forskere,
-studerende og hobbyister har taget den fjernstyrede quadrokopter til
+anvendelse, ikke blot som et avanceret stykke legetøj; forskere,~\cite{single_img_pespective_cues},
+studerende~\cite{electronic:ludep}, og hobbyister har taget AR.Dronen
+til %den fjernstyrede quadrokopter til
 sig som en færdig platform og selv udviklet videre ovenpå den.%cite
-%
-Underholdningsfaktor: -> -> ->
- udover enabling technologies så også båret af masseforbrugere gadgets som,
-specielt indenfor ``gadget''-genren. Kendte eksempler herpå er robotstøvsugeren
-Roompa, \cite{electronic:irobotroomba} af 2002 fra iRobot og den selvkørende
-plæneklipper; Husqvarna's Solar Mower, \cite{techreport:solarmower} af 1995.
-%båret af løfte om støtte menneskers arbejde og dagligdag
-I artiklen, \cite{electronic:redningsdronedk} refereres til
-en næste version af en redningsdronen som afhjælpe kystvagter ved selv at flyve ud til den
-nødstedte og aflevere en redningsvest. 
 
-Inspektionen af højspændingsledninger og broer, \cite{uavbridgeinspection2007}
-bruges som støtte
-
-%
-%\ ... {Related works} hobby selvbyg (ombygge fysisk LED/GPS/WIFI) /
-%flashe ny styreprogram ombord \paragraph{Lignende arbejde -
-%forskning} %\cite evt. flere som har brugt AR.Dronen i deres forsøg
-%\cite{electronic:ludep}\cite{single_img_pespective_cues} forskning,
-%bl.a. LUDEP. --- UD_DYB hvad det er referencerne har lavet 
+% hobby selvbyg (ombygge fysisk LED http://www.youtube.com/user/dikale
+%/GPS/WIFI) /
+%flashe ny styreprogram ombord 
 %Sousveillance vs. surveillance, noget multimedieæstetik, occupy wallstreet movement thing
 %http://www.alternet.org/occupywallst/153542/ows\_fights\_back\_against\_police\_surveillance\_by\_launching\_\%22occucopter\%22\_citizen\_drone/ 
 % også cyborgen Steve Mann
 
-\paragraph{At quadrokoptere er mulige} % enabling technologies
-At ``billige'' quadrokopter UAV idag flyver er kun gjort muligt
-gennem forbrugselektronikkens udvikling og brug af Micro
-Electro-Mechanical Systems (MEMS) accelerometer og gyroskober, samt
-evigt faldende priser på mikroprocessorer. AR.Dronen bruger, udover
-hovedprocessoren, hurtige accelerometre og dedikeret elektronik til
-motorstyring for at stabilisere flyvningen. Uden dem ville det være
-umuligt for en utrænet pilot ikke at styrte konstant. 
-
-%flyvende energieffektivt... overblik ift. kørende
-
-%bruge i område/case som før kørende robot entity, hvad giver forskellen - hvad
-%skal man være bedre til når man flyver, hvad kan man ikke, hvad opnår
-%man ved flyv.
-Selvom elektronikken ombord på quadrokopteren gør mange ting
-lettere, er der stadig mange udfordringer i at opfatte en 3
-dimensionel verden og i at styre en robot i 3 dimensioner, samtidig
-med at robotten udføre andre opgaver selvstændigt.
 En stor del af forskningen i quadrokoptere har hidtil gået på at
-optimere mekanikken, \cite{quteprints33767}, stabiliseringen og
+optimere mekanikken,~\cite{quteprints33767}, stabiliseringen og
 motorstyringen. I mange eksperimenter har quadrokopteren været
 fjernstyret gennem ekstern observation. Eksemplevis i forskningen af
-små agile Mikro Arial Vehicle (MAV) i flok, \cite{turpin:swarm} er der
-fastmonteret kameraer i lokalet omkring MAV til udregning og feedback
-af absolut position.
-
-\paragraph{Quadrokopter styring gennem Kinect} %nyeste forskning
-Idag er der, igen gennem ny nøgleteknologi, lavet
-forsøg med ``Simultaneous localization and mapping''
-(SLAM), \cite{shen2011kinect}, hvor quadrokopteren er påmonteret en
-kinect, \cite{electronic:kinect} til selv at opfatte omgivelserne i 3
-dimensioner og derigennem selv orientere sig.\newline
-
-\paragraph{Specialets tilgang} % <- Tese herop?
-Dette speciale anvender den fjernstyrede AR.Dronen til at opbygge en
-robotplatform omkring for at undersøge hvilke krav der nødvendigvis
-skal opfyldes for at konstruere en modulopbygget kontrolplatform til
-styring af en quadrokopter.
-
-\paragraph{Domæne afgrænsning}
-AR.Dronen siges at kunne flyve både indendørs og udendørs. Dette
-specialet er afgrænset til at behandle navigation indendørs. For at
-skabe en god basis at arbejde videre udfra, defineres afgrænsningen
-yderligere. Der er fundet inspiration i indendørsområder som de
-beskrevet i arbejdet med den kørende museumsrobotguide Minerva fra
-1999, \cite{Thrun99minerva:a}. Af hensyn til at lave praktiske forsøg,
-bliver de konkrete navigationsløsninger designet til at virke i
-IT-byens kontorer og gangarealer samt Zuse-bygningen på Katrinebjerg i
-Århus.
-
-%%
-%% Hvorfor vil vi ikke opbygge en ``war-driving'' database først, 
-%% offline database med 
-%% - wifi-signalstyrke samples
-%% - reference billeder til opslag af lokation
-%%
-%% Burde i alle fald nævne at vi ved det eksisterer...
-%%
+små agile Mikro Arial Vehicle (MAV) i flok,~\cite{turpin:swarm}
+(publiseret 2012) er der
+fastmonteret kameraer i lokalet rundt om MAV til ekstern udregning og feedback
+af MAV absolut position.
+En anden tilgang og en som ligner dette speciales tilgang er at alle
+beslutninger omkring navigation skal træffes udelukkende på baggrund
+af subjektiv sensning fra ombord på quadrokopteren. Eksempeler på
+denne tilgang kan findes i brugen af quadrokoptere i inspektionen af
+højspændingsledninger og broer,~\cite{uavbridgeinspection2007}, og i
+eksperimenterne af Chen et al omkring naviagtion af AR.Dronen i
+forskellige  indendørs miljøer,~\cite{single_img_pespective_cues}.
+Ideen om at sansning og orientering skal komme fra quadrokopteren selv
+ses stadig så sent som 2011 hos chen et al. i deres forsøg med
+``Simultaneous localization and mapping''
+(SLAM),~\cite{shen2011kinect}, hvor quadrokopteren er påmonteret en 
+kinect,~\cite{electronic:kinect} til selv at opfatte omgivelserne i 3
+dimensioner og derigennem selv orientere sig og konstruere modeller af
+omgivelserne.
 
 \section{Motivation} % Thomas & Morten, Hvorfor
 \label{sec:motivation}
-%Anvendelser}%anvendelser fra dette speciales emner
+At specialet skulle beskæftige sig med AR.Dronen var en beslutning der
+blev truffet helt fra projektstarten. Argumentet for valget er at vi
+ønskede at lære mere om og få mere erfaring med beregning indvirkning
+i den fysiske verden. Vi havde en forventning og håb om om at den
+fysiske verden ville stritte imod vores modelrepræsentationer af
+verdenen. 
 
-%\paragraph{Hvem vil vores resultater komme til gode}
-forløberen har været ``fremkommelsen'' af nøgleteknologier
-``enabling-teknologies'' - har gjort det muligt at udbrede teknologien
-kommercielt i legetøjs-helikoptere, hvilket igen har skaffet kapital
-og resourcer til udvikling af mere teknologi, - vi ønsker mere
-teknologi - derfor arbejde hen imod at konstruere en base som
-tilgængeliggør automatisering af flyvende robotter i højere grad for
-en bredere gruppe af hobbyister og dermed udvide viden og udvikling på
-området. 
+Specialet er i løbet af projektet vokset ud af, og omkring
+AR.Dronen, gennem et ønske fra vores side om at vide hvad den
+fjernstyrede quadrokopter ville være istand til som robotplatform.
 
-\paragraph{Hvorfor er det relevant}
-+Optimering -> resource besparelser...?
-+Grundforskning...?
-+vigtigt at klarlægge - ting, så man forstår konsekvenser hvis senere
-tages ibrug...?
+Igennem vores forundersøgelser af AR.Dronen er vi blevet overasket
+over hvor stor interessen er og hvor stor aktivitet der er i diverse
+brugergrupper på internettet omkring Quadrokoptere. %DIYDrones etc
+Udfra denne erfaring mener vi at konstruktionen af en softwareplatform
+udover at skulle støtte vores eget videre arbejde i specialet også bør
+have et fokus på at lave et let tilgængeligt interface for almindelige
+brugere, som ikke nødvendigvis er programmøre. Et perspektiv kunne
+være at AR.dronen og den konstruerede platform vil kunne bruges til at
+lære om programmering (fordi det er sjovt).
 
-\paragraph{Anvendelses områder}
-+For hurtigere at kunne gennemløbe cyklusen mellem ide til
-implementation til aftestning til analyse til ide.
-+ fordi modulopbygget - Lave gode robuste/specialdesignede
-hjælpemidler til dedikeret støtte i forskellige arbejdssituationer.
+Hvis platformen laves modulopbygget, vil man kunne genbruge
+komponenter og derigennem evt kunne effektivisere udviklingen af
+dedikerede styringer til nye arbejdsopgaver for AR.Dronen.
 
-\paragraph{Hvorfor er det bedre/billigere med vores løsninger}
-+modulopbygget, hurtigt at udskifte genbruge komponenter
-+Nemmere / hurtigere kunne implementere nye produkter.
-+en robot skal ikke kunne det hele, så behøver ikke være en stor
-computer monolith, eller mekanisk klumpet platform, men lille hvor
-tilføje / fjerne moduler afhængig af produkt der designes til.
+Langt størstedelen af arbejdet i projektet handler om at klarlægge og
+forstå AR.Dronen og dens muligheder. Det handler om at lave en lille
+smule grundforskning i et proof-of-concept. Vi vil gerne forstå
+konsekvenserne af de forskellige designvalg vi har mulighed for at
+træffe. Inden en eventuel senere reel ibrugtagning og produktudvikling.
 
-\paragraph{referencer til lignende arbejde}, vores forskellig fordi..
-Minerva museums tourguide robot\cite{Thrun99minerva:a}?
-er lavet til at vise gæster rundt på et museum *billede af Minerva*
-har kamera og afstandsmåler til at se publikum og navigere ift. pupl,
-*billede af ``photoshop'' ar.drone flyvende i l'Louvre*g
-hvad ville der ske hvis vi tog samme scenarie og brugte en flyvende
-helikopter istedet, uddyybning at den skulle kunne fjernstyres, optage
-film af flyvning, fjernstyres hjemmefra via et webinterface (nævne
-problematisk hvis andre gæster-måske i konklusion).
-
++Hvilke bestanddele skal en platform have, hvilke muligheder,
+arkitektur/opbygning.
+<- hvad skal der til?
 
 \section{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
-HVAD er det præcis vi vil vise eller afvise?! Lave et
+%HVAD er det præcis vi vil vise eller afvise?!
+%Målet med dette speciale er at 
+To højt prioriteret krav til specialet er at 
+\begin{itemize}
+\item 1 der skal konstruere en softwareplatform til at lette de videre
+  eksperiementer i specialet.
+%(, 3) mediere kontrollen med AR.Dronen, 
+\item 2 det skal undersøges hvorvidt en quadrokopter der er designet
+  til kontrol via fjernstyring kan gøres til semi-autonomt at navigere
+  i et indendørs miljø.
+\end{itemize}
+Derudover skal der undersøges om
+\begin{itemize}
+\item 3 platformen kan konstrueres til at tilgængeliggøre et let
+  anvendelig, medierende interface til AR.Dronen 
+\item 4 mulighederne for at bruge AR.Dronens ombordværende
+  sensorsystem (udvidede sensorsystem) til at udlede højere ordens
+  viden om navigationsmiljø er anvendelige, og om den ny viden kan
+  bruges som støtte i den autonome styring af quadrokopteren. Herunder
+  skal det konkret undersøges mulighederne for at bruge:
+  \begin{itemize}
+  \item positionering via wifi
+  \item positionering via visuelle markøre
+  \item detektering af navigationsmiljøtype
+  \item odometrisk afstandsmåling
+  \item optisk triangulering af afstande
+  \end{itemize}
+\item 5 AR.Dronen faktisk er anvendelighed som robotplatform.
+\end{itemize}
 
-framework/platform til at afhjælpe tiden mellem kodeimplementation til
-aftestning 
+\todo{skal der evt tilføjes noget med understøttelse af inhibition?
+  andre uddybende krav til selve platformen?}
 
-nærmest punktform, - punkter kan konfirmeres eller afvises i konklusionen.
-er det en platform som andre kan arbejde videre på, undersøge hvad der evt. skal til for at lave en sådan
-Det er noget med en [semi autonom] [navigation] [indendørs] [luftbåren]
+%Dette speciale anvender AR.Dronen til at opbygge en
+%robotplatform omkring for at undersøge hvilke krav der nødvendigvis
+%skal opfyldes for at konstruere en modulopbygget kontrolplatform til
+%semiautonom indendørs fjernstyring af en quadrokopter til afvikling på
+%en PC.
 
-Vi har identifiseret nogle punkter/elementer som vi mener skal med /tilstede
-indeholde til modulopbygget kontrolplatform, teste om det kan
-implementeres, ---
-Hvor kommer de identificerede elementer fra, vores tidligere robotleg
-med Lego? - andres artikler?, minerva / ROS men i luften istedet for
-på jorden?
-
-fra semiautonom og navigation er der noget, 1) bevægelse i forskellige miljøer, og 2) avoid opførsel, møde med silhuet eller lavt batteri.
-
-at det er indendørs giver nogle begrænsninger, kan bestemme et bestemt miljø ala Hopper-gangene / Ada-gangene eller Zuse.
-
-Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
-
-Er det en del af opgaven at se om AR.Dronen er den rigtige platform at lave dette på? - er en konklusion at den er adequate, men at det ville være bedre havde man haft tiden til at lave sin egen, finde en anden???
-
-\section{Metode} % Thomas, Hvordan, skal den være en SUBsection eller section?
+\section{Metode} % Thomas,
 \label{sec:metode}
-%% Antagelser, problemdomæne formuleret i introduktionen sektion \ref{sec:introduktion}.
-%% (Lavpraktisk:)
+
+%\paragraph{Domæne afgrænsning}
+AR.Dronen siges at kunne flyve både indendørs og udendørs. Specialet
+er afgrænset til at behandle navigation indendørs. For at 
+skabe en god basis at arbejde videre udfra, defineres afgrænsningen
+yderligere gennem følgende brugsscenarie. 
+%
+Der er fundet inspiration i indendørsområder som de beskrevet i
+arbejdet med den selvkørende museumsrobotguide Minerva fra 1999,
+\cite{Thrun99minerva:a}. 
+
+\todo{*billede af Minerva*}
+Minerva er udstyret med kamera og afstandsmåler til at se publikum og
+til at navigere i omgivelserne og i forhold til puplikum. 
+%
+Minerva handler også om menneske-maskin interaktion som kan være svært
+at finde læsninger på, 
+%
+men i spørgsmålet om at finde løsninger til naviagtionsproblemet alene
+findes allerede mange svar der ligner. Der er skrevet meget litteratur
+der beskriver løsninger som ligner navigation i Minerva. 
+%
+Spørgsmålet er så hvad der sker hvis den kørende robot i et museumsmiljø
+udskiftes med en flyvende AR.Drone. Med AR.Dronens tilgængelige
+sensore og muligheder for manøvrering.
+
+\todo{*billede af ``photoshop'' AR.Drone flyvende i l'Louvre*}
+
+Hvilke muligheder og begrænsninger ville det give at bruge AR.Dronen
+som robotplatform. Et scenarie er at lave et webinterface så gæster
+kan besøge museet fra internettet. Spørgsmålet er hvile implikationer
+det vil medføre, det er nemt at forestille sig at den meget fjerne
+kontrol vil give en klar oplevelse af disembodyment. Der er også et
+stort sikkerhedsaspekt i det at lade en quadrokopter næsten
+selvstyrende flyve rundt i blandt mennesker. En anden mulighed er at
+lave film af en personaliseret flyvning, eller en forprogrammeret
+rutesekvens og dele den med andre som et postkort eller souvenir.
+%
+%% Det er noget med en [semi autonom] [navigation] [indendørs] [luftbåren]
+%% fra semiautonom og navigation er der noget, 1) bevægelse i forskellige miljøer, og 2) avoid opførsel, møde med silhuet eller lavt batteri.
+%% at det er indendørs giver nogle begrænsninger, kan bestemme et bestemt miljø ala Hopper-gangene / Ada-gangene eller Zuse.
+%% Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
+%
+Af hensyn til at lave praktiske forsøg, bliver de konkrete
+navigationsløsninger designet til at virke i IT-byens kontorer og
+gangarealer samt Zuse-bygningen på Katrinebjerg i Århus.
+
+
+
 %% - hvilke værktøjer vil vi tage i brug AR.Dronen, PC, joystick/controller, Python, => hvorfor, argumentation.
 %%    tage AR.Dronen gå fra at bruge den som en fjernstyrbar enhed til at gøre den til en næsten selvstændig semi autonom enhed.
 
 %% -Hvordan vil vi faktisk teste vores tese? - arbejde går imod at lave en testopstilling, hvad skal der til for at opstillingen virker? framework, processor-kraft båndbredde
 %% Højniveau?:
 %% - er der noget højt,... abstraktion?
-hvordan teori
-Domæne/navigationsmiljø % Thomas,
-Nogle bygninger på Katrinebjerg, indendørs...
-hvorfor / uddybende beskrivelse af kontor, gang, openspace
+%hvordan teori
+%Domæne/navigationsmiljø % Thomas,
+%Nogle bygninger på Katrinebjerg, indendørs...
+%hvorfor / uddybende beskrivelse af kontor, gang, openspace
 %% - hvad er miljøet, Vi begrænser anvendelses-/test-området, hvorfor argumentation er simplificering for os selv, fokusere på det relevante, hvad er det (relevante)?! - pege tilbage på tesenformuleringen sektion \ref{sec:tese}.
 
 \subsection{AR.Dronen} % Thomas, 
@@ -323,10 +318,9 @@ AR.Dronen, som beskrives i detaljer i kapitel~\ref{sec:AR.Drone},
 tilfredstiller vores behov for en quadrokopter-platform. AR.Dronen
 stiller en række sensorer tilrådighed og præsenterer et veldefineret
 interface til fjernstyring. Alternativt kunne man have bygget en
-platform fra bunden, som i \cite{quteprints33767}. Til dette projekt,
-har dette dog ikke været en praktisk mulighed.
+platform fra bunden, som i \cite{quteprints33767}.
 
-Anvendelsen af AR.Dronen besværliggøres af den korte batteritid(10-12
+Anvendelsen af AR.Dronen besværliggøres af den korte batteritid (10-12
 minutters flyvetid). Vi har dog kunnet minimere problemet, ved at
 anvende seks batterier og fire opladere. Desuden har vi, under
 eksperimenter der ikke krævede flyvning, anvendt en strømforsyning fra

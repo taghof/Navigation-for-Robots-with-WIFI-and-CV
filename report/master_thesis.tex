@@ -2548,6 +2548,7 @@ at andre markører derfor må anvendes til lokalisering.
 
 
 \section{Afstandsbedømmelse vha. triangulering i planet} %via optical flow} %Afstandsmåling gennem Optical flow} % tt
+\label{sec:afstand}
 For at lette formidlingen af ideen bag dette eksperiment er det her
 forsøgt at introducere problemstillingen via en lignende, men noget
 simplere testopstilling, helt uden quadrokoptere.
@@ -2803,6 +2804,7 @@ virkelighedens vandret ved at bruge $\phi$-vinklen fra AR.Dronens navdata.
 
 
 \section{Korridor-detektering} % Thomas
+\label{sec:korridor}
 %intro
 Denne sektion omhandler en metode til at detektere gangarealer og
 korridorer gennem frontkameraet på AR.Dronen. Målet for dette
@@ -2815,9 +2817,9 @@ For en autonom AR.Drone er det hensigtsmæssigt at have kontekstuel viden for at 
 træffe funderede beslutninger om navigationen i specifikke
 omgivelser. Derfor vil det være interessant at se om det er muligt at
 implementere en korridor-detektions funktionalitet som senere kan
-blive en del af et virtuelle sensor hieraki.
+blive en del af det virtuelle sensor hieraki.
 Robotten Minerva, \cite{Thrun99minerva:a}, fik lov at lave guidede
-tours på the Smithsonian i 2 
+tours på the Smithsonian i to 
 uger. I eksperimentet var robotten blevet givet forskellige
 opførsler at udfører under forkellige forhold. Eksempelvis skulle den
 så ofte som muligt bruge analogien Coastal-planner, dvs. at følge
@@ -3146,7 +3148,7 @@ medianen af afstande målt under de autonome flyvninger.
 En anden observation af eksperimentet og graferne herover er at
 fordelingen af de målte afstande ikke er distribueret omkring den sande
 værdi på 3000 mm, men generelt er fordelt omkring lavere værdier. Der
-er 2 mulige forklaringer på observationen: Enten er tidsfaktoren som
+er to mulige forklaringer på observationen: Enten er tidsfaktoren som
 der integreres over for lille, eller også er hastighedsudledningen fra
 AR.Dronens navdata generelt for lav. Hvis AR.Dronen sættes til altid
 kun at flyve med en og samme hastighed, kan problemet løses ved at bruge en
@@ -3164,24 +3166,104 @@ hældningsfaktor i forhold til den reele værdi.
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
-Evaluering: at det har været svært at finde videnskabelige datalogiske
-kilder af høj troværdighed omkring AR.Dronen ; in part privat
-virksomhed properitær firmware / arkitektur, meget information fra
-hacker, tinker, DIY fora.  Til gengæld nogle videnskabelige artikler
-omkring hvordan man implementere en algoritme ovenpå en allerede
-antaget platform som AR.Dronen...
+\paragraph{Den udviklede klientplatform} har været det primære arbejdsredskab
+under ekperimenterne med AR.Dronen. På trods af kontinuerlig udvikling
+under hele projektet, har klientplatformen understøttet
+eksperimenterne ved at give let adgang til AR.Dronens sensorstrømme og
+ved at tilbyde task-abstraktionen ovenpå kontrolinterfacet. Det
+udviklede tasksystem har været så fleksibelt, at det både har kunnet
+anvendes til simple, tidsbegrænsede, flyvninger i en specifik retning
+og til sammensatte navigationsmønstre med genkendelse af gulvmarkører.
 
-at det har været en learning experinece - vi valgte bl.a. at lege med
-robotter med en forventning og håb om om at den fysiske verden ville
-genere os i vores modelrepræsentationer - den svigtede os ikke :) vi
-har som vi ønskede fået mere erfaring i at arbejde med og tage
-forbehold for computaiton in a physical world.
+Tasksystemets træstruktur gør det muligt at kombinere tasks i
+henholdsvis sekventielle og parallele grupper. Strukturen giver
+anledning til et forholdsvis kompliceret tasksystem, som ofte kunne
+være implementeret i et fladt hieraki med samme resultat. Fordelen ved
+at implementere en kompliceret task som FollowTourTask ved hjælp af
+mindre komplicerede subtasks er, at der åbnes for genbrug af disse
+subtasks. Træstrukturen giver også mulighed for grafiske
+repræsentationer af komplicerede tasks, der giver et bedre overblik
+over den implenterede funktionalitet.
+
+Klientplatformen har under eksperimenterne med visuel lokalisering
+vist (sektion~\ref{ssec:visuellokalisering}), at den muliggør
+semiautonom navigation i et miljø med visuelle
+markører. FollowTourTasken er i forbindelse med eksperimenterne blevet
+afprøvet med gode resultater, på en række forskellige ruter.
+
+Det vises desuden, med eksemplerne i~\ref{sec:platformsadgang}, at
+klientplatformen, og delelementer af denne, er nem at anvende for
+udviklere. Det implementerede testdevice giver desuden mulighed for
+udvikling uden en AR.Drone tilstede.
+
+\vspace{0.5cm}
+\paragraph{Udledning af abstrakte features}ved hjælp af AR.Dronens
+sensorstrømme har været hovedtemaet i de udførte eksperimenter. En
+stor del af de udførte eksperimenter har omhandlet lokalisering. Under
+denne process er der udviklet en visuel markør,
+figur~\ref{fig:markers}, som konsistent kan genkendes med AR.Dronens
+bundkamera. Markøren og FollowTourTasken, som er udviklet sideløbende,
+muliggør AR.Dronens navigation efter en planlagt rute.
+
+Efter eksperimenter med lokalisering vha. WIFI-fingerprinting blev
+denne teknik fundet for upræcis. Der er teknikker til at forbedre
+resultaterne, men teknikken er meget følsom og kræver et større
+eksperiment-setup vi har haft mulighed for. Det forudgående arbejde
+med at få tilkoblet en USB-WIFI-adapter til AR.Dronen, har dog vist,
+at det generelt er muligt at udvide AR.Dronen med USB-enheder.
+
+\vspace{0.5cm}
+Eksperimenterne med korridordetektion, sektion~\ref{sec:korridor}, har
+vist meget lovende muligheder, både for at kunne detektere af
+AR.Dronen faktisk befinder sig i korridor og for at kunne navigere via
+en sådan korridor. Korridordetektoren er oftest i stand til at
+detektere en tilstedeværende korridor i billederne fra AR.Dronens
+frontkamera og i de tilfælde detekteringen ikke sker, er det på grund
+af faktorer der kan tages højde for.
+
+\vspace{1cm}
+Eksperimenterne med odometrisk afstandsmåling (sektion~\ref{sec:distance-mesu})
+har vist, at denne teknik kan anvendes til grove estimater for
+AR.Dronens tilbagelagte afstand. Resultaternes ensartethed er meget
+afhængig af miljøfaktorer som f.eks. belysning. En
+dead-reckoningalgoritme kun baseret på denne afstand og en retning vil
+ikke være pålidelig, men afstanden kunne f.eks. anvendes til at
+visualisere AR.Dronens omtrentlige position på
+et digitalt oversigtskort.
+
+\vspace{0.5cm}
+På trods af at resultaterne med afstandstriangulering ikke var
+overbevisende, se sektion~\ref{sec:afstand}, er det ikke umuligt, at
+denne teknik kan forfines og producere bedre resultater. Teoretisk er
+der adgang til alle de nødvendige parametre i
+trianguleringsberegningen og mulige forbedringer til teknikken
+beskrives sidst i sektionen.
+
+\vspace{0.5cm}
+\paragraph{En vurderingen af AR.Dronen}gives i detaljer i
+sektion~\ref{ssec:dronerecap}. Generelt vurderes AR.Dronen som et godt
+alternativ til at bygge en quadrokopter-platform fra bunden. De
+indbyggede sensorer har dog på nogen punkter begrænset
+udviklingsmulighederne, både for semi-autonom navigation og udledning
+af features. F.eks. udelukker den begrænsede videoopløsning
+lokalisering ved hjælp QR-koder og retningsbestemmelse besværliggøres
+på grund af sensormisvisning (præcis disse problemer er dog udbedret i
+den opdaterede AR.Drone version 2.0).
+Det vurderes desuden at AR.Dronens store udbredelse vil sikre et
+aktivt udviklermiljø, som både kan fungere som hjælp og inspiration under
+udviklingen af projekter med AR.Dronen.
 
 \section{Perspektivering}
-til prisen er ar.droen ok, men virker måske ikke så godt til indendørs / præcision / turbulens ift lokationskrav, men så et andet brugsscenarie, noget turis-happening som flyv en tur på stævnsklint for 100 kroner, se andres optagede videoer *billede*,
-reference til fårehyrde-robot?
+til prisen er ar.droen ok, men virker måske ikke så godt til indendørs
+/ præcision / turbulens ift lokationskrav, men så et andet
+brugsscenarie, noget turis-happening som flyv en tur på stævnsklint
+for 100 kroner, se andres optagede videoer *billede*, reference til
+fårehyrde-robot?
 
-eksempel argumentation på hvorfor AR.Dronen ikke virker som videnskabelig platform, for stor og klumpet, ny forskning i quadrokopter viser det også, eg. swarms med mikrokopter \cite{turpin:swarm}.
+eksempel argumentation på hvorfor AR.Dronen ikke virker som
+videnskabelig platform, for stor og klumpet, ny forskning i
+quadrokopter viser det også, eg. swarms med mikrokopter
+\cite{turpin:swarm}.
 
 \section{Fremtidig arbejde}
 

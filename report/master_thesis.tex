@@ -26,6 +26,12 @@
 %\usepackage{subcaption}
 \usepackage[hyphens]{url}
 
+%\newcounter{description}
+%\renewcommand{\descriptionlabel}[1]{%
+%  \refstepcounter{description}%
+%  \hspace\labelsep
+%  \normalfont\bfseries \thedescription. #1:}
+
 %Define a new 'leo' style for the package that will use a smaller font.
 \makeatletter
 \def\url@leostyle{
@@ -203,46 +209,80 @@ Langt størstedelen af arbejdet i projektet handler om at klarlægge og
 forstå AR.Dronen og dens muligheder. Det handler om at lave en lille
 smule grundforskning i et proof-of-concept. Vi vil gerne forstå
 konsekvenserne af de forskellige designvalg vi har mulighed for at
-træffe. Inden en eventuel senere reel ibrugtagning og produktudvikling.
+træffe, inden en eventuel senere reel ibrugtagning og produktudvikling.
 
-+Hvilke bestanddele skal en platform have, hvilke muligheder,
-arkitektur/opbygning.
-<- hvad skal der til?
+%+Hvilke bestanddele skal en platform have, hvilke muligheder,
+%arkitektur/opbygning.
+%<- hvad skal der til?
 
 \section{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
+Et blødt mål i specialet er at undersøge hvilke bestandele en platform
+skal indeholde, hvad kan AR.Dronen suppleres med og hvilken struktur
+bør softwaren have. 
 %HVAD er det præcis vi vil vise eller afvise?!
 %Målet med dette speciale er at 
-To højt prioriteret krav til specialet er at 
-\begin{itemize}
-\item 1 der skal konstruere en softwareplatform til at lette de videre
-  eksperiementer i specialet.
-%(, 3) mediere kontrollen med AR.Dronen, 
-\item 2 det skal undersøges hvorvidt en quadrokopter der er designet
-  til kontrol via fjernstyring kan gøres til semi-autonomt at navigere
-  i et indendørs miljø.
-\end{itemize}
-Derudover skal der undersøges om
-\begin{itemize}
-\item 3 platformen kan konstrueres til at tilgængeliggøre et let
-  anvendelig, medierende interface til AR.Dronen 
-\item 4 mulighederne for at bruge AR.Dronens ombordværende
-  sensorsystem (udvidede sensorsystem) til at udlede højere ordens
-  viden om navigationsmiljø er anvendelige, og om den ny viden kan
-  bruges som støtte i den autonome styring af quadrokopteren. Herunder
-  skal det konkret undersøges mulighederne for at bruge:
-  \begin{itemize}
-  \item positionering via wifi
-  \item positionering via visuelle markøre
-  \item detektering af navigationsmiljøtype
-  \item odometrisk afstandsmåling
-  \item optisk triangulering af afstande
-  \end{itemize}
-\item 5 AR.Dronen faktisk er anvendelighed som robotplatform.
-\end{itemize}
 
-\todo{skal der evt tilføjes noget med understøttelse af inhibition?
-  andre uddybende krav til selve platformen?}
+Mere konkret har specialet tre højt prioriteret mål som formuleres og
+uddybes således: 
+\begin{enumerate}
+\item \textbf{Klientplatform:} \label{tese1} Der skal konstrueres en softwareplatform til at
+  lette fjernkontrol af AR.Dronen fra PC. Den konstruerede platformen skal:
+  \begin{enumerate}
+  \item \textbf{Facilitere eksperimenter:} \label{tese1a} Understøtte de
+    videre eksperimenter i specialet.
+  \item \textbf{Tilgængelighed:} \label{tese3} Konstrueres så den
+    tilgængeliggør et let anvendeligt medierende interface til AR.Dronen.
+  \end{enumerate}
+\item \textbf{Semiautonom navigation:} \label{tese2} 
+ Det skal undersøges hvorvidt en quadrokopter der er designet % 2
+  til kontrol via fjernstyring kan navigere semi-autonomt 
+  i et indendørs miljø.
+\item \textbf{Udledning af yderligere navigationsdata:} \label{tese4}
+  Mulighederne for at bruge AR.Dronens ombordværende sensorsystem
+  (udvidede sensorsystem) til at udlede højere ordens viden om
+  navigationsmiljø, og om den ny viden kan bruges som støtte i den
+  autonome styring af quadrokopteren. Herunder skal det konkret
+  undersøges mulighederne for at bruge: 
+  \begin{enumerate}
+  \item \label{tese4a} Lokalisering via WIFI signalstyrker.
+  \item \label{tese4b} Lokalisering via visuelle markøre.
+  \item \label{tese4c} Detektering af navigationsmiljøtype.
+  \item \label{tese4d} Odometrisk afstandsmåling.
+  \item \label{tese4e} Optisk triangulering af afstande.
+  \end{enumerate}
+\item \textbf{AR.Dronen som robotplatform:} \label{tese5} Det skal
+  undersøges om AR.Dronen faktisk er anvendelig som robotplatform.
+\end{enumerate}
+
+%label til tese4: \ref{tese4}, og til tese4c: \ref{tese4c}.
+
+%% \begin{enumerate}
+%% \item \label{tese1} Der skal konstruere en softwareplatform til at lette de videre % 1
+%%   eksperiementer i specialet.
+%% %(, 3) mediere kontrollen med AR.Dronen, 
+%% \item \label{tese2} Det skal undersøges hvorvidt en quadrokopter der er designet % 2
+%%   til kontrol via fjernstyring kan navigere semi-autonomt 
+%%   i et indendørs miljø.
+%% \end{enumerate}
+%% Derudover skal der undersøges om
+%% \begin{enumerate}
+%% \item \label{tese3} Platformen kan konstrueres til at tilgængeliggøre et let % 3
+%%   anvendelig, medierende interface til AR.Dronen.
+%% \item \label{tese4} Mulighederne for at bruge AR.Dronens ombordværende % 4
+%%   sensorsystem (udvidede sensorsystem) til at udlede højere ordens
+%%   viden om navigationsmiljø, og om den ny viden kan
+%%   bruges som støtte i den autonome styring af quadrokopteren. Herunder
+%%   skal det konkret undersøges mulighederne for at bruge:
+%%   \begin{enumerate}
+%%   \item \label{tese4a} Lokalisering via WIFI
+%%   \item \label{tese4b} Lokalisering via visuelle markøre
+%%   \item \label{tese4c} Detektering af navigationsmiljøtype
+%%   \item \label{tese4d} Odometrisk afstandsmåling
+%%   \item \label{tese4e} Optisk triangulering af afstande
+%%   \end{enumerate}
+%% \item \label{tese5} AR.Dronen faktisk er anvendelighed som robotplatform. %5
+%% \end{enumerate}
 
 %Dette speciale anvender AR.Dronen til at opbygge en
 %robotplatform omkring for at undersøge hvilke krav der nødvendigvis
@@ -252,7 +292,6 @@ Derudover skal der undersøges om
 
 \section{Metode} % Thomas,
 \label{sec:metode}
-
 %\paragraph{Domæne afgrænsning}
 AR.Dronen siges at kunne flyve både indendørs og udendørs. Specialet
 er afgrænset til at behandle navigation indendørs. For at 
@@ -264,15 +303,15 @@ arbejdet med den selvkørende museumsrobotguide Minerva fra 1999,
 \cite{Thrun99minerva:a}. 
 
 \todo{*billede af Minerva*}
+
 Minerva er udstyret med kamera og afstandsmåler til at se publikum og
 til at navigere i omgivelserne og i forhold til puplikum. 
 %
 Minerva handler også om menneske-maskin interaktion som kan være svært
-at finde læsninger på, 
+at finde løsninger på, 
 %
 men i spørgsmålet om at finde løsninger til naviagtionsproblemet alene
-findes allerede mange svar der ligner. Der er skrevet meget litteratur
-der beskriver løsninger som ligner navigation i Minerva. 
+findes allerede mange svar på lignende problemer i litteraturen.
 %
 Spørgsmålet er så hvad der sker hvis den kørende robot i et museumsmiljø
 udskiftes med en flyvende AR.Drone. Med AR.Dronens tilgængelige

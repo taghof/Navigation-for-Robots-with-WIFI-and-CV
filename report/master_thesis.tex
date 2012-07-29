@@ -232,7 +232,7 @@ uddybes således:
   \item \textbf{Facilitere eksperimenter:} \label{tese1a} Understøtte de
     videre eksperimenter i specialet.
   \item \textbf{Tilgængelighed:} \label{tese3} Konstrueres så den
-    tilgængeliggør et let anvendeligt medierende interface til AR.Dronen.
+    tilgængeliggør et let anvendeligt interface til AR.Dronen.
   \end{enumerate}
 \item \textbf{Semiautonom navigation:} \label{tese2} 
  Det skal undersøges hvorvidt en quadrokopter der er designet % 2
@@ -3199,14 +3199,15 @@ hældningsfaktor i forhold til den reele værdi.
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
-\section{Klientplatform} har været det primære arbejdsredskab
-under ekperimenterne med AR.Dronen. På trods af kontinuerlig udvikling
-under hele projektet, har klientplatformen understøttet
-eksperimenterne ved at give let adgang til AR.Dronens sensorstrømme og
-ved at tilbyde task-abstraktionen ovenpå kontrolinterfacet. Det
-udviklede tasksystem har været så fleksibelt, at det både har kunnet
-anvendes til simple, tidsbegrænsede, flyvninger i en specifik retning
-og til sammensatte navigationsmønstre med genkendelse af gulvmarkører.
+\section{Klientplatform} 
+Klientplatformen har været det primære arbejdsredskab under ekperimenterne med
+AR.Dronen. På trods af kontinuerlig udvikling under hele projektet,
+har klientplatformen understøttet eksperimenterne ved at give let
+adgang til AR.Dronens sensorstrømme og ved at tilbyde
+task-abstraktionen ovenpå kontrolinterfacet. Det udviklede tasksystem
+har været så fleksibelt, at det både har kunnet anvendes til simple,
+tidsbegrænsede, flyvninger i en specifik retning og til sammensatte
+navigationsmønstre med genkendelse af gulvmarkører.
 
 Tasksystemets træstruktur gør det muligt at kombinere tasks i
 henholdsvis sekventielle og parallele grupper. Strukturen giver
@@ -3218,20 +3219,20 @@ subtasks. Træstrukturen giver også mulighed for grafiske
 repræsentationer af komplicerede tasks, der giver et bedre overblik
 over den implenterede funktionalitet.
 
+Det vises desuden, med eksemplerne i~\ref{sec:platformsadgang}, at
+klientplatformen, og delelementer af denne, er nem at anvende for
+udviklere. Det implementerede testdevice giver desuden mulighed for
+udvikling uden en AR.Drone tilstede.
+
+\section{Semi-autonom navigation}
 Klientplatformen har under eksperimenterne med visuel lokalisering
 vist (sektion~\ref{ssec:visuellokalisering}), at den muliggør
 semiautonom navigation i et miljø med visuelle
 markører. FollowTourTasken er, i forbindelse med eksperimenterne, blevet
 afprøvet med gode resultater på en række forskellige ruter.
 
-Det vises desuden, med eksemplerne i~\ref{sec:platformsadgang}, at
-klientplatformen, og delelementer af denne, er nem at anvende for
-udviklere. Det implementerede testdevice giver desuden mulighed for
-udvikling uden en AR.Drone tilstede.
-
 \section{Udledning af yderligere navigationsdata}
-Udledning af yderligere navigationsdata fra AR.Dronens
-sensorstrømme har været hovedtemaet i de udførte eksperimenter. En
+Udledning af yderligere navigationsdata fra AR.Dronenssensorstrømme har været hovedtemaet i de udførte eksperimenter. En
 stor del af de udførte eksperimenter har omhandlet lokalisering. Under
 denne process er der udviklet en visuel markør,
 figur~\ref{fig:markers}, som konsistent kan genkendes med AR.Dronens

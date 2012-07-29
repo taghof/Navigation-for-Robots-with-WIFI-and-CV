@@ -3068,12 +3068,12 @@ nu.
 %Hvad vil vi vise, afvise teste?  
 %Hvadkan/skal resultatet bruges til?  
 
-Dette eksperiment undersøger virkningsgraden af en odometrisk
+Dette eksperiment undersøger virkningen af en odometrisk
 afstandsmåler. Den odometriske afstandsmåler er implementeret i den
 virtuelle sensor DistanceTracker,~\cite{github:virtuel}, og holder
 styr på den afstand AR.Dronen har bevæget sig i løbet af en
 flyvning. Konceptet er kendt som en triptæller i biler og som en
-tacho-counter i motoren på nogle kørende robotter.  
+tacho-counter i motoren på kørende robotter.  
 
 Indenfor navigation anvendes en teknik kaldet dead
 reckoning,~\cite{wiki:deadreck}. Dead reckoning-teknikken går ud på at den
@@ -3111,7 +3111,7 @@ af at odometri-afstandsmåleren afvikles sammen med markør-detektoren (gennemgået
 som skal bruge ekstra tid på at udføre markør-detekterering i FollowTourTasken som
 brugt i eksperimentet.
 
-Resultaterne af flyvningerne kan ses på figur~\ref{fig:xdistr} og
+Resultaterne for flyvningerne kan ses på figur~\ref{fig:xdistr} og
 figur~\ref{fig:ydistr}. Figur~\ref{fig:xdistr} viser en fordeling over
 de målte afstanden i fremadrettet flyveretning, mens figur~\ref{fig:ydistr} viser
 fordelingen af de målte afstande i y-aksens (sideværts) retning.
@@ -3160,7 +3160,7 @@ hældningsfaktor i forhold til den reele værdi.
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
-\paragraph{Den udviklede klientplatform} har været det primære arbejdsredskab
+\section{Klientplatform} har været det primære arbejdsredskab
 under ekperimenterne med AR.Dronen. På trods af kontinuerlig udvikling
 under hele projektet, har klientplatformen understøttet
 eksperimenterne ved at give let adgang til AR.Dronens sensorstrømme og
@@ -3182,16 +3182,16 @@ over den implenterede funktionalitet.
 Klientplatformen har under eksperimenterne med visuel lokalisering
 vist (sektion~\ref{ssec:visuellokalisering}), at den muliggør
 semiautonom navigation i et miljø med visuelle
-markører. FollowTourTasken er i forbindelse med eksperimenterne blevet
-afprøvet med gode resultater, på en række forskellige ruter.
+markører. FollowTourTasken er, i forbindelse med eksperimenterne, blevet
+afprøvet med gode resultater på en række forskellige ruter.
 
 Det vises desuden, med eksemplerne i~\ref{sec:platformsadgang}, at
 klientplatformen, og delelementer af denne, er nem at anvende for
 udviklere. Det implementerede testdevice giver desuden mulighed for
 udvikling uden en AR.Drone tilstede.
 
-\vspace{0.5cm}
-\paragraph{Udledning af abstrakte features}ved hjælp af AR.Dronens
+\section{Udledning af yderligere navigationsdata}
+Udledning af yderligere navigationsdata fra AR.Dronens
 sensorstrømme har været hovedtemaet i de udførte eksperimenter. En
 stor del af de udførte eksperimenter har omhandlet lokalisering. Under
 denne process er der udviklet en visuel markør,
@@ -3202,20 +3202,18 @@ muliggør AR.Dronens navigation efter en planlagt rute.
 Efter eksperimenter med lokalisering vha. WIFI-fingerprinting blev
 denne teknik fundet for upræcis. Der er teknikker til at forbedre
 resultaterne, men teknikken er meget følsom og kræver et større
-eksperiment-setup vi har haft mulighed for. Det forudgående arbejde
+eksperiment-setup end vi har haft mulighed for. Det forudgående arbejde
 med at få tilkoblet en USB-WIFI-adapter til AR.Dronen, har dog vist,
 at det generelt er muligt at udvide AR.Dronen med USB-enheder.
 
-\vspace{0.5cm}
 Eksperimenterne med korridordetektion, sektion~\ref{sec:korridor}, har
-vist meget lovende muligheder, både for at kunne detektere af
-AR.Dronen faktisk befinder sig i korridor og for at kunne navigere via
+vist meget lovende muligheder, både for at kunne detektere at
+AR.Dronen faktisk befinder sig i en korridor og for at kunne navigere via
 en sådan korridor. Korridordetektoren er oftest i stand til at
 detektere en tilstedeværende korridor i billederne fra AR.Dronens
 frontkamera og i de tilfælde detekteringen ikke sker, er det på grund
 af faktorer der kan tages højde for.
 
-\vspace{1cm}
 Eksperimenterne med odometrisk afstandsmåling (sektion~\ref{sec:distance-mesu})
 har vist, at denne teknik kan anvendes til grove estimater for
 AR.Dronens tilbagelagte afstand. Resultaternes ensartethed er meget
@@ -3225,7 +3223,6 @@ ikke være pålidelig, men afstanden kunne f.eks. anvendes til at
 visualisere AR.Dronens omtrentlige position på
 et digitalt oversigtskort.
 
-\vspace{0.5cm}
 På trods af at resultaterne med afstandstriangulering ikke var
 overbevisende, se sektion~\ref{sec:afstand}, er det ikke umuligt, at
 denne teknik kan forfines og producere bedre resultater. Teoretisk er
@@ -3233,8 +3230,7 @@ der adgang til alle de nødvendige parametre i
 trianguleringsberegningen og mulige forbedringer til teknikken
 beskrives sidst i sektionen.
 
-\vspace{0.5cm}
-\paragraph{En vurderingen af AR.Dronen}gives i detaljer i
+\section{En vurdering af AR.Dronen}gives i detaljer i
 sektion~\ref{ssec:dronerecap}. Generelt vurderes AR.Dronen som et godt
 alternativ til at bygge en quadrokopter-platform fra bunden. De
 indbyggede sensorer har dog på nogen punkter begrænset

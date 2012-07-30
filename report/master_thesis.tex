@@ -216,10 +216,10 @@ træffe, inden en eventuel senere reel ibrugtagning og produktudvikling.
 \pagebreak
 \section{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
-\todo{skal de 3 linier væk?}
-Et blødt mål i specialet er at undersøge hvilke bestandele en platform
-skal indeholde, hvad kan AR.Dronen suppleres med og hvilken struktur
-bør softwaren have. 
+%\todo{skal de 3 linier væk?}
+%Et blødt mål i specialet er at undersøge hvilke bestandele en platform
+%skal indeholde, hvad kan AR.Dronen suppleres med og hvilken struktur
+%bør softwaren have. 
 %HVAD er det præcis vi vil vise eller afvise?!
 %Målet med dette speciale er at 
 
@@ -231,19 +231,19 @@ Specialet har fire mål som formuleres og uddybes således:
   \item \textbf{Facilitere eksperimenter:} \label{tese1a} Understøtte de
     videre eksperimenter i specialet.
   %Tilgængeliggøre AR.Drone interface:
-  \item \textbf{Tilgængelighed:} \label{tese3} Konstrueres så den
+  \item \textbf{Være let anvendelig:} \label{tese3} Konstrueres så den
     tilgængeliggør et let anvendeligt interface til AR.Dronen.
   \end{enumerate}
 \item \textbf{Semiautonom navigation:} \label{tese2} 
- Det skal undersøges hvorvidt en quadrokopter der er designet % 2
-  til kontrol via fjernstyring kan navigere semi-autonomt 
+ Det skal undersøges hvorvidt en quadrokopter, der er designet % 2
+  til kontrol via fjernstyring, kan navigere semi-autonomt 
   i et indendørs miljø.
 \item \textbf{Udledning af yderligere navigationsdata:} \label{tese4}
   Mulighederne for at bruge AR.Dronens ombordværende sensorsystem
   (udvidede sensorsystem) til at udlede højere ordens viden om
-  navigationsmiljø, og om den ny viden kan bruges som støtte i den
-  autonome styring af quadrokopteren. Herunder skal det konkret
-  undersøges mulighederne for at bruge: 
+  navigationsmiljøet, og om den ny viden kan bruges som støtte i den
+  semi-autonome styring af quadrokopteren. Herunder undersøges konkret
+  mulighederne for at bruge:
   \begin{enumerate}
   \item \label{tese4a} Lokalisering via WIFI signalstyrker.
   \item \label{tese4b} Lokalisering via visuelle markøre.
@@ -251,8 +251,9 @@ Specialet har fire mål som formuleres og uddybes således:
   \item \label{tese4d} Odometrisk afstandsmåling.
   \item \label{tese4e} Optisk triangulering af afstande.
   \end{enumerate}
-\item \textbf{AR.Dronen som robotplatform:} \label{tese5} Det skal
-  undersøges om AR.Dronen faktisk er anvendelig som robotplatform.
+\item \textbf{Vurdering af AR.Dronen som robotplatform:} \label{tese5} Som en del
+  af specialets metodeevaluering skal det undersøges om AR.Dronen
+  faktisk er anvendelig som robotplatform.
 \end{enumerate}
 
 %label til tese4: \ref{tese4}, og til tese4c: \ref{tese4c}.
@@ -3199,11 +3200,13 @@ hældningsfaktor i forhold til den reele værdi.
 %Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
 
 
-
+\pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
+Rodney Brooks at udnytte det at det er en mobil robot, bekræft eller afkræft
+antagelser om model af miljø ved at flyt rundt og observer fra forskellige vinkler/synspunkter, 
 
 \section{Konstruktion af klientplatform} 
 Klientplatformen har været det primære arbejdsredskab under ekperimenterne med
@@ -3289,18 +3292,17 @@ beskrives sidst i sektionen.
 
 \section{Metode}
 \subsection{Vurdering af AR.Dronen som robotplatform}
-En detaljeret vurdering gives i
-sektion~\ref{ssec:dronerecap}. Generelt vurderes AR.Dronen som et godt
-alternativ til at bygge en quadrokopter-platform fra bunden. De
-indbyggede sensorer har dog på nogen punkter begrænset
-udviklingsmulighederne, både for semi-autonom navigation og udledning
-af features. F.eks. udelukker den begrænsede videoopløsning
-lokalisering ved hjælp QR-koder og retningsbestemmelse besværliggøres
-på grund af sensormisvisning (præcis disse problemer er dog udbedret i
-den opdaterede AR.Drone version 2.0).  Det vurderes desuden at
-AR.Dronens store udbredelse vil sikre et aktivt udviklermiljø, som
-både kan fungere som hjælp og inspiration under udviklingen af
-projekter med AR.Dronen.
+I sektion~\ref{ssec:dronerecap} er vurderingen af AR.Dronen
+beskrevet. Generelt vurderes AR.Dronen som et godt alternativ til at
+bygge en quadrokopter-platform fra bunden. De indbyggede sensorer har
+dog på nogen punkter begrænset udviklingsmulighederne, %hvor?
+%både for semi-autonom navigation og udledning af features. 
+Eksempelvis udelukker den begrænsede videoopløsning afkodning af
+QR-koder til brug i lokaliseringseksperimentet
+(sektion~\ref{sec:QRdecoding}), og bestemmelse af AR.Dronens
+orientering besværliggøres på grund af sensordrift (præcis disse problemer er dog
+udbedret i %også qr?
+den opdaterede AR.Drone version 2.0).
 
 \subsection{Klientplatform}
 Valget af Python som implementationssprog til klientplatformen har
@@ -3339,12 +3341,17 @@ sensor.
 
 %% Skal det være her? 
 \section{Perspektivering}
+Det vurderes desuden at
+AR.Dronens store udbredelse vil sikre et aktivt udviklermiljø, som
+både kan fungere som hjælp og inspiration under udviklingen af
+projekter med AR.Dronen.
+%
 til prisen er ar.droen ok, men virker måske ikke så godt til indendørs
 / præcision / turbulens ift lokationskrav, men så et andet
 brugsscenarie, noget turist-happening som flyv en tur på stævnsklint
 for 100 kroner, se andres optagede videoer *billede*, reference til
 fårehyrde-robot?
-
+%
 eksempel argumentation på hvorfor AR.Dronen ikke virker som
 videnskabelig platform, for stor og klumpet, ny forskning i
 quadrokopter viser det også, eg. swarms med mikrokopter

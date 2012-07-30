@@ -241,12 +241,12 @@ Specialet har fire mål som formuleres og uddybes således:
 \item \textbf{Udledning af yderligere navigationsdata:} \label{tese4}
   Mulighederne for at bruge AR.Dronens ombordværende sensorsystem
   (udvidede sensorsystem) til at udlede højere ordens viden om
-  navigationsmiljøet, og om den ny viden kan bruges som støtte i den
-  semi-autonome styring af quadrokopteren. Herunder undersøges konkret
+  navigationsmiljøet skal undersøges, samt hvorledes den ny viden kan bruges som støtte for den
+  semi-autonome styring af AR.Dronen. Herunder undersøges konkret
   mulighederne for at bruge:
   \begin{enumerate}
-  \item \label{tese4a} Lokalisering via WIFI signalstyrker.
-  \item \label{tese4b} Lokalisering via visuelle markører.
+  \item \label{tese4a} Lokalisering via WIFI-signalstyrker.
+  \item \label{tese4b} Lokalisering via visuelle markøre.
   \item \label{tese4c} Detektering af navigationsmiljøtype.
   \item \label{tese4d} Odometrisk afstandsmåling.
   \item \label{tese4e} Optisk triangulering af afstande.
@@ -490,9 +490,22 @@ mindre ensartede overflader.
 \todo{ref}
 
 \section{Medfølgende CD}
-På den medfølgende CD findes kildekoden til den udviklede
-klientplatform inklusiv de udviklede tasks.
-\todo{men også ... pdf-udgaven af specialet, videoer af...}
+På den medfølgende CD findes README.txt som forklarer hvordan de
+medfølgende programmer afvikles, samt følgende materiale:
+\begin{itemize}
+\item /klientplatform/\\
+  Kildekoden til den udviklede klientplatform inklusiv de udviklede tasks samt
+  klientværktøjerne.
+\item /AR.Drone addons/\\ 
+  Kernemodulerne, bibliotekerne, driver-kildekoden og
+  loadscriptet som er anvendt i forbindelse med udvikling på AR.Dronen.
+\item /report/\\ 
+  Pdf-version af denne specialerapport. 
+\item /webcache/\\
+  Off-line kopier af følsomme webkilder.
+\item /video/\\
+  Videomateriale af AR.Dronen og klientplatformen i funktion.
+\end{itemize}
 
 \section{Projekt Blog}
 \label{sec:blog} Under specialets udvikling, er der anvendt en blog
@@ -1008,7 +1021,7 @@ i en af specialets tilhørende blogposts: "Enabling the Drone USB
 Port",~\cite{blog:usb}. 
 \begin{framefig}
   \centering
-  \subfigure[Hjemmelavet USB-kabel, en USB memorystick og en WIFI USB-dongle til tilslutning på AR.Dronen.]{
+  \subfigure[Hjemmelavet USB-kabel, en USB memorystick og en WIFI-USB-adapter til tilslutning på AR.Dronen.]{
     \includegraphics[width=0.45\textwidth]{grafik/usbdevices.png}
     \label{fig:cableandusbdevices}}
   ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
@@ -1329,7 +1342,7 @@ def square():
 \end{framefig}
 
 \subsection{Modtagelse af sensordata fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
-I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og wifi-data fra AR.Dronen.
+I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og WIFI-data fra AR.Dronen.
 For at kunne anvende AR.Dronen som en robot er det nødvendigt at kunne
 indsamle data fra de ombordværende sensorer, samt at kunne stille
 disse data til rådighed for andre dele af systemet. Til dette formål
@@ -1337,7 +1350,7 @@ er der designet og implementeret en receiver-struktur bestående af tre
 receiver-moduler. Disse moduler eksekveres i hver deres process og
 sørger selv for at initiere forbindelsen med AR.Dronen. Efter
 initialiseringen lytter hver receiver efter enten video-, navigations-
-eller wifi-pakker og når en sådan modtages udføres en passende
+eller WIFI-pakker og når en sådan modtages udføres en passende
 afkodning af pakken og den afkodede data deles med processen der
 startede receiveren. De tre receivere er ikke
 afhængige af hinanden og kan afvikles hver for sig, således kan
@@ -1961,7 +1974,7 @@ erkendt WIFI-kilde. I denne præsentationstilstand er der desuden mulighed for
 at indsamle signalstyrkesamples og sætte en mål-signalstyrkesample. 
 
 Under udviklingen af WIFI-fingerprintingalgoritmen beskrevet i~\ref{sssec:wifialgo},
-har det været nødvendigt, at kunne følge udviklingen i wifisignalstyrker
+har det været nødvendigt, at kunne følge udviklingen i WIFI-signalstyrker
 mellem forskellige lokationer. Dette kan gøres i den fjerde og sidste
 præsentationstilstand. En signalstyrkesample registreres ved at trykke
 på knappen 'Take Sample'. Disse indsamlede signalstyrkesamples kan
@@ -2125,7 +2138,7 @@ informationer fra AR.Dronens miljø også blevet
 undersøgt. F.eks. hvor langt AR.Dronen har bevæget sig, hvorvidt den
 befinder sig i en korridor og afstanden til andre objekter.
 
-\section{Lokalisering via Wifi-fingerprinting} % Morten (1side)
+\section{Lokalisering via WIFI-fingerprinting} % Morten (1side)
 \label{ssec:wifilokalisering}
 Som nævnt i sektion~\ref{sec:udvidelse} er AR.Dronen blevet udvidet med
 en WIFI-sensor. Denne sender løbende information om de omkringliggende
@@ -3146,7 +3159,10 @@ med ensartet underlag og automatisk flyvning med uensartet underlag (med gode
 features at tracke). Hver type flyvning blev gentaget 10
 gange. Den manuelle styring forgik ved brug af joystick, mens de
 automatiserede flyvninger blev udført ved brug af en
-FollowTourTask (sektion~\ref{sssec:followtourtask}). 
+FollowTourTask
+(sektion~\ref{sssec:followtourtask}).~\cite{electronic:youtube3}
+(youtube video) viser en flyvning med en FollowTourTask, hvor den
+tilbagelagte afstand måles.   
 
 \subsection{Resultater}
 Generelt blev de
@@ -3407,6 +3423,8 @@ Det har været planen at udvide sensorhierakiet med flere virtuelle
 sensorer. Efter de lovende resultater med korridordetektoren, kunne denne
 algoritme med fordel implementeres i klientplatformen som en virtuel
 sensor.
+Udledning af AR.Dronens retning ved hjælp af den udviklede markør er
+en forbedring, som kan opnåes med forholdsvis simple midler. 
 
 Som vist er der muligt at udvide AR.Dronen med USB-moduler, det vil
 være nærliggende at undersøge denne tilgang yderligere, ved at montere
@@ -3455,7 +3473,9 @@ quadrokopter viser det også, eg. swarms med mikrokopter
 
 \chapter{AT kommandoer}
 \label{sec:at}
-Kort fortalt så må en AT-kommando ikke deles i flere pakker, men en UDP-pakke kan
+Dette afsnit beskriver de enkelte AT-kommandoer, en mere detaljeret
+beskrivelse findes i~\cite{techreport:ardroneDevGuide}, side 29.
+En AT-kommando må ikke deles over flere UDP-pakker, men en UDP-pakke kan
 indeholde flere AT-kommandoer, kommandoerne skal blot være adskilt med
 en "linefeed" karakter og den samlede længde må ikke overskride 1024
 karakterer. Såfremt en kommando overskrider længdebegrænsningen eller
@@ -3601,10 +3621,6 @@ ovenfor beskrevet, og en probabilistisk Hough line transform. Den
 probalististiske returnere en liste af linier, repræsenteret ved
 liniernes endepunkter $(x_{i1}, y_{i1}), (x_{i2}, x_{i2})$ istedet for
 et $(\theta_i$,$\rho_i)$ par som ovenfor.
-
-\chapter{Medfølgende CD / internet}
-\todo{Readme} Hvad skal læseren gøre, hvad er tilgængeligt
-
 
 \end{document}
 

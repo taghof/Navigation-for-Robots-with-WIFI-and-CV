@@ -230,8 +230,9 @@ Specialet har fire mål som formuleres og uddybes således:
   \begin{enumerate}
   \item \textbf{Facilitere eksperimenter:} \label{tese1a} Understøtte de
     videre eksperimenter i specialet.
-  \item \textbf{Tilgængeliggøre AR.Drone interface:} \label{tese3} Konstrueres så den
-    tilgængeliggør et let anvendeligt medierende interface til AR.Dronen.
+  %Tilgængeliggøre AR.Drone interface:
+  \item \textbf{Tilgængelighed:} \label{tese3} Konstrueres så den
+    tilgængeliggør et let anvendeligt interface til AR.Dronen.
   \end{enumerate}
 \item \textbf{Semiautonom navigation:} \label{tese2} 
  Det skal undersøges hvorvidt en quadrokopter der er designet % 2
@@ -3203,14 +3204,16 @@ hældningsfaktor i forhold til den reele værdi.
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
-\paragraph{Den udviklede klientplatform} har været det primære arbejdsredskab
-under ekperimenterne med AR.Dronen. På trods af kontinuerlig udvikling
-under hele projektet, har klientplatformen understøttet
-eksperimenterne ved at give let adgang til AR.Dronens sensorstrømme og
-ved at tilbyde task-abstraktionen ovenpå kontrolinterfacet. Det
-udviklede tasksystem har været så fleksibelt, at det både har kunnet
-anvendes til simple, tidsbegrænsede, flyvninger i en specifik retning
-og til sammensatte navigationsmønstre med genkendelse af gulvmarkører.
+
+\section{Konstruktion af klientplatform} 
+Klientplatformen har været det primære arbejdsredskab under ekperimenterne med
+AR.Dronen. På trods af kontinuerlig udvikling under hele projektet,
+har klientplatformen understøttet eksperimenterne ved at give let
+adgang til AR.Dronens sensorstrømme og ved at tilbyde
+task-abstraktionen ovenpå kontrolinterfacet. Det udviklede tasksystem
+har været så fleksibelt, at det både har kunnet anvendes til simple,
+tidsbegrænsede, flyvninger i en specifik retning og til sammensatte
+navigationsmønstre med genkendelse af gulvmarkører.
 
 Tasksystemets træstruktur gør det muligt at kombinere tasks i
 henholdsvis sekventielle og parallele grupper. Strukturen giver
@@ -3222,43 +3225,52 @@ subtasks. Træstrukturen giver også mulighed for grafiske
 repræsentationer af komplicerede tasks, der giver et bedre overblik
 over den implenterede funktionalitet.
 
-Klientplatformen har under eksperimenterne med visuel lokalisering
-vist (sektion~\ref{ssec:visuellokalisering}), at den muliggør
-semiautonom navigation i et miljø med visuelle
-markører. FollowTourTasken er i forbindelse med eksperimenterne blevet
-afprøvet med gode resultater, på en række forskellige ruter.
-
 Det vises desuden, med eksemplerne i~\ref{sec:platformsadgang}, at
 klientplatformen, og delelementer af denne, er nem at anvende for
 udviklere. Det implementerede testdevice giver desuden mulighed for
 udvikling uden en AR.Drone tilstede.
 
-\vspace{0.5cm}
-\paragraph{Udledning af abstrakte features}ved hjælp af AR.Dronens
-sensorstrømme har været hovedtemaet i de udførte eksperimenter. En
-stor del af de udførte eksperimenter har omhandlet lokalisering. Under
-denne process er der udviklet en visuel markør,
-figur~\ref{fig:markers}, som konsistent kan genkendes med AR.Dronens
-bundkamera. Markøren og FollowTourTasken, som er udviklet sideløbende,
-muliggør AR.Dronens navigation efter en planlagt rute.
+\section{Semi-autonom navigation}
+Klientplatformen har under eksperimenterne med visuel lokalisering
+vist (sektion~\ref{ssec:visuellokalisering}), at den muliggør
+semiautonom navigation i et miljø med visuelle markører. Semi-autonom
+navigation defineres her som, at AR.Dronen er i stand til at følge en
+på forhånd planlagt rute. Denne funktionalitet implementeres af
+FollowTourTasken,~\ref{sssec:followtourtask}, som kan læse og følge en
+rute. En mere avanceret opførsel der også lader AR.Dronen undgå
+mennesker i synsfeltet, kan opnåes ved at afvikle en
+AvoidTask,~\ref{sssec:avoidtask}, sideløbende med FollowTourTasken. En
+sikker navigation kan opnåes når markørerne ligger forholdsvis tæt på
+hinanden(afstand < 3 meter) og positionsdetektoren er kalibreret til
+lysforholdene. Under disse forhold, er FollowTourTasken blevet
+afprøvet med gode resultater på en række forskellige ruter(i
+forbindelse med eksperimenterne).
 
-Efter eksperimenter med lokalisering vha. WIFI-fingerprinting blev
-denne teknik fundet for upræcis. Der er teknikker til at forbedre
+\section{Udledning af yderligere navigationsdata}
+Udledning af yderligere navigationsdata fra AR.Dronenssensorstrømme
+har været hovedtemaet i de udførte eksperimenter. En stor del af de
+udførte eksperimenter har omhandlet lokalisering. Under denne process
+er der udviklet en visuel markør, figur~\ref{fig:markers}, som
+konsistent kan genkendes med AR.Dronens bundkamera. Markøren og
+FollowTourTasken, som er udviklet sideløbende, muliggør AR.Dronens
+navigation efter en planlagt rute.
+
+Efter eksperimenter der undersøgte anvendelsen af WIFI-fingerprinting
+til lokalisering, blev denne teknik fundet for
+upræcis,~\ref{ssec:wifilokalisering}. Der er teknikker til at forbedre
 resultaterne, men teknikken er meget følsom og kræver et større
-eksperiment-setup vi har haft mulighed for. Det forudgående arbejde
-med at få tilkoblet en USB-WIFI-adapter til AR.Dronen, har dog vist,
-at det generelt er muligt at udvide AR.Dronen med USB-enheder.
+eksperiment-setup end vi har haft mulighed for. Det forudgående
+arbejde med at få tilkoblet en USB-WIFI-adapter til AR.Dronen, har dog
+vist, at det generelt er muligt at udvide AR.Dronen med USB-enheder.
 
-\vspace{0.5cm}
 Eksperimenterne med korridordetektion, sektion~\ref{sec:korridor}, har
-vist meget lovende muligheder, både for at kunne detektere af
-AR.Dronen faktisk befinder sig i korridor og for at kunne navigere via
+vist meget lovende muligheder, både for at kunne detektere at
+AR.Dronen faktisk befinder sig i en korridor og for at kunne navigere via
 en sådan korridor. Korridordetektoren er oftest i stand til at
 detektere en tilstedeværende korridor i billederne fra AR.Dronens
 frontkamera og i de tilfælde detekteringen ikke sker, er det på grund
 af faktorer der kan tages højde for.
 
-\vspace{1cm}
 Eksperimenterne med odometrisk afstandsmåling (sektion~\ref{sec:distance-mesu})
 har vist, at denne teknik kan anvendes til grove estimater for
 AR.Dronens tilbagelagte afstand. Resultaternes ensartethed er meget
@@ -3268,7 +3280,6 @@ ikke være pålidelig, men afstanden kunne f.eks. anvendes til at
 visualisere AR.Dronens omtrentlige position på
 et digitalt oversigtskort.
 
-\vspace{0.5cm}
 På trods af at resultaterne med afstandstriangulering ikke var
 overbevisende, se sektion~\ref{sec:afstand}, er det ikke umuligt, at
 denne teknik kan forfines og producere bedre resultater. Teoretisk er
@@ -3276,8 +3287,9 @@ der adgang til alle de nødvendige parametre i
 trianguleringsberegningen og mulige forbedringer til teknikken
 beskrives sidst i sektionen.
 
-\vspace{0.5cm}
-\paragraph{En vurderingen af AR.Dronen}gives i detaljer i
+\section{Metode}
+\subsection{Vurdering af AR.Dronen som robotplatform}
+En detaljeret vurdering gives i
 sektion~\ref{ssec:dronerecap}. Generelt vurderes AR.Dronen som et godt
 alternativ til at bygge en quadrokopter-platform fra bunden. De
 indbyggede sensorer har dog på nogen punkter begrænset
@@ -3285,15 +3297,51 @@ udviklingsmulighederne, både for semi-autonom navigation og udledning
 af features. F.eks. udelukker den begrænsede videoopløsning
 lokalisering ved hjælp QR-koder og retningsbestemmelse besværliggøres
 på grund af sensormisvisning (præcis disse problemer er dog udbedret i
-den opdaterede AR.Drone version 2.0).
-Det vurderes desuden at AR.Dronens store udbredelse vil sikre et
-aktivt udviklermiljø, som både kan fungere som hjælp og inspiration under
-udviklingen af projekter med AR.Dronen.
+den opdaterede AR.Drone version 2.0).  Det vurderes desuden at
+AR.Dronens store udbredelse vil sikre et aktivt udviklermiljø, som
+både kan fungere som hjælp og inspiration under udviklingen af
+projekter med AR.Dronen.
 
+\subsection{Klientplatform}
+Valget af Python som implementationssprog til klientplatformen har
+haft både positive og negative konsekvenser. Fra et Performance-synspunkt har
+Python ikke været et godt valg. Enkelte gange med den trådbaserede
+taskimplementation, har systemet været presset til det punkt, hvor en
+flydende afvikling ikke længere var mulig. Begrænsningen har dog
+også medført et fokus på at skrive mere effektiv kode, især i forbindelse
+med udviklingen af taskssystemet. For at kombinere hastigheden fra
+sprog som C og C++ med udviklingshastigheden og letlæseligheden fra
+Python, kunne det være have været en mulighed at implementere et eller
+flere af klientplatformens moduler i C/C++ og så have bygget
+python-wrappere til disse moduler.
+Såfremt det ikke havde været et mål i sig selv at implementere en
+platform, var det en mulighed at have anvendt ROS (Robot Operating
+System),~\cite{wiki:ros}. ROS er et mere generelt framework til
+robotudvikling og har en driver udviklet til
+AR.Dronen,~\cite{brown:ros}.
+
+\subsection{OpenCV}
+Anvendelsen af OpenCVs billedbehandlingsalgoritmer har været en
+nødvendighed, algoritmerne ville givetvis have været alt for langsomme
+implementeret i Python. Anvendelsen af OpenCVs Python interface har
+været simpel, på trods af enkelte forklaringsproblemer i
+dokumentationen. 
+
+\section{Fremtidigt arbejde}
+Det er oplagt at undersøge alternativer til anvendelsen af Psyco i
+forbindelse med billeddekodning. En mulighed kunne være at
+implementere hele dekodningsalgoritmen i C og så lave python wrappere
+hertil, en anden mulighed kunne være at anvende eller tilpasse en
+allerede fungerende JPEG afkoder.
+Efter de lovende resultater med korridordetektoren, kunne denne
+algoritme med fordel implementeres i klientplatformen som en virtuel
+sensor.
+
+%% Skal det være her? 
 \section{Perspektivering}
 til prisen er ar.droen ok, men virker måske ikke så godt til indendørs
 / præcision / turbulens ift lokationskrav, men så et andet
-brugsscenarie, noget turis-happening som flyv en tur på stævnsklint
+brugsscenarie, noget turist-happening som flyv en tur på stævnsklint
 for 100 kroner, se andres optagede videoer *billede*, reference til
 fårehyrde-robot?
 
@@ -3302,12 +3350,7 @@ videnskabelig platform, for stor og klumpet, ny forskning i
 quadrokopter viser det også, eg. swarms med mikrokopter
 \cite{turpin:swarm}.
 
-\section{Fremtidig arbejde}
-
-billeddekodning i C, Psyco kun virke til 32 bit
-
 \pagebreak
-
 
 \appendix
 

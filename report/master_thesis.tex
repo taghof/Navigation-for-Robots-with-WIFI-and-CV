@@ -143,10 +143,10 @@ AR.Drone,~\cite{electronic:ardrone}, er en quadrokopter,~\cite{electronic:wiki_q
 Parrot,~\cite{electronic:parrot}. AR.Dronen blev i 2010 introduceret som ``the~Flying~Video~Game'' og
 promoveres stadig af producenten som et stykke legetøj, der fjernstyres fra
 brugerens iPhone eller iPad. Siden har AR.Dronen dog fundet stor
-anvendelse, ikke blot som et avanceret stykke legetøj; forskere,~\cite{single_img_pespective_cues},
+anvendelse, ikke blot som et avanceret stykke legetøj. Forskere,~\cite{single_img_pespective_cues},
 studerende~\cite{electronic:ludep}, og hobbyister har taget AR.Dronen
 til %den fjernstyrede quadrokopter til
-sig som en færdig platform og selv udviklet videre ovenpå den.%cite
+sig som en platform og selv udviklet videre ovenpå den.%cite
 
 % hobby selvbyg (ombygge fysisk LED http://www.youtube.com/user/dikale
 %/GPS/WIFI) /
@@ -165,13 +165,13 @@ fastmonteret kameraer i lokalet rundt om MAV til ekstern udregning og feedback
 af MAV absolut position.
 En anden tilgang og en som ligner dette speciales tilgang er at alle
 beslutninger omkring navigation skal træffes udelukkende på baggrund
-af subjektiv sensning fra ombord på quadrokopteren. Eksempeler på
+af sensorinput fra sensorerne på quadrokopteren. Eksempler på
 denne tilgang kan findes i brugen af quadrokoptere i inspektionen af
 højspændingsledninger og broer,~\cite{uavbridgeinspection2007}, og i
-eksperimenterne af Chen et al omkring naviagtion af AR.Dronen i
-forskellige  indendørs miljøer,~\cite{single_img_pespective_cues}.
-Ideen om at sansning og orientering skal komme fra quadrokopteren selv
-ses stadig så sent som 2011 hos chen et al. i deres forsøg med
+eksperimenterne af Chen et al omkring navigation af AR.Dronen i
+forskellige indendørs miljøer,~\cite{single_img_pespective_cues}.
+Ideen om at sensorinput og navigation skal komme fra quadrokopteren selv
+ses stadig så sent som 2011 hos Shen et al. i deres forsøg med
 ``Simultaneous localization and mapping''
 (SLAM),~\cite{shen2011kinect}, hvor quadrokopteren er påmonteret en 
 kinect,~\cite{electronic:kinect} til selv at opfatte omgivelserne i 3
@@ -182,22 +182,22 @@ omgivelserne.
 \label{sec:motivation}
 At specialet skulle beskæftige sig med AR.Dronen var en beslutning der
 blev truffet helt fra projektstarten. Argumentet for valget er at vi
-ønskede at lære mere om og få mere erfaring med beregning indvirkning
-i den fysiske verden. Vi havde en forventning og håb om om at den
-fysiske verden ville stritte imod vores modelrepræsentationer af
-verdenen. 
+ønskede at lære mere om og få mere erfaring med modeller af den
+fysiske verden og brug af modeller i beregninger på AR.Dronen. Vi
+havde en forventning og håb om at den fysiske verden ville stritte
+imod vores modelrepræsentationer af verdenen. 
 
 Specialet er i løbet af projektet vokset ud af, og omkring
 AR.Dronen, gennem et ønske fra vores side om at vide hvad den
 fjernstyrede quadrokopter ville være istand til som robotplatform.
 
-Igennem vores forundersøgelser af AR.Dronen er vi blevet overasket
+Igennem vores forundersøgelser af AR.Dronen er vi blevet overrasket
 over hvor stor interessen er og hvor stor aktivitet der er i diverse
-brugergrupper på internettet omkring Quadrokoptere. %DIYDrones etc
+brugergrupper på internettet omkring quadrokoptere. %DIYDrones etc
 Udfra denne erfaring mener vi at konstruktionen af en softwareplatform
 udover at skulle støtte vores eget videre arbejde i specialet også bør
 have et fokus på at lave et let tilgængeligt interface for almindelige
-brugere, som ikke nødvendigvis er programmøre. Et perspektiv kunne
+brugere, som ikke nødvendigvis er programmører. Et perspektiv kunne
 være at AR.dronen og den konstruerede platform vil kunne bruges til at
 lære om programmering (fordi det er sjovt).
 
@@ -206,44 +206,44 @@ komponenter og derigennem evt kunne effektivisere udviklingen af
 dedikerede styringer til nye arbejdsopgaver for AR.Dronen.
 
 Langt størstedelen af arbejdet i projektet handler om at klarlægge og
-forstå AR.Dronen og dens muligheder. Det handler om at lave en lille
-smule grundforskning i et proof-of-concept. Vi vil gerne forstå
+forstå AR.Dronen og dens muligheder. Vi vil gerne forstå
 konsekvenserne af de forskellige designvalg vi har mulighed for at
 træffe, inden en eventuel senere reel ibrugtagning og produktudvikling.
 
 %+Hvilke bestanddele skal en platform have, hvilke muligheder,
 %arkitektur/opbygning.
 %<- hvad skal der til?
-
+\pagebreak
 \section{Teseformulering/mål} % Thomas & Morten, Hvad
 \label{sec:tese}
-Et blødt mål i specialet er at undersøge hvilke bestandele en platform
-skal indeholde, hvad kan AR.Dronen suppleres med og hvilken struktur
-bør softwaren have. 
+%\todo{skal de 3 linier væk?}
+%Et blødt mål i specialet er at undersøge hvilke bestandele en platform
+%skal indeholde, hvad kan AR.Dronen suppleres med og hvilken struktur
+%bør softwaren have. 
 %HVAD er det præcis vi vil vise eller afvise?!
 %Målet med dette speciale er at 
 
-Mere konkret har specialet tre højt prioriteret mål som formuleres og
-uddybes således: 
+Specialet har fire mål som formuleres og uddybes således: 
 \begin{enumerate}
-\item \textbf{Klientplatform:} \label{tese1} Der skal konstrueres en softwareplatform til at
-  lette fjernkontrol af AR.Dronen fra PC. Den konstruerede platformen skal:
+\item \textbf{Konstruktion af klientplatform:} \label{tese1} Der skal konstrueres en softwareplatform til at
+  lette fjernkontrol af AR.Dronen fra PC. Den konstruerede platform skal:
   \begin{enumerate}
   \item \textbf{Facilitere eksperimenter:} \label{tese1a} Understøtte de
     videre eksperimenter i specialet.
-  \item \textbf{Tilgængelighed:} \label{tese3} Konstrueres så den
+  %Tilgængeliggøre AR.Drone interface:
+  \item \textbf{Være let anvendelig:} \label{tese3} Konstrueres så den
     tilgængeliggør et let anvendeligt interface til AR.Dronen.
   \end{enumerate}
 \item \textbf{Semiautonom navigation:} \label{tese2} 
- Det skal undersøges hvorvidt en quadrokopter der er designet % 2
-  til kontrol via fjernstyring kan navigere semi-autonomt 
+ Det skal undersøges hvorvidt en quadrokopter, der er designet % 2
+  til kontrol via fjernstyring, kan navigere semi-autonomt 
   i et indendørs miljø.
 \item \textbf{Udledning af yderligere navigationsdata:} \label{tese4}
   Mulighederne for at bruge AR.Dronens ombordværende sensorsystem
   (udvidede sensorsystem) til at udlede højere ordens viden om
-  navigationsmiljø, og om den ny viden kan bruges som støtte i den
-  autonome styring af quadrokopteren. Herunder skal det konkret
-  undersøges mulighederne for at bruge: 
+  navigationsmiljøet, og om den ny viden kan bruges som støtte i den
+  semi-autonome styring af quadrokopteren. Herunder undersøges konkret
+  mulighederne for at bruge:
   \begin{enumerate}
   \item \label{tese4a} Lokalisering via WIFI signalstyrker.
   \item \label{tese4b} Lokalisering via visuelle markøre.
@@ -251,8 +251,9 @@ uddybes således:
   \item \label{tese4d} Odometrisk afstandsmåling.
   \item \label{tese4e} Optisk triangulering af afstande.
   \end{enumerate}
-\item \textbf{AR.Dronen som robotplatform:} \label{tese5} Det skal
-  undersøges om AR.Dronen faktisk er anvendelig som robotplatform.
+\item \textbf{Vurdering af AR.Dronen som robotplatform:} \label{tese5} Som en del
+  af specialets metodeevaluering skal det undersøges om AR.Dronen
+  faktisk er anvendelig som robotplatform.
 \end{enumerate}
 
 %label til tese4: \ref{tese4}, og til tese4c: \ref{tese4c}.
@@ -289,7 +290,7 @@ uddybes således:
 %skal opfyldes for at konstruere en modulopbygget kontrolplatform til
 %semiautonom indendørs fjernstyring af en quadrokopter til afvikling på
 %en PC.
-
+\pagebreak
 \section{Metode} % Thomas,
 \label{sec:metode}
 %\paragraph{Domæne afgrænsning}
@@ -321,11 +322,10 @@ sensore og muligheder for manøvrering.
 
 Hvilke muligheder og begrænsninger ville det give at bruge AR.Dronen
 som robotplatform. Et scenarie er at lave et webinterface så gæster
-kan besøge museet fra internettet. Spørgsmålet er hvile implikationer
-det vil medføre, det er nemt at forestille sig at den meget fjerne
-kontrol vil give en klar oplevelse af disembodyment. Der er også et
-stort sikkerhedsaspekt i det at lade en quadrokopter næsten
-selvstyrende flyve rundt i blandt mennesker. En anden mulighed er at
+kan besøge museet fra internettet. Spørgsmålet er hvad 
+det vil medføre. Det er nemt at forestille sig at den meget fjerne
+kontrol vil give en klar oplevelse af disembodyment. Der er også et sikkerhedsaspekt i det at lade en quadrokopter næsten
+selvstyrende flyve rundt blandt mennesker. Et andet scenarie er at
 lave film af en personaliseret flyvning, eller en forprogrammeret
 rutesekvens og dele den med andre som et postkort eller souvenir.
 %
@@ -383,8 +383,8 @@ fasciliteret de eksperimenter som beskrives i
 sektion~\ref{chap:Eksperimenter} og dermed også udviklingen af de
 forskellige tasks i sektion~\ref{sec:tasks}.
 
-Klientværktøjerne Sensordisplay, Mapcreator og Taskcreator, som alle
-beskrives i sektion ~\ref{chap:clienttools}, er udviklet for at lette
+Klientværktøjerne: Sensordisplay, Mapcreator og Taskcreator, som alle
+beskrives i sektion~\ref{chap:clienttools}, er udviklet for at lette
 arbejdet med klientplatformen. Blandt andet ved at give brugeren
 adgang til en grafisk repræsentation af AR.Dronens
 sensorstrømme. Klientværktøjerne har vist sig meget anvendelige i
@@ -403,30 +403,29 @@ udbyggelig klientplatform, er Python et oplagt valg.
  
 Eksemplerne i sektion~\ref{sec:platformsadgang} viser hvor lidt kode
 der behøves, for at anvende klientplatformen. Desuden henvises til
-implementationen af vores klientværktøjer,
-\cite{github:sensordisplay}\cite{github:mapcreator}\cite{github:taskcreator},
+implementationen af vores klientværktøjer,~\cite{github:sensordisplay},~\cite{github:mapcreator},~\cite{github:taskcreator},
 for eksempler der anvender klientplatformen.
 
 Udfordingen ved valget af implementationssprog er, at Python som et
 dynamisk typet, fortolket sprog, ikke performance-mæssigt kan
 sammenlignes med mere maskinnære sprog som C og C++. For at overkomme
 denne udfordring, har vi gjort anvendelse af OpenCVs
-billedalgoritmer(beskrevet nedenunder) og
+billedalgoritmer (beskrevet nedenunder) og
 Psyco,~\cite{electronic:psyco}, i forbindelse med afkodning af
-billeder fra AR.Dronen(se desuden sektion~\ref{subsec:receivers}). En
+billeder fra AR.Dronen (se desuden sektion~\ref{subsec:receivers}). En
 fremtidig forbedring kunne være, at implementere afkodningen af
 AR.Dronens billeder i et C-bibliotek og bygge en Pythonwrapper til
 dette.
 
 \subsection{OpenCV}
 \label{opencv} OpenCV er et bibliotek af optimerede algoritmer,
-indenfor området computer
-vision,~\cite{opencv}\cite{opencv:wiki}. OpenCV blev oprindeligt
-startet af Intel(med bidrag fra optimeringseksperter i Intel Russia og
+indenfor området
+computer-vision,~\cite{opencv},~\cite{opencv:wiki}. OpenCV blev
+oprindeligt startet af Intel (med bidrag fra optimeringseksperter i Intel Russia og
 Intels Performance Library Team), men udvikles nu af
 robotforskningslaboratoriet Willow Garage,
 \cite{opencv:willow:wiki}. Det har fra starten i 1999 været et mål, at
-skabe ikke bare åben. men også optimeret kode, til en grundlæggende
+skabe ikke bare åben, men også optimeret kode, til en grundlæggende
 computer vision infrastruktur.
 
 OpenCV blev i starten udviklet i C, men den seneste udvikling er
@@ -437,57 +436,63 @@ wrapper om OpenCVs C/C++ algoritmer. Ved anvendelse af dette
 interface, får vi altså kombineret Pythons brugervenlighed og OpenCVs
 hastighed.
 
-Opencvs optimerede algoritmer har, på grund af deres effektivitet,
+OpenCVs optimerede algoritmer har, på grund af deres effektivitet,
 været uundværlige, blandt andet i implementationen af vores
 PositionSilhouetDetector (sektion~\ref{sec:sub:virtuel}). Forskellen i
 afviklingshastighed på en blobdetector implementeret i ren Python og
 en der anvender OpenCVs algoritmer, var tydelig under vores
 eksperimenter i sektion~\ref{ssec:visuellokalisering}.
 
-\subsection{Eksperimenter} For at teste AR.Dronen og vores
+\subsection{Eksperimenter} 
+For at teste AR.Dronen og vores
 klientplatform, har vi udført en række eksperimenter. Eksperimenterne
 omhandler generelt udledning af kontekstuel information fra AR.Dronens
 sensorstrømme. Mere specifikt tester vi metoder til lokalisering,
-afstandsbedømmelse, måling af tilbagelagt afstand(Odometri) og
+afstandsbedømmelse, måling af tilbagelagt afstand (Odometri) og
 korridordetektering.
+\todo{ref?}
 
-\paragraph{Lokalisering via Wifi-fingerprinting} Ved hjælp af en
+\paragraph{Lokalisering via WIFI-fingerprinting:} Ved hjælp af en
 WIFI-fingerprinting algoritme, har vi undersøgt muligheden for at
 lokalisere AR.Dronen i forhold til et antal fastlagte
 positioner. Eksperimenternes opstilling og resultater kan ses i
 sektion~\ref{ssec:wifilokalisering}.
 
-\paragraph{Lokalisering via visuelle markører} simpel blob, og
-udbygget nested blob Vi har designet et antal forskellige visuelle
-markører. Markørerne er blevet testet for hvor godt de kunne genkendes
-af AR.Dronen, både i statiske opstillinger og i forbindelse med
-bevægelse. Disse eksperimenter har også fungeret som test af vores
-tasksystem og de udviklede tasks. Eksperimenternes opstilling og
-resultater kan ses i sektion~\ref{ssec:visuellokalisering}.
+\paragraph{Lokalisering via visuelle markører:} Vi har designet et
+antal forskellige visuelle markører. Markørerne er blevet testet for
+hvor godt de kunne genkendes af AR.Dronen, både i statiske
+opstillinger og i forbindelse med bevægelse. Disse eksperimenter har
+også fungeret som test af vores tasksystem og de udviklede
+tasks. Eksperimenternes opstilling og resultater kan ses i
+sektion~\ref{ssec:visuellokalisering}.
 
-\paragraph{Afstandsbedømmelse via optical flow} Vi har undersøgt
+\paragraph{Afstandsbedømmelse via optical flow:} Vi har undersøgt
 muligheden for at udlede afstande, til objekter synlige for AR.Dronens
 frontkamera.  Ved at lade AR.Dronen flyve sidelæns, trianguleres
 afstande ud til genstande foran frontkameraet. Dette gøres ved brug af
 den tilbagelagte afstand og målte vinkler til genstanden.
+\todo{ref}
 
-\paragraph{Korridor detektering} Der er eksperimenteret med muligheden
+\paragraph{Korridor detektering:} Der er eksperimenteret med muligheden
 for at detektere et korridormiljø. Med en sådan detektion, kan
 AR.Dronen bevæge sig i forhold til denne specifikke
 miljøtype. Algoritmen analyserer på indholdet af diagonale linier i
 billedet fra frontkameraet.
+\todo{ref}
 
-\paragraph{DistanceTracker} En del af den navigationsdata vi modtager
+\paragraph{DistanceTracker:} En del af den navigationsdata vi modtager
 fra AR.Dronen er hastighedsestimater. Vi har anvendt disse
 hastighedsestimater til at implementere en odometrisk
-afstandsmåler(DistanceTracker). Implementationen integrerer over de
+afstandsmåler (DistanceTracker). Implementationen integrerer over de
 modtagne hastighedsestimater. Vores eksperimenter med DistanceTracker
 involverer manuelle og automatiserede flyvninger over mere eller
 mindre ensartede overflader.
+\todo{ref}
 
 \section{Medfølgende CD}
 På den medfølgende CD findes kildekoden til den udviklede
 klientplatform inklusiv de udviklede tasks.
+\todo{men også ... pdf-udgaven af specialet, videoer af...}
 
 \section{Projekt Blog}
 \label{sec:blog} Under specialets udvikling, er der anvendt en blog
@@ -499,12 +504,12 @@ AR.Dronen. Blandt andet beskrives proceduren for at aktivere
 AR.Dronens USB-port i detaljer. Et andet emne som behandles på bloggen
 er afvikling af kode på AR.Dronen, herunder proceduren for
 cross-compiling til ARM arkitekturen. Procedurerne er stykket sammen
-fra adskillige kilder og formålet med bloggen er blandt andet, at
+fra adskillige kilder og formålet med bloggen er blandt andet at
 kunne tilbyde en mere komplet kilde for andre i vores situation.
 
-\section{Raport struktur} % Thomas, %/læsevejledning Introduktion til
-rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit
-indeholder.  intro til medfølgende CD og blogpost, med kode på Github
+%\section{Raport struktur} % Thomas, %/læsevejledning Introduktion til
+%rapportens arbejde, hvilke afsnit der gennemgåes og hvad afsnit
+%indeholder.  intro til medfølgende CD og blogpost, med kode på Github
 
 \pagebreak
 
@@ -2580,7 +2585,7 @@ al tydelighed, at QR-koder ikke kan anvendes med AR.Dronens kamera og
 at andre markører derfor må anvendes til lokalisering.
 
 
-\section{Afstandsbedømmelse vha. triangulering i planet} %via optical flow} %Afstandsmåling gennem Optical flow} % tt
+\section{Afstandsbedømmelse vha. triangulering}
 \label{sec:afstand}
 For at lette formidlingen af ideen bag dette eksperiment er det her
 forsøgt at introducere problemstillingen via en lignende, men noget
@@ -2592,56 +2597,57 @@ havet ved hjælp af triangulering.
 \begin{framefig}
   \centering
   \includegraphics[width=0.85\textwidth]{grafik/strandloeve.png}
-  \caption{2 mennesker på en kyst kan i fælleskab bedømme afstanden
+  \caption{To mennesker på en kyst kan i fælleskab bedømme afstanden
     ud til en båd på vandet, ved at kende afstanden imellem sig ($b$) og
     vinklerne imellem hinanden og båden (hhv. $a1$ og $a2$).}
   \label{fig:stranden}
 \end{framefig}
 Hvis $b$, $a1$ og $a2$ er kendt, så kan de to på stranden i fællesskab
-nemt udregne afstanden ud til båden. Afstanden imellem personen
+udregne afstanden ud til båden. Afstanden imellem personen
 bagerst og båden i figuren vil eksempelvis kunne udregnes ved 
-hjælp af,~\cite{wiki:sinus}, som afstand: $A1 = \frac{\sin(a2) * b}{
+hjælp af,~\cite{wiki:sinus}: $A1 = \frac{\sin(a2) * b}{
   \sin(180-(a2+a1)) }$.
 
-Ideen med det egentlige eksperiment er så at få AR.Dronen til alene at agere de 2
+Ideen med eksperimentet er så at få AR.Dronen til alene at agere de to
 mennesker i eksemplet herover og derigennem finde afstande
-til objekter foran frontkameraet. 
-
-Hvis AR.Dronen sættes til at flyve sidelæns i et lige stykke, svarende til strandkanten herover, vil den
-til 2 tider $t1$ og $t2$ være ved 2 positioner $p1$ og $p2$. Hvis
+til objekter foran frontkameraet. Hvis AR.Dronen sættes til at flyve
+\emph{sidelæns} i et lige stykke, svarende til strandkanten herover, vil den 
+til to tider $t1$ og $t2$ være ved to positioner $p1$ og $p2$. Hvis
 tiden imellem de to tider er tilpas lille, eller hvis AR.Dronen flyver
 tilpas langsomt, vil der være et overlap i billederne taget med
-frontkameraet ud for de to positioner (se evt. figur \ref{fig:optflowpyrlk}).
+frontkameraet ud for de to positioner (figur~\ref{fig:optflowpyrlk}).
 
 \begin{framefig}
   \centering
   \includegraphics[width=0.85\textwidth]{grafik/strand2.png}
   \caption{AR.Drone flyver sidelæns mens frontkameraet filmer
     væggen. Den grønne cirkel ($f2t$) er en genkendelig feature (uddybes i
-    sektion~\ref{sec:sub:feature-tracking}) som optræder i hvert af de
-    2 billeder. Billederne er taget ud for position $p1$ og $p2$. Det er afstanden mellem
+    sektion~\ref{sec:sub:feature-tracking}) som optræder i begge
+    billeder. Billederne er taget ud for position $p1$ og $p2$. Det er
+    afstanden mellem 
     $f2t$ og $p2$, i planet, der ønskes fundet. Den grå pil i figuren viser
     AR.Dronens sidelæns flyveretning. De orange pile viser
     hvilken retning AR.Dronens frontkamera filmer.}
   \label{fig:stranden2}
 \end{framefig}
 I figur~\ref{fig:stranden2} får den genkendelige feature (i den grønne cirkel) den samme
-rolle som båden i figur~\ref{fig:stranden}, mens AR.Drones 2
+rolle som båden i figur~\ref{fig:stranden}, mens AR.Drones to
 positioner har menneskenes rolle. Kodeimplementationen er ikke
 begrænset til kun at holde styr på afstanden til et enkelt 
 punkt, men tager vare på en hel liste af features i billederne fra videosekvensen fra
 AR.Dronens frontkamera. Fra hver feature er det muligt at udregne
 afstande til AR.Dronens position. I sektionen herunder (sektion~\ref{sec:sub:feature-tracking}) beskrives den valgte
 metode til at finde, genfinde og genkende features i en
-videosekvens. I de næste 2 sektioner derefter (\ref{pixel2vinkel} og
-\ref{yaw}) forsøges forklaret hvorledes vinklerne $a1$ og $a2$ af
+videosekvens. I de næste to sektioner derefter (\ref{pixel2vinkel} og
+\ref{yaw}) forsøges forklaret hvorledes vinklerne $a1$ og $a2$ i
 figur~\ref{fig:stranden} udledes af pixel-positioner i billedet fra
-frontkameraet, til brug i den virkelige verden.
+frontkameraet, til brug i beregningen.
+%
 I sektion~\ref{liniestykkeb} forklares udregningen af liniestykket $b$
 imellem de to positioner $p1$ og $p2$, for til sidst at kunne udregne
 afstanden $|ft2\ p2|$ i sektion~\ref{afstandenf2tp2}.
-Sektion~\ref{afstandresult} fremlægger resultatet af det ene
-eksperiment der blev udført.
+Sektion~\ref{afstandresult} fremlægger resultatet af det eksperiment
+der blev udført.
 
 
 \subsection{Optisk feature-tracking}
@@ -2653,7 +2659,7 @@ features\footnote{En egnet feature er et karakteristisk
   punkt i billedet som kan genkendes selvom billedet flytter
   fokuspunkt. En feature kan være flere ting, bl.a. 2. ordens
   gradient i billedintensiteten over en hvis magnitude, hjørner på objekter,
-  karakteristisk teksture, osv.} $(ft2_i)$ een gang i billedramme0 med 
+  karakteristisk teksture, osv.} $(ft2_i)$ een gang i billedramme $0$ med 
 \emph{goodFeaturesToTrack}. Hvorefter hver enkelt $f2t$-position
 følges fra billedramme til billedramme med opticalflow-funktionen
 \emph{calcOpticalFlowPyrLK}. 
@@ -2666,7 +2672,7 @@ følges fra billedramme til billedramme med opticalflow-funktionen
   \centering
   \includegraphics[width=0.85\textwidth]{grafik/optflowpyrlk.png}
   \caption{Et typisk egnet good-feature-to-track er som den grønne
-    ring på de 2 billedrammer: Et hjørne på en billedramme af et
+    ring på de to billedrammer: Et hjørne på en billedramme af et
     billede i billedet. Punktet bag den grønne cirkel i billedet til venstre er
     genfundet i billedet til højre vha. funktionen
     \emph{calcOpticalFlowPyrLK}. Funktionen returnere en liste med nye
@@ -2695,15 +2701,14 @@ skal afstandbedømmes (oftest ligger den fulgte feature enten til venstre eller t
 billedet, se de to billeder i figur~\ref{fig:optflowpyrlk}), er det
 nødvendigt at udregne featurens retning i forhold AR.Dronens front.
 
-Af en features horisontale pixel-position i billedet kan man udregne vinklen i den
-virkelige verden i forhold til retningen på AR.Dronens frontkamera, se
+Af en features horisontale pixel-position i billedet kan man udregne vinklen i forhold til retningen på AR.Dronens frontkamera, se
 vinklen $a_{\Delta}$ i figur~\ref{fig:optflowpyrlk2}.
 \begin{framefig}
   \centering
   \includegraphics[width=0.85\textwidth]{grafik/optflowpyrlk2.png}
   \caption{
     Bredden på billederne i videostrømmen fra AR.Dronens frontkamera
-    er kendt som at være 320 px og kameraoptikken på AR.Dronens
+    er kendt til at være 320 px og kameraoptikken på AR.Dronens
     frontkamera er kendt til at have et horizontal udsyn på 92 $^{\circ}$. Hvis
     den horisontale afstand ($\Delta px$) i pixels mellem 2 punkter
     (midten og featuren) i et billede er kendt, kan denne
@@ -2722,14 +2727,14 @@ Vinklen $a_{\Delta}$ er dog kun orienteret i forhold til AR.Dronens
 front, altså AR.Dronens lokale, interne, koordinatsystem. For at få en
 retning ud som kan bruges til triangulering, er det nødvendigt at
 flytte den over i et globalt koordinatsystem, så retninger og
-positioner har samme referencepunkt og kan bruges i den virkelige verden.
+positioner har samme referencepunkt og kan bruges i afstandsberegningen.
 
 \subsection{Yaw som fælles reference}
 \label{yaw}
 Der er imidlertid et problem i at AR.Dronens front nærmest aldrig peger i den
-samme retning (i figur~\ref{fig:absoluteevinkler} ses AR.Dronens front
+samme retning (i figur~\ref{fig:absoluteevinkler} ses at AR.Dronens front
 peger i forskellige retninger ved de to positioner $p1$ og $p2$). For
-at triangulere skal der bruges 2 pejleretninger med fælles 
+at triangulere skal der bruges to pejleretninger med fælles 
 reference. Den piezo-elektriske yaw-sensor er ikke præcis nok til at
 kunne udgøre det for kompas via dead-reckoning gennem en hel
 flyvning. Tanken er istedet at yaw-værdien fra AR.Dronens navdata, over korte
@@ -2742,28 +2747,27 @@ f.eks. mellem $p1$ og $p2$.
     position $p1$ til $p2$ i planet. Den grønne cirkel (f2t) er et punkt på
     væggen (feature-to-track) som følges gennem
     frontkameraet. Vinklerne $a1$ og $a2$ er orienteret i forhold til
-    samme nulpunkt, ved at bruge AR.Dronens yaw-sensor.}
+    samme referencepunkt, ved at bruge AR.Dronens yaw-sensor.}
   \label{fig:absoluteevinkler}
 \end{framefig}
 
 \subsection{Sidestykket b, 3. parameter i trekanten} %Triangulering i 2
                                 %dimensioner}
 \label{liniestykkeb}
-Der mangles at kende en sidste parameter ud af 3 for at kunne bestemme
+Der mangler den sidste parameter ud af 3 for at kunne bestemme
 alle de andre elementer i trekanten $|p1\ f2t\ p2|$, heriblandt
 afstanden $|f2t\ p2|$. Den sidste ukendte parameter længden $|p1\ p2|$
 (se figur~\ref{fig:linieb})
 er lidt besværlig at fremskaffe idet der ikke findes andre afstande at
 måle udfra. Til gengæld kendes hastigheden som AR.Dronen har fløjet
-med imellem $p1$ til $p2$. Hastigheden fåes fra AR.Dronens navdata 
-som $v_x$ og $v_y$, og er hastigheden i x-aksens og y-aksens
-bevægelsesretning ( hhv. $v_{\updownarrow}$ og $v_{\leftrightarrow}$ i
-figur~\ref{fig:linieb}).
+med imellem $p1$ til $p2$. Den sideværts hastighed fåes fra AR.Dronens navdata 
+som $v_y$, og er hastigheden i y-aksens bevægelsesretning
+($v_{\leftrightarrow}$ i figur~\ref{fig:linieb}).
 %( hhv. $v_{frem-tilbage}$ og $v_{venstre-højre}$ i figur~\ref{fig:linieb}).
 
-Testopstillingen er forsøgt simplificeret til kun at foregå i planet,
-så det kun er frem-, tilbage- og sideværts- bevægelser der
-iberegnes. Rotationer og ændringer i højden forsøges minimeret under
+Testopstillingen er forsøgt simplificeret til kun at foregå i den
+sideværts bevægelsesretning. % planet, så det kun er frem-, tilbage- og sideværts- bevægelser der
+Frem- og tilbage bevægelser, rotationer og ændringer i højden forsøges minimeret under
 flyvningen imellem $p1$ og $p2$. Det antages herved at de parametre er så små
 at de kan ignoreres i udledningen af afstanden imellem $p1$ og $p2$.
 \begin{framefig}
@@ -2772,8 +2776,7 @@ at de kan ignoreres i udledningen af afstanden imellem $p1$ og $p2$.
   \caption{Opstillingen er set oppefra. AR.Dronen har flyttet sig fra
     position $p1$ til $p2$ i planet på tiden $\Delta t$. Her ønskes
     sidelængden $b = |p1\ p2|$ fundet. Afstanden $b$ findes ved:
-  $b = \Delta t * ( \sqrt{ v_{\updownarrow}^2 + v_{\leftrightarrow}^2 } )$.}
-% at integrere over hastigheden i x- og y- retning i tiden $\Delta t$.
+    $b = \Delta t * v_{\leftrightarrow}$.}
   \label{fig:linieb}
 \end{framefig}
 
@@ -2781,7 +2784,7 @@ at de kan ignoreres i udledningen af afstanden imellem $p1$ og $p2$.
 \label{afstandenf2tp2}
 Det er sidestykket $|f2t\ p2|$ i trekanten på
 figur~\ref{fig:opticalafstand} der er forsøgt udregnet. Eftersom der
-nu er fremskaffet 3 elementer af trekanten $|p1\ f2t\ p2|$'s vinkler og
+nu er fremskaffet tre elementer af trekanten $|p1\ f2t\ p2|$'s vinkler og
 sider, er det nu muligt at beregne afstanden $|p2\ f2t|$.
 \begin{framefig}
   \centering
@@ -2799,7 +2802,6 @@ sider, er det nu muligt at beregne afstanden $|p2\ f2t|$.
 
 \subsection{Resultater}
 \label{afstandresult}
-
 \begin{framefig}
   \centering
   \includegraphics[width=0.95\textwidth]{grafik/afstande_avg11_gauss11_thumb.png}
@@ -2816,7 +2818,7 @@ Resultatet af eksperimentet kan ses i figur~\ref{fig:afstandavg11}. De
 16 vildeste outsidere i målingerne er klippet af ved 27 meter. Den
 sande værdi (afstanden mellem AR.Dronen og væggen) ligger imellem $4,0$ og $6,5$ meter.
 
-Dette er et godt eksempel på et af tidspunkter hvor man bør træde et skridt
+Dette er et godt eksempel på et af de tidspunkter hvor man bør træde et skridt
 tilbage og se situationen fra et andet perspektiv. Grunden til at det
 ikke virker som opsætningen er nu, er fordi vinklen der skal
 trianguleres udfra bliver for spids. Liniestykket imellem $p1$ og $p2$ er for kort. Det er meget
@@ -2924,7 +2926,7 @@ Afhængig af om der er en korridor eller ikke, er det som sagt oftest
 ved cellen med størst antal linieskæringer at forsvindingspunktet kan
 findes. Hvorvidt der er tale om et billede af en korridor kan ofte
 afgøres ved at kigge på om antallet af linieskæringer i cellen med
-flest skæringer er over en vis størrelse (en grænse på 100 har vist
+flest skæringer er over en vis størrelse (en grænse på 140 har vist
 godt resultat).
 %
 Herunder gennemgåes metoder til at finde kanter (edges) via
@@ -3000,8 +3002,7 @@ linier på polær form.
   \subfigure[Billedet er opdelt i $11 \times 11$ celler. I hver celle
     gemmes antallet af linier som skærer hinanden. I dette tilfælde er
     cellen med flest skæringer godt overensstemmende med korridorens
-    forsvindingspunkt i billedet. Biledet er augmenteret med
-    AR.Dronens hældning $\phi$]{
+    forsvindingspunkt i billedet.]{
     \includegraphics[width=0.6\textwidth]{grafik/out_put_2jpg.png}
     \label{fig:phiaugmentet}}
 
@@ -3019,54 +3020,45 @@ indikator på et forsvindingspunkt.
 Observationer under eksperimenterne har vist, at cellen med flest
 skæringspunkter skal indeholde et hvis antal for at algoritmen med
 rimelig sikkerhed kan sige at der faktisk er en korridor med
-tilhørende forsvindingspunkt. Observationer har indikeret at detektoren
-kan gøres mere robust ved yderligere at analysere på om fordelingen af
-linieskæringspunkter er jævnt fordelt over det meste af billedet (i
-diagonalt mod forsvindingspunkt) og
-eksempelvis ikke kun er koncentreret omkring en enkelt linie eller
-enkelt område.
+tilhørende forsvindingspunkt. 
+
 
 \subsection{Resultater}
 Billedet a i figur~\ref{fig:linieceller} er et eksempel på et billede med optimale
 forhold til at finde et forsvindingspunkt. 
 
-%\subsection{Resultater}
-I 86 af de test der er lavet hvor korridorenden ses i midten af et billede, hvor billedet
+Ud af de 111 detekteringstest der er lavet, hvor korridorenden ses i midten af et billede, hvor billedet
 er taget fra midten og ned ad Ada 100-gangen, finder detektoren
-området for forsvindingspunktet hver gang. Udover de 86 er der 10
+området for forsvindingspunktet 86 gange. Udover de 86 er der 11
 tilfælde hvor detekteringen ikke virker. Et eksempel er hvis billedet
-er taget i den ene side af gangen, hvor 
-Canny-filteret har detekteret mange næsten lodrette linier, men ikke lodret nok til at blive frasorteret
+er taget i den ene side af gangen, hvor Canny-filteret har detekteret mange næsten lodrette linier, men ikke lodret nok til at blive frasorteret
 via $\phi$-grænsen. Der vil der blive et stort antal linieskæringer i
 siden som vil føre til fejl-placering af forsvindingspunktet (se figuren~\ref{fig:vanishfeler}).
 
-\begin{table}
-  \begin{center}
-  \begin{tabular}{ l | p{3,5cm} | p{5,5cm} }
-    ~  & tror der er & tror ej der er \\
-    \hline
-    der er faktisk & 79 \% & 11 \% \\
-    \hline
-    der er faktisk ikke & 0 \% & 10 \% \\
-  \end{tabular}
-  \end{center}
-  \caption{Resulter af detektering udført på 111 billeder.} 
-  \label{tab:vanishresults}
-\end{table}
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.8\textwidth]{grafik/vanishresultgraf.png}
+  \caption{Testen har ialt gennemløbet 111 billeder. 11 af de 111 er
+    med det blotte øje vurderet til at være uden korridor (f.eks
+    billeder af dørkarm, eller et vindue i et kontor). Ud af de
+    resterende 100 billeder indeholdende korridor-ender, har detektoren
+    været i stand til at finde forsvindingspunkter i de 89 af
+    billederne. De resterende 11 billeder kategoriserede detektoren
+    som værende uden forsvindingspunkt, selvom der med det blotte øje
+    kunne ses en korridor ende omkring midten af billedet.}
+  \label{fig:vanishresult}
+\end{framefig}
 
 \begin{framefig}
   \centering
   \includegraphics[width=0.8\textwidth]{grafik/out_put_6jpg_error.png}
-  \caption{Eksempel på synsvinkel hvor detektoren ikke fungere
+  \caption{Eksempel på synsvinkel hvor detektoren ikke fungerer
     optimalt. Canny-filteret har fundet mange kantpunkter i venstre
     side af billedet hvor vægoverfladen er meget uensartet. Hvilket
     det er umuligt for Houghtranformeringen at danne linier udfra som
     der ikke er fejl på.}
   \label{fig:vanishfeler}
 \end{framefig}
-Som det ses i tabel~\ref{tab:vanishresults} har detektoren i ca. 10
-procent af forsøgene ikke kunnet detekte placeringen af
-forsvindingspunktet korrekt. 
 %
 Oprindeligt blev der opsat et mål om at
 detektoren skulle kunne give en sandsynlighed for hvorvidt AR.Dronen befandt
@@ -3076,8 +3068,22 @@ Med de opstillinger der blev lavet test med, er der til gengæld ikke observeret
 nogle false positives, dvs. detektoren har ikke fejlagtigt 
 vist at der var en korridor i de test hvor der ikke var en korridor.
 I den opstilling der er lavet test med har detektoren konkret gættet
-rigtigt 98 gange ud af 111, hvilket giver en succesrate på 89 procent
-(se tabel~\ref{tab:vanishresults}).
+rigtigt 100 gange ud af 111 (se figuren~\ref{fig:vanishresult}).
+
+Observationer har indikeret at detektoren kan gøres mere robust ved
+yderligere at analysere fordelingen af linieskæringspunkterne i
+billedet. Skærringspunkterne skal gerne være jævnt fordelt over det
+meste af billedet, gerne i et diagonalt kryds over
+forsvindingspunkt som i figur~\ref{fig:phiaugmentet}. Eksempelvis bør
+fordelingen af skæringspunkter ikke kun være koncentreret omkring en
+enkelt linie som ifigur~\ref{fig:korridorwrong} eller kun omkring et
+enkelt område. 
+\begin{framefig}
+  \centering
+  \includegraphics[width=0.8\textwidth]{grafik/korridorwrong.png}
+  \caption{Et sted hvor detektoren ikke skal finde en korridor.}
+  \label{fig:korridorwrong}
+\end{framefig}
 
 En videreudvikling kunne være at udbygge detektoren til at huske mere
 end fra bare en billedramme til den næste, evt. ved at parre
@@ -3150,7 +3156,7 @@ af at odometri-afstandsmåleren afvikles sammen med markør-detektoren (gennemgået
 som skal bruge ekstra tid på at udføre markør-detekterering i FollowTourTasken som
 brugt i eksperimentet.
 
-Resultaterne for flyvningerne kan ses på figur~\ref{fig:xdistr} og
+Resultaterne fra flyvningerne kan ses på figur~\ref{fig:xdistr} og
 figur~\ref{fig:ydistr}. Figur~\ref{fig:xdistr} viser en fordeling over
 de målte afstanden i fremadrettet flyveretning, mens figur~\ref{fig:ydistr} viser
 fordelingen af de målte afstande i y-aksens (sideværts) retning.
@@ -3194,11 +3200,13 @@ hældningsfaktor i forhold til den reele værdi.
 %Indledende øvelse til at kunne måle afstande frontalt via triangulering <- optisk flow
 
 
-
+\pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
+Rodney Brooks at udnytte det at det er en mobil robot, bekræft eller afkræft
+antagelser om model af miljø ved at flyt rundt og observer fra forskellige vinkler/synspunkter, 
 
 \section{Konstruktion af klientplatform} 
 Klientplatformen har været det primære arbejdsredskab under ekperimenterne med
@@ -3284,18 +3292,17 @@ beskrives sidst i sektionen.
 
 \section{Metode}
 \subsection{Vurdering af AR.Dronen som robotplatform}
-En detaljeret vurdering gives i
-sektion~\ref{ssec:dronerecap}. Generelt vurderes AR.Dronen som et godt
-alternativ til at bygge en quadrokopter-platform fra bunden. De
-indbyggede sensorer har dog på nogen punkter begrænset
-udviklingsmulighederne, både for semi-autonom navigation og udledning
-af features. F.eks. udelukker den begrænsede videoopløsning
-lokalisering ved hjælp QR-koder og retningsbestemmelse besværliggøres
-på grund af sensormisvisning (præcis disse problemer er dog udbedret i
-den opdaterede AR.Drone version 2.0).  Det vurderes desuden at
-AR.Dronens store udbredelse vil sikre et aktivt udviklermiljø, som
-både kan fungere som hjælp og inspiration under udviklingen af
-projekter med AR.Dronen.
+I sektion~\ref{ssec:dronerecap} er vurderingen af AR.Dronen
+beskrevet. Generelt vurderes AR.Dronen som et godt alternativ til at
+bygge en quadrokopter-platform fra bunden. De indbyggede sensorer har
+dog på nogen punkter begrænset udviklingsmulighederne, %hvor?
+%både for semi-autonom navigation og udledning af features. 
+Eksempelvis udelukker den begrænsede videoopløsning afkodning af
+QR-koder til brug i lokaliseringseksperimentet
+(sektion~\ref{sec:QRdecoding}), og bestemmelse af AR.Dronens
+orientering besværliggøres på grund af sensordrift (præcis disse problemer er dog
+udbedret i %også qr?
+den opdaterede AR.Drone version 2.0).
 
 \subsection{Klientplatform}
 Valget af Python som implementationssprog til klientplatformen har
@@ -3336,12 +3343,17 @@ en forbedring, som kan opnåes med forholdsvis simple midler.
 
 %% Skal det være her? 
 \section{Perspektivering}
+Det vurderes desuden at
+AR.Dronens store udbredelse vil sikre et aktivt udviklermiljø, som
+både kan fungere som hjælp og inspiration under udviklingen af
+projekter med AR.Dronen.
+%
 til prisen er ar.droen ok, men virker måske ikke så godt til indendørs
 / præcision / turbulens ift lokationskrav, men så et andet
 brugsscenarie, noget turist-happening som flyv en tur på stævnsklint
 for 100 kroner, se andres optagede videoer *billede*, reference til
 fårehyrde-robot?
-
+%
 eksempel argumentation på hvorfor AR.Dronen ikke virker som
 videnskabelig platform, for stor og klumpet, ny forskning i
 quadrokopter viser det også, eg. swarms med mikrokopter

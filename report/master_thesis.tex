@@ -222,7 +222,7 @@ træffe, inden en eventuel senere reel ibrugtagning og produktudvikling.
 %arkitektur/opbygning.
 %<- hvad skal der til?
 \pagebreak
-\section{Teseformulering/mål} % Thomas & Morten, Hvad
+\section{Teseformulering} % Thomas & Morten, Hvad
 \label{sec:tese}
 %\todo{skal de 3 linier væk?}
 %Et blødt mål i specialet er at undersøge hvilke bestandele en platform
@@ -238,8 +238,8 @@ Specialet har fire mål som formuleres og uddybes således:
   \begin{enumerate}
   \item \textbf{Facilitere eksperimenter:} \label{tese1a} Understøtte de
     videre eksperimenter i specialet.
-  %Tilgængeliggøre AR.Drone interface:
-  \item \textbf{Være let anvendelig:} \label{tese3} Konstrueres så den
+  %Være let anvendelig:
+  \item \textbf{Tilgængeliggøre et interface til AR.Dronen:} \label{tese3} Konstrueres så den
     tilgængeliggør et let anvendeligt interface til AR.Dronen.
   \end{enumerate}
 \item \textbf{Semiautonom navigation:} \label{tese2} 
@@ -1039,6 +1039,7 @@ Port",~\cite{blog:usb}.
 \end{framefig}
 
 \subsection{WIFI-sensor på AR.Dronen}
+\label{sec:wifisensorudvidelse}
 Efter de indledende erfaringer med AR.Dronens USB-port, blev der
 implementeret en WIFI-sensor, for på sigt at kunne anvende denne som 
 lokaliseringsenhed. WIFI-sensoren består af en USB-WIFI-adapter
@@ -3058,7 +3059,7 @@ siden som vil føre til fejl-placering af forsvindingspunktet (se figuren~\ref{fi
 
 \begin{framefig}
   \centering
-  \includegraphics[width=0.8\textwidth]{grafik/vanishresultgraf.png}
+  \includegraphics[width=0.96\textwidth]{grafik/vanishresultgraf.png}
   \caption{Testen har ialt gennemløbet 111 billeder. 11 af de 111 er
     med det blotte øje vurderet til at være uden korridor (f.eks
     billeder af dørkarm, eller et vindue i et kontor). Ud af de
@@ -3229,35 +3230,53 @@ hældningsfaktor i forhold til den reele værdi.
 %%%%     Konklusion - section
 
 \chapter{Konklusion}
-Rodney Brooks at udnytte det at det er en mobil robot, bekræft eller afkræft
-antagelser om model af miljø ved at flyt rundt og observer fra forskellige vinkler/synspunkter, 
+%Rodney Brooks at udnytte det at det er en mobil robot, bekræft eller afkræft
+%antagelser om model af miljø ved at flyt rundt og observer fra forskellige vinkler/synspunkter,
+%elephant?
+I det følgende konkluderes på specialet tilstand målt i forhold til
+tese- og mål-formuleringen. Herefter evalueres på valget af specialets
+metode. Til sidst præsenteres løsningsforslag i forhold
+til det arbejde der ikke blev nået at færdiggøre samt forslag til
+alternative fremtidige eksperimenter og metoder.
+%I sektionen~\ref{sec:som} nævnes
 
-\section{Konstruktion af klientplatform} 
-Klientplatformen har været det primære arbejdsredskab under ekperimenterne med
-AR.Dronen. På trods af kontinuerlig udvikling under hele projektet,
+\section{Specialets tilstand}
+\subsection*{1. Konstruktion af klientplatform} 
+%Klientplatformen har været det primære arbejdsredskab under
+%ekperimenterne med AR.Dronen. 
+% på trods af kontinuerlig / samtidig med
+Undervejs i hele specialeforløbet har den konstruerede platform
+understøttet arbejdet med AR.Dronen og har fungeret som en let
+anvendelig grænseflade til AR.Dronen.
+
+\subsubsection*{1.(a) Facilitere eksperimenter}
+På trods af kontinuerlig udvikling under hele projektet,
 har klientplatformen understøttet eksperimenterne ved at give let
 adgang til AR.Dronens sensorstrømme og ved at tilbyde
 task-abstraktionen ovenpå kontrolinterfacet. Det udviklede tasksystem
 har været så fleksibelt, at det både har kunnet anvendes til simple,
-tidsbegrænsede, flyvninger i en specifik retning og til sammensatte
+tidsbegrænsede flyvninger i en specifik retning og til sammensatte
 navigationsmønstre med genkendelse af gulvmarkører.
 
 Tasksystemets træstruktur gør det muligt at kombinere tasks i
 henholdsvis sekventielle og parallele grupper. Strukturen giver
 anledning til et forholdsvis kompliceret tasksystem, som ofte kunne
 være implementeret i et fladt hieraki med samme resultat. Fordelen ved
-at implementere en kompliceret task som FollowTourTask ved hjælp af
-mindre komplicerede subtasks er, at der åbnes for genbrug af disse
-subtasks. Træstrukturen giver også mulighed for grafiske
-repræsentationer af komplicerede tasks, der giver et bedre overblik
-over den implenterede funktionalitet.
+strukturen i tasksystemet er at en forholdsvis kompleks task som
+FollowTourTask kan sammensættes af flere mindre og ikke så komplekse
+subtasks. Dermed åbnes samtidig op for at udnytte muligheden for
+genbrug af disse subtasks. En vigtig pointe er at træstrukturen også
+giver mulighed for grafiske repræsentationer af komplicerede tasks,
+der giver et bedre overblik over den implenterede funktionalitet.
 
-Det vises desuden, med eksemplerne i~\ref{sec:platformsadgang}, at
+\subsubsection*{1.(b) Tilgængeliggøre et interface til AR.Dronen}
+Eksemplerne med let anvendelse af pythoninterfacet i
+sektion~\ref{sec:platformsadgang} viser, at
 klientplatformen, og delelementer af denne, er nem at anvende for
 udviklere. Det implementerede testdevice giver desuden mulighed for
-udvikling uden en AR.Drone tilstede.
+udvikling gennem simulering uden en AR.Drone tilstede.
 
-\section{Semi-autonom navigation}
+\subsection*{2. Semi-autonom navigation}
 Klientplatformen har under eksperimenterne med visuel lokalisering
 vist (sektion~\ref{ssec:visuellokalisering}), at den muliggør
 semiautonom navigation i et miljø med visuelle markører. Semi-autonom
@@ -3268,106 +3287,176 @@ rute. En mere avanceret opførsel der også lader AR.Dronen undgå
 mennesker i synsfeltet, kan opnåes ved at afvikle en
 AvoidTask,~\ref{sssec:avoidtask}, sideløbende med FollowTourTasken. En
 sikker navigation kan opnåes når markørerne ligger forholdsvis tæt på
-hinanden(afstand < 3 meter) og positionsdetektoren er kalibreret til
+hinanden (afstand < 3 meter) og positionsdetektoren er kalibreret til
 lysforholdene. Under disse forhold, er FollowTourTasken blevet
 afprøvet med gode resultater på en række forskellige ruter(i
 forbindelse med eksperimenterne).
 
-\section{Udledning af yderligere navigationsdata}
-Udledning af yderligere navigationsdata fra AR.Dronenssensorstrømme
-har været hovedtemaet i de udførte eksperimenter. En stor del af de
-udførte eksperimenter har omhandlet lokalisering. Under denne process
-er der udviklet en visuel markør, figur~\ref{fig:markers}, som
-konsistent kan genkendes med AR.Dronens bundkamera. Markøren og
-FollowTourTasken, som er udviklet sideløbende, muliggør AR.Dronens
-navigation efter en planlagt rute.
+\subsection*{3. Udledning af yderligere navigationsdata}
+Udledning af yderligere højere-ordens navigationsdata fra
+AR.Dronenssensorstrømme har været et hovedtema i de udførte
+eksperimenter. Herunder konkluderes specialets  opsatte delmål:
 
-Efter eksperimenter der undersøgte anvendelsen af WIFI-fingerprinting
-til lokalisering, blev denne teknik fundet for
-upræcis,~\ref{ssec:wifilokalisering}. Der er teknikker til at forbedre
-resultaterne, men teknikken er meget følsom og kræver et større
-eksperiment-setup end vi har haft mulighed for. Det forudgående
-arbejde med at få tilkoblet en WIFI-USB-adapter til AR.Dronen, har dog
-vist, at det generelt er muligt at udvide AR.Dronen med USB-enheder.
+\subsection*{3.(a) Lokalisering via WIFI}
+Eksperimenter der undersøgte anvendeligheden af WIFI-fingerprinting
+til lokalisering i sektion~\ref{ssec:wifilokalisering}, viste at det
+var muligt at lokalisere AR.Dronen til at være i f.eks den ene eller
+den anden ende af en bygning (lokationer med 6 m afstand). 
+%
+Der er teknikker til at forbedre resultaterne, men teknikken er meget
+følsom og kræver et større eksperiment-setup end vi har haft mulighed
+for. En forbedring på dette område vil samtidig knytte navigationen
+tættere op på at skulle gemme og opdatere en repræsentation af
+omverdenen, hvilket generelt er søgt undgået i dette speciale.
 
+Det forudgående arbejde med at få tilkoblet en USB-WIFI-adapter
+til AR.Dronen, har dog vist, at det generelt er muligt at udvide
+AR.Dronen med USB-enheder.
+
+\subsection*{3.(b) Lokalisering via visuelle markører}
+En stor del af de udførte eksperimenter har omhandlet visuel
+lokalisering på forskellige måder. Under denne process er der udviklet
+en visuel markør, figur~\ref{fig:markers}, som konsistent kan
+genkendes med AR.Dronens bundkamera. Markøren og FollowTourTasken, som
+er udviklet sideløbende, muliggør AR.Dronens navigation efter en
+planlagt rute.
+
+\subsection*{3.(c) Detektering af navigationsmiljøtype}
 Eksperimenterne med korridordetektion, sektion~\ref{sec:korridor}, har
 vist meget lovende muligheder, både for at kunne detektere at
 AR.Dronen faktisk befinder sig i en korridor og for at kunne navigere via
-en sådan korridor. Korridordetektoren er oftest i stand til at
-detektere en tilstedeværende korridor i billederne fra AR.Dronens
-frontkamera og i de tilfælde detekteringen ikke sker, er det på grund
-af faktorer der kan tages højde for.
+en sådan korridor.
+% Korridordetektoren er oftest i stand til at
+%detektere en tilstedeværende korridor i billederne fra AR.Dronens
+%frontkamera og i de tilfælde detekteringen ikke sker, er det på grund
+%af faktorer der kan tages højde for. \todo{omformuler kan tag højde for...}
 
+\subsection*{3.(d) Odometrisk afstandsmåling}
 Eksperimenterne med odometrisk afstandsmåling (sektion~\ref{sec:distance-mesu})
 har vist, at denne teknik kan anvendes til grove estimater for
-AR.Dronens tilbagelagte afstand. Resultaternes ensartethed er meget
-afhængig af miljøfaktorer som f.eks. belysning. En
-dead-reckoningalgoritme kun baseret på denne afstand og en retning vil
-ikke være pålidelig, men afstanden kunne f.eks. anvendes til at
-visualisere AR.Dronens omtrentlige position på
-et digitalt oversigtskort.
+AR.Dronens tilbagelagte afstand. Resultaterne viser at den målte
+afstand er meget følsom overfor forskellige miljøfaktorer som
+belysning, overflade aftegninger i gulvet der flyves over og den 
+hastighed der flyves med. En dead-reckoningalgoritme, kun baseret på
+denne afstand og en retning, vil ikke være pålidelig, men afstanden
+kunne f.eks. anvendes til at visualisere AR.Dronens omtrentlige
+position på et digitalt oversigtskort evt. kombineret med lokation via
+WIFI.
 
-På trods af at resultaterne med afstandstriangulering ikke var
-overbevisende, se sektion~\ref{sec:afstand}, er det ikke umuligt, at
-denne teknik kan forfines og producere bedre resultater. Teoretisk er
-der adgang til alle de nødvendige parametre i
+\subsection*{3.(e) Optisk triangulering af afstande}
+På trods af at resultaterne fra eksperimentopsætningen med
+afstandstriangulering (sektion~\ref{sec:afstand}) ikke var overbevisende, så ser det alligevel ud som
+om at det er muligt, at forfine teknikken og producere bedre
+resultater. Teoretisk er der adgang til alle de nødvendige parametre i
 trianguleringsberegningen og mulige forbedringer til teknikken
-beskrives sidst i sektionen.
+beskrives sidst i sektionen. 
 
-\section{Metode}
-\subsection{Vurdering af AR.Dronen som robotplatform}
+\section{Metodens anvendelighed}
+Metodevalget har taget udgangspunkt i AR.Dronen og er samtidig
+begrænset af AR.Dronen. De eksperimenter der er udført i specialet er
+udvalgt udfra hvad der umiddelbart synes at ligge ligefor at teste,
+ved at kigge på AR.Dronens specifikationer og egenskaber. 
+%
+Eksperimenterne er lavet for at teste ideer til udbygning af AR.Dronen
+som robot udfra AR.Dronens umiddelbare formåen som fjernstyret
+quadrokopter.% godt ?
+%Eksperimenterne er valgt, %specifik til at teste AR.Dronens formåen, oplagte muligheder 
+
+\subsection*{Vurdering af AR.Dronen som robotplatform}
 I sektion~\ref{ssec:dronerecap} er vurderingen af AR.Dronen
 beskrevet. Generelt vurderes AR.Dronen som et godt alternativ til at
-bygge en quadrokopter-platform fra bunden. De indbyggede sensorer har
-dog på nogen punkter begrænset udviklingsmulighederne, %hvor?
+bygge en quadrokopter-platform fra bunden. 
+%
+Selvom AR.Dronen var valgt på forhånd i specialet, og eksperimenterne
+er opstået ud af den. Så har AR.Dronen også været en begrænsende
+faktor i specialet, på godt og ondt. AR.Dronen har været god hjælp til at
+afgrænse domænet for specialet, men de indbyggede sensorer har begrænset udviklingsmulighederne: %hvor?
 %både for semi-autonom navigation og udledning af features. 
 Eksempelvis udelukker den begrænsede videoopløsning afkodning af
 QR-koder til brug i lokaliseringseksperimentet
 (sektion~\ref{sec:QRdecoding}), og bestemmelse af AR.Dronens
-orientering besværliggøres på grund af sensordrift (præcis disse problemer er dog
-udbedret i %også qr?
-den opdaterede AR.Drone version 2.0).
+orientering (kompas) besværliggøres på grund af sensordrift. En mulig
+løsning kunne være at gøre brug af de ny AR.Drone version
+2.0, hvorpå der er udskiftet en del sensore og installeret nye
+(frontkamera med større opløsning og magnetometer-sensor).
+%
+En anden mulighed var måske selv at udvide AR.Dronen med andre sensorer
+som beskrevet i sektion~\ref{sec:udvidelse}. I starten af specialet
+blev der nævnt ideer til at montere gennem serialforbindelsen,
+f.eks. montering af IR-lys eller laser til afstandsmåling. Argumentet
+for ikke at gøre det var, at nu var der lavet et proof-of-concept med
+installationen af WIFI-USB-adapteren (sektion~\ref{sec:wifisensorudvidelse}).
 
-\subsection{Klientplatform}
+
+\subsection*{Klientplatform}
 Valget af Python som implementationssprog til klientplatformen har
 haft både positive og negative konsekvenser. Fra et Performance-synspunkt har
 Python ikke været et godt valg. Enkelte gange med den trådbaserede
 taskimplementation, har systemet været presset til det punkt, hvor en
-flydende afvikling ikke længere var mulig. Begrænsningen har dog
-også medført et fokus på at skrive mere effektiv kode, især i forbindelse
-med udviklingen af taskssystemet. For at kombinere hastigheden fra
+flydende afvikling ikke længere var mulig. En sidegevinst har
+imidlertid været at det har fordret et fokus på at skrive mere
+effektiv kode, især i forbindelse med udviklingen af
+taskssystemet. For at kombinere hastigheden fra 
 sprog som C og C++ med udviklingshastigheden og letlæseligheden fra
-Python, kunne det være have været en mulighed at implementere et eller
+Python, vil en mulighed være at implementere et eller
 flere af klientplatformens moduler i C/C++ og så have bygget
 python-wrappere til disse moduler.
+
 Såfremt det ikke havde været et mål i sig selv at implementere en
-platform, var det en mulighed at have anvendt ROS (Robot Operating
+platform, var det en mulighed at anvende ROS (Robot Operating
 System),~\cite{wiki:ros}. ROS er et mere generelt framework til
-robotudvikling og har en driver udviklet til
-AR.Dronen,~\cite{brown:ros}.
+robotudvikling og har i forvejen en driver udviklet til
+AR.Dronen,~\cite{brown:ros}. 
 
-\subsection{OpenCV}
+\subsection*{OpenCV}
 Anvendelsen af OpenCVs billedbehandlingsalgoritmer har været en
-nødvendighed, algoritmerne ville givetvis have været alt for langsomme
+nødvendighed. Det vil ikke have været muligt at lave beregningerne
+på det samme antal billedrammer, hvis algoritmerne var forsøgt
 implementeret i Python. Anvendelsen af OpenCVs Python interface har
-været simpel, på trods af enkelte forklaringsproblemer i
-dokumentationen. 
+været relativt nemt at tilgå, på trods af at det få steder ikke er
+lige klart hvilken version af en implementeret algoritme bruger
+hvilken parametertyper (billede-argumenterne repræsenteres som
+IPlImage-type i en version og som et array i en anden
+version. Samtidig er ikke alle dele af biblioteket lige opdateret).
 
+%\section{Hvad ville vi gerne have nået}
 \section{Fremtidigt arbejde}
 Det er oplagt at undersøge alternativer til anvendelsen af Psyco i
 forbindelse med billeddekodning. En mulighed kunne være at
 implementere hele dekodningsalgoritmen i C og så lave python wrappere
 hertil, en anden mulighed kunne være at anvende eller tilpasse en
 allerede fungerende JPEG afkoder.
-Efter de lovende resultater med korridordetektoren, kunne denne
+
+Det har været planen at udvide sensorhierakiet med flere virtuelle
+sensorer. Efter de lovende resultater med korridordetektoren, kunne denne
 algoritme med fordel implementeres i klientplatformen som en virtuel
 sensor.
 Udledning af AR.Dronens retning ved hjælp af den udviklede markør er
 en forbedring, som kan opnåes med forholdsvis simple midler. 
 
+Som vist er der muligt at udvide AR.Dronen med USB-moduler, det vil
+være nærliggende at undersøge denne tilgang yderligere, ved at montere
+andre sensorer til at supplere med udledningen af mere højere-ordens
+navigationsdata. Specielt hvis AR.Dronen skal flyve indendørs blandt
+mennesker vil det øge sikkerheden at montere afstandssensor rundt på
+AR.Dronen. 
+%udvide med flere/andre USB-moduler, IR-afstand...
+
+%optisk triangulering teste om det
+%faktisk kan lade sig føre indikationer
+%på at sensor nøjagtighed, at billedet wobler...
+At afstansmålingen gennem triangulering fra AR.Dronen ikke lykkedes er
+ærgeligt, og er en oplagt mulighed at opsøge. I eksperimentet viste
+det sig at beregningen var forkert, men det svarer ikke på om
+trianguleringen kan eller ikke kan lade sig gøre. Der er flere
+faktorer der skal være opfyldt før man kan sige det kan lade sig
+gøre. Både den udledte odometriske afstand, vinklen udledt fra
+frontkameraets optik og orienteringen fra piezo-sensoren skal opfylde
+nogle tolerancekrav for at afstandsmålingen er brugbar. Det vil være
+et meget interesant eksperiment at færdiggøre.
+
 %% Skal det være her? 
-\section{Perspektivering}
-Det vurderes desuden at
+%\section{Perspektivering}
 AR.Dronens store udbredelse vil sikre et aktivt udviklermiljø, som
 både kan fungere som hjælp og inspiration under udviklingen af
 projekter med AR.Dronen.

@@ -42,6 +42,13 @@
 
 \usepackage{hyperref}
 
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+}
+
 \newenvironment{framefig}
    {\begin{figure}[H]\begin{framed}}
    {\end{framed}\end{figure}}
@@ -95,6 +102,7 @@ Ole Caprani
 \end{center}
 
 \end{titlepage}
+\blankpage
 \pagestyle{headings}
 \begin{otherlanguage}{english}
 \abstract{
@@ -105,7 +113,7 @@ apparatus is contructed. The platform is then used for further
 experiments. These experiments explores how the sensor apparatus
 aboard the AR.Drone can be exploited to derive more abstract
 information about the near environment. This information is used to
-make the AR.Drone navigate through respectively corridors and open
+make the AR.Drone navigate through a preplanned route in an open
 spaces with visual markers on the floor.
 }
 \end{otherlanguage}
@@ -120,7 +128,7 @@ sensorapparat. Platformen anvendes herefter til de videre
 eksperimenter. Det undersøges hvorledes sensorapparatet ombord på
 AR.Dronen kan udnyttes, til at udlede mere abstrakt information om
 miljøet i den umiddelbare nærhed. Denne information anvendes til at
-lade AR.Dronen navigere i henholdsvis korridorer og åbne rum med
+lade AR.Dronen navigere efter en planlagt rute i et åbent rum med
 visuelle markører på gulvet. 
 \todo{Kort uddybning af, hvad har vi gjort, hvad var resultatet.}
 }

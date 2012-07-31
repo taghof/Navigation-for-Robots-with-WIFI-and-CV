@@ -106,31 +106,61 @@ Ole Caprani
 \pagestyle{headings}
 \begin{otherlanguage}{english}
 \abstract{
-This thesis investigates the possibility of making a quadrokopter,
-AR.Drone, fly semi autonomously in an indoor environment. Firstly an
-easy to use software platform that utilizes the AR.Drone sensing
-apparatus is contructed. The platform is then used for further
-experiments. These experiments explores how the sensor apparatus
-aboard the AR.Drone can be exploited to derive more abstract
-information about the near environment. This information is used to
-make the AR.Drone navigate through a preplanned route in an open
-spaces with visual markers on the floor.
+%% This thesis investigates the possibility of making a quadrokopter,
+%% AR.Drone, fly semi autonomously in an indoor environment. Firstly an
+%% easy to use software platform that utilizes the AR.Drone sensing
+%% apparatus is contructed. The platform is then used for further
+%% experiments. These experiments explores how the sensor apparatus
+%% aboard the AR.Drone can be exploited to derive more abstract
+%% information about the near environment. This information is used to
+%% make the AR.Drone navigate through a preplanned route in an open
+%% spaces with visual markers on the floor.
+This thesis investigates the options of enabling a quadrokopter,
+AR.Drone, in an indoor environment, in part on its own. 
+%
+Specifically a software platform is implementet, that makes data
+from the built-in sensor device on the AR.Drone available and is
+responsable for maintaining the control connection to the AR.Drone. 
+%
+The platform implemented in this thesis is used to facilitate the
+answering of a series of questions through experimentation. The
+performed experiments are regarding:  
+%
+How can the sensor apparatus aboard the AR.Dronen be exploited to
+derive more abstract information about AR.Drones immediate
+environment (as in information not already accessible).
+%
+How the derived information can be used by the AR.Dronen to navigate by
+(experiments have shown that the AR.Drone is able to follow a
+planned route in an open space using visual markers on the floor). 
+%
+The techniques tested in the experiments show tendencies of usefull
+solutions to infer information about the local area AR.Dronens.
 }
 \end{otherlanguage}
 \abstract{
-%Indeholder og gennemgår i det følgende (på dansk).
-%-Kort intro hvad vil vi gøre...
 Dette speciale handler om at klarlægge mulighederne, for at gøre en
-quadrokopter, AR.Drone, delvis selvflyvende i et indendørsmiljø. Mere
-specifikt implementeres i første omgang en let anvendelig
-softwareplatform, der kan udnytte AR.Dronens indbyggede
-sensorapparat. Platformen anvendes herefter til de videre
-eksperimenter. Det undersøges hvorledes sensorapparatet ombord på
-AR.Dronen kan udnyttes, til at udlede mere abstrakt information om
-miljøet i den umiddelbare nærhed. Denne information anvendes til at
-lade AR.Dronen navigere efter en planlagt rute i et åbent rum med
-visuelle markører på gulvet. 
-\todo{Kort uddybning af, hvad har vi gjort, hvad var resultatet.}
+quadrokopter, AR.Drone, delvis selvflyvende i et indendørsmiljø. 
+%
+Mere specifikt er der implementeret en softwareplatform, som gør data
+fra AR.Dronens indbyggede sensorapparat tilgængelig og som har
+ansvaret for at opretholde kontrolforbindelsen til AR.Dronen.
+%
+Den implementerede platformen er i specialet brugt til at facilitere
+besvarelsen af en række spørgsmål gennem eksperimentation.
+%
+De udførte eksperimenter omhandler: 
+%%
+Hvorledes sensorapparatet ombord på AR.Dronen kan udnyttes, til at
+udlede mere abstrakt information om AR.Dronens umiddelbare nærmiljø,
+som der ikke i forvejen er adgang til. 
+%%
+Hvordan den udledte information kan anvendes af AR.Dronen til at
+navigere efter (eksperimenter har bl.a. vist at AR.Dronen er istand til at
+følge en planlagt rute i et åbent rum ved hjælp af visuelle markører på gulvet).
+%
+De testede teknikker i eksperimenterne viser lovende brugbare
+løsninger til udledning af information om AR.Dronens nærmiljø.
 }
 
 \tableofcontents
@@ -2579,14 +2609,13 @@ mobiltelefonkameraer er steget. De fleste moderne mobiltelefoner har
 således et kamera med en opløsning flere gange højere end AR.Dronens 
 kamera. 
 
+<<<<<<< HEAD
 Til dette eksperiment anvendtes bibliotekerne pyqrcode,
 \cite{electronic:pyqrcode}, og Zbar, \cite{electronic:zbar}, til
 henholdsvis indkodning og afkodning af QR-koder. Zbar er det bibliotek
 der også bruges i iPhone-app'en til afkodning af QR-koder. Zbar har
-pythonbindinger så det kan bruges på billeder taget med AR.Dronen.Der
-blev genereret en QR-kode som i figur~\ref{fig:qr_woah}, og koden blev
-testet til at kunne afkodes korrekt med en iPhone, inden aftestning
-med AR.Dronen.
+pythonbindinger så det kan bruges på billeder taget med AR.Dronen.
+
 \begin{framefig}
   \centering
   \includegraphics[width=0.35\textwidth]{grafik/woah.png}

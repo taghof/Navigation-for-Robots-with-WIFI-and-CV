@@ -201,10 +201,10 @@ små agile Mikro Arial Vehicles (MAV) i flok,~\cite{turpin:swarm}
 (publiseret 2012) er der
 fastmonteret kameraer i lokalet rundt om MAV-flokken til ekstern udregning og feedback
 af MAVens absolutte position.
-En anden tilgang som ligner dette speciales er, at alle
+En anden tilgang som ligner tilgangen i dette speciales er, at alle
 beslutninger omkring navigation skal træffes udelukkende på baggrund
 af sensorinput fra sensorerne på quadrokopteren. Eksempler på
-anvendelse af tilgang kan findes i brugen af quadrokoptere til inspektionen af
+anvendelse af denne tilgang kan findes i brugen af quadrokoptere til inspektionen af
 højspændingsledninger og broer,~\cite{uavbridgeinspection2007}, og i
 eksperimenterne af Chen et al omkring navigation af AR.Dronen i
 forskellige indendørs miljøer,~\cite{single_img_pespective_cues}.
@@ -232,16 +232,16 @@ fjernstyrede quadrokopters egenskaber som robotplatform.
 Igennem vores forundersøgelser af AR.Dronen er vi blevet overrasket
 over hvor stor interessen er og hvor stor aktivitet der er i diverse
 brugergrupper på internettet omkring quadrokoptere. %DIYDrones etc
-Udfra denne erfaring mener vi, at konstruktionen af en
-softwareplatform, udover at skulle støtte vores eget videre arbejde i
-specialet, også bør have fokus på at lave et let tilgængeligt interface til
+Udfra denne erfaring mener vi, at en softwareplatform, udover at
+skulle støtte vores eget videre arbejde i specialet, også skal tilbyde
+et let tilgængeligt interface til
 AR.Dronen. Interfacet skal være anvendeligt for brugere, som ikke
 nødvendigvis er erfarne programmører. Et perspektiv kunne
 være, at AR.dronen og den konstruerede platform kunne bruges til at
 lære om programmering.
 
 Hvis platformen laves modulopbygget, vil man kunne genbruge
-komponenter og derigennem evt kunne effektivisere udviklingen af
+komponenter og derigennem evt. kunne effektivisere udviklingen af
 dedikerede styringer til nye arbejdsopgaver for AR.Dronen.
 
 Langt størstedelen af arbejdet i projektet handler om at klarlægge og
@@ -254,7 +254,7 @@ forstå AR.Dronen og dens muligheder.
 %arkitektur/opbygning.
 %<- hvad skal der til?
 \pagebreak
-\section{Teseformulering} % Thomas & Morten, Hvad
+\section{Teseformulering/Mål} % Thomas & Morten, Hvad
 \label{sec:tese}
 %\todo{skal de 3 linier væk?}
 %Et blødt mål i specialet er at undersøge hvilke bestandele en platform
@@ -336,12 +336,11 @@ Specialet har fire mål som formuleres og uddybes således:
 %\paragraph{Domæne afgrænsning}
 AR.Dronen kan flyve både indendørs og udendørs. Specialet
 er afgrænset til at behandle indendørs navigation. For at 
-skabe en god basis at arbejde videre udfra, defineres specialets domæne
+skabe en god basis, der kan arbejdes videre udfra, defineres specialets domæne
 yderligere gennem følgende brugsscenarie. 
 %
 Der er fundet inspiration i indendørsområder som de der er beskrevet i
-artiklen med den selvkørende museumsrobotguide Minerva fra 1999,
-\cite{Thrun99minerva:a}. 
+artiklen med den selvkørende museumsrobotguide Minerva fra 1999,~\cite{Thrun99minerva:a}. 
 
 \begin{framefig}
   \centering
@@ -354,9 +353,11 @@ Minerva er udstyret med kamera og afstandsmåler til at registrere publikum og
 omgivelserne, for at kunne navigere i forhold til disse. 
 %
 Minerva handler også om menneske-maskin interaktion, som generelt er
-et vanskeligt område, men løsninger til naviagtionsproblemet alene
-findes allerede i litteraturen. Spørgsmålet er hvad der sker hvis den kørende robot i museumsmiljøet
-udskiftes med en flyvende AR.Drone. .
+et vanskeligt område, men løsninger til navigationsproblemet alene
+findes allerede i litteraturen. 
+%
+Et spørgsmål man kan stille sig er hvad sker der hvis den kørende robot i museumsmiljøet
+udskiftes med en flyvende AR.Drone.
 
 \begin{framefig}
   \centering
@@ -366,24 +367,32 @@ udskiftes med en flyvende AR.Drone. .
 \end{framefig}
 
 Hvilke muligheder og begrænsninger giver AR.Dronens sensorer og
-muligheder for manøvrering. 
+manøvreegenskaber. 
+%
 Hvilke muligheder ville det give at bruge AR.Dronen
-som robotplatform. Et scenarie er at lave et webinterface så gæster
+som robotplatform. 
+%
+Et scenarie er at lade gæster fjernstyre AR.Dronen
+rundt på museet. En videre udbygning er at lave et webinterface så gæster
 kan besøge museet fra internettet. Spørgsmålet er hvad 
 det vil medføre. Det er nemt at forestille sig at den meget fjerne
-kontrol vil give en klar oplevelse af disembodyment. Der er også et sikkerhedsaspekt i det at lade en quadrokopter næsten
-selvstyrende flyve rundt blandt mennesker. Et andet scenarie er at
-lave film af en personaliseret flyvning, eller en forprogrammeret
-rutesekvens og dele den med andre som et postkort eller souvenir.
+kontrol vil give en klar oplevelse af disembodyment. Der er også et
+sikkerhedsaspekt i det at lade en quadrokopter næsten selvstyrende
+flyve rundt blandt mennesker. En anden udbygning er at lade gæster
+optage en personaliseret flyvning, eller en forprogrammeret
+rutesekvens og dele den med andre som et postkort eller en souvenir.
 %
 %% Det er noget med en [semi autonom] [navigation] [indendørs] [luftbåren]
 %% fra semiautonom og navigation er der noget, 1) bevægelse i forskellige miljøer, og 2) avoid opførsel, møde med silhuet eller lavt batteri.
 %% at det er indendørs giver nogle begrænsninger, kan bestemme et bestemt miljø ala Hopper-gangene / Ada-gangene eller Zuse.
 %% Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
 %
+
+Herover beskrives billedligt et løst scenarie for specialets domæne.
+% at løse løsninger til
 Af hensyn til at lave praktiske forsøg, bliver de konkrete
-navigationsløsninger designet til at virke i IT-byens kontorer og
-gangarealer samt Zuse-bygningen\cite{zuse} på Katrinebjerg i Århus.
+navigationsløsninger designet til at virke i Ada-bygningens,~\cite{ada}, kontorer og
+gangarealer, samt Zuse-bygningen,~\cite{zuse}, på Katrinebjerg i Århus.
 
 
 

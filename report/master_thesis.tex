@@ -115,27 +115,30 @@ Ole Caprani
 %% information about the near environment. This information is used to
 %% make the AR.Drone navigate through a preplanned route in an open
 %% spaces with visual markers on the floor.
-This thesis investigates the options of enabling a quadrokopter,
-AR.Drone, in an indoor environment, in part on its own. 
+%%This thesis investigates the options of enabling a quadrokopter,
+%%AR.Drone, in an indoor environment, in part on its own. 
+This thesis investigates the possibility of making a quadrokopter,
+AR.Drone, fly semi autonomously in an indoor environment.
 %
-Specifically a software platform is implementet, that makes data
-from the built-in sensor device on the AR.Drone available and is
-responsable for maintaining the control connection to the AR.Drone. 
+A software platform is implemented, which makes data
+from the built-in sensor devices on the AR.Drone available and
+maintains the control connection to the AR.Drone.  
 %
 The platform implemented in this thesis is used to facilitate the
 answering of a series of questions through experimentation. The
-performed experiments are regarding:  
+performed experiments regards:  
 %
-How can the sensor apparatus aboard the AR.Dronen be exploited to
+How can the sensor apparatus aboard the AR.Drone be exploited to
 derive more abstract information about AR.Drones immediate
 environment (as in information not already accessible).
 %
-How the derived information can be used by the AR.Dronen to navigate by
+How the derived information can be used by the AR.Drone to navigate by
 (experiments have shown that the AR.Drone is able to follow a
 planned route in an open space using visual markers on the floor). 
 %
+
 The techniques tested in the experiments show tendencies of usefull
-solutions to infer information about the local area AR.Dronens.
+solutions to infer information about the AR.Drones local area.
 }
 \end{otherlanguage}
 \abstract{
@@ -147,7 +150,7 @@ fra AR.Dronens indbyggede sensorapparat tilgængelig og som har
 ansvaret for at opretholde kontrolforbindelsen til AR.Dronen.
 %
 Den implementerede platformen er i specialet brugt til at facilitere
-besvarelsen af en række spørgsmål gennem eksperimentation.
+besvarelsen af en række spørgsmål gennem eksperimentering.
 %
 De udførte eksperimenter omhandler: 
 %%
@@ -159,6 +162,7 @@ Hvordan den udledte information kan anvendes af AR.Dronen til at
 navigere efter (eksperimenter har bl.a. vist at AR.Dronen er istand til at
 følge en planlagt rute i et åbent rum ved hjælp af visuelle markører på gulvet).
 %
+
 De testede teknikker i eksperimenterne viser lovende brugbare
 løsninger til udledning af information om AR.Dronens nærmiljø.
 }
@@ -423,10 +427,10 @@ eksperimenter der ikke krævede flyvning, anvendt en strømforsyning fra
 en PC i stedet for et batteri.
 
 Med AR.Dronen er man hurtigt i luften og der kan hurtigt bygges software
-der anvender det offentliggjorte interface. Til gengæld er der ingen
+der anvender det offentliggjorte interface. Til gengæld har man ingen
 indflydelse på det styreprogram der kører på AR.Dronen og AR.Dronen kan kun
-styres AR.Dronen gennem interfacet. Det er muligt at implementere et
-alternativt styreprogram til at AR.Dronen, men det har ikke været et
+styres gennem interfacet. Det er muligt at implementere et
+alternativt styreprogram til AR.Dronen, men det har ikke været et
 mål med dette speciale.
 
 Der gives en detaljeret vurdering af AR.Dronen som robotplatform i
@@ -435,7 +439,7 @@ sektion~\ref{ssec:dronerecap}.
 %%%% Introduction - Metode
 \subsection{Klientplatform og klientværktøjer} % Thomas & Morten 
 Der er implementeret en klientplatform til indsamling af AR.Dronens
-sensorstrømme og fjernstyring af denne. Klientplatformen har
+sensorstrømme og fjernstyring af AR.Dronen. Klientplatformen har
 fasciliteret de eksperimenter som beskrives i
 sektion~\ref{chap:Eksperimenter} og dermed også udviklingen af de
 forskellige tasks i sektion~\ref{sec:tasks}.
@@ -449,20 +453,20 @@ forbindelse med forberedelse og udførelse af eksperimenter med
 klientplatformen.
 
 \subsection{Python}
-Klientplatformen implementeres i Python. Grunden til dette er primært Pythons læsbarhed og simple
-syntaks. Læsbar kode fordrer ikke bare hurtig udvikling fra vores
-side, men også at andre udviklere hurtigere kan sætte sig ind i koden
-og videreudvikle på den. Pythons simple syntaks betyder, at
-klientplatformen også vil henvende sig til mindre erfarne
-udviklere. Da det har været et mål, at skabe en let anvendelig og let
-udbyggelig klientplatform, er Python et oplagt valg.
+Klientplatformen implementeres i Python. Grunden til dette er primært
+Pythons læsbarhed og simple syntaks. Læsbar kode fordrer ikke bare
+hurtig udvikling fra vores side, men også at andre udviklere hurtigere
+kan sætte sig ind i koden og videreudvikle på den. Pythons simple
+syntaks betyder, at klientplatformen også vil henvende sig til mindre
+erfarne udviklere. Da det har været et mål, at skabe en let anvendelig
+og let udbyggelig klientplatform, er Python et oplagt valg.
  
 Eksemplerne i sektion~\ref{sec:platformsadgang} viser hvor lidt kode
 der behøves, for at anvende klientplatformen. Desuden henvises til
 implementationen af klientværktøjerne,~\cite{github:sensordisplay},~\cite{github:mapcreator},~\cite{github:taskcreator},
 for eksempler der anvender klientplatformen.
 
-Udfordingen ved valget af implementationssprog er, at Python som et
+Udfordringen ved valget af implementationssprog er, at Python som et
 dynamisk typet, fortolket sprog, ikke performance-mæssigt kan
 sammenlignes med mere maskinnære sprog som C og C++. For at overkomme
 denne udfordring, er der gjort brug af OpenCVs
@@ -483,7 +487,7 @@ computer vision infrastruktur.
 
 OpenCV blev i starten udviklet i C, men den seneste udvikling er
 udelukkende foregået i C++. Udover C og C++, findes der en række
-interfaces til biblioteket, bland andre et Python
+interfaces til biblioteket, blandt andre et Python
 interface,~\cite{opencv:wiki}. Python interfacet fungerer som en
 wrapper om OpenCVs C/C++ algoritmer. Ved anvendelse af dette
 interface, kombineres altså Pythons brugervenlighed og OpenCVs
@@ -492,20 +496,20 @@ hastighed.
 OpenCVs optimerede algoritmer har, på grund af deres effektivitet,
 været uundværlige, blandt andet i implementationen af
 PositionSilhouetDetector (sektion~\ref{sec:sub:virtuel}). Forskellen i
-afviklingshastighed på en blobdetector implementeret i ren Python og
+afviklingshastighed på en blobdetektor implementeret i ren Python og
 en der anvender OpenCVs algoritmer, var tydelig under eksperimenterne
 i sektion~\ref{ssec:visuellokalisering}. 
 
 \subsection{Eksperimenter} 
 For at teste AR.Dronen og klientplatformen, er der udført en række
-eksperimenter,~\ref{chap:Eksperimenter}. Eksperimenterne omhandler
+eksperimenter, se kapitel~\ref{chap:Eksperimenter}. Eksperimenterne omhandler
 generelt udledning af kontekstuel information fra AR.Dronens
 sensorstrømme. Mere specifikt testes metoder til lokalisering,
 afstandsbedømmelse, måling af tilbagelagt afstand (Odometri) og
 korridordetektering.
 
 \paragraph{Lokalisering via WIFI-fingerprinting:} Ved hjælp af en
-WIFI-fingerprinting algoritme, er muligheden for at lokalisere
+WIFI-fingerprinting-algoritme, er muligheden for at lokalisere
 AR.Dronen i forhold til et antal fastlagte positioner blevet
 undersøgt. Eksperimenternes opstilling og resultater kan ses i
 sektion~\ref{ssec:wifilokalisering}.
@@ -526,18 +530,18 @@ foran frontkameraet. Dette gøres ved brug af den tilbagelagte afstand
 og målte vinkler til genstanden.
 
 \paragraph{Korridordetektering:} Der er eksperimenteret med muligheden
-for at detektere et korridormiljø, sektion~\ref{sec:korridor}. Med en
+for at detektere et korridormiljø (sektion~\ref{sec:korridor}). Med en
 sådan detektion, kan AR.Dronen bevæge sig i forhold til denne
 specifikke miljøtype. Algoritmen analyserer på indholdet af diagonale
 linier i billedet fra frontkameraet.
 
-\paragraph{DistanceTracker:} En del af den navigationsdata der modtages
+\paragraph{Odometrisk afstandsmåling:} En del af den navigationsdata der modtages
 fra AR.Dronen er hastighedsestimater. Disse
 hastighedsestimater er anvendt til at implementere en odometrisk
-afstandsmåler (DistanceTracker). Implementationen integrerer over de
+afstandsmåler. Implementationen integrerer over de
 modtagne hastighedsestimater. Eksperimenterne med DistanceTrackeren
 involverer manuelle og automatiserede flyvninger over mere eller
-mindre ensartede overflader, se sektion~\ref{sec:distance-mesu}.
+mindre ensartede overflader (se sektion~\ref{sec:distance-mesu}).
 
 \section{Medfølgende CD}
 På den medfølgende CD findes README.txt som forklarer hvordan de
@@ -587,7 +591,7 @@ AR.Dronen er en quadrokopter fremstillet og udviklet af det franske
 firma Parrot, \cite{electronic:parrot},
 \cite{electronic:wiki_parrot}. AR står Augmented Reality,~
 \cite{electronic:nbc}, og relaterer til muligheden for at udvikle
-augmented reality applikationer, ved hjælp af AR.Dronens
+augmented reality applikationer ved hjælp af AR.Dronens
 sensorstrømme. En quadrokopter benytter fire faste rotorer til at
 generere opdrift og styre sin bevægelse i rummet. AR.Dronen kommer med
 et sæt sensorer bestående af: To kameraer, et vertikalt nedadrettet og
@@ -601,18 +605,15 @@ to forskellige skumskjold til henholdsvis indendørs
 (figur~\ref{fig:indendoersskjold}) og udendørs flyvning
 (figur~\ref{fig:udendoersskjold}).
 
-I det følgende afsnit, \emph{\nameref{ssec:hardware}}. gennemgåes de
+I det følgende afsnit, \emph{\nameref{ssec:hardware}} gennemgåes de
 fysiske enheder som udgør AR.Dronen, i afsnittet
 \emph{\nameref{ssec:fysik}} gives en introduktion til hvorledes
 AR.Dronen bruger rotorerne til at skabe opdrift og bevægelse i
 luften. I afsnittet \emph{\nameref{ssec:software}} og afsnittet
 \emph{\nameref{ssec:kommunikation}} beskrives kommunikationen mellem
-AR.Dronens styreprogram og forskeliige typer klienter, mens afsnittet
+AR.Dronens styreprogram og forskellige typer klienter, mens afsnittet
 \emph{\nameref{ssec:dronerecap}} opregner de observationer der er
-gjort om AR.Dronen
-under specialearbejdet og som kan hjælpe andre med at træffe en
-beslutning om hvorvidt, AR.Dronen er den rigtige platform at bygge
-videre på.
+gjort om AR.Dronen under specialearbejdet.
 
 \begin{framefig}
 \centering
@@ -635,10 +636,9 @@ videre på.
 Det er nærmest umuligt for et menneske at styre en helikopter, eller quadrokopter, ved
 direkte kontrol, med mindre man har trænet i mange år (hvilket er det
 profesionelle piloter gør, \cite{electronic:heli}). Brugerens styring af AR.Dronen er således
-ikke direkte, men støttet af en feedback-kontrol hvortil der
-er sensorinput fra omverdenen. Sensorerne, aktuatorerne der gør det
-muligt at kontrollere rotorerne, strømforsyningen og computeren
-ombord beskrives herunder.
+ikke direkte, men støttet af en feedback-kontrol, hvortil der
+er sensorinput fra omverdenen. Herunder beskrives sensorerne,
+aktuatorerne, strømforsyningen og computeren ombord.
 
 %og må siges at være en af de grundlæggende egenskaber for en robot. At der så er mulighed for at udbygge en stillingstagen iforhold til 
 %
@@ -659,7 +659,7 @@ ombord beskrives herunder.
 
 \subsubsection{Kameraer}
 AR.Dronen er som sagt udstyret med to kameraer: Et
-bundkamera(nedadrettet) og et frontkamera(fremadrettet). Frontkameraet
+bundkamera (nedadrettet) og et frontkamera (fremadrettet). Frontkameraet
 har en synsvinkel på $93 ^{\circ}$ og består af en
 CMOS\footnote{Complimentary-Symmetry Metal Oxide Semiconductor, på
 dansk: en sensor af komplimentær metaloxid halvleder
@@ -681,14 +681,13 @@ Intermediate Format (QCIF), med en framerate på 60 FPS.
 
 \subsubsection{Afstandssensor} 
 Til at bestemme AR.Dronens afstand til gulvet anvendes en ultrasonisk
-afstandssensor. Denne opererer ved at udsende en ultralydspuls og
-herefter måle tidsintervallet der går før ekkoet
-måles. Ultralydsmåleren er angivet til at virke op til 6 meter og er
-fysisk placeret på navboardet, på AR.Dronens underside (se figur
-\ref{fig:navboard}).
+afstandssensor (se figur \ref{fig:navboard}). Denne opererer ved at
+udsende en ultralydspuls og herefter måle tidsintervallet der går før
+ekkoet måles. Ultralydsmåleren er angivet til at virke op til 6 meter
+og er fysisk placeret på navboardet, på AR.Dronens underside.
 
 \subsubsection{Gyroskoper og accelerometer} %Acceleration og inerti} 
-AR.Dronen er udstyret med to gyroskoper, et 2-akses gyroskop til at
+AR.Dronen er udstyret med to gyroskoper: Et 2-akses gyroskop til at
 måle rotationsvinklerne $\theta$ og $\phi$ (pitch og roll) samt et
 1-akses piezoelektrisk gyroskop til at måle rotationsvinklen $\psi$
 (yaw). Gyroskoperne kombineres med et 3-akses accelerometer i en
@@ -706,12 +705,12 @@ Unit}-enhed til at måle inerti. For en grafisk repræsentation se figur \ref{fig:
 \begin{framefig}
   \centering
   \includegraphics[width=0.60\textwidth]{grafik/motor_gear.png}
-  \caption{a) Motorreservedel, b) samlet motor og gear på kulfiberkryds og c) gear-reservedel.}
+  \caption{Motorreservedel, samlet motor og gear på kulfiberkryds, gear-reservedele.}
   \label{fig:motorgear}
 \end{framefig}
 AR.Dronens aktuatorer er de fire børsteløse 15 Watt
 motorer, \cite{electronic:engines}. Motorerne
-arbejder i intervallet 10350 til 41400 omdrejninger per minut(RPM) og når AR.Dronen står stille i
+arbejder i intervallet 10350 til 41400 omdrejninger per minut (RPM) og når AR.Dronen står stille i
 luften, arbejder motorerne med 28000 RPM. Dette svarer, grundet gearingen,
 til 3300 RPM for propellerne, \cite{electronic:engines}. Motorerne har uden sammenligning det
 største strømforbrug af alle AR.Dronens enheder.
@@ -741,9 +740,9 @@ Batteriet der driver AR.Dronens enheder er et 3 celle lithium-polymer
 batteri med en open-circuit\footnote{Open-circuit spændingen er den
 spænding, der er over batteriet, når det er uden belastning og ikke
 oplades.} spænding på 11,1 Volt. Batteriet har en ladning på 1000
-milli-ampere-timer(mAh) og en afladnings hastighed på 10 Coulomb(C),
+milli-ampere-timer (mAh) og en afladnings hastighed på 10 Coulomb (C),
 \cite{electronic:ar.drone_parrot_technologies}. Opladning af batteriet
-kan foregå i løbet af 90 minutter og et fuldt opladt batteri giver
+kan foregå i løbet af 90 minutter og et fuldt opladet batteri giver
 omking 12 minutters flyvetid, \cite{electronic:wiki_ar.drone}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -759,8 +758,8 @@ omking 12 minutters flyvetid, \cite{electronic:wiki_ar.drone}.
 AR.Dronen fåes som nævnt med to skrog eller skjold
 (se figur~\ref{fig:indendoersskjold}), og vejer 420 gram med det
 indendørs skrog monteret. 420 gram er en relativ lille vægt i forhold
-til andre quadrokoptere, \cite{quteprints33767}, som har 4-5 kg de skal
-løfte. 
+til f.eks. \cite{quteprints33767}, som beskriver en quadrokopter der
+skal løfte 4-5 kg. 
 
 På en AR.Drone sidder de fire propeller i hver sit hjørne af et
 kulfiberkryds. Når en propel roterer om sin akse flytter den 
@@ -772,18 +771,19 @@ AR.Dronen med en kraft modsat tyngdekraften (thrust),
 \cite{electronic:wiki_quadrotor}. Udover thrust påvirker den 
 roterende bevægelse også propellens base med et moment (torque)
 modsat propellens retning. Eksempelvis vil en helikopter uden haleror
-dreje ukontrollerbart rundt om sig selv, men fordi AR.Dronen har et par
-rotorer som drejer med uret og et andet par som drejer modsat mod
-uret, \cite{techreport:ardroneDevGuide}, bliver summen af
-momentpåvirkningen nul, såfremt de fire rotorer drejer med samme hastighed. 
-Denne egenskab bruges også til at styre AR.Dronens flyvning og bevægelser i
-rummet, som kan beskrives med tre bevægelsesakser: x, y og z, og de tilhørende
-rotationsvinkler $\phi$, $\theta$  og $\psi$ (Tait-Bryan-vinklerne, \cite{wiki:euler}). På figur~\ref{fig:drone_movements} forklares hvordan
-en quadrokopter i det generelle tilfælde kan bevæges omkring de tre
-akser. Det bemærkes at x og y-akserne på
-denne figur er forskudt 45$^{\circ}$ så de flugter med motorerne (for at
-lette forklaringen), hvorimod AR.Dronens akser er forskudt så y-aksens positive retning peger i
-samme retning som dennes frontkamera, se figur~\ref{fig:drone_akser}.   
+dreje ukontrollerbart rundt om sig selv, men fordi AR.Dronen har et
+par rotorer som drejer med uret og et andet par som drejer modsat mod
+uret, bliver summen af momentpåvirkningen nul, såfremt de fire rotorer
+drejer med samme hastighed.  Denne egenskab bruges også til at styre
+AR.Dronens flyvning og bevægelser i rummet, som kan beskrives med tre
+bevægelsesakser: x, y og z, og de tilhørende rotationsvinkler $\phi$,
+$\theta$ og $\psi$ (Tait-Bryan-vinklerne, \cite{wiki:euler}). På
+figur~\ref{fig:drone_movements} forklares hvordan en quadrokopter i
+det generelle tilfælde kan bevæges omkring de tre akser. Det bemærkes
+at x og y-akserne på denne figur er forskudt 45$^{\circ}$ så de
+flugter med motorerne (for at lette forklaringen), hvorimod AR.Dronens
+akser er forskudt så y-aksens positive retning peger i samme retning
+som frontkameraet, se figur~\ref{fig:drone_akser}.
 
 AR.Dronens bevægelser styres ved at kontrollere dens vinkel i forhold
 til de 3 akser, ligesom på figur~\ref{fig:drone_movements}. Skal
@@ -809,7 +809,7 @@ rotere.
     (ændring i $\phi$), (c) samme som b, men i pitch
     (ændring i $\theta$) (d) En større vinkelhastighed på de
     med-uret-drejende propeller gør at torque bliver ulige og at
-    quadrokopteren roterer(yaw) mod venstre (ændring i $\psi$). Ved bevægelser frem og tilbage udledes en positiv
+    quadrokopteren roterer (yaw) mod venstre (ændring i $\psi$). Ved bevægelser frem og tilbage udledes en positiv
     eller negativ hastighed ($V_x$), ligesom ved bevægelser sideværts
     ($V_y$). Figuren er fra ~\cite{techreport:ardroneDevGuide}.}
   \label{fig:drone_movements}
@@ -866,9 +866,9 @@ minimum. Busybox på AR.Drone fylder 483 kbyte og udstyrer AR.Dronen
 med de brugerkommandoer man forventer på et standard
 Linuxsystem. AR.Dronens Busybox leverer DHCP-serveren,
 \cite{rfc2131}, som AR.Dronen anvender til at tildele %DHCP cite?
-IP\cite{rfc791}-adresser og lave et netværk mellem en ekstern klient
+IP-adresser,~\cite{rfc791}, og lave et netværk mellem en ekstern klient
 og AR.Dronen selv. Desuden leverer Busybox også en telnet-server, \cite{rfc854}, der giver
-adgang til AR.Dronens terminal og en texteditor(Vi) der gør det muligt
+adgang til AR.Dronens terminal og en texteditor (Vi) der gør det muligt
 at redigere filer direkte på AR.Dronen.
 
 \subsection{AR.Dronens styreprogram}% fra Parrot}
@@ -880,14 +880,14 @@ betragtes programmet som en lukket kasse, hvor implementationsdetaljer
 ikke er kendt. Forskellige elementer af \code{program.elf} kan dog udledes, efter at
 have observeret AR.Dronen under flyvning. \code{Program.elf} indeholder blandt andet:
 \begin{itemize}
-\item en PID controller, \cite{electronic:pid}, \cite{electronic:pid2}, til at stabilisere AR.Dronen når der svæves.
-\item en algoritme til at udlede AR.Dronens hastighed ved hjælp af
+\item En PID controller, \cite{electronic:pid}, \cite{electronic:pid2}, til at stabilisere AR.Dronen når der svæves.
+\item En algoritme til at udlede AR.Dronens hastighed ved hjælp af
   bundkameraet, \cite{velocity_estimation_inside_the_drone}.
-\item og en algoritme til at detektere tags i billeder, til brug for
+\item En algoritme til at detektere tags i billeder, til brug for
   augmented reality spil, se figur~\ref{fig:tags}. 
 \end{itemize}
-AR.Dronens styreprogram modtager styringskommandoer(AT-kommandoer) fra brugeren gennem en User
-Datagram Protocol(UDP) port, \cite{rfc768}. Kommunikationsinterfacet
+AR.Dronens styreprogram modtager styringskommandoer (AT-kommandoer) fra brugeren gennem en User
+Datagram Protocol (UDP)-port, \cite{rfc768}. Kommunikationsinterfacet
 mellem klientenhed og AR.Dronen beskrives i afsnit~\ref{ssec:kommunikation}.
 
 \begin{framefig}

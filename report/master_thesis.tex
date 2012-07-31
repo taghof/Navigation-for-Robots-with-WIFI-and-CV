@@ -372,7 +372,7 @@ udskiftes med en flyvende AR.Drone.
 \end{framefig}
 
 Hvilke muligheder og begrænsninger giver AR.Dronens sensorer og
-manøvreegenskaber. 
+man\-øvreegenskaber. 
 %
 Hvilke muligheder ville det give at bruge AR.Dronen
 som robotplatform. 
@@ -509,7 +509,7 @@ afstandsbedømmelse, måling af tilbagelagt afstand (Odometri) og
 korridordetektering.
 
 \paragraph{Lokalisering via WIFI-fingerprinting:} Ved hjælp af en
-WIFI-fingerprinting-algoritme, er muligheden for at lokalisere
+WIFI-fingerprin\-ting-algoritme, er muligheden for at lokalisere
 AR.Dronen i forhold til et antal fastlagte positioner blevet
 undersøgt. Eksperimenternes opstilling og resultater kan ses i
 sektion~\ref{ssec:wifilokalisering}.
@@ -545,7 +545,7 @@ mindre ensartede overflader (se sektion~\ref{sec:distance-mesu}).
 
 \section{Medfølgende CD}
 På den medfølgende CD findes README.txt som forklarer hvordan de
-medfølgende programmer afvikles, samt følgende materiale:
+med\-følgende programmer afvikles, samt følgende materiale:
 \begin{itemize}
 \item /klientplatform/\\
   Kildekoden til den udviklede klientplatform inklusiv de udviklede tasks samt
@@ -932,7 +932,7 @@ både i form af fjernstyring og intern kommunikation på AR.Dronen.
 \end{framefig}
 \subsection{Ekstern klientkommunikation}
 En ekstern klients (PC, smartphone eller lignende) interaktion med
-AR.Dronens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupper:
+AR.Dro\-nens Linux-platform og AR.Dronens styreprogram kan kategoriseres i 2 grupper:
 \begin{itemize}
   \item Fra en ekstern klientapplikation (FTP, \cite{rfc959},
     eller Telnet, se figur~\ref{fig:telnetterminal}) over WIFI til
@@ -962,9 +962,12 @@ process, der kører parallelt med AR.Dronens styreprogram på AR.Dronen.
 %første kategori herunder og sommetider som værende i begge kategorier
 %herunder: 
 Interne processer på AR.Drone-platformen har mulighed for at
-kommunikere med AR.Dronens styreprogram gennem UDP, på lige fod med de eksterne
-klienter til fjernstyring. En intern process vil afvikles i userspace,
-en nærmere beskrivelse herom gennemgåes i sektion~\ref{sec:udvidelse}.
+kommunikere med AR.Dronens styreprogram gennem UDP, på lige fod med de
+eksterne klienter til fjernstyring. Et eksempel på en intern klient
+gives i blogposten "UDPing ATcommands from inside the
+drone",~\cite{blog:intern}. En intern process vil afvikles i
+userspace, en nærmere beskrivelse herom gennemgåes i
+sektion~\ref{sec:udvidelse}.
 %
 \begin{framefig}
   \centering
@@ -977,7 +980,7 @@ en nærmere beskrivelse herom gennemgåes i sektion~\ref{sec:udvidelse}.
 \subsection{FTP og Telnet baseret kommunikation}
 \label{sssec:tcp}
 Fra en PC eller smartphone er det muligt at få adgang til AR.Dronens 
-Linuxinstallation ved at oprette en Telnetforbindelse til AR.Dronens 
+Linuxinstallation, ved at oprette en Telnetforbindelse til AR.Dronens 
 faste IP-adresse: $192.168.1.1$. Efter forbindelsen er etableret, 
 får brugeren adgang til en root-terminal (se figur~\ref{fig:telnetterminal}).
 
@@ -995,7 +998,7 @@ klienter og AR.Dronens styreprogram.
 AR.Dronens styreprogram sender og modtager pakker på tre UDP-porte:
 \begin{itemize}
   \item På port 5556 (command port) lytter styreprogrammet efter
-    AT-kommandoer afsendt fra klienten, AT-kommandoer gennemgåes i \ref{sssec:atinterface}.
+    AT-komman\-doer afsendt fra klienten, AT-kommandoer gennemgåes i \ref{sssec:atinterface}.
   \item på port 5555 (video port) sender AR.Dronen en videostrøm,
     indeholdende billeder fra èn af fire videokanaler til klienten.
   \item på port 5554 (navdata port) sender AR.Dronen en navdatastrøm
@@ -1025,7 +1028,7 @@ figur \ref{fig:atsyntaks}.
 \end{framefig}
 %
 Ved at afsende kommandoen i figur~\ref{fig:ateksempel} bestemmer
-man hvorledes AR.Dronen skal bevæge sig ved translation og rotation,
+man hvorledes AR.Dron\-en skal bevæge sig ved translation og rotation,
 som beskrevet i \nameref{ssec:fysik}, sektion \ref{ssec:fysik}. 
 %
 %
@@ -1382,7 +1385,7 @@ def square():
 
 \subsection{Modtagelse af sensordata fra AR.Dronen} % Introduktion til modtagelse af video, navigationsog wifidata fra AR. Dronen
 I det følgende gennemgåes mulighederne for at modtage datapakker med video, navigation- og WIFI-data fra AR.Dronen.
-For at kunne anvende AR.Dronen som en robot, er det nødvendigt at kunne
+For at kunne anvende AR.Dro\-nen som en robot, er det nødvendigt at kunne
 indsamle data fra de ombordværende sensorer, samt at kunne stille
 disse data til rådighed for andre dele af systemet. Til dette formål
 er der designet og implementeret en receiver-struktur bestående af tre
@@ -1527,7 +1530,7 @@ videostrøm. Afkodningen af billederne foregår på baggrund af den
 process der nævnes i sektion 7.2 side 43 i
 \cite{techreport:ardroneDevGuide}.
 
-\paragraph{JIT-kompileret afkodning af billeder}
+\subsubsection{JIT-kompileret afkodning af billeder}
 %%% % % %
 Da Python er et fortolket højniveau sprog er det ikke muligt at opnå
 samme afviklingshastighed som ved afvikling af C eller andre
@@ -1553,7 +1556,7 @@ Psyco.
 
 \subsubsection{WIFI-modtager}
 Som de andre receivere modtager \emph{WIFIReceiveren} en datastrøm fra
-AR.Dronen. WIFI-strømmen er dog en tilføjelse vi har lavet og formatet
+AR.Dron\-en. WIFI-strømmen er dog en tilføjelse vi har lavet og formatet
 der skal afkodes er blot en tekststreng bestående af en MAC-adresse og
 en signalstyrke. Der modtages således en pakke for hver pakke
 det indlejrede WIFI-sensor-program (beskrevet i
@@ -1663,8 +1666,7 @@ ikke være nogen mulighed for at bringe AR.Dronen manuelt (og sikkert) ned.
   \label{fig:controlleruml}
 \end{framefig}
 
-Begge controllere nedarver fra en grundlæggende
-controllerklasse: \code{Controller} (se
+Begge controllere nedarver fra en basecontrollerklasse: \code{Controller} (se
 figur~\ref{fig:controlleruml}). Denne er implementeret som en tråd der
 med et givent tidsinterval kalder en kontrolmetode (\code{process\_events}). Den simple
 opbygning betyder, at hvis man ønsker at implementere en anden type
@@ -2354,7 +2356,7 @@ detekterings-hastighed ikke var afgørende, fungerede den simple
 implementation udemærket. 
 
 Eksperimentet udførtes ved at markøren blev placeret på
-gulvet og AR.Dronen placeret i position over markøren, hvorefter
+gulvet og AR.Dro\-nen placeret i position over markøren, hvorefter
 blobdetectionalgoritmen blev startet. Detektionsraten defineres som
 antal succesfulde detektioner delt med antal gentagelser af
 algoritmen. Algoritmen kørtes 200 gange i henholdsvis 0.5, 1.0, 1.5
@@ -2719,7 +2721,7 @@ der blev udført.
 \subsection{Optisk feature-tracking}
 \label{sec:sub:feature-tracking}
 I det følgende bruges OpenCV-funktionerne \code{goodFeaturesToTrack} og
-\code{calcOpticalFlowPyrLK}.
+\code{calc\-OpticalFlowPyrLK}.
 Programmet sættes til først at finde en liste af egnede
 features\footnote{En egnet feature er et karakteristisk 
   punkt i billedet som kan genkendes selvom billedet flytter
@@ -3322,8 +3324,8 @@ forbindelse med eksperimenterne).
 
 \subsection*{3. Udledning af yderligere navigationsdata}
 Udledning af yderligere højere-ordens navigationsdata fra
-AR.Dronenssensorstrømme har været et hovedtema i de udførte
-eksperimenter. Herunder konkluderes specialets  opsatte delmål:
+AR.Dronens sensorstrømme, har været et hovedtema i de udførte
+eksperimenter. Herunder konkluderes på specialets opsatte delmål:
 
 \subsection*{3.(a) Lokalisering via WIFI}
 Eksperimenter der undersøgte anvendeligheden af WIFI-fingerprinting
@@ -3437,7 +3439,7 @@ AR.Dronen,~\cite{brown:ros}.
 
 \subsection*{OpenCV}
 Anvendelsen af OpenCVs billedbehandlingsalgoritmer har været en
-nødvendighed. Det havde ikke været muligt at behandle nær samme antal
+nødven\-dighed. Det havde ikke været muligt at behandle nær samme antal
 billed, hvis algoritmerne var forsøgt implementeret i
 Python. Anvendelsen af OpenCVs Python interface har 
 været relativt nemt, på trods af få tilfælde hvor det ikke er helt
@@ -3565,7 +3567,7 @@ kontrollere AR.Dronen.
 \end{table} 
 
 
-\chapter{Canny kanter og Houghtransformerede linier}
+\chapter{Canny kanter og Hough linier}
 \label{app:linier}
 %plus hvad er kanter, og hvad er linier...
 \section{At finde kanter i et billede}

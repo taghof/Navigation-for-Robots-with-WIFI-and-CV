@@ -3579,7 +3579,7 @@ gradienten i 2 dimensioner.
   \caption{Graf over rød-, grøn-, blå-farveværdier for en linie i
     billedet med pixel indeks $j=67,\ i=\{0,1,\ldots,320-1 \}$. Samt
     pixel intensitet, her givet ved summen af de tre farver for $i$ og
-    $j$. Der hvor grafen, eg. for intensiteten, har stejlest hældning
+    $j$. Der hvor grafen, f.eks. for intensiteten, har stejlest hældning
     er der stor sandsynlighed for en kant i billedet.}
   \label{fig:kanter1}
 \end{framefig}
@@ -3590,40 +3590,37 @@ lysintensitet lokalt\footnote{Man kan også lede efter kanter globalt,
   anden tilgang. I dette afsnit beskrives en metode der søger 
 lokalt.} mellem naboer af pixels. Kanter er ofte en indikator for
 eksistensen af bl.a. ændringer i dybden af et billede og for
-overfladeændringer m.fl., se figur~\ref{fig:kanter1}. 
+overfladeændringer m.fl. (se figur~\ref{fig:kanter1}).
 
 For at forbedre resultatet af kant-filteret, kan indput-billedet
-forinden flyttes ned i dimension ved at bruge et
-båndpasfilter. Båndpasfilteret er en udglatning over
-billedet, som udføres med en \todo{convolve?} gaussisk
-klokke-operation, \cite{electronic:wiki_gaussklokke}, (fra
-billedbehandlingsprogrammer, eg. GIMP, \cite{gimp}, er funktionen kendt
+forinden påføres en udglatning over, som udføres ved at folde billedet
+med en gaussisk klokke-operation, \cite{electronic:wiki_gaussklokke},
+(fra billedbehandlingsprogrammer, f.eks. GIMP, \cite{gimp}, er funktionen kendt
 som Gaussian-blur).
 
-For herefter at finde kanter bruges cannyfilteret, \cite{Canny1986}.
-Canny blev valgt over Sobel, fordi Canny blev kendt først i specialet, men også
+For herefter at finde kanter bruges Cannyfilteret, \cite{Canny1986}.
+Canny blev valgt i stedet for Sobel, fordi Canny blev kendt først i specialet, men også
 fordi det ser ud til at kantmarkeringerne af et Sobelfilter er bredere end
 med Canny. Hvilket senere vil have indvirkning på Houghtransformens
-udførsel. \todo{er det rigtigt? hjemmel?}
+udførsel.
 
-Cannyfilteret tager et farvebillede i 3 kanaler og returnere et binært billede
+Cannyfilteret tager et billede i sort/hvide nuancer (1 kanal), så
+inden da, kopieres billedet fra tre kanaler til en kanal. Hvor
+billedet med den ene kanal er intensiteten (summen af tre farve
+kanaler rød, grøn og blå). Canny-filteret returnere et binært billede
 (sort/hvid) som det i figur~\ref{fig:vanishopb}. Hvide billedpunkter
-\todo{hedder det noget andet end billedpunketer}
 indikere at der er en kant i det oprindellige billede, mens sort
 betyder at der ikke er ændringer. 
 
-Tager man alle pixelpositioner hvor den første afledte er over
-threshold \todo{problemet med Sobel?} kan man ende op med mange tykke
-kanter, for at præcisere placeringen kan man udtynde dem, ved at søge
-i retningen af den lokale gradient og istedet finde
-optimum. \todo{skal dette med?: Videreudbygninger af Cannyfilter-implementationen efter 1986
-bruger bl.a. endnu en retningsbestemt afledt af gradienten og finder
-maximum ved den anden afledtes skæring med 0. - Lindenberg88 den
-2. og 3. afledte...}
+Tager man alle pixelpositioner hvor den første afledte af intensiteten
+er over threshold\footnote{Forklaret via det simple eksempel i
+figur~\ref{fig:kanter1}, ellers vil det være gradienten ($x$ og $y$)} kan man ende op med mange tykke
+kanter. For at præcisere placeringen kan man udtynde dem, ved at søge
+i retningen af den lokale gradient og istedet finde optimum. 
 
 \section{Liniedetektering via Houghtransformation}
-Generaliseret houghtransformation, \cite{duda1972houghline}, er en
-metode til at finde perfekte linier hvor der ikke andet end
+Generaliseret Houghtransformation, \cite{duda1972houghline}, er en
+metode til at finde perfekte linier hvor der ikke er andet end
 billedpunkter. Dvs. metoden finder steder i et billeder hvor der ligger mange
 billedpunkter på en lige række, og kalder rækken for en linie.
 
@@ -3633,14 +3630,14 @@ der går gennem punktet som
   \label{linigennempunkteq}
   \rho_{\theta} = x_0 * \cos{ \theta } + y_0 * \sin{ \theta }
 \end{equation}
-Hvor $0 \le \theta < 2 \pi$ og $0 \le \rho$, og hvor hvert par $(\theta, \rho_{\theta})$ vil repræsentere en linie igennem
-det punkt (se figur~\ref{fig:houghting}).
+Hvor $0 \le \theta < 2 \pi$ og $0 \le \rho_{\theta}$. 
+De linier der går gennem punktet $(x_0, y_0)$ repræsenteres ved de $(\theta, \rho_{\theta})$-par der er løsninger til linien.
 
 \begin{framefig}
   %\centering
   \subfigure[En linie beskrevet ved det velkendte almindelige
-    cartesisk koordinatsystem som: $y=ax+b$, samme linie beskrevet i
-    polar koordinatsystem ved en vinkel $\theta$ og en afstand
+    cartesisk koordinatsystem som: $y=ax+b$. Samme linie beskrevet på
+    polarform ved en vinkel $\theta$ og en afstand
     $\rho$. Forholdet imellem de 2 repræsentationer er $y = 
 \left( 
   - \frac{ \cos \theta }{ \sin \theta} 
@@ -3653,23 +3650,23 @@ det punkt (se figur~\ref{fig:houghting}).
     \label{fig:polar2cartesian}
 }
   %~ %add desired spacing between images, e. g. ~, \quad, \qquad etc. (or a blank line to force the subfig onto a new line)
-  \subfigure[Houghtransform, linie med flest stemmer, de 3 blå kryds
-    er billedpunkter]{
+  \subfigure[Houghtransform, linie der er løsning til hos mange
+    linie-ligninger, de 3 blå kryds er billedpunkter]{
     \includegraphics[width=0.66\textwidth]{grafik/houghting.png}
     \label{fig:houghting}}
   \label{fig:houghprocess2}
   %\caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
 \end{framefig}
-Man kan opsætte et kriterie for hvad der gør en
-god linie, ie. at linien skal gennemløbe mindst $X$ billedpunkter, for
-komme i betragtning til at være detekteret som en linie (minimumfor $X$
+Man kan opsætte et kriterie for hvad der gør en linie god, f.eks. at
+linien skal gennemløbe mindst $X$ billedpunkter, for 
+komme i betragtning til at være detekteret som en linie (minimum for $X$
 er 3 punkter). De linie-par som er løsning til flest konkrete
 \ref{linigennempunkteq}-ligninger vil rangere højest i resultatlisten.
-Resultatet af at køre det cannyfiltrerede billed igennem en
+Resultatet af at køre det Cannyfiltrerede billed igennem en
 Houghtransform er en liste med linier, repræsenteret ved ($\theta_i$,
 $\rho_i$) par, og sorteret efter godhed.
 
-OpenCV har to implementationer af Houghtransforms: En standard som
+OpenCV har to implementationer af Houghtransformationer: En standard som
 ovenfor beskrevet, og en probabilistisk. Den
 probalististiske returnerer en liste af linier, repræsenteret ved
 liniernes endepunkter $(x_{i1}, y_{i1}), (x_{i2}, x_{i2})$ istedet for

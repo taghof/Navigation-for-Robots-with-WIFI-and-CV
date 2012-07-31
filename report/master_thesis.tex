@@ -1,6 +1,6 @@
 %\documentclass[12pt,a4paper,twoside,openright,fleqn]{memoir}
 %\documentclass[10pt]{article}
-\documentclass[12pt]{report}
+\documentclass[12pt, twoside, openleft]{report}
 %\documentclass[12pt,twoside,openright]{report}
 %\documentclass[10pt,twoside]{report}
  
@@ -103,6 +103,7 @@ Ole Caprani
 
 \end{titlepage}
 \blankpage
+\raggedbottom
 \pagestyle{headings}
 \begin{otherlanguage}{english}
 \abstract{
@@ -166,10 +167,9 @@ følge en planlagt rute i et åbent rum ved hjælp af visuelle markører på gulvet).
 De testede teknikker i eksperimenterne viser lovende brugbare
 løsninger til udledning af information om AR.Dronens nærmiljø.
 }
-
+\setcounter{page}{0}
 \tableofcontents
-
-\pagebreak
+\blankpage
 
 \chapter{Introduktion}  %Thomas
 \label{sec:introduktion}
@@ -547,17 +547,17 @@ mindre ensartede overflader (se sektion~\ref{sec:distance-mesu}).
 På den medfølgende CD findes README.txt som forklarer hvordan de
 med\-følgende programmer afvikles, samt følgende materiale:
 \begin{itemize}
-\item /klientplatform/\\
+\item \code{/klientplatform/}\\
   Kildekoden til den udviklede klientplatform inklusiv de udviklede tasks samt
   klientværktøjerne.
-\item /AR.Drone addons/\\ 
+\item \code{/AR.Drone addons/}\\ 
   Kernemodulerne, bibliotekerne, driver-kildekoden og
   loadscriptet som er anvendt i forbindelse med udvikling på AR.Dronen.
-\item /report/\\ 
+\item \code{/report/}\\ 
   Pdf-version af denne specialerapport. 
-\item /webcache/\\
+\item \code{/webcache/}\\
   Off-line kopier af følsomme webkilder.
-\item /video/\\
+\item \code{/video/}\\
   Videomateriale af AR.Dronen og klientplatformen i funktion.
 \end{itemize}
 
@@ -875,7 +875,7 @@ at redigere filer direkte på AR.Dronen.
 \label{sssec:program.elf}
 Det styreprogram der står for selve motorkontrollen, transmitteringen af data og
 bearbejdning af sensordata i forbindelse med flyvning, er implementeret
-i \uri{/bin/program.elf} på AR.Dronen. Da der er tale om proprietært software
+i \code{/bin/program.elf} på AR.Dronen. Da der er tale om proprietært software
 betragtes programmet som en lukket kasse, hvor implementationsdetaljer
 ikke er kendt. Forskellige elementer af \code{program.elf} kan dog udledes, efter at
 have observeret AR.Dronen under flyvning. \code{Program.elf} indeholder blandt andet:
@@ -987,7 +987,7 @@ får brugeren adgang til en root-terminal (se figur~\ref{fig:telnetterminal}).
 Ved at oprette en FTP-forbindelse til AR.Dronens FTP-server, fra en
 FTP-klient, kan man overføre filer mellem AR.Dronen og en PC med 
 FTP-protokollens PUT og GET kommandoer. Hvis der ikke angives en sti lægges 
-overførte filer som standard i\uri{~/data/video} mappen på AR.Dronen.
+overførte filer som standard i \code{/data/video} mappen på AR.Dronen.
 
 \subsection{UDP baseret kommunikation}
 \label{sssec:udp}
@@ -1009,9 +1009,9 @@ AR.Dronens styreprogram sender og modtager pakker på tre UDP-porte:
 \subsection{AT kommando interface}
 \label{sssec:atinterface}
 En klient som skal kommunikere med AR.Dronens styreprogram, gør dette ved hjælp af
-såkaldte attention-kommandoer(AT-kommando). En AT-kommando er basalt set blot en
+såkaldte attention-kommandoer (AT-kommando). En AT-kommando er basalt set blot en
 tekststreng repræsenteret som 8 bits karakterer. AT-kommandoer sendes til AR.Dronens
-kommandoport(5556) som UDP-pakker. Formatet for AT-kommandoer ses på
+kommandoport (5556) som UDP-pakker. Formatet for AT-kommandoer ses på
 figur \ref{fig:atsyntaks}.
 
 \begin{framefig}
@@ -1019,11 +1019,12 @@ figur \ref{fig:atsyntaks}.
  AT*[kommandonavn]=[sekvensnummer],[arg1, arg2 ... argN]<LF>
 \end{verbatim}
   \caption{Syntaksen for en AT-kommando: [kommandonavn] kan f.eks. være
-    \code{PCMD}, se \ref{tab:kommandoer}. [sekvensnummer]-heltallet skal være stigende for hver
+    \code{PCMD}. [sekvensnummer]-heltallet skal være stigende for hver
     ny afsendt AT-besked. Listen med argumenter: [arg1, arg2 ... argN],
     varierer i længde afhængig af konteksten. Ved afsending af en
     \code{PCMD}-kommando skal der medsendes 5 talværdier for hhv. flag,
-    roll, pitch, gas og yaw.} 
+    roll, pitch, gas og yaw. Se tabel over alle AT-kommandoer i
+    appendiks~\ref{tab:kommandoer}}  
   \label{fig:atsyntaks}
 \end{framefig}
 %
@@ -1049,8 +1050,7 @@ beskrives i detaljer i afsnit 6 af AR.Drone Development
 Guide, \cite{techreport:ardroneDevGuide}. Det skal dog nævnes, at
 man i reglen skal sikre sig, at man vedbliver at sende beskeder
 periodisk, for at AR.Dronen ikke skal tolke forbindelsen til
-klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
-\ref{tab:kommandoer} i appendiks \ref{sec:at}. 
+klientenheden som tabt.
 
 %\section{Userspace process på AR.Dronen}
 \section{Udvidelse af AR.Dronen med USB-\-moduler}
@@ -1065,12 +1065,12 @@ klientenheden som tabt. En tabel med AT-kommandoerne kan ses i tabel
 En robotplatform der kan udvides med nye sensorer efter behov, er
 klart mere anvendelig end en helt lukket platform. Derfor blev det
 undersøgt hvorvidt, det er muligt at anvende AR.Dronens OTG-USB-port,
-\cite{electronic:otg}, til andet end softwareopdateringer.  Dette har
+\cite{electronic:otg}, til andet end softwareopdateringer. Dette har
 blandt andet indbefattet at kompilere kernemoduler til AR.Dronens
-linuxkerne, samt at omgå AR.Dronens software for ikke at miste
+linuxkerne, samt at omgå AR.Dronens styreprogram for ikke at miste
 strømmen til USB-porten, \cite{blog:usb}. Det indledende
 proof-of-concept var, at få mounted en almindelig USB-memorystick, at
-skrive til og at læse fra den. Indstallationsproceduren er forholdsvis
+skrive til den og at læse fra den. Indstallationsproceduren er forholdsvis
 simpel, idet Linuxdriverne til dette formål er meget
 generiske. Proceduren for at aktivere AR.Dronens USB-port og læse fra
 en USB-memorystick, kan læses i blogposten "Enabling the Drone USB
@@ -1102,9 +1102,10 @@ signal med svag signalstyrke, så ved man at man er langt væk fra den
 placering. Hvis man istedet modtager et kraftigt signal fra samme
 accespoint, så ved man at man er tæt på placeringen. 
 Lokalisering via WIFI-fingerprinting bruger radiosignalstyrker til at
-give specifikke lokationer unikke karakteristika,
-WIFI-fingerprints. Et WIFI-fingerprint kommer i form af en  
-mængde af accesspoint-identifikationer med tilhørende målte
+give specifikke lokationer unikke karakteristika
+(WIFI-fingerprints). Et WIFI-fingerprint kommer i form af en  
+mængde MAC\footnote{Media Access
+Control}-adresser med tilhørende målte
 signalstyrkeværdier på en given lokation, se
 sektion~\ref{ssec:wifilokalisering} for en detaljeret beskrivelse af
 WIFI-fingerprinting. 
@@ -1116,13 +1117,13 @@ WIFI-adapteren i monitor og  promiscous mode\footnote{Normalt vil et
   ikke er adresseret til det, men i promiscous mode sendes
   al trafik videre.}, så den modtager alle pakker der sendes fra de 
 omkringliggende WIFI-kilder. Netværksinterfacet indstilles gennem et
-script (\uri{load.sh}, \cite{github:loadsh}) som kaldes i forlængelse
+script (load.sh, \cite{github:loadsh}) som kaldes i forlængelse
 af AR.Dronens  oprindelige bootup-sekvens. Scriptet sørger også for at
 indlæse alle de nødvendige kernemoduler og starte
 WIFI-sensor-programmet. 
 
 \subsubsection{WIFI-sensor hardware}
-AR.Dronen er blevet udstyret med en Dlink DWL-G122 WIFI-adapter,
+AR.Dronen er blevet udstyret med en D-Link DWL-G122 WIFI-adapter,
 \cite{electronic:dwlg122}. Denne adapter blev valgt fordi
 den bygger på et Ralink chipset, \cite{electronic:wikiralink} og
 understøtter monitor mode. Desuden udgiver Ralink linuxdrivere til
@@ -1149,11 +1150,10 @@ WIFI-sensor-programmet kunne linke til det (se blogposten
 
 WIFI-sensor-programmet kører på AR.Dronen. Det henter WIFI-pakker som
 det installerede netværksinterface, gennem WIFI-adapteren, henter fra
-luften. De modtagne WIFI-pakker indlæses og MAC\footnote{Media Access
-Control}-adressen på pakkens afsender, samt signalstyrken puttes i en
+luften. De modtagne WIFI-pakker indlæses og MAC-adressen på pakkens afsender, samt signalstyrken puttes i en
 ny besked, som afsendes fra AR.Dronen. De afsendte pakker er del af en
 sensorstrøm, WIFI-strømmen, og ligner det der ellers kommer fra
-AR.Dronen(navdata og video). Strømmen fra WIFI-sensoren går over UDP-port
+AR.Dronen (navdata og video). Strømmen fra WIFI-sensoren går over UDP-port
 5551. Kommunikationen anvender denne port, for at holde
 klientens interface til AR.Dronen nogenlunde konsistent.
 
@@ -1184,13 +1184,14 @@ $\psi$-værdien har en tendens til at blive mere og mere upræcis under
 flyvning, hvilket også bekræftes i \cite{electronic:parrotforum3}.
 
 En observeret egenskab er, at man ikke kan sige noget udfra
-accelerometer og gyroer \emph{præcis} hvor
-langt AR.Dronen har fløjet eller med \emph{præcis} hvilken hastighed AR.Dronen
+accelerometer og gyroer om \emph{præcis} hvor
+langt AR.Dronen har fløjet eller \emph{præcis} med hvilken hastighed AR.Dronen
 bevæger sig. Der kan dog udledes estimater for hastigheder ved at integrere over
 accelerationen, men hastigheden i det horisontale plan er i praksis
 afhængig af miljøet og kan ikke umiddelbart bestemmes. Roll og pitch
 værdierne kan være aflæst til 0, men AR.Dronen kan stadig godt bevæge sig sideværts i luften\footnote{AR.Dronen siges
-  at være ``trimmet'' (med en konstant hastighed, evt. $0m/S$, men også forskellig fra $0m/S$) hvis den
+  at være ``trimmet'' (med en konstant hastighed, evt. $0 m/S$, men
+  også forskellig fra $0 m/S$) hvis den
   ikke påvirkes af en resulterende kraft og acceleration dermed er 0}
 på grund af indebåren inerti eller f.eks. en stille konstant
 vind. Bevæger AR.Dronen sig med en konstant hastighed, kan det ikke
@@ -1214,7 +1215,7 @@ kan detektere markante features.
   \centering
   \includegraphics[width=0.99\textwidth]{grafik/sonarzone2.png}
   \caption{a) Udbredelsesområde for ultralydssensorsignal, b) man ser
-    at afstanden ikke nødvendigvis er vinkelret på sensoren idet der kan
+    at afstanden ikke nødvendigvis er vinkelret på sensoren, idet der kan
     forekomme ekko fra et større område under sensoren (figuren er fra
     \cite{electronic:brown})}
   \label{fig:sonicbeam2}
@@ -1249,8 +1250,8 @@ mere end de resterende f.eks. $20\%$, uden at det vil gå ud over
 kontrollen med flyvningen.
 
 \subsection{Trådløs båndbredde} 
-På grund af den manglende transmissionskontrol, operer UDP-protokollen
-med et forholdsvist lille overhead. Det gør, at der i
+På grund af den manglende transmissionskontrol, opererer UDP-protokollen
+med et forholdsvist lille kontroloverhead. Det gør, at der i
 princippet kan sendes flere f.eks. videopakker end med en
 synkroniseret kommunikationsprotokol som TCP. Det giver mest mening at
 anvende en asynkron protokol i realtidskommunikationen med
@@ -2095,8 +2096,7 @@ meningen, at FollowTourTasken skal kunne vælge en bevæge-algoritme på
 baggrund af denne information. Tour-skærmbilledet kan ses på
 figur~\ref{fig:maptour}.
 
-Når programmet sluttes, gemmes map-objektet i filen
-./testdata/map.data. I map klassens
+Når programmet sluttes, gemmes map-objektet i filen map.data . I map-klassens
 constructor søges efter denne fil og hvis den findes, indlæses
 map-objektets state fra denne.
 

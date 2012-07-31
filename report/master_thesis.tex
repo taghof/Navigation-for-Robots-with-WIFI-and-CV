@@ -353,7 +353,7 @@ rutesekvens og dele den med andre som et postkort eller souvenir.
 %
 Af hensyn til at lave praktiske forsøg, bliver de konkrete
 navigationsløsninger designet til at virke i IT-byens kontorer og
-gangarealer samt Zuse-bygningen på Katrinebjerg i Århus.
+gangarealer samt Zuse-bygningen\cite{zuse} på Katrinebjerg i Århus.
 
 
 
@@ -1979,7 +1979,7 @@ Under udviklingen af WIFI-fingerprintingalgoritmen beskrevet i~\ref{sssec:wifial
 har det været nødvendigt, at kunne følge udviklingen i WIFI-signalstyrker
 mellem forskellige lokationer. Dette kan gøres i den fjerde og sidste
 præsentationstilstand. En signalstyrkesample registreres ved at trykke
-på knappen 'Take Sample'. Disse indsamlede signalstyrkesamples kan
+på knappen 'Take Sample'. De indsamlede signalstyrkesamples kan
 herefter sammenlignes. Skærmbilledet, figur~\ref{fig:sampledisplay},
 viser en ramme for hver erkendt WIFI-kilde. I rammerne angives
 WIFI-kildens signalstyrke for hver registreret
@@ -2039,7 +2039,7 @@ punkterne, til gengæld kan disse forbindes til en tour. Dette gøres
 ved at holde 'ctrl' nede og så trække en linie mellem to punkter med musen. Det
 er kun muligt, at forbinde til det første eller sidste punkt i en
 eksisterende tour. Det er muligt at fjerne liniesegmenter fra en tour
-ved at markere segmentet med musen og herfter trykke på knappen
+ved at markere segmentet med musen og herefter trykke på knappen
 'Delete Segment'. Ved at markere et liniesegment og trykke enten
 'Add/remove A' eller 'Add/remove B' kan man markere, at dette
 liniesegment tilhører en specifik type. Denne annotering af
@@ -2049,7 +2049,7 @@ FollowTourTasken skal kunne vælge en bevæge-algoritme på baggrund af
 denne information. Tour-skærmbilledet kan ses på figur~\ref{fig:maptour}.
 
 Når programmet sluttes, gemmes map-objektet i filen
-./testdata/map.data ved hjælp af Pythons pickle-modul. I map klassens
+./testdata/map.data. I map klassens
 constructor søges efter denne fil og hvis den findes, indlæses
 map-objektets state fra denne.
 
@@ -2125,20 +2125,20 @@ blevet ekperimenteret med forskellige former for lokalisering. Mere
 specifikt er der arbejdet med lokalisering ved hjælp af
 WIFI-signalstyrker og lokalisering ved hjælp af visuelle markører. I
 eksperimenterne er der gjort brug af et map-objekt med beskrivelser af
-lokationer(bestående af indsamlede WIFI-signalstyrker,
+lokationer (bestående af indsamlede WIFI-signalstyrker,
 markørbeskrivelse og koordinater) og en rutebeskrivelse bestående af
 en liste med lokationer. Map-objektet indeholder desuden en
 fortegnelse over vinkelretninger mellem alle
 lokationspar. Map-objektet oprettes let ved hjælp af
-Mapcreator-værktøjet beskrevet i \ref{sec:mapcreator}. For at teste
-forskellige de lokaliseringsmetoder anvendes HoverTrackTasks(se
-section \ref{sssec:hovertracktask}) og FollowTourTasks(se section
+Mapcreator-værktøjet beskrevet i sektion~\ref{sec:mapcreator}. For at teste
+de forskellige lokaliseringsmetoder anvendes HoverTrackTasks (se
+section \ref{sssec:hovertracktask}) og FollowTourTasks (se section
 \ref{sssec:followtourtask}).
 
-Udover lokalisering, er mulighederne for at udlede andre
-informationer fra AR.Dronens miljø også blevet
-undersøgt. F.eks. hvor langt AR.Dronen har bevæget sig, hvorvidt den
-befinder sig i en korridor og afstanden til andre objekter.
+Udover lokalisering, er der også undersøgt andre muligheder for at
+udlede ekstra informationer om AR.Dronens miljø. F.eks. hvor langt
+AR.Dronen har bevæget sig, hvorvidt den 
+befinder sig i en korridor og afstandsmåling til genstande foran den.
 
 \section{Lokalisering via WIFI-fingerprinting} % Morten (1side)
 \label{ssec:wifilokalisering}
@@ -2147,26 +2147,26 @@ en WIFI-sensor. Denne sender løbende information om de omkringliggende
 WIFI-kilders signalstyrker. I de følgende eksperimenter anvendes en
 teknik kaldet WIFI-fingerprinting. WIFI-fingerprinting fungerer i
 hovedtræk ved at der opbygges et WIFI-map
-under en initiel offline-fase, hvorefter livesignalstyrkemålinger kan
-sammenlignes med dette map. WIFI-mappet opbygges ved at foretage
+under en initiel offline-fase. Herefter kan livesignalstyrkemålinger
+sammenlignes med WIFI-mappet. WIFI-mappet opbygges ved at foretage 
 signalstykemålinger på et antal faste punkter. Generelt kan det siges,
 at jo mere offlinedata der indsamles, jo bedre fungerer 
 lokaliseringen. WIFI-fingerprintingteknikken beskrives i
 \cite{832252}. 
 
 Under eksperimenterne anvendes kun den allerede tilstedeværende
-WIFI-infrastruktur i testmiljøet(Zuse-bygningen, \cite{zuse}).
+WIFI-infrastruktur i testmiljøet i Zuse-bygningen på Daimi.
 
 \subsection{WIFI-fingerprinting-algoritmen}
 \label{sssec:wifialgo}
 I de følgende eksperimenter anvendes en fingerprintingalgoritme, der
-udfører en simpel nearest-neighbor søgning i et WIFI-map. Dette
-WIFI-map opbygges under offline.proceduren umiddelbart før
+udfører en simpel nearest-neighbor søgning i et WIFI-map. WIFI-mappet
+opbygges under offline-proceduren umiddelbart før 
 eksperimentets udførelse og er en integreret del af det map-objekt der
 anvendes af FollowTourTasken. Et overblik over offline-proceduren kan
 ses på figur~\ref{fig:offline}. 
 Nearest-neighbor søgningen udføres ved at sammenligne hvert
-punkt i WIFI-mappet med de nuværende signalstyrker. To sæt af
+grid-punkt i WIFI-mappet med de nuværende signalstyrker. To sæt af
 signalstyrker sammenlignes ved først at finde en fællesmængde af
 WIFI-kilder i de to sæt og herefter udregne en afstand mellem de to
 sæt, baseret på denne fællesmængde. Lokaliseringsproceduren er
@@ -2195,14 +2195,14 @@ implementeret som en del af map.py, \cite{github:map}.
   \label{fig:online}
 \end{framefig}
 
-\subsection{Første Eksperiment}
-Opstillingen til dette eksperiment består af 3 markører med 3 meters
-mellemrum som vist på figur~\ref{fig:wifisetup}. Efter opstillingen
-udførtes en indsamling af WIFI-signalstyrker som beskrevet i
-sektion~\ref{ssec:wifilokalisering}. Til dette formål anvendtes   
-mapcreator-værktøjet(sektion~\ref{sec:mapcreator}). Indsamlingen blev
-udført i en højde af 1 meter, med AR.Dronen placeret på et fast
-stativ.
+\subsection{Første Eksperiment med WIFI}
+Opstillingen til dette eksperiment består af 3 visuelle markører med 3 meters
+mellemrum som vist på figur~\ref{fig:wifisetup}. Inden eksperimentet,
+udførtes en indsamling af WIFI-signalstyrker (beskrevet i 
+sektion~\ref{ssec:wifilokalisering}), til indsamlingen blev
+mapcreator-værktøjet (sektion~\ref{sec:mapcreator})
+anvendt. Indsamlingen blev udført i en højde af 1 meter, med AR.Dronen
+placeret på et fast stativ.
 \begin{framefig}
   \centering
   \includegraphics[width=0.90\textwidth]{grafik/wifisetup.png}
@@ -2215,8 +2215,8 @@ stativ.
 Efter den indledende fase, blev AR.Dronen skiftevis placeret over de
 tre markører og WIFI-fingerprinting-algoritmen afviklet 200
 gange. Dette blev gentaget 3 gange for hver position. På
-tabel~\ref{fig:wifidetection1} ses detektionsraten for hver udførelse,
-detektionsraten defineres som antal gentagelser(200) divideret med
+tabel~\ref{fig:wifidetection1} ses detektionsraten for hver
+udførelse. Detektionsraten defineres som antal gentagelser (200) divideret med
 antal korrekte lokaliseringer.
 \begin{table}[H]
   \begin{framed}
@@ -2241,7 +2241,7 @@ Som det ses er resultaterne meget svingende. Med den implementerede fingerprinti
 algoritme og afstande mellem lokationerne på 3 meter eller derunder,
 kan en konsistent lokalisering ikke garanteres.
 
-\subsection{Andet Eksperiment}
+\subsection{Andet Eksperiment med WIFI}
 Det andet eksperiment med WIFI-lokalisering er direkte afledt af de
 dårlige resultater i det første eksperiment. Det blev besluttet at øge
 afstanden mellem punkterne til 6 meter, for herefter at gentage
@@ -2293,47 +2293,51 @@ WIFI-infrastruktur specifikt til eksperimentet.
     \label{fig:advancedmarker}}
 
   
-  \caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
+  \caption{Tre forskellige maarkører der er testet i forbindelse med visuel lokalisering af AR.Dronen}
   \label{fig:markers}
 \end{framefig}
 
 \subsection{Lokalisering via simple markører} % Thomas & Morten
-\paragraph{Første eksperiment}
+\subsubsection{Første eksperiment med simple markører}
 \label{p:simple1}
 Det første forsøg med visuel lokalisering anvendte en simpel rød
 markør i A5 størrelse, se figur~\ref{fig:simplemarker}. Til eksperimentet
-var der implementeret en blobdetectionalgoritme i Python, \cite{github:blob}, som for
+var der implementeret en blobdetekteringsalgoritme i Python,~\cite{github:blob}, som for
 hver pixel vurderer om denne er rød nok til at være en del af markøren. Algoritmen antager at der i
-billedet kun findes et rødt objekt og er på grund af Pythons
-afviklingshastighed ikke videre hurtig. Til dette eksperiment hvor
-hastighed ikke var afgørende, var den dog anvendelig.
+billedet kun findes eet rødt objekt. På grund af Pythons
+afviklingshastighed er detektoren ikke videre hurtig, men til denne test, hvor
+detekterings-hastighed ikke var afgørende, fungerede den simple
+implementation udemærket. Testen gav et indtryk af at den foreslåede
+ide var brugbar nok til at afterfølge.
 
 Eksperimentet udførtes ved at markøren blev placeret på
 gulvet og AR.Dronen placeret i position over markøren, hvorefter
-blobdetectionalgoritmen blev startet. Detektionsraten defineressom
+blobdetectionalgoritmen blev startet. Detektionsraten defineres som
 antal succesfulde detektioner delt med antal gentagelser af
 algoritmen. Algoritmen kørtes 200 gange i henholdsvis 0.5, 1.0, 1.5
 og 2.0 meters højde og resultaterne kan ses i tabel
-~\ref{fig:detection1}, sammen med resultaterne for de andre markører.
+~\ref{fig:detection1} på side~\pageref{fig:detection1}, sammen med
+resultaterne af de andre markør-tests.
  
 Det første forsøg viste, at den simple markør, i højder fra 0.5 til
 2.0 meter, altid kunne genkendes med AR.Dronen bundkamera.
 
-\paragraph{Andet eksperiment} 
+\subsubsection{Andet eksperiment med simple markører} 
 Næste skridt var at anvende ovennævnte lokaliseringsmetode i
-forbindelse med afviklingen af en HoverTrackTask(sektion
-~\ref{sssec:hovertracktask}). Dette blev gjort, for at få en idé om
+forbindelse med afviklingen af en HoverTrackTask
+(sektion~\ref{sssec:hovertracktask}). Dette blev gjort, for at få en
+idé om 
 metodens anvendelighed i en kontekst hvor effektivitet er afgørende.
 
-Til dette forsøg anvendtes også kun en enkelt markør og forsøget
-afvikledes ved at AR.Dronen blev fløjet i position over denne,
+Til dette forsøg anvendtes også kun én markør. Forsøget
+afvikledes ved at AR.Dronen blev fløjet i position over Markøren,
 hvorefter HoverTrackTasken blev aktiveret. Det viste sig tydeligt, at
-blobdetectoren ikke var effektiv nok. Der blev ikke opdateret hurtigt
+blobdetektoren ikke var effektiv nok. Der blev ikke opdateret hurtigt
 nok og som resultat nåede AR.Dronen ofte at bevæge sig væk fra
-markøren. Dette resultat fik os til at reimplementere HoverTrackTasken
-således, at den anvendte den implementerede blobdetector til at opdage
-markøren og herefter anvendte en af OpenCVs opticalflow-algoritmer
-(cv2.calcOpticalFlowPyrLK, \cite{opencv:optflow}) til at tracke den i
+markøren. Af denne grund blev HoverTrackTasken reimplementeret
+således, at den anvendte den implementerede blobdetektor til at opdage
+markøren og herefter anvendte OpenCVs opticalflow-algoritme 
+(\code{calcOpticalFlowPyrLK},~\cite{opencv:optflow}) til at tracke markøren i
 videostrømmen. Afviklingen af opticalflow-algoritmen er omtrent 10
 gange hurtigere end blobdetectoren. Ved gentagelse af forsøget med denne
 tilføjelse, var AR.Dronen meget mere responsiv og efter at have
@@ -2355,7 +2359,7 @@ af turbulens og dette let forekommer, især i mindre lokaler.
   \label{fig:simplehover}
 \end{framefig}
 
-\paragraph{Tredje eksperiment}
+\subsubsection{Tredje eksperiment med simpel markør}
 \label{p:simple3}
 Sidste eksperiment med simple markører anvendte en FollowTourTask
 der fulgte en rute mellem fire markører på gulvet. Eksperimenterne startede
@@ -2376,26 +2380,26 @@ problem kan dog løses ved at lade AR.Dronen flyve i en passende højde,
 en højde på 1800 mm blev fundet passende til formålet. Til
 gengæld afdækkede eksperimentet to andre problemer. Det første
 problem var relaterede til, at alle vores markører var ens. Dette betød, at der var
-tilfælde hvor AR.Dronen fandt samme lokation to gange i træk, men
-antog at den fundne lokation var den næste i
+tilfælde hvor AR.Dronen fandt samme lokation to gange i træk, og
+fejlagtigt antog at den genfundne første lokation var den næste i
 rutebeskrivelsen. Problemet lagde grund til tanken om at anvende mere
-avancerede lokationsmarkører for at opnå en mere bedre
+avancerede lokationsmarkører for at opnå en bedre
 lokalisering. Det andet problem var, at hvis AR.Dronen først mistede en markør
 fra synsfeltet, så var det umuligt at fortsætte. Dette
-problem løstes ved at tilføje en recovermode til HoverTrackTasken,
+problem blev løst ved at tilføje en recovermode til HoverTrackTasken,
 således at denne kunne bevæge AR.Dronen opad indtil enten markøren
 igen kunne genkendes eller en højdegrænse blev nået, hvorefter
 experimentet alligevel måtte afsluttes. Denne simple tilføjelse gjorde
 vores FollowTourTask meget mere robust.
 
-\paragraph{Resultater}
+\subsubsection{Resultater}
 De overordnede resultater af eksperimenterne med simple
 lokationsmarkører var, at AR.Dronens evne til at
 genkende simple markører blev bekræftet. Desuden blev både HoverTrackTasken
 og FollowTourTasken udviklet i løbet af eksperimentet. I løbet af
 tredje eksperiment viste det sig, at markørkonceptet var
 for simpelt til at være praktisk anvendeligt. Dette medførte
-udviklingen af mere avancerede markører, for bedre understøttelse af FollowTourTasken.
+udviklingen af mere avancerede markører (næste sektion) for bedre understøttelse af FollowTourTasken.
 \cite{electronic:youtube2}(youtube link) viser en video hvor AR.Dronen flyver frem
 og tilbage mellem to simple markører og demonstrerer at lokaliseringen,
 på trods af de to nævnte problemer, oftest fungerer. 
@@ -2406,31 +2410,31 @@ Efter de indledende eksperimenter blevt det besluttet at designe og anvende en
 mere avanceret markør. Det første redesign var markøren der
 ses på figur~\ref{fig:semiadvancedmarker}. 
 
-\paragraph{Detekteringsalgoritme}
+\subsubsection{Detekteringsalgoritme}
 Grundideen er at man først detekterer den røde firkant, hvorefter det
 indkransede område afsøges for en farvet blob der relaterer markøren
 til en specifik lokation. 
 
-For at sikre en hurtig detektering(og dermed lokalisering) gør algoritmen omfattende brug af OpenCVs optimerede
-billedbehandlingsalgoritmer,
-\cite{opencv:main}. Detekteringsalgoritmen er implementeret i den
+For at sikre en hurtig detektering (og dermed lokalisering) gør
+algoritmen omfattende brug af OpenCVs,~\cite{opencv:main}, optimerede 
+billedbehandlingsalgoritmer. Detekteringsalgoritmen er implementeret i den
 virtuelle sensor PositionSilhouetDetector og afvikles 
 således konstant for at give et så nøjagtigt billede af det
 øjeblikkelige miljø som muligt. Første skridt i algoritmen er at
-udføre thresholding ved hjælp af OpensCV inRange algoritme. Dette
+udføre thresholding ved hjælp af OpenCVs \code{inRange} algoritme. Dette
 giver et billede, hvor alle de oprindelige røde pixels nu er hvide
 og resten er sorte.  Andet skridt er at finde konturer i det binære
-billede. Dette gøres med OpenCVs findContours algoritme. Tredje
+billede. Dette gøres med OpenCVs \code{findContours} algoritme. Tredje
 skridt indbefatter at udvælge de konturer der har et stort nok areal
-til at være interessante. Dette gøres med OpenCVs contourArea
+til at være interessante. Dette gøres med OpenCVs \code{contourArea}
 algoritme.  Fjerde skridt er at undersøge områderne der dækkes af de
 udvalgte konturer, for at finde en farvet blob. Denne undersøgelse
-anvender igen OpenCVs inRange algoritme. Hvis en sådan farvet blob
-findes, kan farven sammenlignes med beskrivelsen af de forskellige
+anvender igen OpenCVs \code{inRange} algoritme. Hvis en sådan farvet
+blob findes, kan farven sammenlignes med beskrivelsen af de forskellige
 lokationer i map-objektet og dermed lokalisere AR.Dronen
 præcist.
 
-\paragraph{Første eksperiment}
+\subsubsection{Første eksperiment med avancerede markører}
 \label{p:advanced1}
 Dette eksperiment udførtes på samme måde som
 \ref{p:simple1}, blot var den simple markør skiftet 
@@ -2451,11 +2455,10 @@ figur~\ref{fig:advancedmarker}, for at sikre bedre detektion. En
 gentagelse af eksperimentet med den avancerede markør bekræftede, at
 denne nu kunne detekteres i op til 2 meters højde. Den avancerede
 markør er desuden designet sådan, at den på sigt kan bruges til at
-udlede AR.Dronens præcise retning. Dette vil gøre FollowTourTasken mindre
-afhængig af de upræcise $\psi$-målinger fra AR.Dronens piezo-sensor(
-se sektion~\ref{ssec:dronerecap}). 
+udlede orienteringen af AR.Dronens front. Dette vil gøre FollowTourTasken mindre
+afhængig af de upræcise $\psi$-målinger fra AR.Dronens piezo-sensor (se sektion~\ref{ssec:dronerecap}). 
 
-\paragraph{Andet eksperiment}
+\subsubsection{Andet eksperiment med avancerede markører}
 Dette eksperiment er næsten identisk, med det andet eksperiment der blev udført for
 de simple markører. Det skal dog nævnes, at vores HoverTrackTask i
 mellemtiden blev redigeret til at anvende den virtuelle sensors
@@ -2465,10 +2468,11 @@ indstillet til ikke at skifte mellem de to kamerastrømme.
 Som forventet var AR.Dronen også i stand til at holde positionen over
 den avancerede markør.
 
-\paragraph{Tredje eksperiment}
+%\paragraph{Tredje eksperiment}
+\subsubsection{Tredje eksperiment med avancerede markører}
 \label{p:advanced3}
-Dette eksperiment varierede fra det ovenstående, ved at den virtuelle
-sensor her løbende skiftede kamerastrøm. Det blev undersøgt om
+Dette eksperiment varierer fra det ovenstående, ved at den virtuelle
+sensor her løbende skifter mellem de to kamerastrømme. Det blev undersøgt om
 HoverTrackTasken stadig var i stand til at stabilisere AR.Dronen over
 en erkendt lokation, når bundkameraets framerate blev begrænset. Forsøget viste
 AR.Dronen stadig forblev stabil over lokationen. Til gengæld stoppede
@@ -2478,12 +2482,13 @@ har en memoryleak. Dette viser sig ved at softwarens hukommelsesforbrug
 stiger kraftigt, så snart de hurtige kameraskift iværksættes ved brug
 af AR-kommandoen set\_config. Denne opførsel beskrives også i sektion~\ref{sec:sub:virtuel}. 
 
-\paragraph{Fjerde eksperiment}
-Ligesom \ref{p:simple3}, anvendtes til dette eksperiment en opsætning med
-fire markører. Formålet var at bekræfte, at der stadig med de nye
-markører og den ændrede HoverTrackTask, kunne navigeres mellem
-de fire punkter med vores FollowTourTask. Opstillingen kan ses på
-figur ~\ref{fig:advancedsetup}.
+%\paragraph{Fjerde eksperiment}
+\subsubsection{Fjerde eksperiment med avancerede markører}
+Ligesom i sektion~\ref{p:simple3}, anvendes der også til dette
+eksperiment en opsætning med fire markører. Formålet var at bekræfte,
+at der stadig med de nye markører og den ændrede HoverTrackTask, kunne
+navigeres mellem de fire punkter med FollowTourTask. Opstillingen kan
+ses på figur~\ref{fig:advancedsetup}. 
 
 Eksperimentet bekræftede, at FollowTourTasken konsistent kunne
 lokalisere AR.Dronon og følge den fastlagte tour. 
@@ -2503,7 +2508,8 @@ bruge data fra frontkameraet. Af den grund kan det være nødvendigt kontinuerligt
 de to kameraer og dette fungererer som nævnt i sektion~\ref{p:advanced3} ikke særligt
 godt. Derfor undersøges mulighederne for at anvende den
 videostrøm hvor bundkameraets billeder er lagt oven på 
-frontkameraets(se \ref{fig:2frames}). Når bundkameraets billeder udtrækkes fra
+frontkameraets (se figur~\ref{fig:2frames},
+side~\pageref{fig:2frames}). Når bundkameraets billeder udtrækkes fra 
 denne strøm, er disse billeder i en opløsning på 88x72.
 Eksperimenterne er fuldstændig magen til dem der udførtes i sektion~\ref{p:simple1} og
  sektion~\ref{p:advanced1}. De er ligeledes udført i højderne 0.5, 1.0, 1.5 og 2.0 og er
@@ -2573,10 +2579,12 @@ kamera.
 Til dette eksperiment anvendtes bibliotekerne pyqrcode, 
 \cite{electronic:pyqrcode}, og Zbar, 
 \cite{electronic:zbar}, til henholdsvis
-indkodning og afkodning af QR-koder. Zbar har pythonbindinger og anvendes også på
-iPhone-platformen. Dette betød at vi kunne teste den genererede
-QR-kode ved at scanne den med en iPhone.
-
+indkodning og afkodning af QR-koder. Zbar er det bibliotek der også
+bruges i iPhone-app'en til afkodning af QR-koder. Zbar har
+pythonbindinger så det kan bruges på billeder taget med AR.Dronen.
+Der blev genereret en QR-kode som i figur~\ref{fig:woah}, og koden
+blev testet til at kunne afkodes korrekt med en iPhone, inden
+aftestning med AR.Dronen.
 \begin{framefig}
   \centering
   \includegraphics[width=0.35\textwidth]{grafik/woah.png}

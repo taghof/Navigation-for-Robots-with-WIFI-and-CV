@@ -360,13 +360,14 @@ Minerva handler også om menneske-maskin interaktion, som generelt er
 et vanskeligt område, men løsninger til navigationsproblemet alene
 findes allerede i litteraturen. 
 %
-Et spørgsmål man kan stille sig er hvad sker der hvis den kørende robot i museumsmiljøet
+Et spørgsmål man kan stille sig er, hvad sker der hvis den kørende robot i museumsmiljøet
 udskiftes med en flyvende AR.Drone.
 
 \begin{framefig}
   \centering
   \includegraphics[width=0.9580\textwidth]{grafik/ml_fetisism.png}
-  \caption{Kan du ikke komme tæt nok på til at tage et billede, bryder du dig ikke om stor folkemængder, så brug AR.Dronen! \todo{anden caption}}
+  \caption{AR.Dronen med semi-autonom styring, svæver over de andre
+    gæster på museet og tager billeder.}
   \label{fig:monalisa}
 \end{framefig}
 
@@ -381,7 +382,7 @@ rundt på museet. En videre udbygning er at lave et webinterface så gæster
 kan besøge museet fra internettet. Spørgsmålet er hvad 
 det vil medføre. Det er nemt at forestille sig at den meget fjerne
 kontrol vil give en klar oplevelse af disembodyment. Der er også et
-sikkerhedsaspekt i det at lade en quadrokopter næsten selvstyrende
+sikkerhedsaspekt ved at lade en quadrokopter næsten selvstyrende
 flyve rundt blandt mennesker. En anden udbygning er at lade gæster
 optage en personaliseret flyvning, eller en forprogrammeret
 rutesekvens og dele den med andre som et postkort eller en souvenir.
@@ -392,13 +393,13 @@ rutesekvens og dele den med andre som et postkort eller en souvenir.
 %% Luftbåren at vi ligepludselig har en 3. dimension at forholde os til
 %
 
-Herover beskrives billedligt et løst scenarie for specialets domæne.
+Herover beskrives billedligt et scenarie for specialets domæne.
 % at løse løsninger til
 Af hensyn til at lave praktiske forsøg, bliver de konkrete
 navigationsløsninger designet til at virke i Ada-bygningens,~\cite{ada}, kontorer og
 gangarealer, samt Zuse-bygningen,~\cite{zuse}, på Katrinebjerg i Århus.
 
-
+I det efterfølgende gennemgåes elementerne i den valgte metode.
 
 %% - hvilke værktøjer vil vi tage i brug AR.Dronen, PC, joystick/controller, Python, => hvorfor, argumentation.
 %%    tage AR.Dronen gå fra at bruge den som en fjernstyrbar enhed til at gøre den til en næsten selvstændig semi autonom enhed.
@@ -3566,7 +3567,6 @@ kontrollere AR.Dronen.
 
 \chapter{Canny kanter og Houghtransformerede linier}
 \label{app:linier}
-\todo{Tilføj Oles rettelser}
 %plus hvad er kanter, og hvad er linier...
 \section{At finde kanter i et billede}
 Herunder gives en definition på hvad kanter (edges) er, samt deres egenskaber.

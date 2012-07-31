@@ -837,8 +837,8 @@ Det styreprogram der står for selve motorkontrollen, transmitteringen af data og
 bearbejdning af sensordata i forbindelse med flyvning, er implementeret
 i \uri{/bin/program.elf} på AR.Dronen. Da der er tale om proprietært software
 betragtes programmet som en lukket kasse, hvor implementationsdetaljer
-ikke er kendt. Vi kan dog udlede forskellige elementer, efter at
-have observeret AR.Dronen under flyvning. Program.elf indeholder blandt andet:
+ikke er kendt. Forskellige elementer af \code{program.elf} kan dog udledes, efter at
+have observeret AR.Dronen under flyvning. \code{Program.elf} indeholder blandt andet:
 \begin{itemize}
 \item en PID controller, \cite{electronic:pid}, \cite{electronic:pid2}, til at stabilisere AR.Dronen når der svæves.
 \item en algoritme til at udlede AR.Dronens hastighed ved hjælp af
@@ -1135,7 +1135,7 @@ AR.Dronen. Nogle af de mest markante observationer er opregnet her.
 \subsection{Hastighed og inerti}
 Det giver mening at beskrive AR.Dronens bevægelser i 3
 dimensioner, for derved nemmere direkte at kunne bruge accelerometer- og gyro-målinger
-fra sensorerne om bord. Under arbejdet har vi kunnet konstatere, at $\theta$
+fra sensorerne om bord. Under arbejdet har det kunnet konstateres, at $\theta$
 og $\phi$-værdierne ikke afviger fra det forventede, hvorimod
 $\psi$-værdien har en tendens til at blive mere og mere upræcis under
 flyvning, hvilket også bekræftes i \cite{electronic:parrotforum3}.
@@ -1503,7 +1503,7 @@ mange billeder. Psyco er lavet til 32 bit maskiner og virker fint der,
 men desværre har udvikleren af Psyco valgt ikke at lave en 64-bit
 version af biblioteket.
 
-Videoformatet der sendes fra AR.Dronen minder meget om JPEG formatet
+Videoformatet der sendes fra AR.Dronen minder meget om JPEG-formatet
 og forfatteren til den algoritme vi har tilpasset, spekulerer på
 forumsiden, \cite{electronic:parrotforum2}, om det ville være muligt
 at anvende en decideret JPEG decoder til afkodningen. Dette kunne gøre
@@ -1557,31 +1557,36 @@ sandsynlighed for, at metoden ikke virker pålideligt,
 
 Den anden virtuelle sensor, DistanceTracker,~\cite{github:virtuel}, benytter
 hastighedsværdierne fra navdatastrømmen. Sensoren udfører løbende
-integration over hastighederne i x og y-retning. Dette giver os et
+integration over hastighederne i x og y-retning. Dette giver et
 brugbart estimat over den distance AR.Dronen har tilbagelagt. Se
-sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter vi har udført med
-DistanceTrackeren. 
+sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter
+der er udført med DistanceTrackeren. 
 
 \subsection{Kontrolinterface til fjernstyring af AR.Dronen}
 \label{sec:sub:controlinterface}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et AT-interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
-gøre dette AT-interface mere praktisk anvendeligt, har vi videreudviklet
-på en Python-wrapper, \cite{electronic:venthur}, til AT-interfacet. Vi har implementeret
-kontrolinterfacet som en tråd der løbende sender kommandoer med de
-aktuelle kontrolværdier til AR.Dronen. 
-Dette betyder, at platformen ikke afhænger af at alle
+gøre dette AT-interface mere praktisk anvendeligt, er der, med basis i
+arbejdet i \cite{electronic:venthur}, udviklet en Python-wrapper, til
+AT-interfacet.
+
+Kontrolinterfacet er implementeret som en tråd, der
+løbende sender kommandoer med de aktuelle kontrolværdier til
+AR.Dronen.  Dette betyder, at platformen ikke afhænger af at alle
 kontrolpakker når deres destination, hvilket er praktisk, da
-UDP-protokollen netop ikke garanterer at en pakke når sin destination. %think I understand but humor me and elaborate...
-Ved at sende al kontrolkommunikation gennem kontrolinterfacet, skal der ikke tænkes på detaljer som sekvensnumre og
-watchdog-beskeder, da disse håndteres transparent af systemet.
+UDP-protokollen netop ikke garanterer at en pakke når sin
+destination. Ved at sende al kontrolkommunikation gennem
+kontrolinterfacet, skal der ikke tænkes på detaljer som sekvensnumre
+og watchdog-beskeder, da disse håndteres transparent af systemet.
   
-Kontrolinterfacet (implementeret i ControllerInterface-klassen, \cite{github:controllers}) definerer en række metoder til at
+Kontrolinterfacet (implementeret i ControllerInterface-klassen,
+\cite{github:controllers}) definerer en række metoder til at
 fjernstyre AR.Dronens opførsel og bevægelser. Al styring af AR.Dronen
 fra platformens tråde, går gennem den samme ene instans af
-kontrolinterfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i platformen, kan interfacet til
-til simple formål også anvendes alene, direkte fra
-Pythons interpreter (som beskrevet i sektion~\ref{sec:sub:fjernstyrpy}).
+kontrolinterfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i
+platformen, kan interfacet til til simple formål også anvendes alene,
+direkte fra Pythons interpreter (som beskrevet i
+sektion~\ref{sec:sub:fjernstyrpy}).
 
 \begin{framefig}
   \centering
@@ -1680,10 +1685,10 @@ foregår næsten transparent for resten af platformen. Receiverne skal
 stadig initiere kommunikationen (nu blot med testdevicet og ikke den
 reelle AR.Drone). Forbindelsen skal stadig holdes i live og data der
 modtages skal stadig afkodes. De eneste synlige forskelle der er mellem test og
-live-kørsler er timing og hastighed, den første fordi vi ikke har
-prioriteret at afsende testdataen i de intervaller de blev modtaget i
+live-kørsler er timing og hastighed, den første fordi det ikke har
+været en prioritet at afsende testdataen i de intervaller de blev modtaget i
 og den sidste fordi samme computer nu står både for afsendelse,
-modtagelse og afkodning.  Testdevicemodulet har ikke noget at gøre med
+modtagelse og afkodning. Testdevicemodulet har ikke noget at gøre med
 optagelsen af sensoroutputtet. Dette foregår ved hjælp af
 sensordisplay-værktøjet, beskrevet i sektion~\ref{sec:sensordisplay}.
 
@@ -1711,9 +1716,9 @@ landtasks) og derfor mere minder om en opgave der skal forberedes,
 udføres og afsluttes. Dette ses i modsætning til en behavior, som kan
 opfattes som en længerevarende opførsel. Der er også implementeret
 højniveau bevægemønstre, der minder mere om en traditionelle behaviors
-(for eksempel FollowTourTask som gennemgåes i sektion~\ref{sssec:followtourtask}). Vi mener at det også giver mening, at
-kalde disse tasks, da de også implementeres efter den generelle
-taskstruktur.
+(for eksempel FollowTourTask som gennemgåes i
+sektion~\ref{sssec:followtourtask}), men for at være konsistente,
+kaldes disse også tasks.
 
 De første udgaver af tasksystemet indbefattede tasks der indsamlede
 og behandlede data fra AR.Dronens sensorer. De behandlede data blev
@@ -1725,11 +1730,11 @@ kun reagere og formidle bevægelse på baggrund af højniveau-sensordata.
 \subsection{Task typer} 
 Der er to hoved-tasktyper, simple og compoundtasks. Simple tasks nedarver
 fra basetaskklassen Task. De repræsenterer oftest en simpel bevægelse,
-men kan være vilkårligt komplekse. For eksempel har vi en task der,
-blandt andet, implementerer en PID-controller.
+men kan være vilkårligt komplekse. For eksempel implementerer
+HoverTrackTask, blandt andet, en PID-controller.
   
 Compoundtasks nedarver fra CompoundTask-klassen og indeholder en liste
-af subtasks. Vi opdeler compoundtasks yderligere i to typer, 
+af subtasks. Compoundtasks opdeles yderligere i to typer, 
 sekventielle og parallelle (SeqCompoundTask og
 ParCompoundTask). Sekventielle compoundtasks starter deres 
 subtasks en efter en og venter med at starte en ny subtask, indtil den
@@ -1883,8 +1888,8 @@ og herefter aktiveres.
 
 I den ikke-trådbaserede tilgang forsimples ovennævnte princip. En
 Compoundtask skal på opfordring aktivere \emph{den} bedst 
-egnede subtask, da vi ikke opererer med flere aktive tasks
-samtidig\footnote{De bevægelser vi har til rådighed kan ikke udføres
+egnede subtask, da  der ikke er mere end én aktiv tasks
+samtidig\footnote{De bevægelser der er til rådighed kan ikke udføres
 uden indflydelse på hinanden}. Den bedst egnede
 subtask defineres altid, som den med det højeste level og et ønske om at bevæge
 AR.Dronen.
@@ -2293,7 +2298,7 @@ WIFI-infrastruktur specifikt til eksperimentet.
     \label{fig:advancedmarker}}
 
   
-  \caption{Markører vi har testet i forbindelse med visuel lokalisering af AR.Dronen}
+  \caption{Tre markører som er blevet testet i forbindelse med visuel lokalisering af AR.Dronen}
   \label{fig:markers}
 \end{framefig}
 
@@ -2330,7 +2335,7 @@ afvikledes ved at AR.Dronen blev fløjet i position over denne,
 hvorefter HoverTrackTasken blev aktiveret. Det viste sig tydeligt, at
 blobdetectoren ikke var effektiv nok. Der blev ikke opdateret hurtigt
 nok og som resultat nåede AR.Dronen ofte at bevæge sig væk fra
-markøren. Dette resultat fik os til at reimplementere HoverTrackTasken
+markøren. Dette resultat medførte en reimplementering af HoverTrackTasken
 således, at den anvendte den implementerede blobdetector til at opdage
 markøren og herefter anvendte en af OpenCVs opticalflow-algoritmer
 (cv2.calcOpticalFlowPyrLK, \cite{opencv:optflow}) til at tracke den i
@@ -2341,7 +2346,7 @@ fintunet HoverTrackTaskens PID-parametre var AR.Dronen i stand til at
 forblive over markøren. På fig~\ref{fig:simplehover} ses
 HoverTrackTraskens PID error-værdier i forhold til markøren på gulvet,
 over en periode på mere end 2 minutter. Errorværdierne er omregnet fra
-pixels til millimeter ved hjælp af den højdeværdi vi løbende får fra
+pixels til millimeter, ved hjælp af den højdeværdi der løbende modtages fra
 navdatastrømmen. Det bemærkes at der er et udsving omtrent midt i
 forløbet. Dette er ikke usædvanligt, da AR.Dronen er meget påvirkelig
 af turbulens og dette let forekommer, især i mindre lokaler.
@@ -2574,8 +2579,8 @@ Til dette eksperiment anvendtes bibliotekerne pyqrcode,
 \cite{electronic:pyqrcode}, og Zbar, 
 \cite{electronic:zbar}, til henholdsvis
 indkodning og afkodning af QR-koder. Zbar har pythonbindinger og anvendes også på
-iPhone-platformen. Dette betød at vi kunne teste den genererede
-QR-kode ved at scanne den med en iPhone.
+iPhone-platformen. Dette betød, at den genererede
+QR-kode kunne testes ved at scanne den med en iPhone.
 
 \begin{framefig}
   \centering

@@ -371,7 +371,7 @@ gangarealer samt Zuse-bygningen\cite{zuse} på Katrinebjerg i Århus.
 
 \subsection{AR.Dronen} % Thomas, 
 AR.Dronen, som beskrives i detaljer i kapitel~\ref{sec:AR.Drone},
-tilfredstiller vores behov for en quadrokopter-platform. AR.Dronen
+tilfredstiller behovet for en quadrokopter-platform. AR.Dronen
 stiller en række sensorer tilrådighed og præsenterer et veldefineret
 interface til fjernstyring. Alternativt kunne man have bygget en
 platform fra bunden, som i \cite{quteprints33767}.
@@ -382,7 +382,7 @@ anvende seks batterier og fire opladere. Desuden er der, under
 eksperimenter der ikke krævede flyvning, anvendt en strømforsyning fra
 en PC i stedet for et batteri.
 
-Med AR.Dronen er vi hurtigt i luften og der kan hurtigt bygges software
+Med AR.Dronen er man hurtigt i luften og der kan hurtigt bygges software
 der anvender det offentliggjorte interface. Til gengæld er der ingen
 indflydelse på det styreprogram der kører på AR.Dronen og AR.Dronen kan kun
 styres AR.Dronen gennem interfacet. Det er muligt at implementere et
@@ -419,13 +419,13 @@ udbyggelig klientplatform, er Python et oplagt valg.
  
 Eksemplerne i sektion~\ref{sec:platformsadgang} viser hvor lidt kode
 der behøves, for at anvende klientplatformen. Desuden henvises til
-implementationen af vores klientværktøjer,~\cite{github:sensordisplay},~\cite{github:mapcreator},~\cite{github:taskcreator},
+implementationen af klientværktøjerne,~\cite{github:sensordisplay},~\cite{github:mapcreator},~\cite{github:taskcreator},
 for eksempler der anvender klientplatformen.
 
 Udfordingen ved valget af implementationssprog er, at Python som et
 dynamisk typet, fortolket sprog, ikke performance-mæssigt kan
 sammenlignes med mere maskinnære sprog som C og C++. For at overkomme
-denne udfordring, har vi gjort anvendelse af OpenCVs
+denne udfordring, er der gjort brug af OpenCVs
 billedalgoritmer (beskrevet nedenunder) og
 Psyco,~\cite{electronic:psyco}, i forbindelse med afkodning af
 billeder fra AR.Dronen (se desuden sektion~\ref{subsec:receivers}). 
@@ -446,56 +446,56 @@ udelukkende foregået i C++. Udover C og C++, findes der en række
 interfaces til biblioteket, bland andre et Python
 interface,~\cite{opencv:wiki}. Python interfacet fungerer som en
 wrapper om OpenCVs C/C++ algoritmer. Ved anvendelse af dette
-interface, får vi altså kombineret Pythons brugervenlighed og OpenCVs
+interface, kombineres altså Pythons brugervenlighed og OpenCVs
 hastighed.
 
 OpenCVs optimerede algoritmer har, på grund af deres effektivitet,
-været uundværlige, blandt andet i implementationen af vores
+været uundværlige, blandt andet i implementationen af
 PositionSilhouetDetector (sektion~\ref{sec:sub:virtuel}). Forskellen i
 afviklingshastighed på en blobdetector implementeret i ren Python og
-en der anvender OpenCVs algoritmer, var tydelig under vores
-eksperimenter i sektion~\ref{ssec:visuellokalisering}.
+en der anvender OpenCVs algoritmer, var tydelig under eksperimenterne
+i sektion~\ref{ssec:visuellokalisering}. 
 
 \subsection{Eksperimenter} 
-For at teste AR.Dronen og vores
-klientplatform, har vi udført en række eksperimenter,~\ref{}. Eksperimenterne
-omhandler generelt udledning af kontekstuel information fra AR.Dronens
-sensorstrømme. Mere specifikt tester vi metoder til lokalisering,
+For at teste AR.Dronen og klientplatformen, er der udført en række
+eksperimenter,~\ref{chap:Eksperimenter}. Eksperimenterne omhandler
+generelt udledning af kontekstuel information fra AR.Dronens
+sensorstrømme. Mere specifikt testes metoder til lokalisering,
 afstandsbedømmelse, måling af tilbagelagt afstand (Odometri) og
 korridordetektering.
 
-
 \paragraph{Lokalisering via WIFI-fingerprinting:} Ved hjælp af en
-WIFI-fingerprinting algoritme, har vi undersøgt muligheden for at
-lokalisere AR.Dronen i forhold til et antal fastlagte
-positioner. Eksperimenternes opstilling og resultater kan ses i
+WIFI-fingerprinting algoritme, er muligheden for at lokalisere
+AR.Dronen i forhold til et antal fastlagte positioner blevet
+undersøgt. Eksperimenternes opstilling og resultater kan ses i
 sektion~\ref{ssec:wifilokalisering}.
 
-\paragraph{Lokalisering via visuelle markører:} Vi har designet et
+\paragraph{Lokalisering via visuelle markører:} Der er designet et
 antal forskellige visuelle markører. Markørerne er blevet testet for
 hvor godt de kunne genkendes af AR.Dronen, både i statiske
 opstillinger og i forbindelse med bevægelse. Disse eksperimenter har
-også fungeret som test af vores tasksystem og de udviklede
+også fungeret som test af tasksystemet og de udviklede
 tasks. Eksperimenternes opstilling og resultater kan ses i
 sektion~\ref{ssec:visuellokalisering}.
 
-\paragraph{Afstandsbedømmelse via optical flow:} Vi har undersøgt
-muligheden for at udlede afstande, til objekter synlige for AR.Dronens
-frontkamera (se sektion~\ref{sec:afstand}). Ved at lade AR.Dronen flyve sidelæns, trianguleres
-afstande ud til genstande foran frontkameraet. Dette gøres ved brug af
-den tilbagelagte afstand og målte vinkler til genstanden.
+\paragraph{Afstandsbedømmelse via optical flow:} Der er udført
+eksperimenter for at undersøge muligheden for at udlede afstande
+vha. AR.Dronens frontkamera (se sektion~\ref{sec:afstand}). Ved at
+lade AR.Dronen flyve sidelæns, trianguleres afstande ud til genstande
+foran frontkameraet. Dette gøres ved brug af den tilbagelagte afstand
+og målte vinkler til genstanden.
 
 \paragraph{Korridordetektering:} Der er eksperimenteret med muligheden
-for at detektere et korridormiljø, sektion~\ref{sec:korridor}. Med en sådan detektion, kan
-AR.Dronen bevæge sig i forhold til denne specifikke
-miljøtype. Algoritmen analyserer på indholdet af diagonale linier i
-billedet fra frontkameraet.
+for at detektere et korridormiljø, sektion~\ref{sec:korridor}. Med en
+sådan detektion, kan AR.Dronen bevæge sig i forhold til denne
+specifikke miljøtype. Algoritmen analyserer på indholdet af diagonale
+linier i billedet fra frontkameraet.
 
-\paragraph{DistanceTracker:} En del af den navigationsdata vi modtager
-fra AR.Dronen er hastighedsestimater. Vi har anvendt disse
-hastighedsestimater til at implementere en odometrisk
+\paragraph{DistanceTracker:} En del af den navigationsdata der modtages
+fra AR.Dronen er hastighedsestimater. Disse
+hastighedsestimater er anvendt til at implementere en odometrisk
 afstandsmåler (DistanceTracker). Implementationen integrerer over de
-modtagne hastighedsestimater. Vores eksperimenter med DistanceTrackeren
+modtagne hastighedsestimater. Eksperimenterne med DistanceTrackeren
 involverer manuelle og automatiserede flyvninger over mere eller
 mindre ensartede overflader, se sektion~\ref{sec:distance-mesu}.
 
@@ -522,7 +522,7 @@ medfølgende programmer afvikles, samt følgende materiale:
 til at beskrive tekniske fremgangsmåder og til at fungere som
 adgangspunkt til det offentlige kode-repository. Bloggen hostes på
 Github og adressen angives i~\cite{blog}. Bloggen indeholder udover en
-projektbeskrivelse, især informationer om vores tidlige forsøg med
+projektbeskrivelse, især informationer om de tidlige forsøg med
 AR.Dronen. Blandt andet beskrives proceduren for at aktivere
 AR.Dronens USB-port i detaljer. Et andet emne som behandles på bloggen
 er afvikling af kode på AR.Dronen, herunder proceduren for
@@ -837,8 +837,8 @@ Det styreprogram der står for selve motorkontrollen, transmitteringen af data og
 bearbejdning af sensordata i forbindelse med flyvning, er implementeret
 i \uri{/bin/program.elf} på AR.Dronen. Da der er tale om proprietært software
 betragtes programmet som en lukket kasse, hvor implementationsdetaljer
-ikke er kendt. Vi kan dog udlede forskellige elementer, efter at
-have observeret AR.Dronen under flyvning. Program.elf indeholder blandt andet:
+ikke er kendt. Forskellige elementer af \code{program.elf} kan dog udledes, efter at
+have observeret AR.Dronen under flyvning. \code{Program.elf} indeholder blandt andet:
 \begin{itemize}
 \item en PID controller, \cite{electronic:pid}, \cite{electronic:pid2}, til at stabilisere AR.Dronen når der svæves.
 \item en algoritme til at udlede AR.Dronens hastighed ved hjælp af
@@ -1135,7 +1135,7 @@ AR.Dronen. Nogle af de mest markante observationer er opregnet her.
 \subsection{Hastighed og inerti}
 Det giver mening at beskrive AR.Dronens bevægelser i 3
 dimensioner, for derved nemmere direkte at kunne bruge accelerometer- og gyro-målinger
-fra sensorerne om bord. Under arbejdet har vi kunnet konstatere, at $\theta$
+fra sensorerne om bord. Under arbejdet har det kunnet konstateres, at $\theta$
 og $\phi$-værdierne ikke afviger fra det forventede, hvorimod
 $\psi$-værdien har en tendens til at blive mere og mere upræcis under
 flyvning, hvilket også bekræftes i \cite{electronic:parrotforum3}.
@@ -1332,7 +1332,7 @@ def square():
 
     c.stop()
 \end{lstlisting}
-\caption{Python implementation der importerer og anvender vores kontrolinterface til en
+\caption{Python implementation der importerer og anvender kontrolinterfacet til en
   simpel flyvning. De fire første numeriske parametre der gives til
   move-metoden repræsenterer henholdsvis roll, pitch, thust og
   yaw. Den boolske parameter indentificerer overfor kontrolinterfacet,
@@ -1503,7 +1503,7 @@ mange billeder. Psyco er lavet til 32 bit maskiner og virker fint der,
 men desværre har udvikleren af Psyco valgt ikke at lave en 64-bit
 version af biblioteket.
 
-Videoformatet der sendes fra AR.Dronen minder meget om JPEG formatet
+Videoformatet der sendes fra AR.Dronen minder meget om JPEG-formatet
 og forfatteren til den algoritme vi har tilpasset, spekulerer på
 forumsiden, \cite{electronic:parrotforum2}, om det ville være muligt
 at anvende en decideret JPEG decoder til afkodningen. Dette kunne gøre
@@ -1546,7 +1546,7 @@ markører på gulvet og silhuetter er det nødvendigt for sensoren hele
 tiden at skifte mellem bund- og frontkamera. Dette giver imidlertid
 problemer for AR.Dronens styreprogram der ved konstante kameraskift
 løbende øger sit hukommelsesforbrug indtil Linuxkernen lukker
-styreprogrammet ned. Vores målinger viser, at AR.Dronens program kun kan
+styreprogrammet ned. Målinger viser, at AR.Dronens program kun kan
 køre mellem ti og tolv minutter, såfremt der samtidig skiftes kamera
 med cirka 5 millisekunders interval. Selvom om dette problem ikke
 beskrives direkte nogen steder, antydes det dog af en udvikler på
@@ -1557,31 +1557,36 @@ sandsynlighed for, at metoden ikke virker pålideligt,
 
 Den anden virtuelle sensor, DistanceTracker,~\cite{github:virtuel}, benytter
 hastighedsværdierne fra navdatastrømmen. Sensoren udfører løbende
-integration over hastighederne i x og y-retning. Dette giver os et
+integration over hastighederne i x og y-retning. Dette giver et
 brugbart estimat over den distance AR.Dronen har tilbagelagt. Se
-sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter vi har udført med
-DistanceTrackeren. 
+sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter
+der er udført med DistanceTrackeren. 
 
 \subsection{Kontrolinterface til fjernstyring af AR.Dronen}
 \label{sec:sub:controlinterface}
 Ved hjælp af AT-kommandoerne definerer AR.Dronen et AT-interface til
 enheder der er indenfor rækkevidde af dens trådløse netværk. For at
-gøre dette AT-interface mere praktisk anvendeligt, har vi videreudviklet
-på en Python-wrapper, \cite{electronic:venthur}, til AT-interfacet. Vi har implementeret
-kontrolinterfacet som en tråd der løbende sender kommandoer med de
-aktuelle kontrolværdier til AR.Dronen. 
-Dette betyder, at platformen ikke afhænger af at alle
+gøre dette AT-interface mere praktisk anvendeligt, er der, med basis i
+arbejdet i \cite{electronic:venthur}, udviklet en Python-wrapper, til
+AT-interfacet.
+
+Kontrolinterfacet er implementeret som en tråd, der
+løbende sender kommandoer med de aktuelle kontrolværdier til
+AR.Dronen.  Dette betyder, at platformen ikke afhænger af at alle
 kontrolpakker når deres destination, hvilket er praktisk, da
-UDP-protokollen netop ikke garanterer at en pakke når sin destination. %think I understand but humor me and elaborate...
-Ved at sende al kontrolkommunikation gennem kontrolinterfacet, skal der ikke tænkes på detaljer som sekvensnumre og
-watchdog-beskeder, da disse håndteres transparent af systemet.
+UDP-protokollen netop ikke garanterer at en pakke når sin
+destination. Ved at sende al kontrolkommunikation gennem
+kontrolinterfacet, skal der ikke tænkes på detaljer som sekvensnumre
+og watchdog-beskeder, da disse håndteres transparent af systemet.
   
-Kontrolinterfacet (implementeret i ControllerInterface-klassen, \cite{github:controllers}) definerer en række metoder til at
+Kontrolinterfacet (implementeret i ControllerInterface-klassen,
+\cite{github:controllers}) definerer en række metoder til at
 fjernstyre AR.Dronens opførsel og bevægelser. Al styring af AR.Dronen
 fra platformens tråde, går gennem den samme ene instans af
-kontrolinterfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i platformen, kan interfacet til
-til simple formål også anvendes alene, direkte fra
-Pythons interpreter (som beskrevet i sektion~\ref{sec:sub:fjernstyrpy}).
+kontrolinterfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i
+platformen, kan interfacet til til simple formål også anvendes alene,
+direkte fra Pythons interpreter (som beskrevet i
+sektion~\ref{sec:sub:fjernstyrpy}).
 
 \begin{framefig}
   \centering
@@ -1648,7 +1653,7 @@ Joystickcontrolleren bruges udover manuel fjernstyring af AR.Dronen
 også til at starte tasks (sektion~\ref{sec:tasks}). Således kan
 piloten manuelt bringe AR.Dronen i en ønsket position og så herefter
 starte afviklingen af en task. På
-figur~\ref{fig:xboxlayout} ses vores standardopsætning af Xbox360
+figur~\ref{fig:xboxlayout} ses den anvendte standardopsætning af Xbox360
 controlleren.
 \begin{framefig}
   \centering
@@ -1680,10 +1685,10 @@ foregår næsten transparent for resten af platformen. Receiverne skal
 stadig initiere kommunikationen (nu blot med testdevicet og ikke den
 reelle AR.Drone). Forbindelsen skal stadig holdes i live og data der
 modtages skal stadig afkodes. De eneste synlige forskelle der er mellem test og
-live-kørsler er timing og hastighed, den første fordi vi ikke har
-prioriteret at afsende testdataen i de intervaller de blev modtaget i
+live-kørsler er timing og hastighed, den første fordi det ikke har
+været en prioritet at afsende testdataen i de intervaller de blev modtaget i
 og den sidste fordi samme computer nu står både for afsendelse,
-modtagelse og afkodning.  Testdevicemodulet har ikke noget at gøre med
+modtagelse og afkodning. Testdevicemodulet har ikke noget at gøre med
 optagelsen af sensoroutputtet. Dette foregår ved hjælp af
 sensordisplay-værktøjet, beskrevet i sektion~\ref{sec:sensordisplay}.
 
@@ -1711,9 +1716,9 @@ landtasks) og derfor mere minder om en opgave der skal forberedes,
 udføres og afsluttes. Dette ses i modsætning til en behavior, som kan
 opfattes som en længerevarende opførsel. Der er også implementeret
 højniveau bevægemønstre, der minder mere om en traditionelle behaviors
-(for eksempel FollowTourTask som gennemgåes i sektion~\ref{sssec:followtourtask}). Vi mener at det også giver mening, at
-kalde disse tasks, da de også implementeres efter vores generelle
-taskstruktur.
+(for eksempel FollowTourTask som gennemgåes i
+sektion~\ref{sssec:followtourtask}), men for at være konsistente,
+kaldes disse også tasks.
 
 De første udgaver af tasksystemet indbefattede tasks der indsamlede
 og behandlede data fra AR.Dronens sensorer. De behandlede data blev
@@ -1725,11 +1730,11 @@ kun reagere og formidle bevægelse på baggrund af højniveau-sensordata.
 \subsection{Task typer} 
 Der er to hoved-tasktyper, simple og compoundtasks. Simple tasks nedarver
 fra basetaskklassen Task. De repræsenterer oftest en simpel bevægelse,
-men kan være vilkårligt komplekse. For eksempel har vi en task der,
-blandt andet, implementerer en PID-controller.
+men kan være vilkårligt komplekse. For eksempel implementerer
+HoverTrackTask, blandt andet, en PID-controller.
   
 Compoundtasks nedarver fra CompoundTask-klassen og indeholder en liste
-af subtasks. Vi opdeler compoundtasks yderligere i to typer, 
+af subtasks. Compoundtasks opdeles yderligere i to typer, 
 sekventielle og parallelle (SeqCompoundTask og
 ParCompoundTask). Sekventielle compoundtasks starter deres 
 subtasks en efter en og venter med at starte en ny subtask, indtil den
@@ -1741,26 +1746,26 @@ to simple tasks.
 
 \subsubsection{FollowTourTask}
 \label{sssec:followtourtask}
-Et eksempel på en compoundtask er FollowTourTasken, hvis tasktræ kan ses
-på figur~\ref{fig:followtour}. FollowTourTask nedarver fra
-SeqCompoundTask og indeholder, udover takeoff og land-tasks, en  
+Et eksempel på en compoundtask er FollowTourTasken, hvis tasktræ kan
+ses på figur~\ref{fig:followtour}. FollowTourTask nedarver fra
+SeqCompoundTask og indeholder, udover takeoff og land-tasks, en
 parallel compoundtask der kan veksle mellem en MoveTask og en
 HoverTrackTask (det vil sige, at der veksles mellem bevægelse og
-fastholdelse af en erkendt position). Selve FollowTourTask 
-enheden holder, ved hjælp af et
-map-objekt (se sektion~\ref{sec:mapcreator}), styr på den tour der
-følges og sørger for at opdatere HoverTrackTasken med en ny 
-målposition, når det er nødvendigt. 
-Hvis map-objektet anskues som en relationel graf, hvor alle knuder er
-forbundne, minder den implementerede opførsel meget om Kuipers og Byuns metode der
-beskrives i \cite{murphy2000introduction}. Specielt lægges mærke til, at der i
-begge systemer udføres fejlkorrigering, hver gang en ny position
-detekteres. I vores system sker dette ved, at HoverTrackTasken bringer
-AR.Dronen indenfor en maksimum afstand af den præcise position, før
-den sendes videre. % Det ville desuden være let at tilføje metrisk data
-% fra DistanceTrackeren (se sektion~\ref{sec:sub:virtuel}), til
-% map-objektet, hver gang AR.Dronen har bevæget sig mellem to
-% positioner. 
+fastholdelse af en erkendt position). Selve FollowTourTask enheden
+holder, ved hjælp af et map-objekt (se sektion~\ref{sec:mapcreator}),
+styr på den tour der følges og sørger for at opdatere HoverTrackTasken
+med en ny målposition, når det er nødvendigt.  Hvis map-objektet
+anskues som en relationel graf, hvor alle knuder er forbundne, minder
+den implementerede opførsel meget om Kuipers og Byuns metode der
+beskrives i \cite{murphy2000introduction}. Specielt lægges mærke til,
+at der i begge systemer udføres fejlkorrigering, hver gang en ny
+position detekteres. Under afviklingen af en FollowTourTask, sker
+dette ved at HoverTrackTasken bringer AR.Dronen indenfor en maksimum
+afstand af den præcise position, før den sendes videre. 
+% Det villedesuden være let at tilføje metrisk data 
+% fra DistanceTrackeren (sesektion~\ref{sec:sub:virtuel}), til 
+% map-objektet, hver gang AR.Dronen har bevæget sig mellem to 
+% positioner.
 
 \begin{framefig}
   \centering
@@ -1830,7 +1835,7 @@ parent ønsker at bevæge AR.Dronen og 2) Taskens parent har tilladelse
 til at flytte AR.Dronen.
 
 På figur~\ref{fig:taskhieraky} ses et eksempel på et tasktræ
-konstrueret med vores taskcreator (sektion ~\ref{sec:taskcreator}). Under antagelse af, at hver TestTask
+konstrueret med taskcreator-værktøjet (sektion ~\ref{sec:taskcreator}). Under antagelse af, at hver TestTask
 ønsker at udføre samme antal bevægelser med AR.Dronen og ønsker at udføre
 disse bevægelser uden pause, vil TestTask med level 1 slutte først og
 TestTask med level 2 slutte sidst.
@@ -1845,7 +1850,7 @@ TestTask med level 2 slutte sidst.
 
 \subsection{Task implementationer} 
 Der er implementeret to forskellige udgaver
-af vores task-system(taskmanageren og alle tasks), begge implementerer
+af task-systemet(taskmanageren og alle tasks), begge implementerer
 den opførsel og struktur der er beskrevet ovenfor.
 
 Den første, trådbaserede, implementation er inspireret af Lejos'
@@ -1883,8 +1888,8 @@ og herefter aktiveres.
 
 I den ikke-trådbaserede tilgang forsimples ovennævnte princip. En
 Compoundtask skal på opfordring aktivere \emph{den} bedst 
-egnede subtask, da vi ikke opererer med flere aktive tasks
-samtidig\footnote{De bevægelser vi har til rådighed kan ikke udføres
+egnede subtask, da  der ikke er mere end én aktiv tasks
+samtidig\footnote{De bevægelser der er til rådighed kan ikke udføres
 uden indflydelse på hinanden}. Den bedst egnede
 subtask defineres altid, som den med det højeste level og et ønske om at bevæge
 AR.Dronen.
@@ -1902,8 +1907,8 @@ afbrydes iterationen og der startes forfra. Sammenlignet med den
 trådede udgave, er flowet 'top-down', da bevægelsen altid initieres af
 taskmanageren.
 
-Denne ikke-trådbaserede tilgang virker mere velegnet til en træbaseret
-taskstruktur som vores. Kommunikationen mellem tasks er simplere
+Den ikke-trådbaserede tilgang virker mere velegnet til en træbaseret
+taskstruktur. Kommunikationen mellem tasks er simplere
 og overheadet pga. de mange tråde undgåes.
 
 \chapter{Klientværktøjer} % Morten, 
@@ -2292,8 +2297,7 @@ WIFI-infrastruktur specifikt til eksperimentet.
   \subfigure[avanceret markør]{\includegraphics[width=0.35\textwidth]{grafik/advancedmarker.png}
     \label{fig:advancedmarker}}
 
-  
-  \caption{Tre forskellige maarkører der er testet i forbindelse med visuel lokalisering af AR.Dronen}
+    \caption{Tre markører som er blevet testet i forbindelse med visuel lokalisering af AR.Dronen}
   \label{fig:markers}
 \end{framefig}
 
@@ -2345,7 +2349,7 @@ fintunet HoverTrackTaskens PID-parametre var AR.Dronen i stand til at
 forblive over markøren. På fig~\ref{fig:simplehover} ses
 HoverTrackTraskens PID error-værdier i forhold til markøren på gulvet,
 over en periode på mere end 2 minutter. Errorværdierne er omregnet fra
-pixels til millimeter ved hjælp af den højdeværdi vi løbende får fra
+pixels til millimeter, ved hjælp af den højdeværdi der løbende modtages fra
 navdatastrømmen. Det bemærkes at der er et udsving omtrent midt i
 forløbet. Dette er ikke usædvanligt, da AR.Dronen er meget påvirkelig
 af turbulens og dette let forekommer, især i mindre lokaler.
@@ -2379,9 +2383,9 @@ tidsnok, til at stoppe AR.Dronen før den var fløjet forbi. Dette
 problem kan dog løses ved at lade AR.Dronen flyve i en passende højde,
 en højde på 1800 mm blev fundet passende til formålet. Til
 gengæld afdækkede eksperimentet to andre problemer. Det første
-problem var relaterede til, at alle vores markører var ens. Dette betød, at der var
-tilfælde hvor AR.Dronen fandt samme lokation to gange i træk, og
-fejlagtigt antog at den genfundne første lokation var den næste i
+problem var relaterede til, at de anvendte markører var ens. Dette betød, at der var
+tilfælde hvor AR.Dronen fandt samme lokation to gange i træk, og 
+antog fejlagtigt at den genfundne første lokation var den næste i
 rutebeskrivelsen. Problemet lagde grund til tanken om at anvende mere
 avancerede lokationsmarkører for at opnå en bedre
 lokalisering. Det andet problem var, at hvis AR.Dronen først mistede en markør
@@ -2390,7 +2394,7 @@ problem blev løst ved at tilføje en recovermode til HoverTrackTasken,
 således at denne kunne bevæge AR.Dronen opad indtil enten markøren
 igen kunne genkendes eller en højdegrænse blev nået, hvorefter
 experimentet alligevel måtte afsluttes. Denne simple tilføjelse gjorde
-vores FollowTourTask meget mere robust.
+FollowTourTasken meget mere robust.
 
 \subsubsection{Resultater}
 De overordnede resultater af eksperimenterne med simple
@@ -2460,7 +2464,7 @@ afhængig af de upræcise $\psi$-målinger fra AR.Dronens piezo-sensor (se sektion~
 
 \subsubsection{Andet eksperiment med avancerede markører}
 Dette eksperiment er næsten identisk, med det andet eksperiment der blev udført for
-de simple markører. Det skal dog nævnes, at vores HoverTrackTask i
+de simple markører. Det skal dog nævnes, at HoverTrackTasken i
 mellemtiden blev redigeret til at anvende den virtuelle sensors
 detekteringsresultater, istedet for selv at udføre en
 detekteringsalgoritme. Under dette eksperiment var den virtuelle sensor
@@ -2482,7 +2486,6 @@ har en memoryleak. Dette viser sig ved at softwarens hukommelsesforbrug
 stiger kraftigt, så snart de hurtige kameraskift iværksættes ved brug
 af AR-kommandoen set\_config. Denne opførsel beskrives også i sektion~\ref{sec:sub:virtuel}. 
 
-%\paragraph{Fjerde eksperiment}
 \subsubsection{Fjerde eksperiment med avancerede markører}
 Ligesom i sektion~\ref{p:simple3}, anvendes der også til dette
 eksperiment en opsætning med fire markører. Formålet var at bekræfte,
@@ -3466,8 +3469,8 @@ AR.Dronen.
 Selv om andre kritisere AR.Dronen som legetøj og ikke anvendelig som
 videnskabelig platform,~\cite{quteprints33767} og andre allerede er begyndt at
 eksperimentere med mindre quadrokoptere med mindre inerti-kapacitet,~\cite{turpin:swarm},
-så virker AR.Dronen til prisen som værende god-nok. Vores oplevelse af
-AR.Dronen gennem projektet er måske at den ikke virker helt så godt
+så virker AR.Dronen til prisen som værende god-nok. Erfaringen med
+AR.Dronen gennem projektet er, at den måske ikke virker helt så godt 
 til indendørs brug som man skulle tro (når der nu følger et indendørs
 skjold med). I små rum har AR.Dronen vanskeligheder ved stabilt at stå
 stille i luften, pga. vind turbulens, ekko fra de omgivende overflader
@@ -3477,7 +3480,7 @@ I stedet for at AR.Dronen bruges på et museum indendørs, er et andet
 og bedre brugscenarie måske at den skal bruges udendørs. AR.Dronen kan flyve
 steder hvor der ikke er umiddelbar adgang for mennesker (se eksemplet
 med inspektioner af broer og højspændingsledninger). Denne egenskab
-kan udnyttes så AR.Dronen kan bruges som trækplaster til events eller
+kan udnyttes, så AR.Dronen kan bruges som trækplaster til events eller
 på turist-atraktioner.
 \begin{framefig}
   \centering
@@ -3491,9 +3494,6 @@ klinte-siden. Gæster kan se og dele andres flyvninger
 på optagelser. For et lille ekstra beløb kan gæsten købe
 filmoptagelsen på en CD eller SD-kort.
 %
-
-
-
 \pagebreak
 
 \appendix
@@ -3646,9 +3646,9 @@ Resultatet af at køre det cannyfiltrerede billed igennem en
 Houghtransform er en liste med linier, repræsenteret ved ($\theta_i$,
 $\rho_i$) par, og sorteret efter godhed.
 
-OpenCV har to implementationer af Houghtransforms: en standard som
-ovenfor beskrevet, og en probabilistisk Hough line transform. Den
-probalististiske returnere en liste af linier, repræsenteret ved
+OpenCV har to implementationer af Houghtransforms: En standard som
+ovenfor beskrevet, og en probabilistisk. Den
+probalististiske returnerer en liste af linier, repræsenteret ved
 liniernes endepunkter $(x_{i1}, y_{i1}), (x_{i2}, x_{i2})$ istedet for
 et $(\theta_i$,$\rho_i)$ par som ovenfor.
 

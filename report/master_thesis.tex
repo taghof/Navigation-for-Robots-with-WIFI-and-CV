@@ -1271,7 +1271,7 @@ at være billig i produktion, for dermed let at kunne erhverves af menigmand. I
 deres valg af design har Parrot derfor gjort et tradeoff mellem
 videokvalitet og framerate. Det
 betyder, at opdateringshastigheden af billeder og data fra AR.Dronen
-som nævnt er tilstrækkelig i de fleste tilfælde, men, som det fremgår afafsnit~\ref{sec:QRdecoding}, er billedkvaliteten ikke tilstrækkelig
+som nævnt er tilstrækkelig i de fleste tilfælde, men, som det fremgår af afsnit~\ref{sec:QRdecoding}, er billedkvaliteten ikke tilstrækkelig
 til f.eks. afkodning af QR-koder, \cite{electronic:wikiqr}.
 
 \begin{framefig}
@@ -1293,10 +1293,10 @@ der bruges billeder i fuld størrelse fra begge kameraer, er det
 nødvendigt at skifte imellem to videostrømme og skiftevis få
 et billede fra front- og bundkamera. Dette er ikke praktisk, idet det
 nedsætter opdateringshastigheden i eksempelvis en feedback-kontrol
-løkke. Anvender man de kombinerede billeder,
-se figur~\ref{fig:2frames}, skal man være opmærksom på, at det billede
+løkke. Anvender man de kombinerede billeder 
+(se figur~\ref{fig:2frames}) skal man være opmærksom på, at det billede
 der er indeholdt i det andet, er af noget mindre opløsning end det
-originale($88 \times 72$ pixels for bundkameraets billede når det er
+originale ($88 \times 72$ pixels for bundkameraets billede når det er
 lagt ovenpå frontkameraets, mod $176 \times 144$ pixels
 originalt). Denne forskel i kvalitet har tydeligt en indflydelse på
 resultatet af diverse billedanalysealgoritmer, se
@@ -1308,7 +1308,7 @@ understøtte det videre arbejde med AR.Dronen. Platformen skal sikre
 let og effektiv adgang til AR.Dronens sensor output, samt give
 mulighed for at styre AR.Dronen, både manuelt med joystick og tastatur
 gennem en PC og ved hjælp af
-forprogrammerede sekvenser af bevægelser(tasks, beskrives nærmere i
+forprogrammerede sekvenser af bevægelser (tasks, beskrives nærmere i
 sektion~\ref{sec:tasks}). 
 
 \section{Platformens anvendelse}
@@ -1316,15 +1316,17 @@ sektion~\ref{sec:tasks}).
 Python blev, som tidligere nævnt, valgt for at lette tilgængeligheden for
 brugeren. Et af specialets mål er, at stille en let anvendelig og
 let udbyggelig platform til rådighed for udviklermiljøet omkring
-AR.Dronen. Herunder vises simple eksempler på anvendelsen af dele af
-klientplatformen.  
+AR.Dronen. 
+
+Herunder vises simple eksempler på anvendelsen af dele af klientplatformen.
+
 
 \subsection{Nem fjenstyring af AR.Dronen}% i Python}
 \label{sec:sub:fjernstyrpy}
 Et simpelt eksempel på anvendelse af det implementerede
 kontrolinterface gives på figur~\ref{fig:pythoninterpex1}. Først
 startes pythons fortolker, herefter importeres examples-modulet og
-metoden square() afvikles. Det antages, at computeren der afvikler
+metoden \code{square} afvikles. Det antages, at computeren som afvikler
 eksemplet er forbundet med AR.Dronens trådløse netværk.
 
 \begin{framefig}
@@ -1338,14 +1340,15 @@ eksemplet er forbundet med AR.Dronens trådløse netværk.
 
 Metoden \code{square} der kaldes i eksemplet,
 lader AR.Dronen lette, flyve rundt i en firkant og for herefter at
-lande igen . Bevægelsesmønstret opnåes ved at der kaldes en
-metode (\code{take\_off}, \code{move} eller \code{land}) på kontrolinterfacet(sektion~\ref{sec:sub:controlinterface}), hvorefter der er en pause
-før den næste metode kaldes. Metodekaldende oversættes af kontrolinterfacet til
-AT-kommandoer og sendes så som UDP-pakker til AR.Dronens
-kommandoport. Den konkrete implementation af \code{square} ses i
-figur~\ref{fig:pythonimpl1}. Det bemærkes, at kontrolinterfacet skal
-startes (ved kald af \code{c.start()}) før kommandoerne har nogen effekt. 
-
+lande igen. Bevægelsesmønstret opnåes ved at der kaldes en
+metode (\code{take\_off}, \code{move} eller \code{land}) på
+kontrolinterfacet (sektion~\ref{sec:sub:controlinterface}), hvorefter
+der er en pause før den næste metode kaldes. Metodekaldende oversættes
+af kontrolinterfacet til AT-kommandoer og sendes så som UDP-pakker til
+AR.Dronens kommandoport. Den konkrete implementation af \code{square}
+ses i figur~\ref{fig:pythonimpl1}. Det bemærkes, at kontrolinterfacet
+skal startes (ved kald af \code{c.start()}) før kommandoerne har nogen
+effekt.
 \begin{framefig}
   \lstset{language=Python, frame=none}
   \begin{lstlisting}
@@ -1380,7 +1383,7 @@ def square():
   simpel flyvning. De fire første numeriske parametre der gives til
   move-metoden repræsenterer henholdsvis roll, pitch, thust og
   yaw. Den boolske parameter indentificerer overfor kontrolinterfacet,
-  om der tale om værdier fra en fysisk kontrolenhed(XBox360 controller)}
+  om der tale om værdier fra en fysisk kontrolenhed (XBox360 controller)}
 \label{fig:pythonimpl1}
 \end{framefig}
 
@@ -1458,13 +1461,13 @@ Platformen består af et antal klasser placeret i et antal
 Python-moduler som beskrives nærmere i det følgende. Her er
 indledningsvis en kort introduktion for overblikkets skyld. Der er
 udviklet tre forskellige receiverklasser til at modtage henholdvis video, 
-navigationsdata(navdata) og WIFI-data. Disse beskrives i sektion \ref{subsec:receivers}. Der er udviklet to forskellige
+navigationsdata (navdata) og WIFI-data. Disse beskrives i sektion \ref{subsec:receivers}. Der er udviklet to forskellige
 controllerklasser til joystick og keyboard som beskrives i sektion \ref{subsec:controller}. Der er
 kontrueret en taskmanager (sektion~\ref{subsec:taskmanager}) med ansvar for at opstarte autonome
 delopgaver kaldet tasks (tasks beskrives i
 sektion~\ref{sec:tasks}). For at styre AR.Dronen anvendes et kontrolinterface. Et simpelt eksempel herpå er allerede
 vist i figur~\ref{fig:pythonimpl1}. Kontrolinterfacet
-gennemgåes i sektion~\ref{sec:sub:controlinterface}).
+gennemgåes i sektion~\ref{sec:sub:controlinterface}.
 Med inspiration fra~\cite{lenser:behaviorbasedarchitecture} og
 \cite{Dey01:ctoolkit} er der, udover de allerede nævnte grundreceivere,
 implementeret to virtuelle sensorer (sektion~\ref{sec:sub:virtuel}) som
@@ -1486,7 +1489,7 @@ sekvensdiagrammet i figur~\ref{fig:initialiseringssekvens}.
 Udover ovenstående er der lavet et testdevice, som anvendes i forbindelse
 med udvikling, når det ikke er muligt at have en AR.Drone fysisk
 tilstede. Sektion~\ref{sec:sub:testdevice} beskriver muligheden for at
-simulere output fra AR.Dronen gennem testmodulet.
+simulere output fra AR.Dronen gennem testdevicet.
 % De enkelte klasser kan også anvendes hver for sig, se*.
 
 %“klasse diagram eller lignende”
@@ -1528,8 +1531,7 @@ navdata\_common.h,~\cite{ardroneorg:navdatacommonh}, fra Parrots SDK.
 \subsubsection{Video-modtager og billedafkoding via Psyco}
 \emph{VideoReceiveren} modtager og afkoder AR.Dronens
 videostrøm. Afkodningen af billederne foregår på baggrund af den
-process der nævnes i sektion 7.2 side 43 i
-\cite{techreport:ardroneDevGuide}.
+process der nævnes i \cite{techreport:ardroneDevGuide} på side 43.
 
 \subsubsection{JIT-kompileret afkodning af billeder}
 %%% % % %
@@ -1556,7 +1558,7 @@ at øge afkodningshastigheden og samtidig eliminere afhængigheden af
 Psyco.
 
 \subsubsection{WIFI-modtager}
-Som de andre receivere modtager \emph{WIFIReceiveren} en datastrøm fra
+Som de andre receivere modtager WIFIReceiveren en datastrøm fra
 AR.Dron\-en. WIFI-strømmen er dog en tilføjelse vi har lavet og formatet
 der skal afkodes er blot en tekststreng bestående af en MAC-adresse og
 en signalstyrke. Der modtages således en pakke for hver pakke
@@ -1602,7 +1604,7 @@ sandsynlighed for, at metoden ikke virker pålideligt,
 Den anden virtuelle sensor, DistanceTracker,~\cite{github:virtuel}, benytter
 hastighedsværdierne fra navdatastrømmen. Sensoren udfører løbende
 integration over hastighederne i x og y-retning. Dette giver et
-brugbart estimat over den distance AR.Dronen har tilbagelagt. Se
+estimat over den distance AR.Dronen har tilbagelagt. Se 
 sektion~\ref{sec:distance-mesu}, for resultaterne af de eksperimenter
 der er udført med DistanceTrackeren. 
 
@@ -1628,7 +1630,7 @@ Kontrolinterfacet (implementeret i ControllerInterface-klassen,
 fjernstyre AR.Dronens opførsel og bevægelser. Al styring af AR.Dronen
 fra platformens tråde, går gennem den samme ene instans af
 kontrolinterfacet se figur~\ref{fig:ciagregateuml}. Udover at virke i
-platformen, kan interfacet til til simple formål også anvendes alene,
+platformen, kan interfacet til simple formål også anvendes alene,
 direkte fra Pythons interpreter (som beskrevet i
 sektion~\ref{sec:sub:fjernstyrpy}).
 
@@ -1663,7 +1665,7 @@ ikke være nogen mulighed for at bringe AR.Dronen manuelt (og sikkert) ned.
   \includegraphics[width=0.8\textwidth]{grafik/controlleruml.png}
   \caption{Klassehieraki for klasser der nedarver fra
     Controller-klassen. Subklasser af Controller er kendetegnet ved
-    at have adgang til styring af AR.Dronen gennem controlinterfacet.}
+    at have adgang til styring af AR.Dronen gennem kontrolinterfacet.}
   \label{fig:controlleruml}
 \end{framefig}
 
@@ -1758,7 +1760,7 @@ de implementerede tasks er forholdsvis kortlivede (for eksempel take-off og
 landtasks) og derfor mere minder om en opgave der skal forberedes,
 udføres og afsluttes. Dette ses i modsætning til en behavior, som kan
 opfattes som en længerevarende opførsel. Der er også implementeret
-højniveau bevægemønstre, der minder mere om en traditionelle behaviors
+højniveau bevægemønstre, der minder mere om traditionelle behaviors
 (for eksempel FollowTourTask som gennemgåes i
 sektion~\ref{sssec:followtourtask}), men for at være konsistente,
 kaldes disse også tasks.
@@ -1784,7 +1786,7 @@ subtasks en efter en og venter med at starte en ny subtask, indtil den
 forrige er afsluttet. En sekventiel compoundtask stopper, når den
 sidste subtask er afsluttet. Parallelle compoundtasks starter alle
 deres subtasks på en gang og stopper, når den sidste subtask er
-afsluttet. Herunder gives eksempler på henholdsvis èn compoundtask og
+afsluttet. Herunder gives eksempler på henholdsvis én compoundtask og
 to simple tasks. 
 
 \subsubsection{FollowTourTask}
@@ -1823,7 +1825,7 @@ HoverTrackTasken, som er en simpel task, implementerer en
 PID-controller,\cite{electronic:pid}, der kan holde AR.Dronen over en
 erkendt position.
  
-Når en markør (se \ref{fig:advancedmarker}) er synlig for AR.Dronens
+Når en markør (se \ref{fig:advancedmarker} side~\pageref{fig:advancedmarker}) er synlig for AR.Dronens
 bundkamera, kan markørens billedkoordinat findes via af
 PositionSilhouetDetectoren (se sektion~\ref{sec:sub:virtuel}). Med
 dette billedkoordinat udregnes en error-værdi i x- og y-retningen, i forhold til centrum af

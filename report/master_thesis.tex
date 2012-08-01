@@ -1058,7 +1058,7 @@ klientenheden som tabt.
 \label{sec:udvidelse}
 \begin{framefig}
   \centering
-  \includegraphics[width=0.80\textwidth]{grafik/userspace_n_module.png}
+  \includegraphics[width=0.50\textwidth]{grafik/userspace_n_module.png}
   \caption{Platformstrukturen på AR.Dronen gør det muligt at tilføje
     kernemoduler, biblioteker og at køre programmer i userspace.}
   \label{fig:userspace15}
@@ -1914,7 +1914,7 @@ AR.Dronen, får den tilladelse til dette ved at spørge sin parent (som
 muligvis skal spørge videre op i træet).
 
 Denne tilgang minder meget om arkitekturen der anvendes af Lejos'
-subsumption pakke, \cite{lejossub}. Taskmanageren vil, som tasktræets
+subsumption pakke,~\cite{lejossub}. Taskmanageren vil, som tasktræets
 rod, have samme rolle som Arbitratoren i Lejos system. Denne
 arkitektur har primært et 'bottom-up'-flow, da det er de individuelle
 tasks der initierer bevægelsen af AR.Dronen. En ulempe ved designet er dog, at flowet ikke kun går
@@ -1925,7 +1925,7 @@ grund af overheadet ved at have en tråd per task, ikke skalerer
 særligt godt. 
 
 \subsubsection{Ikke-trådbaseret} Tilgangen i 'A Modular Hierarchical
-Behavior-Based Architecture',\cite{lenser:behaviorbasedarchitecture},
+Behavior-Based Architecture',~\cite{lenser:behaviorbasedarchitecture},
 er at en aktiveret behavior skal bestemme hvilke af sine
 subbehaviors der skal aktiveres. I artiklen er dette praktisk, da
 deres robot kan udføre forskellige bevægelser på samme tid. Tilgangen
@@ -1962,7 +1962,7 @@ og overheadet pga. de mange tråde undgåes.
 I dette kapitel gennemgåes tre værktøjer, som er udviklet i forbindelse med specialearbejdet. Der er
 tale om et program til at præsentere og visualisere datastrømmene fra
 AR.Drone (Sensordisplay), et program til at bygge de map-objekter der
-anvendes af FollowTourTasken(Mapcreator) og et program til at
+anvendes af FollowTourTasken (Mapcreator) og et program til at
 instantiere, kombinere og afvikle Tasks (Taskcreator). Alle tre
 værktøjer anvender et drone-objekt som vist på
 figur~\ref{fig:initialiseringssekvens} og kan startes i henholdsvis
@@ -2065,9 +2065,9 @@ $ ./sensordisplay.py -t
   \label{fig:mapcreator}
 \end{framefig}
 Mapcreator er et værktøj til at oprette og redigere map-objekter.
-Map-objekter instantieres fra klassen PosMap(placeret i map.py,
-\cite{github:map}) og bruges af FollowTourTasks til at navigere
-efter. 
+Map-objekter instantieres fra klassen PosMap (placeret i
+map.py,~\cite{github:map}) og bruges af FollowTourTasks til at
+navigere efter. 
 Mapcreator har to redigeringstilstande, world og tour, som kan 
 vælges ved at trykke på det tilsvarende faneblad øverst i billedet. De
 to tilstande ses på figur~\ref{fig:mapcreator}.
@@ -2080,7 +2080,7 @@ liste med vinklerne mellem alle punkter. Når punkter tilføjes, flyttes
 og slettes opdateres denne liste også automatisk. Udover punkternes
 fysiske position i forhold til hinanden, kan man også tilføje
 WIFI-signalstyrkemålinger (WIFI-fingerprint) til punkterne ved at trykke på
-'Add/update WIFI sample'-knappen og herefter trykke med musen på det
+'Add\-/update WIFI sample'-knappen og herefter trykke med musen på det
 punkt der ønskes markeret. Hvis WIFI-signalstyrkemålingen
 ønskes slettet, trykkes først på 'clear WIFI sample' og derefter på
 punktet. World-skærmbilledet kan ses på figur~\ref{fig:mapworld}.
@@ -2230,7 +2230,7 @@ implementeret som en del af map.py, \cite{github:map}.
   \caption{Diagrammet viser fingerprintingteknikkens
     offlinefase. WIFI-sensoren sender løbende signalstyrker til
     WIFI-receiveren, der stiller disse tilrådighed for det program der
-    bruges til at opbygge WIFI-mappet(mapcreator.py). Figuren er
+    bruges til at opbygge WIFI-mappet (mapcreator.py). Figuren er
     tilpasset fra \cite{quan2010wi}.}
   \label{fig:offline}
 \end{framefig}
@@ -2530,7 +2530,7 @@ originale styringssoftware lukkede ned efter omtrent ti
 minutter. Nærmere undersøgelser viser, at AR.Dronens software muligvis
 har en memoryleak. Dette viser sig ved at softwarens
 hukommelsesforbrug stiger kraftigt, så snart de hurtige kameraskift
-iværksættes ved brug af AR-kommandoen set\_config. Denne opførsel
+iværksættes ved brug af AT-kommandoen \emph{set\_config}. Denne opførsel
 beskrives også i sektion~\ref{sec:sub:virtuel}.
 
 \subsubsection{Fjerde eksperiment med avancerede markører}
@@ -2562,7 +2562,8 @@ frontkameraets (se figur~\ref{fig:2frames},
 side~\pageref{fig:2frames}). Når bundkameraets billeder udtrækkes fra 
 denne strøm, er disse billeder i en opløsning på 88x72 pixels.
 Eksperimenterne er fuldstændig magen til dem der udførtes i sektion~\ref{p:simple1} og
- sektion~\ref{p:advanced1}. De er ligeledes udført i højderne 0.5, 1.0, 1.5 og 2.0 og er
+ sektion~\ref{p:advanced1}. De er ligeledes udført i højderne 0.5,
+ 1.0, 1.5 og 2.0 meter og er
 udført både med de simple, semiavancerede og avancerede
 markører. Resultaterne ses i tabel~\ref{fig:detection2}, de viser tydeligt at
 det ikke er muligt at anvende de små billeder, da de selv for de

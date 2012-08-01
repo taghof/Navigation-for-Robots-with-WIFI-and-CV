@@ -1,8 +1,9 @@
 %\documentclass[12pt,a4paper,twoside,openright,fleqn]{memoir}
 %\documentclass[10pt]{article}
-\documentclass[12pt, twoside, openleft]{report}
 %\documentclass[12pt,twoside,openright]{report}
-%\documentclass[10pt,twoside]{report}
+
+%\documentclass[12pt, twoside, openleft]{report}
+\documentclass[12pt]{report}
  
 \usepackage[english, danish]{babel}
 \usepackage[ansinew]{inputenc}
@@ -67,7 +68,7 @@
 
 
 % Upper part of the page
-\includegraphics[width=0.50\textwidth]{./grafik/segl.jpg}\\[1cm]    
+\includegraphics[width=0.50\textwidth]{./grafik/segl2.jpg}\\[1cm]    
 
 \textsc{\LARGE Aarhus Universitet}\\[0.2cm]
 \textsc{Datalogisk Institut}\\[1.0cm]
@@ -1895,16 +1896,16 @@ TestTask med level 2 slutte sidst.
 
 \subsection{Task implementationer} 
 Der er implementeret to forskellige udgaver
-af task-systemet(taskmanageren og alle tasks), begge implementerer
+af task-systemet (taskmanageren og alle tasks), begge implementerer
 den opførsel og struktur der er beskrevet ovenfor.
 
 Den første, trådbaserede, implementation er inspireret af Lejos'
-subsumption-pakke, ~\cite{lejossub}. Lejos er en firmwareerstatning
+subsumption-pakke,~\cite{lejossub}. Lejos er en firmwareerstatning
 til LEGO Mindstorms RCX- og NXT-platform, der tillader afviklingen af
-Java på disse platforme,~\cite{lejos}.  Den anden, ikke-trådbaserede,
-implementation er primært inpireret af artiklen 'A Modular
+Java på disse platforme,~\cite{lejos}. Den anden, ikke-trådbaserede,
+implementation er primært inspireret af artiklen 'A Modular
 Hierarchical Behavior-Based
-Architecture',\cite{lenser:behaviorbasedarchitecture}.
+Architecture',~\cite{lenser:behaviorbasedarchitecture}.
 
 \subsubsection{Trådbaseret} 
 I den første trådbaserede løsning er hver task implementeret som en
@@ -1943,8 +1944,8 @@ Den eneste tråd i denne implementation er taskmanageren. Denne lader
 kontinuerligt den bedst egnede task bevæge AR.Dronen. I Praksis 
 sker dette ved at taskmanageren vedligeholder en sorteret liste over
 de aktive tasks. Under hver iteration kalder taskmanageren
-domove()-metoden på den første task i listen (tasken med det højeste
-level). Kaldet til domove()-metoden propageres rekursivt ned gennem
+\code{domove}-metoden på den første task i listen (tasken med det højeste
+level). Kaldet til \code{domove}-metoden propageres rekursivt ned gennem
 tasktræet og returnerer True hvis AR.Dronen blev bevæget og False hvis
 ingen task havde interesse i at bevæge den. Hvis metoden returner
 False forsøges med den næste task i listen, hvis der returneres True

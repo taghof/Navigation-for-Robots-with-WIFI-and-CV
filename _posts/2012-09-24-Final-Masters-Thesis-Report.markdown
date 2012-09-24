@@ -14,5 +14,5 @@ in the repo.
 
 
 [02]:
-/Navigation-for-Robots-with-WIFI-and-CV/downloads/masters_thesis.pdf "Masters Thesis"
+/Navigation-for-Robots-with-WIFI-and-CV/downloads/master_thesis.pdf "Masters Thesis"
 

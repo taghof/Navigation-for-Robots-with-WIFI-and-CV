@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Final Masters Thesis Report
-public: False
+public: True
 ---
 
 On the 21st of September we passed our final masters thesis exam. One
